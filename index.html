@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Javier Moraga | Data Engineer & Analyst</title>
+    <title>Javier Moraga | Senior Data Professional</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -13,7 +13,7 @@
             --bg-dark: #0b1120;
             --bg-card: #151e32;
             --accent: #3b82f6; /* Azul Tech */
-            --accent-gold: #fbbf24; /* Dorado para resaltar (Estilo Gardi) */
+            --accent-gold: #fbbf24; /* Dorado para resaltar */
             --text-main: #ffffff;
             --text-muted: #94a3b8;
         }
@@ -34,19 +34,21 @@
             z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .nav-flex { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-weight: 800; font-size: 1.5rem; }
+        .logo { font-weight: 800; font-size: 1.5rem; text-transform: uppercase; }
         .logo span { color: var(--accent); }
         .nav-links a { margin-left: 30px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
         /* --- HERO --- */
-        .hero { padding: 160px 0 100px; text-align: center; }
+        .hero { padding: 180px 0 100px; text-align: center; }
         .hero h1 {
             font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
             background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 40px; }
-        
+        .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
+        .hero-tags { margin-bottom: 30px; }
+        .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
+
         /* --- VIDEO BREAK --- */
         .video-break {
             position: relative; height: 50vh; width: 100%; overflow: hidden;
@@ -59,39 +61,48 @@
             object-fit: contain; z-index: 0; opacity: 1;
         }
         .video-overlay {
-            z-index: 2; text-align: center; background: rgba(11, 17, 32, 0.7);
-            padding: 30px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.3);
-            backdrop-filter: blur(5px);
+            z-index: 2; text-align: center; background: rgba(11, 17, 32, 0.8);
+            padding: 30px 50px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.3);
+            backdrop-filter: blur(5px); max-width: 600px;
         }
 
-        /* --- ABOUT ME (Estilo Gardi) --- */
+        /* --- ABOUT ME (Actualizado) --- */
         .about-section { padding: 100px 0; background-color: #0f1629; }
-        .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 50px; align-items: center; }
-        .profile-img-container { text-align: center; }
+        .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
+        .profile-img-container { text-align: center; position: relative; }
         .profile-img {
             width: 280px; height: 280px; object-fit: cover; border-radius: 50%;
-            border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+            border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
         }
-        .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; }
-        .about-text p { font-size: 1.1rem; color: #cbd5e1; margin-bottom: 20px; }
+        .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
+        .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
+        
+        .industries-box {
+            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 10px; margin: 20px 0;
+            border-left: 3px solid var(--accent-gold);
+        }
+        .industries-box h4 { color: var(--accent-gold); margin-bottom: 10px; }
+        .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
+        .industries-box li { margin-bottom: 5px; }
 
         /* --- SKILLS GRID --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .skills-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
         }
-        .skill-col { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .skill-col h3 { color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .skill-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95rem; }
-        .skill-item i { width: 25px; color: var(--accent); margin-right: 10px; }
+        .skill-col { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .skill-col:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .skill-col h3 { color: var(--accent); font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .skill-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95rem; font-weight: 500; }
+        .skill-item i { width: 25px; color: var(--text-muted); margin-right: 10px; }
 
-        /* --- PROJECTS (Estilo Detallado) --- */
+        /* --- PROJECTS --- */
         .projects-section { padding: 100px 0; background-color: #0f1629; }
         .project-card {
             background-color: var(--bg-card); border-radius: 15px; overflow: hidden;
             margin-bottom: 50px; border: 1px solid rgba(255,255,255,0.05);
-            display: grid; grid-template-columns: 1.2fr 1fr; /* Imagen izq, texto der */
+            display: grid; grid-template-columns: 1.2fr 1fr;
         }
         .project-img {
             width: 100%; height: 100%; min-height: 350px; object-fit: cover;
@@ -103,11 +114,10 @@
         .project-desc { color: #cbd5e1; margin-bottom: 20px; font-size: 1rem; }
         .tools-used { margin-bottom: 25px; }
         .tool-tag {
-            display: inline-block; font-size: 0.8rem; background: rgba(59, 130, 246, 0.1);
-            color: var(--accent); padding: 5px 10px; border-radius: 4px; margin-right: 5px; margin-bottom: 5px; font-weight: 600;
+            display: inline-block; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1);
+            color: var(--accent); padding: 5px 10px; border-radius: 4px; margin-right: 5px; margin-bottom: 5px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2);
         }
         
-        /* Botones del Proyecto */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-outline {
             padding: 8px 16px; border: 1px solid var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600;
@@ -127,7 +137,7 @@
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
-            .about-grid, .project-card { grid-template-columns: 1fr; } /* Apilar en movil */
+            .about-grid, .project-card { grid-template-columns: 1fr; }
             .project-img { height: 250px; }
             .nav-links { display: none; }
         }
@@ -140,7 +150,7 @@
             <div class="logo">Javier <span>Moraga</span></div>
             <nav class="nav-links">
                 <a href="#about">About Me</a>
-                <a href="#skills">Skills</a>
+                <a href="#skills">Stack</a>
                 <a href="#projects">Portfolio</a>
                 <a href="#contact">Contact</a>
             </nav>
@@ -149,40 +159,60 @@
 
     <section class="hero">
         <div class="container">
-            <h1>Data Engineering & <br> Strategic Analytics</h1>
-            <p>Transforming complex data into <span class="highlight">actionable business insights</span>. <br>Targeting the Australian Market with Scalable Solutions.</p>
+            <div class="hero-tags">
+                <span class="hero-tag">Healthcare</span>
+                <span class="hero-tag">Aviation</span>
+                <span class="hero-tag">Telecom</span>
+            </div>
+            <h1>Senior Data Analyst & <br> Data Engineer</h1>
+            <p>
+                Computer Engineer with <span class="highlight">+10 years of experience</span>. 
+                I bridge the gap between business strategy and technical execution, specializing in 
+                <span style="color:white;">GCP, BigQuery, and Modern Data Stacks</span>.
+            </p>
+            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px;">View Case Studies</a>
         </div>
     </section> 
 
     <div class="video-break">
         <video class="bg-video" autoplay muted loop playsinline>
-            <source src="video-bg.mp4" type="video/mp4">
+            <source src="video-futurista_1.mp4" type="video/mp4">
         </video>
         <div class="video-overlay">
-            <h2>Bridging Data & Strategy</h2>
-            <p style="color: #cbd5e1; margin-top: 5px;">Delivering high-performance solutions.</p>
+            <h2>From Raw Data to Strategic Value</h2>
+            <p style="color: #cbd5e1; margin-top: 10px;">Translating complex business rules into robust pipelines and actionable insights.</p>
         </div>
     </div>
 
     <section id="about" class="about-section">
         <div class="container about-grid">
             <div class="profile-img-container">
-                <img src="https://via.placeholder.com/300" alt="Javier Moraga" class="profile-img">
+                <img src="profile.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
             </div>
             <div class="about-text">
-                <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">About Me</span>
-                <h2>Hello, I'm <span style="color: var(--accent);">Javier!</span></h2>
+                <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Professional Profile</span>
+                <h2>Hello, I'm <span style="color: var(--accent);">Javier Moraga</span></h2>
                 <p>
-                    Data Analyst / Engineer with over <span class="highlight">10 years of experience</span>. 
-                    I specialize in end-to-end data processes, from extraction (ETL) to visualization in the <span class="highlight">Healthcare & Retail</span> sectors.
+                    I am a Computer Engineer with a hybrid profile that combines the 
+                    <span class="highlight">business vision</span> of a Senior Data Analyst with the 
+                    <span class="highlight">technical expertise</span> of a Data Engineer.
                 </p>
                 <p>
-                    My goal is to support Australian businesses by uncovering hidden patterns in their data using Python, SQL, and Power BI. 
-                    I am focused on creating clear, automated reporting that drives decision-making.
+                    With over a decade of experience, I specialize in modernizing legacy systems, implementing Modern Data Stacks (Dataform/GCP), and translating complex business rules into automated, scalable data solutions.
                 </p>
+
+                <div class="industries-box">
+                    <h4><i class="fa-solid fa-briefcase"></i> Industry Impact</h4>
+                    <ul>
+                        <li><strong>Healthcare (Current):</strong> Ensuring medical data integrity & REDCap integration.</li>
+                        <li><strong>Aviation:</strong> Analytics architecture for GenAI & workflow modernization.</li>
+                        <li><strong>Telecom:</strong> High-volume data management for revenue assurance.</li>
+                    </ul>
+                </div>
+
                 <div class="btn-group">
                     <a href="#contact" class="btn-fill">Download CV</a>
-                    <a href="#projects" class="btn-outline">View Projects</a>
+                    <a href="https://linkedin.com/in/tu-usuario" target="_blank" class="btn-outline"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
                 </div>
             </div>
         </div>
@@ -190,31 +220,27 @@
 
     <section id="skills" class="skills-section">
         <div class="container">
-            <h2 class="section-title">Technical <span class="highlight">Skills</span></h2>
+            <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
             <div class="skills-container">
                 <div class="skill-col">
-                    <h3>Languages & DB</h3>
-                    <div class="skill-item"><i class="fa-brands fa-python"></i> Python (Pandas/NumPy)</div>
-                    <div class="skill-item"><i class="fa-solid fa-database"></i> SQL (BigQuery/Postgres)</div>
-                    <div class="skill-item"><i class="fa-solid fa-code"></i> HTML/CSS Basics</div>
+                    <h3>Cloud & Engineering</h3>
+                    <div class="skill-item"><i class="fa-brands fa-google"></i> Google Cloud Platform</div>
+                    <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery (Expert)</div>
+                    <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform (Modern Stack)</div>
+                    <div class="skill-item"><i class="fa-brands fa-aws"></i> AWS Basic</div>
                 </div>
                 <div class="skill-col">
-                    <h3>Analysis Tools</h3>
-                    <div class="skill-item"><i class="fa-solid fa-table"></i> Microsoft Excel (Advanced)</div>
-                    <div class="skill-item"><i class="fa-brands fa-google"></i> Google Sheets</div>
-                    <div class="skill-item"><i class="fa-solid fa-cloud"></i> Google Cloud Platform</div>
+                    <h3>Languages & Core</h3>
+                    <div class="skill-item"><i class="fa-solid fa-code"></i> SQL (Advanced)</div>
+                    <div class="skill-item"><i class="fa-brands fa-python"></i> Python</div>
+                    <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
+                    <div class="skill-item"><i class="fa-solid fa-file-code"></i> HTML/CSS</div>
                 </div>
                 <div class="skill-col">
-                    <h3>Visualization</h3>
-                    <div class="skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI</div>
-                    <div class="skill-item"><i class="fa-solid fa-chart-pie"></i> Looker Studio</div>
-                    <div class="skill-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Tableau</div>
-                </div>
-                <div class="skill-col">
-                    <h3>Methods</h3>
-                    <div class="skill-item"><i class="fa-solid fa-list-check"></i> ETL Pipelines</div>
-                    <div class="skill-item"><i class="fa-solid fa-brain"></i> Linear Regression</div>
-                    <div class="skill-item"><i class="fa-solid fa-bullseye"></i> A/B Testing</div>
+                    <h3>Specialized Tools</h3>
+                    <div class="skill-item"><i class="fa-solid fa-notes-medical"></i> REDCap (Healthcare)</div>
+                    <div class="skill-item"><i class="fa-solid fa-table"></i> Excel / Spreadsheets</div>
+                    <div class="skill-item"><i class="fa-solid fa-chart-line"></i> Power BI / Looker</div>
                 </div>
             </div>
         </div>
@@ -228,10 +254,10 @@
                 <img src="https://via.placeholder.com/600x400" alt="Housing Project" class="project-img">
                 <div class="project-content">
                     <div class="project-number">01</div>
-                    <h3>Australian Housing Market Trends</h3>
+                    <h3>Australian Housing Trends</h3>
                     <p class="project-desc">
-                        An end-to-end analysis using <span class="highlight">ABS Public Data</span> to identify high-growth suburbs in NSW & Victoria. 
-                        Developed a predictive model to estimate price fluctuations based on interest rates.
+                        End-to-end analysis using ABS Public Data to identify high-growth suburbs. 
+                        Demonstrates ability to clean, model, and visualize local market data.
                     </p>
                     <div class="tools-used">
                         <span class="tool-tag">Power BI</span>
@@ -240,19 +266,18 @@
                     </div>
                     <div class="btn-group">
                         <a href="#" class="btn-fill">View Dashboard</a>
-                        <a href="#" class="btn-outline">See Code</a>
                     </div>
                 </div>
             </article>
 
             <article class="project-card">
-                <img src="https://via.placeholder.com/600x400" alt="Retail Project" class="project-img">
+                <img src="https://via.placeholder.com/600x400" alt="Medical Data" class="project-img">
                 <div class="project-content">
                     <div class="project-number">02</div>
                     <h3>Medical Records Version Control</h3>
                     <p class="project-desc">
-                        Automated system created for a Healthcare provider to track changes in biomedical templates.
-                        Solved the issue of data inconsistency by implementing a <span class="highlight">Python-based versioning logic</span>.
+                        Automated system to track changes in biomedical templates. 
+                        Solved data inconsistency issues by implementing a Python-based versioning logic.
                     </p>
                     <div class="tools-used">
                         <span class="tool-tag">Python Scripting</span>
@@ -260,8 +285,7 @@
                         <span class="tool-tag">Healthcare</span>
                     </div>
                     <div class="btn-group">
-                        <a href="#" class="btn-fill">View Case Study</a>
-                        <a href="#" class="btn-outline">Github Repo</a>
+                        <a href="#" class="btn-fill">View Project</a>
                     </div>
                 </div>
             </article>
@@ -271,14 +295,14 @@
 
     <section id="contact" class="contact-section">
         <div class="container">
-            <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Contact Info</span>
-            <h2 style="margin-top: 20px; font-size: 2.5rem;">Let's connect and <br> <span class="highlight">work together!</span></h2>
+            <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
+            <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
             
             <div class="contact-icons">
-                <a href="mailto:tu-email@gmail.com" class="c-icon"><i class="fa-solid fa-envelope"></i></a>
+                <a href="mailto:javierignacio.moraga@gmail.com" class="c-icon"><i class="fa-solid fa-envelope"></i></a>
                 <a href="https://linkedin.com/in/tu-usuario" class="c-icon"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="https://wa.me/56900000000" class="c-icon"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
+            <p style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
         </div>
     </section>
 
