@@ -86,6 +86,52 @@
         }
         .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -10px rgba(59, 130, 246, 0.6); }
 
+        /* --- TRANSICIÓN DE VIDEO CINEMÁTICO --- */
+        .video-break {
+            position: relative;
+            height: 60vh; /* Altura del video (60% de la pantalla) */
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* El video de fondo */
+        .bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que cubra todo sin deformarse */
+            z-index: -1;
+            opacity: 0.4; /* Lo oscurecemos para que no distraiga tanto */
+            filter: hue-rotate(200deg) contrast(1.2); /* Truco: Le da un tono azulado 'Tech' a cualquier video */
+        }
+
+        /* Texto sobre el video */
+        .video-content {
+            text-align: center;
+            z-index: 2;
+            padding: 20px;
+            background: rgba(11, 17, 32, 0.6); /* Caja semitransparente */
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .video-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: -webkit-linear-gradient(0deg, #fff, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         /* --- SECCIÓN DE PROYECTOS (Grid) --- */
         .section-title { font-size: 2rem; margin-bottom: 40px; font-weight: 700; text-align: center; }
         .projects-section { padding: 100px 0; }
@@ -138,52 +184,7 @@
 
         /* --- FOOTER --- */
         footer { padding: 50px 0; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-top: 50px;}
-        
-/* --- TRANSICIÓN DE VIDEO CINEMÁTICO --- */
-.video-break {
-    position: relative;
-    height: 60vh; /* Altura del video (60% de la pantalla) */
-    width: 100%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
 
-/* El video de fondo */
-.bg-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Asegura que cubra todo sin deformarse */
-    z-index: -1;
-    opacity: 0.4; /* Lo oscurecemos para que no distraiga tanto */
-    filter: hue-rotate(200deg) contrast(1.2); /* Truco: Le da un tono azulado 'Tech' a cualquier video */
-}
-
-/* Texto sobre el video */
-.video-content {
-    text-align: center;
-    z-index: 2;
-    padding: 20px;
-    background: rgba(11, 17, 32, 0.6); /* Caja semitransparente */
-    backdrop-filter: blur(5px);
-    border-radius: 10px;
-    border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-.video-content h2 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-    background: -webkit-linear-gradient(0deg, #fff, #3b82f6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
@@ -215,18 +216,16 @@
         </div>
     </section> 
 
-<video class="bg-video" autoplay muted loop playsinline>
-    <source src="video-futurista.mp4" type="video/mp4">
-</video>
+    <div class="video-break">
+        <video class="bg-video" autoplay muted loop playsinline>
+            <source src="video-futurista.mp4" type="video/mp4">
+        </video>
 
         <div class="video-content">
             <h2>Bridging Data & Strategy</h2>
             <p style="color: #cbd5e1; font-size: 1.1rem;">Delivering scalable solutions for the Australian Industry.</p>
         </div>
     </div>
-    <section id="projects" class="projects-section">
-    </section>
-
     <section id="projects" class="projects-section">
         <div class="container">
             <h2 class="section-title">Selected Works</h2>
@@ -271,3 +270,17 @@
                         </p>
                         <a href="#" class="card-link">View Project</a>
                     </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Javier Moraga. Built for the Global Market.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
