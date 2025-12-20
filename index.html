@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Javier Moraga | Senior Data Professional</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -66,7 +69,7 @@
             backdrop-filter: blur(5px); max-width: 600px;
         }
 
-        /* --- ABOUT ME (Actualizado) --- */
+        /* --- ABOUT ME --- */
         .about-section { padding: 100px 0; background-color: #0f1629; }
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
         .profile-img-container { text-align: center; position: relative; }
@@ -175,9 +178,9 @@
     </section> 
 
     <div class="video-break">
-        <video class="bg-video" autoplay muted loop playsinline>
-            <source src="video-futurista-1.mp4" type="video/mp4">
-        </video>
+        <video id="bgVideo" class="bg-video" muted loop playsinline poster="video-cover.jpg">
+            </video>
+        
         <div class="video-overlay">
             <h2>From Raw Data to Strategic Value</h2>
             <p style="color: #cbd5e1; margin-top: 10px;">Translating complex business rules into robust pipelines and actionable insights.</p>
@@ -311,6 +314,28 @@
             <p>© 2025 Javier Moraga. Built for the Global Market.</p>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var video = document.getElementById("bgVideo");
+            
+            // NOMBRE EXACTO DEL VIDEO AQUÍ (Verifica si es guion medio o bajo)
+            // Si tu archivo es "video-futurista-2.mp4", déjalo así.
+            var videoSource = "video-futurista-2.mp4"; 
+
+            var source = document.createElement('source');
+            source.src = videoSource;
+            source.type = 'video/mp4';
+
+            video.appendChild(source);
+            
+            // Intentar reproducir solo cuando todo lo demás cargó
+            video.load();
+            video.play().catch(function(error) {
+                console.log("Autoplay prevenido por el navegador o video cargando.");
+            });
+        });
+    </script>
 
 </body>
 </html>
