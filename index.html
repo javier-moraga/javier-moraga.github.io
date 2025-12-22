@@ -27,7 +27,6 @@
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
-        /* Resaltado dorado en textos */
         .highlight { color: var(--accent-gold); font-weight: 700; }
 
         /* --- HEADER --- */
@@ -78,6 +77,8 @@
             border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
         }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
+        
+        /* Justificado por defecto (Desktop) */
         .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
         
         .industries-box {
@@ -88,29 +89,23 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- SKILLS GRID --- */
+        /* --- SKILLS & PROJECTS --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        .skills-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
-        }
+        .skills-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .skill-col { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
         .skill-col:hover { border-color: var(--accent); transform: translateY(-5px); }
         .skill-col h3 { color: var(--accent); font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         .skill-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95rem; font-weight: 500; }
         .skill-item i { width: 25px; color: var(--text-muted); margin-right: 10px; }
 
-        /* --- PROJECTS --- */
         .projects-section { padding: 100px 0; background-color: #0f1629; }
         .project-card {
             background-color: var(--bg-card); border-radius: 15px; overflow: hidden;
             margin-bottom: 50px; border: 1px solid rgba(255,255,255,0.05);
             display: grid; grid-template-columns: 1.2fr 1fr;
         }
-        .project-img {
-            width: 100%; height: 100%; min-height: 350px; object-fit: cover;
-            background-color: #1e293b;
-        }
+        .project-img { width: 100%; height: 100%; min-height: 350px; object-fit: cover; background-color: #1e293b; }
         .project-content { padding: 40px; display: flex; flex-direction: column; justify-content: center; }
         .project-number { color: var(--text-muted); font-size: 3rem; font-weight: 800; opacity: 0.2; line-height: 1; margin-bottom: 10px; }
         .project-content h3 { font-size: 1.8rem; margin-bottom: 15px; color: white; }
@@ -120,17 +115,11 @@
             display: inline-block; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1);
             color: var(--accent); padding: 5px 10px; border-radius: 4px; margin-right: 5px; margin-bottom: 5px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2);
         }
-        
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-outline {
-            padding: 8px 16px; border: 1px solid var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600;
-        }
+        .btn-outline { padding: 8px 16px; border: 1px solid var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; }
         .btn-outline:hover { background: var(--accent); color: white; }
-        .btn-fill {
-            padding: 8px 16px; background: var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent);
-        }
+        .btn-fill { padding: 8px 16px; background: var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent); }
 
-        /* --- CONTACT FOOTER --- */
         .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); }
         .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         .c-icon { font-size: 2rem; color: var(--text-muted); transition: 0.3s; }
@@ -143,6 +132,10 @@
             .about-grid, .project-card { grid-template-columns: 1fr; }
             .project-img { height: 250px; }
             .nav-links { display: none; }
+            
+            /* --- CORRECCIÓN RESPONSIVA: TEXTO IZQUIERDA --- */
+            .about-text p { text-align: left; }
+            .container { padding: 0 25px; }
         }
     </style>
 </head>
@@ -180,7 +173,6 @@
     <div class="video-break">
         <video id="bgVideo" class="bg-video" muted loop playsinline poster="video-cover.jpg">
             </video>
-        
         <div class="video-overlay">
             <h2>From Raw Data to Strategic Value</h2>
             <p style="color: #cbd5e1; margin-top: 10px;">Translating complex business rules into robust pipelines and actionable insights.</p>
@@ -190,8 +182,7 @@
     <section id="about" class="about-section">
         <div class="container about-grid">
             <div class="profile-img-container">
-                <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
-                
+                <img src="profile.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
                 <div style="margin-top: 20px;">
                     <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; border: 1px solid rgba(16, 185, 129, 0.2);">
                         <i class="fa-solid fa-plane-departure"></i> Relocation Ready
@@ -201,7 +192,6 @@
 
             <div class="about-text">
                 <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
-                
                 <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
                 
                 <p>
@@ -213,18 +203,15 @@
                 </p>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
-                    
                     <div class="industries-box" style="margin:0;">
                         <h4><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
                         <ul style="font-size: 0.9rem;">
                             <li style="margin-bottom: 8px;">
-                                <strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Businnes & Analytics, Operations, Finance, Marketing, Risk & Collections</em>. I understand the specific KPIs and pain points of each business unit.
+                                <strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Operations, Finance, Marketing, Risk & Collections</em>. I understand the specific KPIs and pain points of each unit.
                             </li>
-                            
                             <li style="margin-bottom: 8px;">
                                 <strong>Resourcefulness:</strong> Driven by curiosity. If a solution doesn't exist or I don't know the tool, I find a way to learn it and build it from scratch.
                             </li>
-                            
                             <li>
                                 <strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.
                             </li>
@@ -245,7 +232,6 @@
                             </li>
                         </ul>
                     </div>
-
                 </div>
 
                 <div class="btn-group" style="margin-top: 30px;">
@@ -287,7 +273,6 @@
     <section id="projects" class="projects-section">
         <div class="container">
             <h2 class="section-title">Selected <span class="highlight">Case Studies</span></h2>
-
             <article class="project-card">
                 <img src="https://via.placeholder.com/600x400" alt="Housing Project" class="project-img">
                 <div class="project-content">
@@ -327,7 +312,6 @@
                     </div>
                 </div>
             </article>
-
         </div>
     </section>
 
@@ -336,9 +320,14 @@
             <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
             <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
             
-            <div style="margin-top: 30px; margin-bottom: 10px;">
-                <img src="rocky.jpg" alt="Rocky" style="width: 180px; height: 180px; border-radius: 50%; border: 2px solid var(--accent-gold); object-fit: cover;" onerror="this.style.display='none'">
-                <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">(Rocky is also ready for the flight! 🐾)</p>
+            <div style="margin-top: 50px; margin-bottom: 30px;">
+                <img src="rocky.jpg" alt="Rocky" 
+                     style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" 
+                     onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
+                
+                <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">
+                    (Rocky is also ready for the flight! 🐾)
+                </p>
             </div>
 
             <div class="contact-icons">
@@ -358,17 +347,11 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var video = document.getElementById("bgVideo");
-            
-            // ACTUALIZACIÓN: Apunta al archivo con terminación -2
             var videoSource = "video-futurista-2.mp4"; 
-
             var source = document.createElement('source');
             source.src = videoSource;
             source.type = 'video/mp4';
-
             video.appendChild(source);
-            
-            // Intentar reproducir solo cuando todo lo demás cargó
             video.load();
             video.play().catch(function(error) {
                 console.log("Autoplay prevenido por el navegador o video cargando.");
