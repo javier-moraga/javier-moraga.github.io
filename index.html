@@ -25,10 +25,10 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; }
         .highlight { color: var(--accent-gold); font-weight: 700; }
 
-        /* --- HEADER (Navegación) --- */
+        /* --- HEADER --- */
         header {
             padding: 20px 0; position: fixed; width: 100%;
             background-color: rgba(11, 17, 32, 0.95); backdrop-filter: blur(10px);
@@ -40,7 +40,7 @@
         .nav-links a { margin-left: 30px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
-        /* --- HERO SECTION (Portada) --- */
+        /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
         .hero h1 {
             font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
@@ -50,9 +50,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (Estilo MokN) --- */
+        /* --- EVOLUTION SECTION --- */
         .evolution-section {
-            padding: 100px 0 450px 0; /* Espacio extra inferior para el scroll */
+            padding: 100px 0 450px 0;
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -60,11 +60,9 @@
             justify-content: center;
         }
 
-        /* Líneas Centrales */
+        /* Líneas y Nodos */
         .evolution-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1; }
         .evolution-line-progress { position: absolute; left: 50%; top: 0; width: 2px; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent); transition: height 0.1s linear; }
-        
-        /* Esfera Móvil */
         .moving-node { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold); }
 
         .evolution-container { max-width: 1000px; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px; }
@@ -77,47 +75,68 @@
             opacity: 0; height: 320px; display: flex; flex-direction: column; justify-content: center;
         }
         .evo-legacy { transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); margin-top: 50px; }
-        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 550px; /* Separación vertical grande */ }
+        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 550px; }
 
-        /* Estado Activo Tarjetas */
         .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
         .evo-legacy.active { border-right-color: #64748b; }
         .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
 
-        /* Conectores (Brazos) */
+        /* Conectores */
         .evo-card::before { content: ''; position: absolute; top: 50%; width: 60px; height: 1px; background: rgba(255,255,255,0.1); transition: 0.6s ease; }
         .evo-legacy::before { right: -60px; }
         .evo-modern::before { left: -60px; }
         .evo-legacy.active::before { background: #64748b; box-shadow: 0 0 10px #64748b; }
         .evo-modern.active::before { background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
 
-        /* Puntos Fijos (Dots) - ALINEACIÓN CORREGIDA */
+        /* Puntos Fijos */
         .connector-dot { position: absolute; left: 50%; width: 8px; height: 8px; background: #0b1120; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; transition: 0.3s; }
-        .dot-legacy { top: 19.5%; } /* Alineado al centro de la tarjeta 1 */
-        .dot-modern { top: 80.5%; } /* Alineado al centro de la tarjeta 2 */
+        .dot-legacy { top: 19.5%; }
+        .dot-modern { top: 80.5%; }
         .active-dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold); }
 
-        /* Textos Tarjetas */
         .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
 
-        /* --- ABOUT ME SECTION (Con efecto de marco final) --- */
+        /* --- ABOUT ME SECTION (Con EFECTO DE LUZ VOLUMÉTRICA FINAL) --- */
         .about-frame-container {
-            padding: 100px 0; background-color: #0f1629;
-            /* Borde inicial invisible */
-            border-top: 2px solid transparent;
-            box-shadow: none;
-            transition: all 0.8s ease;
+            padding: 100px 0;
+            background-color: #0f1629;
+            position: relative; /* Necesario para el pseudo-elemento */
+            overflow: visible; /* Permitir que la luz se salga */
         }
 
-        /* Clase que se añade con JS al final del scroll */
-        .about-frame-container.frame-active {
-            border-top-color: var(--accent-gold);
-            box-shadow: 0 -20px 60px rgba(251, 191, 36, 0.2); /* Luz dorada hacia arriba */
+        /* El haz de luz (Pseudo-elemento) */
+        .about-frame-container::before {
+            content: '';
+            position: absolute;
+            top: -80px; /* Subimos el punto de origen de la luz */
+            left: 50%;
+            transform: translateX(-50%) scaleX(1.5); /* Más ancho que el contenedor */
+            width: 100%;
+            height: 250px; /* Altura del haz de luz */
+            /* Degradado radial complejo para simular el foco */
+            background: radial-gradient(
+                ellipse at center top,
+                rgba(255, 255, 255, 0.8) 0%,   /* Núcleo blanco brillante */
+                rgba(251, 191, 36, 0.8) 20%,   /* Oro intenso */
+                rgba(251, 191, 36, 0.2) 50%,   /* Oro difuso */
+                transparent 75%                /* Desvanecimiento */
+            );
+            filter: blur(40px); /* Desenfoque intenso para el efecto atmosférico */
+            opacity: 0; /* Empieza oculto */
+            transition: opacity 1s ease-in-out; /* Transición suave */
+            pointer-events: none; /* No interfiere con el mouse */
+            z-index: 0; /* Detrás del contenido */
         }
 
-        .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
+        /* Clase activa que enciende la luz */
+        .about-frame-container.frame-active::before {
+            opacity: 1;
+        }
+
+        /* Estilos del contenido About */
+        .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
@@ -171,14 +190,14 @@
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
 
-            /* Ajustes Móviles Evolution - ALINEACIÓN CORREGIDA */
+            /* Ajustes Móviles Evolution */
             .evolution-container { grid-template-columns: 1fr; gap: 50px; }
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
             .connector-dot { left: 20px; }
             
-            /* En móvil quitamos el desplazamiento horizontal para que no se vea cortado */
+            /* Tarjetas en móvil: Sin desplazamiento lateral */
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
             .evo-modern { margin-top: 80px !important; }
@@ -426,7 +445,7 @@
             // Fallback de seguridad
             setTimeout(() => {
                 if(!cardLegacy.classList.contains('active')) {
-                    cardLegacy.style.opacity = '0.5'; cardLegacy.style.transform = 'translateX(-20px)';
+                    cardLegacy.style.opacity = '0.5'; cardLegacy.style.transform = 'translateX(0)';
                 }
             }, 3000);
 
@@ -437,16 +456,14 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Cálculo del % de scroll
                 let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.88);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
-                // Mover esfera y llenar línea
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // --- ACTIVACIÓN TARJETAS Y PUNTOS ---
+                // Activación Tarjetas
                 if (scrollPercent > 0.18) {
                     if(cardLegacy) cardLegacy.classList.add('active');
                     if(dotLegacy) dotLegacy.classList.add('active-dot');
@@ -463,9 +480,8 @@
                     if(dotModern) dotModern.classList.remove('active-dot');
                 }
 
-                // --- EFECTO FINAL DE ILUMINACIÓN DEL MARCO ---
-                // Se activa cuando la esfera llega casi al final (95%)
-                if (scrollPercent > 0.95) {
+                // Activación Luz Final (al llegar al 96%)
+                if (scrollPercent > 0.96) {
                     if(aboutFrame) aboutFrame.classList.add('frame-active');
                 } else {
                     if(aboutFrame) aboutFrame.classList.remove('frame-active');
