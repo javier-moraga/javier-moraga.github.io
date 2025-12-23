@@ -42,26 +42,48 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (SNAKE) --- */
-        /* NOTA: Este código ya implementa la serpiente dorada solicitada */
+        /* --- BOTÓN DE CONTACTO (CORREGIDO: Sin puntos fantasmas) --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
         .nav-btn:hover { background: rgba(251, 191, 36, 0.08); color: var(--accent-gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2); }
-        .nav-btn span { position: absolute; display: block; }
+        .nav-btn span { position: absolute; display: block; opacity: 0; /* Invisible por defecto */ }
         
-        .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
-        @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
-        .nav-btn span:nth-child(2) { top: -100%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
-        @keyframes btn-anim2 { 0% { top: -100%; } 50%, 100% { top: 100%; } }
-        .nav-btn span:nth-child(3) { bottom: 0; right: -100%; width: 100%; height: 2px; background: linear-gradient(270deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim3 2s linear infinite; animation-delay: 1s; }
-        @keyframes btn-anim3 { 0% { right: -100%; } 50%, 100% { right: 100%; } }
-        .nav-btn span:nth-child(4) { bottom: -100%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim4 2s linear infinite; animation-delay: 1.5s; }
-        @keyframes btn-anim4 { 0% { bottom: -100%; } 50%, 100% { bottom: 100%; } }
+        /* Ajuste clave: Start positions más alejadas (-150%) y control de opacidad para evitar "puntos" en las esquinas */
+        .nav-btn span:nth-child(1) { top: 0; left: -150%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
+        @keyframes btn-anim1 { 
+            0% { left: -150%; opacity: 0; } 
+            10% { opacity: 1; }
+            50%, 100% { left: 100%; opacity: 1; } 
+        }
+
+        .nav-btn span:nth-child(2) { top: -150%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
+        @keyframes btn-anim2 { 
+            0% { top: -150%; opacity: 0; } 
+            10% { opacity: 1; }
+            50%, 100% { top: 100%; opacity: 1; } 
+        }
+
+        .nav-btn span:nth-child(3) { bottom: 0; right: -150%; width: 100%; height: 2px; background: linear-gradient(270deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim3 2s linear infinite; animation-delay: 1s; }
+        @keyframes btn-anim3 { 
+            0% { right: -150%; opacity: 0; } 
+            10% { opacity: 1; }
+            50%, 100% { right: 100%; opacity: 1; } 
+        }
+
+        .nav-btn span:nth-child(4) { bottom: -150%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim4 2s linear infinite; animation-delay: 1.5s; }
+        @keyframes btn-anim4 { 
+            0% { bottom: -150%; opacity: 0; } 
+            10% { opacity: 1; }
+            50%, 100% { bottom: 100%; opacity: 1; } 
+        }
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
-        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero h1 {
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+            background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
         .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
@@ -183,9 +205,7 @@
         .stack-card { background-color: #0f172a; border: 1px solid #1e3a8a; border-radius: 12px; padding: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
         .stack-card:hover { transform: translateY(-7px); box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25); border-color: var(--accent); }
         .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        
         .skill-list { display: flex; flex-direction: column; gap: 15px; }
-        
         .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
         .skill-item:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: white; }
         .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
@@ -213,38 +233,36 @@
         .project-visual img { width: 85%; height: auto; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.5s ease; }
         .project-card:hover .project-visual img { transform: scale(1.02); }
 
-        /* --- BOTONES GENERALES (MODIFICADOS A AMARILLO/DORADO) --- */
+        /* --- BOTONES GENERALES --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        /* Botón Relleno (Ahora Dorado con texto oscuro) */
         .btn-fill { 
             padding: 12px 24px; 
-            background: var(--accent-gold); /* Cambio a dorado */
-            color: var(--bg-dark); /* Texto oscuro para contraste */
+            background: var(--accent-gold); 
+            color: var(--bg-dark); 
             border-radius: 50px; 
             font-size: 0.9rem; 
             font-weight: 600; 
-            border: 1px solid var(--accent-gold); /* Borde dorado */
+            border: 1px solid var(--accent-gold); 
             transition: 0.3s; 
         }
         .btn-fill:hover { 
             background: transparent; 
-            color: var(--accent-gold); /* Texto dorado al hacer hover */
+            color: var(--accent-gold); 
         }
 
-        /* Botón Borde (Ahora Dorado) */
         .btn-outline { 
             padding: 12px 24px; 
-            border: 1px solid var(--accent-gold); /* Borde dorado */
-            color: var(--accent-gold); /* Texto dorado */
+            border: 1px solid var(--accent-gold); 
+            color: var(--accent-gold); 
             border-radius: 50px; 
             font-size: 0.9rem; 
             font-weight: 600; 
             transition: 0.3s; 
         }
         .btn-outline:hover { 
-            background: var(--accent-gold); /* Fondo dorado al hover */
-            color: var(--bg-dark); /* Texto oscuro para contraste */
+            background: var(--accent-gold); 
+            color: var(--bg-dark); 
         }
 
         /* --- CONTACT & FOOTER --- */
@@ -315,9 +333,7 @@
                 <a href="#about">About Me</a>
                 <a href="#skills">Stack</a>
                 <a href="#projects">Portfolio</a>
-                <a href="#contact" class="nav-btn">
-                    <span></span><span></span><span></span><span></span>Contact
-                </a>
+                <a href="#contact">Contact</a>
             </nav>
         </div>
     </header>
@@ -335,7 +351,7 @@
                 I bridge the gap between business strategy and technical execution, delivering solutions 
                 <span style="color:white;">adaptable to any stack: from Advanced Excel to Modern Cloud Architectures</span>.
             </p>
-            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px; background: var(--accent); border-color: var(--accent); color: white;">View Case Studies</a>
+            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px;">View Case Studies</a>
         </div>
     </section> 
 
@@ -589,7 +605,8 @@
                 progressPath.style.strokeDashoffset = pathLength;
             }
 
-            window.addEventListener('scroll', function() {
+            // FUNCIÓN CENTRALIZADA DE UPDATE SCROLL
+            function updateScroll() {
                 if(!section) return; 
 
                 const rect = section.getBoundingClientRect();
@@ -635,7 +652,14 @@
                 } else {
                     if(aboutFrame) aboutFrame.classList.remove('frame-active');
                 }
-            });
+            }
+
+            // EVENT LISTENERS
+            window.addEventListener('scroll', updateScroll);
+            window.addEventListener('resize', updateScroll);
+            
+            // LLAMADA INICIAL PARA CORREGIR POSICIÓN AL CARGAR
+            updateScroll();
 
             /* --- STACK CARDS ANIMATION --- */
             const stackCards = document.querySelectorAll('.stack-card');
