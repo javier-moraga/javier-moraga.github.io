@@ -42,7 +42,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (EFECTO SNAKE) --- */
+        /* --- BOTÓN DE CONTACTO (SNAKE) --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -61,14 +61,17 @@
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
-        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero h1 {
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+            background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
         .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (ZIG-ZAG PERFECTO) --- */
+        /* --- EVOLUTION SECTION (ZIG-ZAG + SCROLL REVEAL) --- */
         .evolution-section {
-            padding: 50px 0 150px 0; /* Padding ajustado */
+            padding: 50px 0 150px 0;
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -82,48 +85,73 @@
 
         .evolution-container { 
             max-width: 1000px; width: 100%; position: relative; z-index: 5; 
-            /* Cambiado a FLEX para control vertical total */
-            display: flex; 
-            flex-direction: column; 
+            display: flex; flex-direction: column; 
+            /* GAP aumentado a 300px para scroll largo y diferenciado */
+            gap: 300px; 
             padding: 20px;
         }
 
         .evo-card {
-            width: 45%; /* Ancho de la tarjeta */
+            width: 45%; 
             background: rgba(15, 23, 42, 0.4); padding: 35px;
             border: 1px solid rgba(255, 255, 255, 0.05); position: relative;
-            backdrop-filter: blur(8px); transition: all 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0; display: flex; flex-direction: column; justify-content: center;
-            margin-bottom: 120px; /* Separación vertical entre tarjetas */
+            backdrop-filter: blur(8px); 
+            
+            /* ANIMACIÓN DE ENTRADA */
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity: 0; /* Invisible al inicio */
+            display: flex; flex-direction: column; justify-content: center;
         }
 
         .evo-icon { font-size: 2rem; color: var(--accent-gold); margin-bottom: 15px; }
 
-        /* ALINEACIÓN ZIG ZAG */
+        /* POSICIONES INICIALES (Con desplazamiento vertical para el efecto "subir") */
         .evo-left { 
-            align-self: flex-start; /* Pegado a la izquierda */
-            text-align: right; 
-            transform: translateX(-50px); 
+            align-self: flex-start; text-align: right; 
             border-right: 3px solid rgba(255,255,255,0.1); 
+            /* Estado Inicial: A la izquierda (-50px) y abajo (100px) */
+            transform: translateX(-50px) translateY(100px);
         }
         
         .evo-right { 
-            align-self: flex-end; /* Pegado a la derecha */
-            text-align: left; 
-            transform: translateX(50px); 
+            align-self: flex-end; text-align: left; 
             border-left: 3px solid rgba(255,255,255,0.1); 
+            /* Estado Inicial: A la derecha (50px) y abajo (100px) */
+            transform: translateX(50px) translateY(100px);
+            margin-top: 150px; /* Desfase visual estructural */
         }
 
-        /* ACTIVACIÓN */
-        .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
-        .evo-left.active { border-right-color: var(--accent-gold); }
-        .evo-right.active { border-left-color: var(--accent); }
+        /* --- ESTADO ACTIVO (Cuando el JS detecta scroll) --- */
+        .evo-card.active { 
+            opacity: 1; 
+            /* Vuelve a su posición vertical 0, manteniendo la X */
+        }
+        
+        /* Mantenemos X, reseteamos Y a 0 */
+        .evo-left.active { 
+            transform: translateX(-50px) translateY(0); 
+            border-right-color: var(--accent-gold); 
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15);
+        }
+        
+        .evo-right.active { 
+            transform: translateX(50px) translateY(0); 
+            border-left-color: var(--accent); 
+            background: rgba(15, 23, 42, 0.9);
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15);
+        }
 
         .evo-header { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: white; line-height: 1.2; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
+        
+        /* Ajuste para la 3ra tarjeta */
+        .evo-left-2 { margin-top: 150px; }
 
         /* --- ABOUT ME SECTION --- */
-        .about-frame-container { padding: 100px 0; background-color: #0f1629; position: relative; overflow: visible; }
+        .about-frame-container {
+            padding: 100px 0; background-color: #0f1629; position: relative; overflow: visible;
+        }
         .about-frame-container::before { content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%) scaleX(1.5); width: 100%; height: 250px; background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); filter: blur(40px); opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
         .about-frame-container.frame-active::before { opacity: 1; }
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
@@ -136,21 +164,18 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK SECTION --- */
+        /* --- STACK CARDS --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        .stack-container { display: flex; flex-direction: column; gap: 25px; max-width: 1000px; margin: 0 auto; }
-        .stack-card { background-color: #0f172a; border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 15px; padding: 35px; width: 100%; display: grid; grid-template-columns: 220px 1fr; gap: 30px; align-items: start; opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease-out, transform 0.6s ease-out, box-shadow 0.3s ease, border-color 0.3s ease; }
-        .stack-card.visible { opacity: 1; transform: translateY(0); }
-        .stack-card.visible:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15); border-color: var(--accent); }
-        .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
-        .skill-list { display: flex; flex-wrap: wrap; gap: 10px; }
-        .skill-item { display: flex; align-items: center; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 6px; color: #cbd5e1; font-size: 0.85rem; font-weight: 500; transition: 0.3s; }
-        .skill-item:hover { background: rgba(59, 130, 246, 0.15); border-color: var(--accent); color: white; }
-        .skill-item i { margin-right: 8px; color: #64748b; font-size: 1rem; }
+        .stack-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .stack-card { background-color: #0f172a; border: 1px solid #1e3a8a; border-radius: 12px; padding: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+        .stack-card:hover { transform: translateY(-7px); box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25); border-color: var(--accent); }
+        .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .skill-list { display: flex; flex-direction: column; gap: 15px; }
+        .skill-item { display: flex; align-items: center; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
+        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
-        .tag-highlight { color: var(--accent-gold); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
-        .tag-tech { color: var(--accent); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
+        .tech-level { margin-left: auto; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; background: rgba(251, 191, 36, 0.1); padding: 2px 8px; border-radius: 4px; }
 
         /* --- PROJECTS --- */
         .projects-section { padding: 100px 0; background-color: #0f1629; }
@@ -192,16 +217,21 @@
             .container { padding: 0 25px; }
 
             /* Ajustes Móviles Evolution */
-            .evolution-container { padding: 0; }
+            .evolution-container { grid-template-columns: 1fr; gap: 50px; }
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
+            .connector-dot { left: 20px; }
             
-            /* Tarjetas en móvil: Todas a la izquierda */
-            .evo-card { width: 80%; margin-left: 50px; transform: translateX(0) !important; text-align: left; height: auto; border-left: 3px solid rgba(255,255,255,0.1); border-right: none; margin-bottom: 50px; }
-            .evo-card.active { border-left-color: var(--accent-gold); }
-            .evo-right { align-self: flex-start; } /* Forzar alineación izq en móvil */
+            /* Tarjetas en móvil: Sin desplazamiento lateral */
+            .evo-card { width: 85%; margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
+            .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
+            .evo-modern { margin-top: 80px !important; }
+            .evo-card::before { width: 20px; left: -20px; right: auto; }
+            .evo-legacy::before { left: -20px; right: auto; }
             
+            .evo-left, .evo-right { transform: translateX(0) translateY(50px); }
+            .evo-left.active, .evo-right.active { transform: translateX(0) translateY(0); }
             .stack-card { grid-template-columns: 1fr; gap: 15px; } 
             .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         }
@@ -252,7 +282,7 @@
 
         <div class="evolution-container">
             
-            <div class="evo-card evo-left" id="card1">
+            <div class="evo-card evo-left">
                 <i class="fa-solid fa-layer-group evo-icon"></i>
                 <h3 class="evo-header">Multi-Industry Adaptability</h3>
                 <p class="evo-desc">
@@ -260,7 +290,7 @@
                 </p>
             </div>
 
-            <div class="evo-card evo-right" id="card2">
+            <div class="evo-card evo-right">
                 <i class="fa-solid fa-rocket evo-icon"></i>
                 <h3 class="evo-header">Modernization Specialist</h3>
                 <p class="evo-desc">
@@ -268,7 +298,7 @@
                 </p>
             </div>
 
-            <div class="evo-card evo-left" id="card3">
+            <div class="evo-card evo-left evo-left-2">
                 <i class="fa-solid fa-handshake-simple evo-icon"></i>
                 <h3 class="evo-header">Business & Tech Bridge</h3>
                 <p class="evo-desc">
@@ -461,12 +491,11 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. ANIMACIÓN EVOLUTION (VISIBILIDAD ABSOLUTA) --- */
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
             
-            // Usamos una lista para iterar mejor
+            // Selección de tarjetas de evolución
             const evoCards = document.querySelectorAll('.evo-card');
             
             const aboutFrame = document.getElementById('aboutFrame');
@@ -478,7 +507,7 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Cálculo del progreso de la línea (Estético)
+                // --- 1. LÓGICA DE LA LÍNEA (PROGRESO) ---
                 let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.9);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
@@ -486,17 +515,16 @@
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // --- NUEVA LÓGICA DE APARICIÓN ---
-                // "Si la tarjeta entra en el 75% inferior de la pantalla, actívala"
+                // --- 2. LÓGICA DE LAS TARJETAS (SCROLL REVEAL) ---
+                // Esta lógica activa cada tarjeta individualmente cuando entra en pantalla
                 evoCards.forEach(card => {
-                    const cardRect = card.getBoundingClientRect();
-                    // Si el tope de la tarjeta está visible (con un margen de confort)
-                    if(cardRect.top < windowHeight * 0.85) {
+                    const cardTop = card.getBoundingClientRect().top;
+                    const triggerPoint = window.innerHeight * 0.8; // Se activa al 80% de la pantalla
+
+                    if (cardTop < triggerPoint) {
                         card.classList.add('active');
-                    } else {
-                        // Opcional: Si quieres que desaparezcan al subir, descomenta esto:
-                        // card.classList.remove('active');
-                    }
+                    } 
+                    // No ponemos 'else remove' para que no desaparezcan al subir (más elegante)
                 });
 
                 // Activación Luz Final
@@ -507,7 +535,7 @@
                 }
             });
 
-            /* --- 2. ANIMACIÓN STACK CARDS (STAGGERED FADE UP) --- */
+            /* --- STACK CARDS (FADE UP) --- */
             const stackCards = document.querySelectorAll('.stack-card');
             const stackSection = document.getElementById('skills');
 
@@ -526,7 +554,7 @@
 
             if(stackSection) observerStack.observe(stackSection);
 
-            /* --- 3. ANIMACIÓN ICONOS AL FINAL --- */
+            /* --- ICONOS FINAL --- */
             let iconsAnimated = false; 
             window.addEventListener('scroll', () => {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
