@@ -125,18 +125,96 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK CARDS --- */
+        /* --- STACK SECTION: CLICKGUARD STYLE (Vertical Clean Cards) --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        .stack-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .stack-card { background-color: #0f172a; border: 1px solid #1e3a8a; border-radius: 12px; padding: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
-        .stack-card:hover { transform: translateY(-7px); box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25); border-color: var(--accent); }
-        .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .skill-list { display: flex; flex-direction: column; gap: 15px; }
-        .skill-item { display: flex; align-items: center; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
-        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
+        
+        .stack-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px; /* Espacio entre tarjetas */
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Tarjeta Ancha estilo ClickGuard */
+        .stack-card {
+            background-color: #0f172a; 
+            border: 1px solid rgba(59, 130, 246, 0.2); 
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* Grid interno: Título a la izq, Skills a la derecha */
+            display: grid;
+            grid-template-columns: 200px 1fr; 
+            gap: 30px;
+            align-items: start;
+        }
+
+        .stack-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            color: var(--accent);
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1.4;
+            /* Quitamos el borde inferior, ahora es una columna lateral */
+            border-bottom: none; 
+            padding-bottom: 0;
+        }
+
+        /* Contenedor de Skills (Pills) */
+        .skill-list { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+        }
+        
+        /* Estilo de "Etiqueta" o "Pill" para cada skill */
+        .skill-item { 
+            display: flex; 
+            align-items: center; 
+            background: rgba(30, 41, 59, 0.6); /* Fondo pastilla */
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 10px 18px;
+            border-radius: 50px; /* Borde redondo */
+            color: #e2e8f0; 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .skill-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .skill-item i { 
+            margin-right: 10px; 
+            color: #64748b; 
+            font-size: 1.1rem;
+        }
+        
         .skill-item:hover i { color: var(--accent); }
-        .tech-level { margin-left: auto; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; background: rgba(251, 191, 36, 0.1); padding: 2px 8px; border-radius: 4px; }
+
+        .tech-level {
+            margin-left: 10px;
+            font-size: 0.75rem;
+            color: var(--accent-gold); 
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
 
         /* --- PROJECTS --- */
         .projects-section { padding: 100px 0; background-color: #0f1629; }
@@ -160,15 +238,13 @@
         .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); }
 
-        /* --- ANIMACIÓN SALTO DE ICONOS (Pop) --- */
+        /* --- ANIMACIÓN ICONOS --- */
         @keyframes iconPop {
             0% { transform: translateY(0); color: var(--text-muted); }
-            50% { transform: translateY(-15px); color: var(--accent-gold); } /* Salta y brilla */
+            50% { transform: translateY(-15px); color: var(--accent-gold); }
             100% { transform: translateY(0); color: var(--text-muted); }
         }
-        .icon-pop {
-            animation: iconPop 0.5s ease forwards;
-        }
+        .icon-pop { animation: iconPop 0.5s ease forwards; }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
@@ -185,6 +261,10 @@
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
             .evo-modern { margin-top: 60px !important; }
+
+            /* RESET STACK EN MOVIL */
+            .stack-card { grid-template-columns: 1fr; gap: 15px; } /* Una columna en móvil */
+            .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         }
     </style>
 </head>
@@ -294,33 +374,39 @@
     <section id="skills" class="skills-section">
         <div class="container">
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
+            
             <div class="stack-container">
+            
                 <div class="stack-card">
-                    <div class="card-header">Cloud & Engineering</div>
+                    <div class="card-header">Cloud &<br>Engineering</div>
                     <div class="skill-list">
-                    <div class="skill-item"><i class="fa-brands fa-google"></i> Google Cloud Platform</div>
-                    <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tech-level">Expert</span></div>
-                    <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform <span class="tech-level">Modern Stack</span></div>
-                    <div class="skill-item"><i class="fa-brands fa-aws"></i> AWS Basic</div>
+                        <div class="skill-item"><i class="fa-brands fa-google"></i> Google Cloud</div>
+                        <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tech-level">Expert</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform <span class="tech-level">Modern</span></div>
+                        <div class="skill-item"><i class="fa-brands fa-aws"></i> AWS Basic</div>
                     </div>
                 </div>
+            
                 <div class="stack-card">
-                    <div class="card-header">Languages & Core</div>
+                    <div class="card-header" style="color: var(--accent-gold);">Core &<br>Foundations</div>
                     <div class="skill-list">
-                    <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tech-level">Advanced</span></div>
-                    <div class="skill-item"><i class="fa-brands fa-python"></i> Python <span class="tech-level">Pandas</span></div>
-                    <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
-                    <div class="skill-item"><i class="fa-brands fa-html5"></i> HTML/CSS</div>
+                        <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tech-level">Adv</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-database"></i> Oracle / Netezza</div>
+                        <div class="skill-item"><i class="fa-brands fa-python"></i> Python Pandas</div>
+                        <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS / Linux</div>
+                        <div class="skill-item"><i class="fa-brands fa-html5"></i> HTML/CSS</div>
                     </div>
                 </div>
+            
                 <div class="stack-card">
-                    <div class="card-header">Specialized Tools</div>
+                    <div class="card-header">Specialized<br>Tools</div>
                     <div class="skill-list">
-                    <div class="skill-item"><i class="fa-solid fa-notes-medical"></i> REDCap <span class="tech-level">Healthcare</span></div>
-                    <div class="skill-item"><i class="fa-solid fa-table"></i> Excel / Spreadsheets <span class="tech-level">Advanced</span></div>
-                    <div class="skill-item"><i class="fa-solid fa-chart-line"></i> Power BI / Looker <span class="tech-level">Advanced</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-notes-medical"></i> REDCap <span class="tech-level">Healthcare</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-table"></i> Excel Expert</div>
+                        <div class="skill-item"><i class="fa-solid fa-chart-line"></i> Power BI / Looker</div>
                     </div>
                 </div>
+            
             </div>
         </div>
     </section>
@@ -396,8 +482,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            
-            /* --- 1. ANIMACIÓN EVOLUTION (SCROLL) --- */
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
@@ -438,18 +522,14 @@
                 }
             });
 
-            /* --- 2. ANIMACIÓN ICONOS AL FINAL DE PAGINA (OLA FINAL) --- */
-            let iconsAnimated = false; // Bandera para que solo ocurra una vez
-
+            // ANIMACIÓN ICONOS AL FINAL
+            let iconsAnimated = false; 
             window.addEventListener('scroll', () => {
-                // Detectar si llegamos al final del documento (con margen de 10px)
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
                     if (!iconsAnimated) {
-                        iconsAnimated = true; // Bloquear para que no se repita
+                        iconsAnimated = true;
                         const icons = document.querySelectorAll('.c-icon');
-                        
                         icons.forEach((icon, index) => {
-                            // Añadir clase con retraso para efecto ola (0ms, 200ms)
                             setTimeout(() => {
                                 icon.classList.add('icon-pop');
                             }, index * 200);
@@ -457,7 +537,6 @@
                     }
                 }
             });
-
         });
     </script>
 
