@@ -42,171 +42,88 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (EFECTO SNAKE REFINADO) --- */
+        /* --- BOTÓN DE CONTACTO (SNAKE EFFECT) --- */
         .nav-btn {
-            position: relative;
-            padding: 10px 25px;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 700;
-            overflow: hidden;
-            transition: 0.3s;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.02); /* Fondo casi invisible */
-            /* Borde base tenue estático */
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
+            position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
-
-        .nav-btn:hover {
-            background: rgba(251, 191, 36, 0.08); /* Fondo dorado muy sutil */
-            color: var(--accent-gold);
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2);
-        }
-
-        /* Las 4 líneas de la serpiente */
-        .nav-btn span {
-            position: absolute;
-            display: block;
-        }
-
-        /* --- CONFIGURACIÓN DE ANIMACIÓN (2 SEGUNDOS = LENTO Y ELEGANTE) --- */
-
-        /* Línea Superior */
-        .nav-btn span:nth-child(1) {
-            top: 0; left: -100%;
-            width: 100%; height: 2px;
-            /* Degradado largo: Transparente -> Dorado */
-            background: linear-gradient(90deg, transparent, transparent, var(--accent-gold));
-            /* Sombra para dar volumen (glow) */
-            box-shadow: 0 0 10px var(--accent-gold);
-            animation: btn-anim1 2s linear infinite; /* 2s Duration */
-        }
-        @keyframes btn-anim1 {
-            0% { left: -100%; }
-            50%, 100% { left: 100%; }
-        }
-
-        /* Línea Derecha */
-        .nav-btn span:nth-child(2) {
-            top: -100%; right: 0;
-            width: 2px; height: 100%;
-            background: linear-gradient(180deg, transparent, transparent, var(--accent-gold));
-            box-shadow: 0 0 10px var(--accent-gold);
-            animation: btn-anim2 2s linear infinite;
-            animation-delay: 0.5s; /* Retraso exacto (2s / 4 = 0.5s) */
-        }
-        @keyframes btn-anim2 {
-            0% { top: -100%; }
-            50%, 100% { top: 100%; }
-        }
-
-        /* Línea Inferior */
-        .nav-btn span:nth-child(3) {
-            bottom: 0; right: -100%;
-            width: 100%; height: 2px;
-            background: linear-gradient(270deg, transparent, transparent, var(--accent-gold));
-            box-shadow: 0 0 10px var(--accent-gold);
-            animation: btn-anim3 2s linear infinite;
-            animation-delay: 1s;
-        }
-        @keyframes btn-anim3 {
-            0% { right: -100%; }
-            50%, 100% { right: 100%; }
-        }
-
-        /* Línea Izquierda */
-        .nav-btn span:nth-child(4) {
-            bottom: -100%; left: 0;
-            width: 2px; height: 100%;
-            background: linear-gradient(360deg, transparent, transparent, var(--accent-gold));
-            box-shadow: 0 0 10px var(--accent-gold);
-            animation: btn-anim4 2s linear infinite;
-            animation-delay: 1.5s;
-        }
-        @keyframes btn-anim4 {
-            0% { bottom: -100%; }
-            50%, 100% { bottom: 100%; }
-        }
+        .nav-btn:hover { background: rgba(251, 191, 36, 0.08); color: var(--accent-gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2); }
+        .nav-btn span { position: absolute; display: block; }
+        .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
+        @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
+        .nav-btn span:nth-child(2) { top: -100%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
+        @keyframes btn-anim2 { 0% { top: -100%; } 50%, 100% { top: 100%; } }
+        .nav-btn span:nth-child(3) { bottom: 0; right: -100%; width: 100%; height: 2px; background: linear-gradient(270deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim3 2s linear infinite; animation-delay: 1s; }
+        @keyframes btn-anim3 { 0% { right: -100%; } 50%, 100% { right: 100%; } }
+        .nav-btn span:nth-child(4) { bottom: -100%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim4 2s linear infinite; animation-delay: 1.5s; }
+        @keyframes btn-anim4 { 0% { bottom: -100%; } 50%, 100% { bottom: 100%; } }
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
-        .hero h1 {
-            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
-            background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION --- */
-        .evolution-section {
-            padding: 100px 0 150px 0;
-            background-color: #050a14;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
+        /* --- VALUE PROPOSITION SECTION (REEMPLAZA A EVOLUTION) --- */
+        .value-section {
+            padding: 50px 0 100px; /* Más compacto, pegado al Hero */
+            background-color: #0b1120;
         }
 
-        .evolution-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1; }
-        .evolution-line-progress { position: absolute; left: 50%; top: 0; width: 2px; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent); transition: height 0.1s linear; }
-        .moving-node { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold); }
-
-        .evolution-container { max-width: 1000px; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px; }
-
-        .evo-card {
-            background: rgba(15, 23, 42, 0.4); padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.05); position: relative;
-            backdrop-filter: blur(8px); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0; height: 320px; display: flex; flex-direction: column; justify-content: center;
+        .value-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Columnas */
+            gap: 25px;
         }
-        
-        .evo-legacy { transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); margin-top: 0px; }
-        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 150px; }
 
-        .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
-        .evo-legacy.active { border-right-color: #64748b; }
-        .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
+        .value-card {
+            background: rgba(21, 30, 50, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 12px;
+            transition: all 0.4s ease;
+            opacity: 0; /* Inicialmente invisible */
+            transform: translateY(20px); /* Inicialmente abajo */
+        }
 
-        .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
-        .evo-desc { color: #94a3b8; font-size: 1rem; }
-        .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
+        .value-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .value-card:hover {
+            background: rgba(21, 30, 50, 0.9);
+            border-color: rgba(59, 130, 246, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .value-icon {
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+        }
+
+        .value-card h3 {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .value-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .value-card strong {
+            color: #e2e8f0;
+        }
 
         /* --- ABOUT ME SECTION --- */
-        .about-frame-container {
-            padding: 100px 0;
-            background-color: #0f1629;
-            position: relative;
-            overflow: visible;
-        }
-
-        .about-frame-container::before {
-            content: '';
-            position: absolute;
-            top: -80px;
-            left: 50%;
-            transform: translateX(-50%) scaleX(1.5);
-            width: 100%;
-            height: 250px;
-            background: radial-gradient(
-                ellipse at center top,
-                rgba(255, 255, 255, 0.8) 0%,
-                rgba(251, 191, 36, 0.8) 20%,
-                rgba(251, 191, 36, 0.2) 50%,
-                transparent 75%
-            );
-            filter: blur(40px);
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            pointer-events: none;
-            z-index: 0;
-        }
-
+        .about-frame-container { padding: 100px 0; background-color: #0f1629; position: relative; overflow: visible; }
+        .about-frame-container::before { content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%) scaleX(1.5); width: 100%; height: 250px; background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); filter: blur(40px); opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
         .about-frame-container.frame-active::before { opacity: 1; }
-
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
@@ -220,54 +137,16 @@
         /* --- STACK SECTION --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        
-        .stack-container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .stack-card {
-            background-color: #0f172a; 
-            border: 1px solid rgba(59, 130, 246, 0.2); 
-            border-radius: 15px;
-            padding: 35px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 220px 1fr;
-            gap: 30px;
-            align-items: start;
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-
+        .stack-container { display: flex; flex-direction: column; gap: 25px; max-width: 1000px; margin: 0 auto; }
+        .stack-card { background-color: #0f172a; border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 15px; padding: 35px; width: 100%; display: grid; grid-template-columns: 220px 1fr; gap: 30px; align-items: start; opacity: 0; transform: translateY(40px); transition: opacity 0.6s ease-out, transform 0.6s ease-out, box-shadow 0.3s ease, border-color 0.3s ease; }
         .stack-card.visible { opacity: 1; transform: translateY(0); }
         .stack-card.visible:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15); border-color: var(--accent); }
-
-        .card-header {
-            color: var(--accent); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4;
-        }
-
+        .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
         .skill-list { display: flex; flex-wrap: wrap; gap: 10px; }
-        
-        .skill-item { 
-            display: flex; align-items: center; 
-            background: rgba(30, 41, 59, 0.6); 
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 8px 16px;
-            border-radius: 6px; 
-            color: #cbd5e1; 
-            font-size: 0.85rem; font-weight: 500;
-            transition: 0.3s;
-        }
-
+        .skill-item { display: flex; align-items: center; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.08); padding: 8px 16px; border-radius: 6px; color: #cbd5e1; font-size: 0.85rem; font-weight: 500; transition: 0.3s; }
         .skill-item:hover { background: rgba(59, 130, 246, 0.15); border-color: var(--accent); color: white; }
         .skill-item i { margin-right: 8px; color: #64748b; font-size: 1rem; }
         .skill-item:hover i { color: var(--accent); }
-
         .tag-highlight { color: var(--accent-gold); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
         .tag-tech { color: var(--accent); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
 
@@ -294,11 +173,7 @@
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); }
 
         /* --- ANIMACIÓN ICONOS --- */
-        @keyframes iconPop {
-            0% { transform: translateY(0); color: var(--text-muted); }
-            50% { transform: translateY(-15px); color: var(--accent-gold); }
-            100% { transform: translateY(0); color: var(--text-muted); }
-        }
+        @keyframes iconPop { 0% { transform: translateY(0); color: var(--text-muted); } 50% { transform: translateY(-15px); color: var(--accent-gold); } 100% { transform: translateY(0); color: var(--text-muted); } }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
         /* --- RESPONSIVE --- */
@@ -309,20 +184,10 @@
             .nav-links { display: none; }
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
-
-            /* Ajustes Móviles Evolution */
-            .evolution-container { grid-template-columns: 1fr; gap: 50px; }
-            .evolution-line { left: 20px; }
-            .evolution-line-progress { left: 20px; }
-            .moving-node { left: 20px; }
-            .connector-dot { left: 20px; }
             
-            /* Tarjetas en móvil */
-            .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
-            .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
-            .evo-modern { margin-top: 60px !important; }
-
-            /* RESET STACK EN MOVIL */
+            /* Ajuste Value Grid en móvil */
+            .value-grid { grid-template-columns: 1fr; gap: 20px; }
+            
             .stack-card { grid-template-columns: 1fr; gap: 15px; } 
             .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         }
@@ -366,31 +231,31 @@
         </div>
     </section> 
 
-    <div id="evolution-section" class="evolution-section">
-        <div class="evolution-line"></div>
-        <div class="evolution-line-progress" id="evoLineProgress"></div>
-        <div class="moving-node" id="movingNode"></div>
+    <section id="value-section" class="value-section">
+        <div class="container">
+            <div class="value-grid">
+                
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <h3>Multi-Industry Adaptability</h3>
+                    <p>Adaptive problem-solving across high-stakes sectors like <strong>Healthcare, Telecom & Aviation</strong>. I speak the language of complex regulated industries.</p>
+                </div>
 
-        <div class="evolution-container">
-            <div class="evo-card evo-legacy" id="cardLegacy">
-                <span class="evo-label" style="color: #cbd5e1;">The Conventional Trap</span>
-                <h3 class="evo-header">"Because we've always <br>done it this way."</h3>
-                <p class="evo-desc" style="color: #e2e8f0;">
-                    Relying on rigid processes and preconceived notions. 
-                    Solving new challenges with old thinking patterns creates inertia, not progress.
-                </p>
-            </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-rocket"></i></div>
+                    <h3>Modernization Specialist</h3>
+                    <p>Proven ability to <strong>modernize legacy data systems</strong> (Oracle, Netezza, SAS) and challenge outdated processes with Cloud-native solutions.</p>
+                </div>
 
-            <div class="evo-card evo-modern" id="cardModern">
-                <span class="evo-label" style="color: var(--accent);">The Adaptive Mindset</span>
-                <h3 class="evo-header">Multi-Lens <br><span class="highlight">Problem Solving</span></h3>
-                <p class="evo-desc" style="color: #e2e8f0;">
-                    I leverage diverse experience across high-stakes industries (Healthcare, Aviation) to challenge assumptions. 
-                    <strong>I don't just migrate data; I bring fresh perspectives to redefine how problems are solved.</strong>
-                </p>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fa-solid fa-handshake-simple"></i></div>
+                    <h3>Business & Tech Bridge</h3>
+                    <p>I don't just code; I translate. <strong>Bridging the gap</strong> between abstract business strategy and concrete technical execution.</p>
+                </div>
+
             </div>
         </div>
-    </div>
+    </section>
 
     <div id="aboutFrame" class="about-frame-container">
         <section id="about" class="container about-grid">
@@ -574,55 +439,43 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const section = document.getElementById('evolution-section');
-            const movingNode = document.getElementById('movingNode');
-            const lineProgress = document.getElementById('evoLineProgress');
             
-            const cardLegacy = document.getElementById('cardLegacy');
-            const cardModern = document.getElementById('cardModern');
+            /* --- 1. ANIMACIÓN VALUE CARDS (REEMPLAZO DE EVOLUTION) --- */
+            const valueCards = document.querySelectorAll('.value-card');
+            const valueSection = document.getElementById('value-section');
+
+            const observerValue = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        valueCards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.classList.add('visible');
+                            }, index * 150); 
+                        });
+                        observerValue.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            if(valueSection) observerValue.observe(valueSection);
+
+            /* --- 2. ANIMACIÓN ABOUT FRAME (LUZ) --- */
             const aboutFrame = document.getElementById('aboutFrame');
-
             window.addEventListener('scroll', function() {
-                if(!section) return; 
-
-                const rect = section.getBoundingClientRect();
-                const sectionHeight = section.offsetHeight;
+                if(!aboutFrame) return;
+                const rect = aboutFrame.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
-
-                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.88);
-                scrollPercent = Math.max(0, Math.min(1, scrollPercent));
-                const cssPercent = scrollPercent * 100;
-
-                if(movingNode) movingNode.style.top = cssPercent + '%';
-                if(lineProgress) lineProgress.style.height = cssPercent + '%';
-
-                // Activación Tarjetas (SIN PUNTOS)
-                if (scrollPercent > 0.18) {
-                    if(cardLegacy) cardLegacy.classList.add('active');
-                } else {
-                    if(cardLegacy) cardLegacy.classList.remove('active');
-                }
-
-                // TRIGGER AJUSTADO A 0.60 PARA QUE APAREZCA ANTES
-                if (scrollPercent > 0.60) {
-                    if(cardModern) cardModern.classList.add('active');
-                } else {
-                    if(cardModern) cardModern.classList.remove('active');
-                }
-
-                // Activación Luz Final
-                if (scrollPercent > 0.96) {
-                    if(aboutFrame) aboutFrame.classList.add('frame-active');
-                } else {
-                    if(aboutFrame) aboutFrame.classList.remove('frame-active');
+                // Si la sección About entra en pantalla, encender luz
+                if (rect.top < windowHeight * 0.8) {
+                    aboutFrame.classList.add('frame-active');
                 }
             });
 
-            /* --- 2. ANIMACIÓN STACK CARDS (STAGGERED FADE UP) --- */
+            /* --- 3. ANIMACIÓN STACK CARDS (STAGGERED FADE UP) --- */
             const stackCards = document.querySelectorAll('.stack-card');
             const stackSection = document.getElementById('skills');
 
-            const observer = new IntersectionObserver((entries) => {
+            const observerStack = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         stackCards.forEach((card, index) => {
@@ -630,14 +483,14 @@
                                 card.classList.add('visible');
                             }, index * 150); 
                         });
-                        observer.unobserve(entry.target); 
+                        observerStack.unobserve(entry.target); 
                     }
                 });
             }, { threshold: 0.2 });
 
-            if(stackSection) observer.observe(stackSection);
+            if(stackSection) observerStack.observe(stackSection);
 
-            /* --- 3. ANIMACIÓN ICONOS AL FINAL --- */
+            /* --- 4. ANIMACIÓN ICONOS AL FINAL --- */
             let iconsAnimated = false; 
             window.addEventListener('scroll', () => {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
