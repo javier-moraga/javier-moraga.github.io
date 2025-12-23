@@ -50,9 +50,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION --- */
+        /* --- EVOLUTION SECTION (COMPACTA PARA NOTEBOOK) --- */
         .evolution-section {
-            padding: 100px 0 250px 0;
+            padding: 100px 0 150px 0; /* Padding inferior reducido */
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -72,8 +72,16 @@
             backdrop-filter: blur(8px); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 0; height: 320px; display: flex; flex-direction: column; justify-content: center;
         }
-        .evo-legacy { transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); margin-top: 50px; }
-        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 350px; }
+        
+        /* AJUSTES DE DISTANCIA */
+        .evo-legacy { 
+            transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); 
+            margin-top: 0px; /* Empieza más arriba */
+        }
+        .evo-modern { 
+            transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); 
+            margin-top: 150px; /* REDUCIDO DE 350px a 150px PARA NOTEBOOKS */
+        }
 
         .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
         .evo-legacy.active { border-right-color: #64748b; }
@@ -125,7 +133,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK SECTION (CLICKGUARD STYLE) --- */
+        /* --- STACK SECTION (LISTA VERTICAL - CLICKGUARD STYLE) --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         
@@ -133,7 +141,7 @@
             display: flex;
             flex-direction: column;
             gap: 25px;
-            max-width: 1000px; /* Un poco más ancho para que quepa todo */
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -144,7 +152,7 @@
             padding: 35px;
             width: 100%;
             display: grid;
-            grid-template-columns: 220px 1fr; /* Columna titulo fija */
+            grid-template-columns: 220px 1fr;
             gap: 30px;
             align-items: start;
             opacity: 0;
@@ -161,7 +169,6 @@
 
         .skill-list { display: flex; flex-wrap: wrap; gap: 10px; }
         
-        /* Pills / Etiquetas */
         .skill-item { 
             display: flex; align-items: center; 
             background: rgba(30, 41, 59, 0.6); 
@@ -177,7 +184,6 @@
         .skill-item i { margin-right: 8px; color: #64748b; font-size: 1rem; }
         .skill-item:hover i { color: var(--accent); }
 
-        /* Etiquetas especiales (Gold, Blue, etc) */
         .tag-highlight { color: var(--accent-gold); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
         .tag-tech { color: var(--accent); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
 
@@ -457,7 +463,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. ANIMACIÓN EVOLUTION --- */
+            /* --- 1. ANIMACIÓN EVOLUTION (AJUSTADA PARA NOTEBOOK) --- */
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
@@ -485,7 +491,8 @@
                     if(cardLegacy) cardLegacy.classList.remove('active');
                 }
 
-                if (scrollPercent > 0.78) {
+                // TRIGGER AJUSTADO A 0.60 PARA QUE APAREZCA ANTES
+                if (scrollPercent > 0.60) {
                     if(cardModern) cardModern.classList.add('active');
                 } else {
                     if(cardModern) cardModern.classList.remove('active');
@@ -508,9 +515,9 @@
                         stackCards.forEach((card, index) => {
                             setTimeout(() => {
                                 card.classList.add('visible');
-                            }, index * 150); // Retraso de 150ms entre cada tarjeta
+                            }, index * 150); 
                         });
-                        observer.unobserve(entry.target); // Animación solo una vez
+                        observer.unobserve(entry.target); 
                     }
                 });
             }, { threshold: 0.2 });
