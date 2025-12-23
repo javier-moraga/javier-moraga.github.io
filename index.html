@@ -83,8 +83,6 @@
         .evo-legacy.active { border-right-color: #64748b; }
         .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
 
-        /* (ELIMINADOS: Conectores y Puntos Fijos) */
-
         .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
@@ -180,13 +178,11 @@
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
-            /* (ELIMINADO: .connector-dot en móvil) */
             
             /* Tarjetas en móvil */
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
             .evo-modern { margin-top: 60px !important; }
-            /* (ELIMINADO: .evo-card::before en móvil) */
         }
     </style>
 </head>
@@ -228,9 +224,9 @@
 
         <div class="evolution-container">
             <div class="evo-card evo-legacy" id="cardLegacy">
-                <span class="evo-label" style="color: #64748b;">The Conventional Trap</span>
-                <h3 class="evo-header" style="opacity: 0.7;">"Because we've always <br>done it this way."</h3>
-                <p class="evo-desc">
+                <span class="evo-label" style="color: #cbd5e1;">The Conventional Trap</span>
+                <h3 class="evo-header">"Because we've always <br>done it this way."</h3>
+                <p class="evo-desc" style="color: #e2e8f0;">
                     Relying on rigid processes and preconceived notions. 
                     Solving new challenges with old thinking patterns creates inertia, not progress.
                 </p>
@@ -419,16 +415,10 @@
             
             const cardLegacy = document.getElementById('cardLegacy');
             const cardModern = document.getElementById('cardModern');
-            // (ELIMINADOS: Variables de puntos)
             
             const aboutFrame = document.getElementById('aboutFrame');
 
-            // Fallback de seguridad
-            setTimeout(() => {
-                if(!cardLegacy.classList.contains('active')) {
-                    cardLegacy.style.opacity = '0.5'; cardLegacy.style.transform = 'translateX(0)';
-                }
-            }, 3000);
+            // (ELIMINADO: Fallback de seguridad setTimeout)
 
             window.addEventListener('scroll', function() {
                 if(!section) return; 
