@@ -69,7 +69,7 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (COMPACTA) --- */
+        /* --- EVOLUTION SECTION --- */
         .evolution-section {
             padding: 50px 0 100px 0;
             background-color: #050a14;
@@ -123,37 +123,12 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- BOTONES RESTAURADOS (CV y LinkedIn) --- */
+        /* --- BOTONES RESTAURADOS --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        
-        .btn-fill { 
-            padding: 12px 24px; 
-            background: var(--accent); 
-            color: white; 
-            border-radius: 50px; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            border: 1px solid var(--accent); 
-            transition: 0.3s;
-        }
-        .btn-fill:hover {
-            background: transparent;
-            color: var(--accent);
-        }
-
-        .btn-outline { 
-            padding: 12px 24px; 
-            border: 1px solid var(--accent); 
-            color: white; 
-            border-radius: 50px; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            transition: 0.3s;
-        }
-        .btn-outline:hover { 
-            background: var(--accent); 
-            color: white; 
-        }
+        .btn-fill { padding: 12px 24px; background: var(--accent); color: white; border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent); transition: 0.3s; }
+        .btn-fill:hover { background: transparent; color: var(--accent); }
+        .btn-outline { padding: 12px 24px; border: 1px solid var(--accent); color: white; border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
+        .btn-outline:hover { background: var(--accent); color: white; }
 
         /* --- STACK CARDS --- */
         .skills-section { padding: 80px 0; }
@@ -166,8 +141,11 @@
         .skill-item { display: flex; align-items: center; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
         .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
-        .tag-highlight { color: var(--accent-gold); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
-        .tag-tech { color: var(--accent); font-weight: 700; margin-left: 5px; font-size: 0.75rem; }
+        
+        /* CORRECCIÓN: Alineación a la derecha */
+        .tag-highlight { color: var(--accent-gold); font-weight: 700; margin-left: auto; font-size: 0.75rem; }
+        .tag-tech { color: var(--accent); font-weight: 700; margin-left: auto; font-size: 0.75rem; }
+        
         .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
         .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
         .extended-stack p { color: #64748b; font-size: 0.85rem; line-height: 1.6; }
@@ -211,7 +189,7 @@
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
-            .about-grid { grid-template-columns: 1fr; }
+            .about-grid, .project-card { grid-template-columns: 1fr; }
             .project-img { height: 250px; }
             .nav-links { display: none; }
             .about-text p { text-align: left; }
@@ -243,12 +221,10 @@
         <div class="container nav-flex">
             <div class="logo">Javier <span>Moraga</span></div>
             <nav class="nav-links">
-                <a href="#about" class="link-text">About Me</a>
-                <a href="#skills" class="link-text">Stack</a>
-                <a href="#projects" class="link-text">Portfolio</a>
-                <a href="#contact" class="nav-btn">
-                    <span></span><span></span><span></span><span></span>Contact
-                </a>
+                <a href="#about">About Me</a>
+                <a href="#skills">Stack</a>
+                <a href="#projects">Portfolio</a>
+                <a href="#contact">Contact</a>
             </nav>
         </div>
     </header>
@@ -343,23 +319,21 @@
     <section id="skills" class="skills-section">
         <div class="container">
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
-            
             <div class="stack-container">
                 <div class="stack-card">
-                    <div class="card-header">Cloud &<br>Data Engineering</div>
+                    <div class="card-header">Cloud & Engineering</div>
                     <div class="skill-list">
-                        <div class="skill-item"><i class="fa-brands fa-google"></i> GCP <span class="tag-tech">CORE</span></div>
-                        <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tag-highlight">EXPERT</span></div>
-                        <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform</div>
-                        <div class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer / Airflow</div>
-                        <div class="skill-item"><i class="fa-solid fa-box-archive"></i> Cloud Storage</div>
-                        <div class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</div>
-                        <div class="skill-item"><i class="fa-brands fa-git-alt"></i> Git Workflows</div>
+                    <div class="skill-item"><i class="fa-brands fa-google"></i> GCP <span class="tag-tech">CORE</span></div>
+                    <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tag-highlight">EXPERT</span></div>
+                    <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform</div>
+                    <div class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer / Airflow</div>
+                    <div class="skill-item"><i class="fa-solid fa-box-archive"></i> Cloud Storage</div>
+                    <div class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</div>
+                    <div class="skill-item"><i class="fa-brands fa-git-alt"></i> Git Workflows</div>
                     </div>
                 </div>
-            
                 <div class="stack-card">
-                    <div class="card-header" style="color: var(--accent-gold);">Languages &<br>Data Foundations</div>
+                    <div class="card-header" style="color: var(--accent-gold);">Languages & Data Foundations</div>
                     <div class="skill-list">
                         <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tag-highlight">ADVANCED</span></div>
                         <div class="skill-item"><i class="fa-brands fa-python"></i> Python / Pandas</div>
@@ -368,9 +342,8 @@
                         <div class="skill-item"><i class="fa-solid fa-server"></i> Oracle / Netezza</div>
                     </div>
                 </div>
-            
                 <div class="stack-card">
-                    <div class="card-header">Analytics, BI &<br>Business Tools</div>
+                    <div class="card-header">Analytics, BI & Business Tools</div>
                     <div class="skill-list">
                         <div class="skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI <span class="tag-tech">ADVANCED</span></div>
                         <div class="skill-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Looker</div>
@@ -380,7 +353,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="extended-stack">
                 <h4>Enterprise Tooling & Collaboration</h4>
                 <p>
@@ -482,10 +454,10 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. ANIMACIÓN EVOLUTION --- */
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
+            
             const evoCards = document.querySelectorAll('.evo-card');
             const aboutFrame = document.getElementById('aboutFrame');
 
