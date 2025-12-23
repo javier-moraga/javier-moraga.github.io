@@ -50,9 +50,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (AJUSTADA: MENOS ALTURA, MEJOR ALINEACIÓN) --- */
+        /* --- EVOLUTION SECTION (LIMPIA SIN CONECTORES) --- */
         .evolution-section {
-            padding: 100px 0 250px 0; /* REDUCIDO de 450px a 250px */
+            padding: 100px 0 250px 0;
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -60,9 +60,11 @@
             justify-content: center;
         }
 
-        /* Líneas y Nodos */
+        /* Línea Central Vertical */
         .evolution-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1; }
+        /* Progreso de la línea */
         .evolution-line-progress { position: absolute; left: 50%; top: 0; width: 2px; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent); transition: height 0.1s linear; }
+        /* Esfera Móvil */
         .moving-node { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold); }
 
         .evolution-container { max-width: 1000px; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px; }
@@ -74,39 +76,14 @@
             backdrop-filter: blur(8px); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 0; height: 320px; display: flex; flex-direction: column; justify-content: center;
         }
-        
-        /* POSICIONAMIENTO AJUSTADO */
-        .evo-legacy { 
-            transform: translateX(-50px); text-align: right; 
-            border-right: 3px solid rgba(255,255,255,0.1); 
-            margin-top: 50px; 
-        }
-        
-        .evo-modern { 
-            transform: translateX(50px); 
-            border-left: 3px solid rgba(255,255,255,0.1); 
-            margin-top: 350px; /* REDUCIDO de 550px a 350px para acercarlas */
-        }
+        .evo-legacy { transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); margin-top: 50px; }
+        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 350px; }
 
         .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
         .evo-legacy.active { border-right-color: #64748b; }
         .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
 
-        /* Conectores */
-        .evo-card::before { content: ''; position: absolute; top: 50%; width: 60px; height: 1px; background: rgba(255,255,255,0.1); transition: 0.6s ease; }
-        .evo-legacy::before { right: -60px; }
-        .evo-modern::before { left: -60px; }
-        .evo-legacy.active::before { background: #64748b; box-shadow: 0 0 10px #64748b; }
-        .evo-modern.active::before { background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
-
-        /* Puntos Fijos (Dots) - RECALIBRADOS */
-        .connector-dot { position: absolute; left: 50%; width: 8px; height: 8px; background: #0b1120; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; transition: 0.3s; }
-        
-        /* Ajuste fino para la nueva distancia (250px margin bottom / 350px margin top) */
-        .dot-legacy { top: 22%; } /* Ajustado para coincidir con la tarjeta 1 */
-        .dot-modern { top: 78%; } /* Ajustado para coincidir con la tarjeta 2 */
-        
-        .active-dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold); }
+        /* (ELIMINADOS: Conectores y Puntos Fijos) */
 
         .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
@@ -203,14 +180,13 @@
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
-            .connector-dot { left: 20px; }
+            /* (ELIMINADO: .connector-dot en móvil) */
             
-            /* Tarjetas en móvil: Compactas */
+            /* Tarjetas en móvil */
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
-            .evo-modern { margin-top: 60px !important; } /* Menos separación en móvil */
-            .evo-card::before { width: 20px; left: -20px; right: auto; }
-            .evo-legacy::before { left: -20px; right: auto; }
+            .evo-modern { margin-top: 60px !important; }
+            /* (ELIMINADO: .evo-card::before en móvil) */
         }
     </style>
 </head>
@@ -248,8 +224,6 @@
     <div id="evolution-section" class="evolution-section">
         <div class="evolution-line"></div>
         <div class="evolution-line-progress" id="evoLineProgress"></div>
-        <div class="connector-dot dot-legacy" id="dotLegacy"></div>
-        <div class="connector-dot dot-modern" id="dotModern"></div>
         <div class="moving-node" id="movingNode"></div>
 
         <div class="evolution-container">
@@ -445,8 +419,7 @@
             
             const cardLegacy = document.getElementById('cardLegacy');
             const cardModern = document.getElementById('cardModern');
-            const dotLegacy = document.getElementById('dotLegacy');
-            const dotModern = document.getElementById('dotModern');
+            // (ELIMINADOS: Variables de puntos)
             
             const aboutFrame = document.getElementById('aboutFrame');
 
@@ -464,34 +437,27 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Calculamos el % de scroll con más margen
                 let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.88);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
-                // Mover esfera y llenar línea
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // --- ACTIVACIÓN TARJETA 1 ---
+                // Activación Tarjetas (SIN PUNTOS)
                 if (scrollPercent > 0.18) {
                     if(cardLegacy) cardLegacy.classList.add('active');
-                    if(dotLegacy) dotLegacy.classList.add('active-dot');
                 } else {
                     if(cardLegacy) cardLegacy.classList.remove('active');
-                    if(dotLegacy) dotLegacy.classList.remove('active-dot');
                 }
 
-                // --- ACTIVACIÓN TARJETA 2 ---
                 if (scrollPercent > 0.78) {
                     if(cardModern) cardModern.classList.add('active');
-                    if(dotModern) dotModern.classList.add('active-dot');
                 } else {
                     if(cardModern) cardModern.classList.remove('active');
-                    if(dotModern) dotModern.classList.remove('active-dot');
                 }
 
-                // --- ACTIVACIÓN LUZ FINAL ---
+                // Activación Luz Final
                 if (scrollPercent > 0.96) {
                     if(aboutFrame) aboutFrame.classList.add('frame-active');
                 } else {
