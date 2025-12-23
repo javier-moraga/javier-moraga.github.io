@@ -50,9 +50,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION --- */
+        /* --- EVOLUTION SECTION (AJUSTADA: MENOS ALTURA, MEJOR ALINEACIÓN) --- */
         .evolution-section {
-            padding: 100px 0 450px 0;
+            padding: 100px 0 250px 0; /* REDUCIDO de 450px a 250px */
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -74,8 +74,19 @@
             backdrop-filter: blur(8px); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 0; height: 320px; display: flex; flex-direction: column; justify-content: center;
         }
-        .evo-legacy { transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); margin-top: 50px; }
-        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 550px; }
+        
+        /* POSICIONAMIENTO AJUSTADO */
+        .evo-legacy { 
+            transform: translateX(-50px); text-align: right; 
+            border-right: 3px solid rgba(255,255,255,0.1); 
+            margin-top: 50px; 
+        }
+        
+        .evo-modern { 
+            transform: translateX(50px); 
+            border-left: 3px solid rgba(255,255,255,0.1); 
+            margin-top: 350px; /* REDUCIDO de 550px a 350px para acercarlas */
+        }
 
         .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
         .evo-legacy.active { border-right-color: #64748b; }
@@ -88,54 +99,51 @@
         .evo-legacy.active::before { background: #64748b; box-shadow: 0 0 10px #64748b; }
         .evo-modern.active::before { background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
 
-        /* Puntos Fijos */
+        /* Puntos Fijos (Dots) - RECALIBRADOS */
         .connector-dot { position: absolute; left: 50%; width: 8px; height: 8px; background: #0b1120; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; transition: 0.3s; }
-        .dot-legacy { top: 19.5%; }
-        .dot-modern { top: 80.5%; }
+        
+        /* Ajuste fino para la nueva distancia (250px margin bottom / 350px margin top) */
+        .dot-legacy { top: 22%; } /* Ajustado para coincidir con la tarjeta 1 */
+        .dot-modern { top: 78%; } /* Ajustado para coincidir con la tarjeta 2 */
+        
         .active-dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold); }
 
         .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
 
-        /* --- ABOUT ME SECTION (Con EFECTO DE LUZ VOLUMÉTRICA FINAL) --- */
+        /* --- ABOUT ME SECTION (Con Luz Volumétrica Final) --- */
         .about-frame-container {
             padding: 100px 0;
             background-color: #0f1629;
-            position: relative; /* Necesario para el pseudo-elemento */
-            overflow: visible; /* Permitir que la luz se salga */
+            position: relative;
+            overflow: visible;
         }
 
-        /* El haz de luz (Pseudo-elemento) */
         .about-frame-container::before {
             content: '';
             position: absolute;
-            top: -80px; /* Subimos el punto de origen de la luz */
+            top: -80px;
             left: 50%;
-            transform: translateX(-50%) scaleX(1.5); /* Más ancho que el contenedor */
+            transform: translateX(-50%) scaleX(1.5);
             width: 100%;
-            height: 250px; /* Altura del haz de luz */
-            /* Degradado radial complejo para simular el foco */
+            height: 250px;
             background: radial-gradient(
                 ellipse at center top,
-                rgba(255, 255, 255, 0.8) 0%,   /* Núcleo blanco brillante */
-                rgba(251, 191, 36, 0.8) 20%,   /* Oro intenso */
-                rgba(251, 191, 36, 0.2) 50%,   /* Oro difuso */
-                transparent 75%                /* Desvanecimiento */
+                rgba(255, 255, 255, 0.8) 0%,
+                rgba(251, 191, 36, 0.8) 20%,
+                rgba(251, 191, 36, 0.2) 50%,
+                transparent 75%
             );
-            filter: blur(40px); /* Desenfoque intenso para el efecto atmosférico */
-            opacity: 0; /* Empieza oculto */
-            transition: opacity 1s ease-in-out; /* Transición suave */
-            pointer-events: none; /* No interfiere con el mouse */
-            z-index: 0; /* Detrás del contenido */
+            filter: blur(40px);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        /* Clase activa que enciende la luz */
-        .about-frame-container.frame-active::before {
-            opacity: 1;
-        }
+        .about-frame-container.frame-active::before { opacity: 1; }
 
-        /* Estilos del contenido About */
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
@@ -197,10 +205,10 @@
             .moving-node { left: 20px; }
             .connector-dot { left: 20px; }
             
-            /* Tarjetas en móvil: Sin desplazamiento lateral */
+            /* Tarjetas en móvil: Compactas */
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
-            .evo-modern { margin-top: 80px !important; }
+            .evo-modern { margin-top: 60px !important; } /* Menos separación en móvil */
             .evo-card::before { width: 20px; left: -20px; right: auto; }
             .evo-legacy::before { left: -20px; right: auto; }
         }
@@ -456,14 +464,16 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
+                // Calculamos el % de scroll con más margen
                 let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.88);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
+                // Mover esfera y llenar línea
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // Activación Tarjetas
+                // --- ACTIVACIÓN TARJETA 1 ---
                 if (scrollPercent > 0.18) {
                     if(cardLegacy) cardLegacy.classList.add('active');
                     if(dotLegacy) dotLegacy.classList.add('active-dot');
@@ -472,6 +482,7 @@
                     if(dotLegacy) dotLegacy.classList.remove('active-dot');
                 }
 
+                // --- ACTIVACIÓN TARJETA 2 ---
                 if (scrollPercent > 0.78) {
                     if(cardModern) cardModern.classList.add('active');
                     if(dotModern) dotModern.classList.add('active-dot');
@@ -480,7 +491,7 @@
                     if(dotModern) dotModern.classList.remove('active-dot');
                 }
 
-                // Activación Luz Final (al llegar al 96%)
+                // --- ACTIVACIÓN LUZ FINAL ---
                 if (scrollPercent > 0.96) {
                     if(aboutFrame) aboutFrame.classList.add('frame-active');
                 } else {
