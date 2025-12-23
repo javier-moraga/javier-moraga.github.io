@@ -51,21 +51,119 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- VIDEO BREAK --- */
-        .video-break {
-            position: relative; height: 50vh; width: 100%; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-            border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid rgba(255,255,255,0.1);
-            background-color: #000;
+        /* --- MODERN EVOLUTION TRANSITION (MokN Style) --- */
+        .evolution-section {
+            padding: 100px 0;
+            background-color: #050a14; /* Fondo ultra oscuro */
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
         }
-        .bg-video {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; z-index: 0; opacity: 1;
+
+        .evolution-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, 
+                rgba(59, 130, 246, 0) 0%, 
+                rgba(59, 130, 246, 0.5) 20%, 
+                rgba(251, 191, 36, 1) 50%, 
+                rgba(59, 130, 246, 0.5) 80%, 
+                rgba(59, 130, 246, 0) 100%);
+            transform: translateX(-50%);
+            z-index: 1;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
-        .video-overlay {
-            z-index: 2; text-align: center; background: rgba(11, 17, 32, 0.8);
-            padding: 30px 50px; border-radius: 15px; border: 1px solid rgba(59, 130, 246, 0.3);
-            backdrop-filter: blur(5px); max-width: 600px;
+
+        .evolution-container {
+            max-width: 1000px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            padding: 20px;
+        }
+
+        .evo-card {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: 0.4s ease;
+        }
+
+        .evo-card:hover {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Esquinas tecnológicas */
+        .evo-card::before, .evo-card::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            transition: 0.3s;
+        }
+
+        .evo-card::before {
+            top: -1px; left: -1px;
+            border-top: 2px solid var(--text-muted);
+            border-left: 2px solid var(--text-muted);
+        }
+        .evo-card::after {
+            bottom: -1px; right: -1px;
+            border-bottom: 2px solid var(--text-muted);
+            border-right: 2px solid var(--text-muted);
+        }
+
+        .evo-legacy::before, .evo-legacy::after { border-color: #64748b; opacity: 0.3; }
+        .evo-modern::before, .evo-modern::after { border-color: var(--accent-gold); opacity: 1; box-shadow: 0 0 10px var(--accent-gold); }
+
+        .evo-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .legacy-title { color: #64748b; }
+        .modern-title { color: var(--accent); text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+
+        .evo-header {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            color: white;
+        }
+
+        .evo-desc {
+            color: #94a3b8;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .center-node {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: var(--bg-dark);
+            border: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 15px var(--accent-gold), inset 0 0 10px var(--accent-gold);
         }
 
         /* --- ABOUT ME --- */
@@ -87,7 +185,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- NEW STACK CARDS (ESTILOS CORREGIDOS) --- */
+        /* --- STACK CARDS --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         
@@ -192,6 +290,12 @@
             .nav-links { display: none; }
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
+
+            /* Ajustes para la sección Evolution en móvil */
+            .evolution-container { grid-template-columns: 1fr; gap: 40px; }
+            .evolution-line { left: 20px; }
+            .center-node { left: 20px; }
+            .evo-card { margin-left: 30px; }
         }
     </style>
 </head>
@@ -226,16 +330,34 @@
         </div>
     </section> 
 
-    <div class="video-break">
-        <video id="bgVideo" class="bg-video" muted loop playsinline poster="video-cover.jpg">
-            <source src="video-futurista-2.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay">
-            <h2>From Raw Data to Strategic Value</h2>
-            <p style="color: #cbd5e1; margin-top: 10px;">Translating complex business rules into robust pipelines and actionable insights.</p>
+    <div class="evolution-section">
+        <div class="evolution-line"></div>
+        
+        <div class="center-node"></div>
+
+        <div class="evolution-container">
+            
+            <div class="evo-card evo-legacy" style="text-align: right; border-right: none; align-self: center;">
+                <span class="evo-title legacy-title">The Legacy Trap</span>
+                <h3 class="evo-header" style="opacity: 0.6;">Data Silos & <br>Manual Fatigue</h3>
+                <p class="evo-desc">
+                    Spreadsheets that crash, fragmented SQL queries, and reactive fixing. 
+                    Where data is a burden, not an asset.
+                </p>
+            </div>
+
+            <div class="evo-card evo-modern" style="align-self: center;">
+                <span class="evo-title modern-title">The New Standard</span>
+                <h3 class="evo-header">Automated Engineering <br>& <span class="highlight">True Scalability</span></h3>
+                <p class="evo-desc" style="color: #e2e8f0;">
+                    Robust Pipelines (Airflow), Single Source of Truth (BigQuery), and 
+                    Automated Quality Checks. <br>
+                    <strong>I build systems that sleep soundly while you do.</strong>
+                </p>
+            </div>
+
         </div>
     </div>
-
     <section id="about" class="about-section">
         <div class="container about-grid">
             <div class="profile-img-container">
@@ -428,15 +550,6 @@
             <p>© 2025 Javier Moraga. Built for the Global Market.</p>
         </div>
     </footer>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            var video = document.getElementById("bgVideo");
-            video.play().catch(function(error) {
-                console.log("Autoplay prevenido por el navegador o video cargando.");
-            });
-        });
-    </script>
 
 </body>
 </html>
