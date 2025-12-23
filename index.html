@@ -43,6 +43,7 @@
         .nav-links a.link-text:hover { color: var(--accent); }
 
         /* --- BOTÓN DE CONTACTO (SNAKE) --- */
+        /* NOTA: Este código ya implementa la serpiente dorada solicitada */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -175,7 +176,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK CARDS (ETIQUETAS CORREGIDAS) --- */
+        /* --- STACK CARDS --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
@@ -185,32 +186,13 @@
         
         .skill-list { display: flex; flex-direction: column; gap: 15px; }
         
-        .skill-item { 
-            display: flex; align-items: center; 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255,255,255,0.05);
-            padding: 10px 18px;
-            border-radius: 6px; 
-            color: #e2e8f0; 
-            font-size: 0.95rem; font-weight: 500;
-            transition: 0.3s;
-        }
-        
+        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
         .skill-item:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: white; }
         .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
 
-        .tag-tech { 
-            margin-left: auto; font-size: 0.75rem; font-weight: 700; 
-            background: var(--accent); color: white; 
-            padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-
-        .tag-highlight { 
-            margin-left: auto; font-size: 0.75rem; font-weight: 700; 
-            background: var(--accent-gold); color: #0b1120; 
-            padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
         .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
@@ -219,13 +201,7 @@
         /* --- PROJECTS SECTION (STICKY STACK) --- */
         .projects-section { padding: 100px 0 150px; background-color: #050a14; }
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-        .project-card {
-            position: sticky; top: 130px;
-            background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px;
-            overflow: hidden; margin-bottom: 60px;
-            display: grid; grid-template-columns: 1fr 1.2fr; min-height: 480px;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5); transform-origin: center top; transition: transform 0.3s ease;
-        }
+        .project-card { position: sticky; top: 130px; background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; overflow: hidden; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1.2fr; min-height: 480px; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); transform-origin: center top; transition: transform 0.3s ease; }
         .project-content { padding: 50px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid rgba(255,255,255,0.05); }
         .project-tags { margin-bottom: 20px; }
         .p-tag { display: inline-block; background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; margin-right: 6px; margin-bottom: 6px; text-transform: uppercase; }
@@ -237,12 +213,39 @@
         .project-visual img { width: 85%; height: auto; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.5s ease; }
         .project-card:hover .project-visual img { transform: scale(1.02); }
 
-        /* Botones Generales */
+        /* --- BOTONES GENERALES (MODIFICADOS A AMARILLO/DORADO) --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-fill { padding: 12px 24px; background: var(--accent); color: white; border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent); transition: 0.3s; }
-        .btn-fill:hover { background: transparent; color: var(--accent); }
-        .btn-outline { padding: 12px 24px; border: 1px solid var(--accent); color: white; border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
-        .btn-outline:hover { background: var(--accent); color: white; }
+
+        /* Botón Relleno (Ahora Dorado con texto oscuro) */
+        .btn-fill { 
+            padding: 12px 24px; 
+            background: var(--accent-gold); /* Cambio a dorado */
+            color: var(--bg-dark); /* Texto oscuro para contraste */
+            border-radius: 50px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            border: 1px solid var(--accent-gold); /* Borde dorado */
+            transition: 0.3s; 
+        }
+        .btn-fill:hover { 
+            background: transparent; 
+            color: var(--accent-gold); /* Texto dorado al hacer hover */
+        }
+
+        /* Botón Borde (Ahora Dorado) */
+        .btn-outline { 
+            padding: 12px 24px; 
+            border: 1px solid var(--accent-gold); /* Borde dorado */
+            color: var(--accent-gold); /* Texto dorado */
+            border-radius: 50px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            transition: 0.3s; 
+        }
+        .btn-outline:hover { 
+            background: var(--accent-gold); /* Fondo dorado al hover */
+            color: var(--bg-dark); /* Texto oscuro para contraste */
+        }
 
         /* --- CONTACT & FOOTER --- */
         .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); }
@@ -312,7 +315,9 @@
                 <a href="#about">About Me</a>
                 <a href="#skills">Stack</a>
                 <a href="#projects">Portfolio</a>
-                <a href="#contact">Contact</a>
+                <a href="#contact" class="nav-btn">
+                    <span></span><span></span><span></span><span></span>Contact
+                </a>
             </nav>
         </div>
     </header>
@@ -330,7 +335,7 @@
                 I bridge the gap between business strategy and technical execution, delivering solutions 
                 <span style="color:white;">adaptable to any stack: from Advanced Excel to Modern Cloud Architectures</span>.
             </p>
-            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px;">View Case Studies</a>
+            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px; background: var(--accent); border-color: var(--accent); color: white;">View Case Studies</a>
         </div>
     </section> 
 
