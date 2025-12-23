@@ -77,8 +77,6 @@
             border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
         }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
-        
-        /* Justificado por defecto (Desktop) */
         .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
         
         .industries-box {
@@ -89,16 +87,73 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- SKILLS & PROJECTS --- */
+        /* --- NEW STACK CARDS (ESTILOS CORREGIDOS) --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        .skills-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-        .skill-col { background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
-        .skill-col:hover { border-color: var(--accent); transform: translateY(-5px); }
-        .skill-col h3 { color: var(--accent); font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .skill-item { display: flex; align-items: center; margin-bottom: 12px; font-size: 0.95rem; font-weight: 500; }
-        .skill-item i { width: 25px; color: var(--text-muted); margin-right: 10px; }
+        
+        .stack-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
 
+        .stack-card {
+            background-color: #0f172a; /* Fondo muy oscuro */
+            border: 1px solid #1e3a8a; /* Borde azul */
+            border-radius: 12px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        .stack-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .skill-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        .skill-item { 
+            display: flex; 
+            align-items: center; 
+            color: #e2e8f0; 
+            font-size: 1rem; 
+            font-weight: 500;
+        }
+
+        .skill-item i { 
+            width: 30px; 
+            margin-right: 10px; 
+            color: #64748b; 
+            text-align: center; 
+            font-size: 1.1rem;
+        }
+        
+        .skill-item:hover i { color: var(--accent); }
+
+        .tech-level {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--accent-gold); /* Texto dorado */
+            font-weight: 600;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* --- PROJECTS --- */
         .projects-section { padding: 100px 0; background-color: #0f1629; }
         .project-card {
             background-color: var(--bg-card); border-radius: 15px; overflow: hidden;
@@ -115,11 +170,14 @@
             display: inline-block; font-size: 0.75rem; background: rgba(59, 130, 246, 0.1);
             color: var(--accent); padding: 5px 10px; border-radius: 4px; margin-right: 5px; margin-bottom: 5px; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2);
         }
+        
+        /* Buttons */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-outline { padding: 8px 16px; border: 1px solid var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; }
         .btn-outline:hover { background: var(--accent); color: white; }
         .btn-fill { padding: 8px 16px; background: var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent); }
 
+        /* Contact & Footer */
         .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); }
         .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         .c-icon { font-size: 2rem; color: var(--text-muted); transition: 0.3s; }
@@ -132,8 +190,6 @@
             .about-grid, .project-card { grid-template-columns: 1fr; }
             .project-img { height: 250px; }
             .nav-links { display: none; }
-            
-            /* --- CORRECCIÓN RESPONSIVA: TEXTO IZQUIERDA --- */
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
         }
@@ -172,7 +228,8 @@
 
     <div class="video-break">
         <video id="bgVideo" class="bg-video" muted loop playsinline poster="video-cover.jpg">
-            </video>
+            <source src="video-futurista-2.mp4" type="video/mp4">
+        </video>
         <div class="video-overlay">
             <h2>From Raw Data to Strategic Value</h2>
             <p style="color: #cbd5e1; margin-top: 10px;">Translating complex business rules into robust pipelines and actionable insights.</p>
@@ -239,45 +296,50 @@
 
                 <div class="btn-group" style="margin-top: 30px;">
                     <a href="#contact" class="btn-fill">Download CV</a>
-                    <a href="https://www.din.com/in/javiermoraganarria/?locale=en_US" target="_blank" class="btn-outline"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                    <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" target="_blank" class="btn-outline"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
                 </div>
             </div>
         </div>
     </section>
 
-<div class="skills-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-  
-  <div class="stack-card">
-    <div class="card-header">Cloud & Engineering</div>
-    <div class="skill-list">
-      <div class="skill-item"><i class="fa-brands fa-google"></i> Google Cloud Platform</div>
-      <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="highlight">(Expert)</span></div>
-      <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform <span class="highlight">(Modern Stack)</span></div>
-      <div class="skill-item"><i class="fa-brands fa-aws"></i> AWS Basic</div>
-    </div>
-  </div>
-
-  <div class="stack-card">
-    <div class="card-header">Languages & Core</div>
-    <div class="skill-list">
-      <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="highlight">(Advanced)</span></div>
-      <div class="skill-item"><i class="fa-brands fa-python"></i> Python</div>
-      <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
-      <div class="skill-item"><i class="fa-brands fa-html5"></i> HTML/CSS</div>
-    </div>
-  </div>
-
-  <div class="stack-card">
-    <div class="card-header">Specialized Tools</div>
-    <div class="skill-list">
-      <div class="skill-item"><i class="fa-solid fa-notes-medical"></i> REDCap <span class="highlight">(Healthcare)</span></div>
-      <div class="skill-item"><i class="fa-solid fa-table"></i> Excel / Spreadsheets</div>
-      <div class="skill-item"><i class="fa-solid fa-chart-line"></i> Power BI / Looker</div>
-    </div>
-  </div>
-
-</div>
-
+    <section id="skills" class="skills-section">
+        <div class="container">
+            <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
+            
+            <div class="stack-container">
+            
+                <div class="stack-card">
+                    <div class="card-header">Cloud & Engineering</div>
+                    <div class="skill-list">
+                    <div class="skill-item"><i class="fa-brands fa-google"></i> Google Cloud Platform</div>
+                    <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tech-level">Expert</span></div>
+                    <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform <span class="tech-level">Modern Stack</span></div>
+                    <div class="skill-item"><i class="fa-brands fa-aws"></i> AWS Basic</div>
+                    </div>
+                </div>
+            
+                <div class="stack-card">
+                    <div class="card-header">Languages & Core</div>
+                    <div class="skill-list">
+                    <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tech-level">Advanced</span></div>
+                    <div class="skill-item"><i class="fa-brands fa-python"></i> Python</div>
+                    <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
+                    <div class="skill-item"><i class="fa-brands fa-html5"></i> HTML/CSS</div>
+                    </div>
+                </div>
+            
+                <div class="stack-card">
+                    <div class="card-header">Specialized Tools</div>
+                    <div class="skill-list">
+                    <div class="skill-item"><i class="fa-solid fa-notes-medical"></i> REDCap <span class="tech-level">Healthcare</span></div>
+                    <div class="skill-item"><i class="fa-solid fa-table"></i> Excel / Spreadsheets</div>
+                    <div class="skill-item"><i class="fa-solid fa-chart-line"></i> Power BI / Looker</div>
+                    </div>
+                </div>
+            
+            </div>
+        </div>
+    </section>
     <section id="projects" class="projects-section">
         <div class="container">
             <h2 class="section-title">Selected <span class="highlight">Case Studies</span></h2>
@@ -355,12 +417,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var video = document.getElementById("bgVideo");
-            var videoSource = "video-futurista-2.mp4"; 
-            var source = document.createElement('source');
-            source.src = videoSource;
-            source.type = 'video/mp4';
-            video.appendChild(source);
-            video.load();
             video.play().catch(function(error) {
                 console.log("Autoplay prevenido por el navegador o video cargando.");
             });
