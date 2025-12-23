@@ -125,36 +125,45 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK SECTION: CLICKGUARD STYLE (Vertical Clean Cards) --- */
+        /* --- STACK SECTION (ANIMADA) --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         
         .stack-container {
             display: flex;
             flex-direction: column;
-            gap: 25px; /* Espacio entre tarjetas */
+            gap: 25px;
             max-width: 900px;
             margin: 0 auto;
         }
 
-        /* Tarjeta Ancha estilo ClickGuard */
         .stack-card {
             background-color: #0f172a; 
             border: 1px solid rgba(59, 130, 246, 0.2); 
             border-radius: 15px;
             padding: 40px;
             width: 100%;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
             
-            /* Grid interno: Título a la izq, Skills a la derecha */
+            /* GRID INTERNO */
             display: grid;
             grid-template-columns: 200px 1fr; 
             gap: 30px;
             align-items: start;
+
+            /* ESTADO INICIAL ANIMACIÓN (Invisible y desplazado) */
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
-        .stack-card:hover {
-            transform: translateY(-5px);
+        /* CLASE VISIBLE (Se añade con JS) */
+        .stack-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stack-card.visible:hover {
+            transform: translateY(-5px); /* Pequeño salto extra al hover */
             box-shadow: 0 10px 30px rgba(30, 64, 175, 0.15);
             border-color: var(--accent);
         }
@@ -166,29 +175,20 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             line-height: 1.4;
-            /* Quitamos el borde inferior, ahora es una columna lateral */
             border-bottom: none; 
             padding-bottom: 0;
         }
 
-        /* Contenedor de Skills (Pills) */
-        .skill-list { 
-            display: flex; 
-            flex-wrap: wrap; 
-            gap: 12px; 
-        }
+        .skill-list { display: flex; flex-wrap: wrap; gap: 12px; }
         
-        /* Estilo de "Etiqueta" o "Pill" para cada skill */
         .skill-item { 
-            display: flex; 
-            align-items: center; 
-            background: rgba(30, 41, 59, 0.6); /* Fondo pastilla */
+            display: flex; align-items: center; 
+            background: rgba(30, 41, 59, 0.6); 
             border: 1px solid rgba(255,255,255,0.05);
             padding: 10px 18px;
-            border-radius: 50px; /* Borde redondo */
+            border-radius: 50px; 
             color: #e2e8f0; 
-            font-size: 0.95rem; 
-            font-weight: 500;
+            font-size: 0.95rem; font-weight: 500;
             transition: 0.3s;
         }
 
@@ -198,22 +198,12 @@
             color: white;
         }
 
-        .skill-item i { 
-            margin-right: 10px; 
-            color: #64748b; 
-            font-size: 1.1rem;
-        }
-        
+        .skill-item i { margin-right: 10px; color: #64748b; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
 
         .tech-level {
-            margin-left: 10px;
-            font-size: 0.75rem;
-            color: var(--accent-gold); 
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            opacity: 0.8;
+            margin-left: 10px; font-size: 0.75rem; color: var(--accent-gold); 
+            font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.8;
         }
 
         /* --- PROJECTS --- */
@@ -238,7 +228,7 @@
         .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); }
 
-        /* --- ANIMACIÓN ICONOS --- */
+        /* --- ANIMACIÓN ICONOS (Ola Final) --- */
         @keyframes iconPop {
             0% { transform: translateY(0); color: var(--text-muted); }
             50% { transform: translateY(-15px); color: var(--accent-gold); }
@@ -263,7 +253,7 @@
             .evo-modern { margin-top: 60px !important; }
 
             /* RESET STACK EN MOVIL */
-            .stack-card { grid-template-columns: 1fr; gap: 15px; } /* Una columna en móvil */
+            .stack-card { grid-template-columns: 1fr; gap: 15px; } 
             .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         }
     </style>
@@ -482,6 +472,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            /* --- 1. ANIMACIÓN EVOLUTION --- */
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
@@ -522,7 +513,26 @@
                 }
             });
 
-            // ANIMACIÓN ICONOS AL FINAL
+            /* --- 2. ANIMACIÓN STACK CARDS (STAGGERED FADE UP) --- */
+            const stackCards = document.querySelectorAll('.stack-card');
+            const stackSection = document.getElementById('skills');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        stackCards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.classList.add('visible');
+                            }, index * 150); // Retraso de 150ms entre cada tarjeta
+                        });
+                        observer.unobserve(entry.target); // Animación solo una vez
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            if(stackSection) observer.observe(stackSection);
+
+            /* --- 3. ANIMACIÓN ICONOS AL FINAL --- */
             let iconsAnimated = false; 
             window.addEventListener('scroll', () => {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
