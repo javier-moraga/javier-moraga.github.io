@@ -67,7 +67,7 @@
 
         .nav-btn span { position: absolute; display: block; }
 
-        /* Animación Snake */
+        /* Animación Snake: Cabeza brillante, cola transparente */
         .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
         @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
         
@@ -106,7 +106,10 @@
 
         .evolution-container { 
             max-width: 1000px; width: 100%; position: relative; z-index: 5; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; 
+            /* AUMENTADO: Gap más grande para separar las tarjetas verticalmente */
+            gap: 180px; 
+            padding: 20px;
         }
 
         .evo-card {
@@ -129,7 +132,7 @@
             grid-column: 2; text-align: left; 
             transform: translateX(50px); 
             border-left: 3px solid rgba(255,255,255,0.1); 
-            margin-top: 100px; /* Desfase vertical */
+            margin-top: 100px; /* Desfase visual inicial */
         }
 
         /* ACTIVACIÓN */
@@ -140,10 +143,8 @@
         .evo-header { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: white; line-height: 1.2; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         
-        /* Ajuste para la 3ra tarjeta (Izquierda otra vez) */
-        .evo-left-2 {
-            margin-top: 100px; /* Desfase respecto a la derecha */
-        }
+        /* Ajuste para la 3ra tarjeta */
+        .evo-left-2 { margin-top: 100px; }
 
         /* --- ABOUT ME SECTION --- */
         .about-frame-container {
@@ -243,12 +244,13 @@
             .container { padding: 0 25px; }
 
             /* Ajustes Móviles Evolution */
-            .evolution-container { grid-template-columns: 1fr; gap: 30px; }
+            .evolution-container { grid-template-columns: 1fr; gap: 50px; }
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
+            .connector-dot { left: 20px; }
             
-            /* Tarjetas en móvil: Todo a la izquierda */
+            /* Tarjetas en móvil */
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; border-left: 3px solid rgba(255,255,255,0.1); border-right: none; }
             .evo-card.active { border-left-color: var(--accent-gold); }
             
@@ -530,7 +532,7 @@
                 const windowHeight = window.innerHeight;
 
                 // Cálculo del progreso del scroll
-                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.9);
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.95);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
@@ -538,22 +540,22 @@
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // --- ACTIVACIÓN TARJETA 1 (15%) ---
-                if (scrollPercent > 0.15) {
+                // --- ACTIVACIÓN TARJETA 1 (10%) ---
+                if (scrollPercent > 0.10) {
                     if(card1) card1.classList.add('active');
                 } else {
                     if(card1) card1.classList.remove('active');
                 }
 
-                // --- ACTIVACIÓN TARJETA 2 (45%) ---
-                if (scrollPercent > 0.45) {
+                // --- ACTIVACIÓN TARJETA 2 (40%) ---
+                if (scrollPercent > 0.40) {
                     if(card2) card2.classList.add('active');
                 } else {
                     if(card2) card2.classList.remove('active');
                 }
 
-                // --- ACTIVACIÓN TARJETA 3 (75%) ---
-                if (scrollPercent > 0.75) {
+                // --- ACTIVACIÓN TARJETA 3 (70%) ---
+                if (scrollPercent > 0.70) {
                     if(card3) card3.classList.add('active');
                 } else {
                     if(card3) card3.classList.remove('active');
