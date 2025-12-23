@@ -60,12 +60,14 @@
             justify-content: center;
         }
 
+        /* Líneas y Nodos */
         .evolution-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1; }
         .evolution-line-progress { position: absolute; left: 50%; top: 0; width: 2px; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent); transition: height 0.1s linear; }
         .moving-node { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold); }
 
         .evolution-container { max-width: 1000px; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px; }
 
+        /* Tarjetas */
         .evo-card {
             background: rgba(15, 23, 42, 0.4); padding: 40px;
             border: 1px solid rgba(255, 255, 255, 0.05); position: relative;
@@ -83,7 +85,7 @@
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
 
-        /* --- ABOUT ME SECTION --- */
+        /* --- ABOUT ME SECTION (Con Luz Volumétrica Final) --- */
         .about-frame-container {
             padding: 100px 0;
             background-color: #0f1629;
@@ -160,23 +162,6 @@
         .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); }
 
-        /* --- TEXTO ANIMADO (Shimmer Effect) --- */
-        .shimmer-text {
-            /* Creamos un degradado: Blanco -> Dorado -> Blanco */
-            background: linear-gradient(90deg, var(--text-main) 0%, var(--accent-gold) 50%, var(--text-main) 100%);
-            background-size: 200% auto; /* Hacemos el fondo el doble de ancho */
-            background-clip: text;
-            -webkit-background-clip: text; /* Recortamos el fondo con el texto */
-            -webkit-text-fill-color: transparent; /* Hacemos el texto transparente para ver el fondo */
-            animation: shimmer 3s linear infinite reverse; /* Animamos */
-            display: inline-block;
-        }
-
-        /* Animación que mueve el fondo de un lado a otro */
-        @keyframes shimmer {
-            to { background-position: 200% center; }
-        }
-
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
@@ -185,10 +170,14 @@
             .nav-links { display: none; }
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
+
+            /* Ajustes Móviles Evolution */
             .evolution-container { grid-template-columns: 1fr; gap: 50px; }
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
+            
+            /* Tarjetas en móvil */
             .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
             .evo-modern { margin-top: 60px !important; }
@@ -257,8 +246,17 @@
             <div class="profile-img-container">
                 <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
                 <div style="margin-top: 25px;">
-                    <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 8px 20px; border-radius: 50px; font-size: 0.95rem; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 600; letter-spacing: 0.5px; box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-laptop"></i> Remote <span style="opacity: 0.4; font-weight: 300;">|</span> <i class="fa-solid fa-plane-departure"></i> Relocation
+                    <span style="
+                        background: rgba(16, 185, 129, 0.1); 
+                        color: #10b981; padding: 8px 20px; border-radius: 50px; 
+                        font-size: 0.95rem; border: 1px solid rgba(16, 185, 129, 0.3); 
+                        font-weight: 600; letter-spacing: 0.5px; 
+                        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+                        display: inline-flex; align-items: center; gap: 8px;
+                    ">
+                        <i class="fa-solid fa-laptop"></i> Remote 
+                        <span style="opacity: 0.4; font-weight: 300;">|</span> 
+                        <i class="fa-solid fa-plane-departure"></i> Relocation
                     </span>
                 </div>
             </div>
@@ -266,8 +264,14 @@
             <div class="about-text">
                 <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
                 <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
-                <p>Beyond the code and pipelines, I am a <strong>problem-solver</strong> with over 10 years of resilience and adaptability in high-pressure industries like Healthcare and Aviation. I am driven by curiosity and the challenge of translating complex scenarios into clear solutions.</p>
-                <p><strong>Why Australia?</strong> This is a structured life project. With family already settled in the country (my brother is an Industrial Specialist in Australia), I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.</p>
+                
+                <p>
+                    Beyond the code and pipelines, I am a <strong>problem-solver</strong> with over 10 years of resilience and adaptability in high-pressure industries like Healthcare and Aviation. 
+                    I am driven by curiosity and the challenge of translating complex scenarios into clear solutions.
+                </p>
+                <p>
+                    <strong>Why Australia?</strong> This is a structured life project. With family already settled in the country (my brother is an Industrial Specialist in Australia), I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.
+                </p>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
                     <div class="industries-box" style="margin:0;">
@@ -380,7 +384,7 @@
     <section id="contact" class="contact-section">
         <div class="container">
             <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
-            <h2 class="shimmer-text" style="margin-top: 20px; font-size: 2.5rem;">Ready to collaborate?</h2>
+            <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
             <div style="margin-top: 50px; margin-bottom: 30px;">
                 <img src="rocky.jpg" alt="Rocky" 
                      style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" 
@@ -426,7 +430,7 @@
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // Activación Tarjetas
+                // Activación Tarjetas (SIN PUNTOS)
                 if (scrollPercent > 0.18) {
                     if(cardLegacy) cardLegacy.classList.add('active');
                 } else {
