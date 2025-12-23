@@ -42,7 +42,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (EFECTO SNAKE) --- */
+        /* --- BOTÓN DE CONTACTO (SNAKE) --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -79,40 +79,42 @@
             justify-content: center;
         }
 
-        /* SVG Container ocupa todo el fondo */
+        /* SVG Container centrado perfectamente */
         .evolution-svg-container {
             position: absolute;
             top: 0;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%); /* Centrado estricto */
             width: 100%;
             max-width: 1000px;
             height: 100%;
             z-index: 1; 
             pointer-events: none;
-            overflow: visible; /* Importante para ver sombras */
+            overflow: visible; 
         }
 
+        /* Línea de fondo tenue y delgada */
         .path-bg {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.05);
-            stroke-width: 2;
+            stroke: rgba(255, 255, 255, 0.03); /* Muy sutil */
+            stroke-width: 2px; /* Delgada */
         }
 
+        /* Línea de progreso (color) delgada y sin sombras */
         .path-progress {
             fill: none;
             stroke: url(#lineGradient);
-            stroke-width: 3;
+            stroke-width: 2px; /* Delgada */
             stroke-linecap: round;
-            stroke-dasharray: 3000; /* Ajustado para la longitud de la curva */
+            stroke-dasharray: 3000; 
             stroke-dashoffset: 3000;
             transition: stroke-dashoffset 0.1s linear;
-            filter: drop-shadow(0 0 8px var(--accent));
+            /* Eliminado el filtro de sombra para quitar el efecto "borde" */
         }
 
-        /* La bola ahora es un elemento SVG Circle, estilizada aquí si es necesario */
         #movingNodeCircle {
-            filter: drop-shadow(0 0 10px var(--accent-gold));
+            /* Sombra solo para la bola, no para la línea */
+            filter: drop-shadow(0 0 8px var(--accent-gold));
         }
 
         .evolution-container { 
@@ -132,20 +134,20 @@
 
         .evo-icon { font-size: 2rem; color: var(--accent-gold); margin-bottom: 15px; }
 
-        /* Posiciones ajustadas para tocar suavemente la curva */
+        /* Posiciones ajustadas a la nueva curva más suave */
         .evo-left { 
             align-self: flex-start; text-align: right; 
             border-right: 3px solid rgba(255,255,255,0.1); 
             transform: translateX(-50px) translateY(80px);
             margin-top: 100px;
-            margin-right: 40px; /* Acercar al centro */
+            margin-right: 20px; /* Más cerca del centro */
         }
         .evo-right { 
             align-self: flex-end; text-align: left; 
             border-left: 3px solid rgba(255,255,255,0.1); 
             transform: translateX(50px) translateY(80px);
             margin-top: 100px; 
-            margin-left: 40px; /* Acercar al centro */
+            margin-left: 20px; /* Más cerca del centro */
         }
 
         .evo-card.active { opacity: 1; }
@@ -170,7 +172,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK CARDS --- */
+        /* --- STACK CARDS (ETIQUETAS CORREGIDAS) --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
@@ -226,7 +228,7 @@
         .p-tag { display: inline-block; background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; margin-right: 6px; margin-bottom: 6px; text-transform: uppercase; }
         .project-title { font-size: 2rem; font-weight: 800; margin-bottom: 20px; line-height: 1.1; color: white; }
         .project-desc { color: #94a3b8; font-size: 1rem; margin-bottom: 30px; line-height: 1.6; }
-        .btn-project { align-self: flex-start; padding: 12px 28px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; color: white; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
+        .btn-project { align-self: flex-start; padding: 10px 24px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; color: white; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
         .btn-project:hover { background: white; color: black; border-color: white; }
         .project-visual { background-color: #1e293b; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .project-visual img { width: 85%; height: auto; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.5s ease; }
@@ -316,15 +318,15 @@
 
     <div id="evolution-section" class="evolution-section">
         
-        <svg class="evolution-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin slice">
+        <svg class="evolution-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:var(--accent); stop-opacity:1" />
                     <stop offset="100%" style="stop-color:var(--accent-gold); stop-opacity:1" />
                 </linearGradient>
             </defs>
-            <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 300 300, 300 500 C 300 700, 700 800, 700 1000 C 700 1200, 300 1300, 300 1500 C 300 1700, 500 1850, 500 2000" />
-            <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 300 300, 300 500 C 300 700, 700 800, 700 1000 C 700 1200, 300 1300, 300 1500 C 300 1700, 500 1850, 500 2000" />
+            <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
+            <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
             
             <circle id="movingNodeCircle" cx="0" cy="0" r="7" fill="white" />
         </svg>
@@ -537,6 +539,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const section = document.getElementById('evolution-section');
+            const movingNode = document.getElementById('movingNode');
             // Obtenemos el camino del progreso del SVG
             const progressPath = document.getElementById('progressPath');
             const movingNodeCircle = document.getElementById('movingNodeCircle');
