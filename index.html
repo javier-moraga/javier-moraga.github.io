@@ -49,7 +49,6 @@
         .nav-btn:hover { background: rgba(251, 191, 36, 0.08); color: var(--accent-gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2); }
         .nav-btn span { position: absolute; display: block; }
         
-        /* Animación Snake */
         .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
         @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
         .nav-btn span:nth-child(2) { top: -100%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
@@ -61,15 +60,12 @@
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
-        .hero h1 {
-            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
-            background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (HÍBRIDA: SVG PC / LINEA MÓVIL) --- */
+        /* --- EVOLUTION SECTION (SISTEMA HÍBRIDO) --- */
         .evolution-section {
             padding: 50px 0 200px 0;
             background-color: #050a14;
@@ -79,23 +75,12 @@
             justify-content: center;
         }
 
-        /* 1. SVG CURVO (Solo Desktop) */
-        .evolution-svg-container {
+        /* 1. SISTEMA ESCRITORIO (SVG) */
+        .desktop-svg-container {
             position: absolute;
             top: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 1000px; height: 100%;
             z-index: 1; pointer-events: none; overflow: visible; 
-        }
-
-        /* 2. LÍNEA RECTA (Solo Móvil - Oculta por defecto) */
-        .mobile-line {
-            display: none; /* Se activa en media query */
-            position: absolute;
-            top: 0; bottom: 0; left: 50%;
-            width: 2px;
-            background: rgba(255,255,255,0.05);
-            transform: translateX(-50%);
-            z-index: 1;
         }
 
         .path-bg { fill: none; stroke: rgba(255, 255, 255, 0.03); stroke-width: 2px; }
@@ -103,17 +88,45 @@
             fill: none; stroke: url(#lineGradient); stroke-width: 2px; stroke-linecap: round;
             stroke-dasharray: 3000; stroke-dashoffset: 3000; transition: stroke-dashoffset 0.1s linear;
         }
+        
+        /* BOLA SVG (ESCRITORIO) */
+        #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
 
-        /* Bola Brillante */
-        .moving-node {
-            position: absolute; top: 0; left: 0; 
-            width: 14px; height: 14px; background-color: #fff; border-radius: 50%;
-            z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold);
-            transform: translate(-50%, -50%); pointer-events: none;
+        /* 2. SISTEMA MÓVIL (LÍNEA RECTA) - OCULTO POR DEFECTO */
+        .mobile-system {
+            display: none; /* Se activa en @media */
+            position: absolute;
+            top: 0; bottom: 0; left: 50%; 
+            transform: translateX(-50%);
+            width: 2px;
+            z-index: 0; /* DETRÁS DE LAS TARJETAS */
         }
 
+        .mobile-line-bg {
+            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .mobile-line-progress {
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 0%; /* Se llena con JS */
+            background: linear-gradient(to bottom, var(--accent), var(--accent-gold));
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .mobile-ball {
+            position: absolute; left: 50%; top: 0%;
+            transform: translate(-50%, -50%);
+            width: 14px; height: 14px;
+            background-color: #fff; border-radius: 50%;
+            box-shadow: 0 0 15px #fff, 0 0 20px var(--accent-gold);
+            z-index: 2;
+        }
+
+        /* CONTENEDOR DE TARJETAS */
         .evolution-container { 
-            max-width: 1000px; width: 100%; position: relative; z-index: 5; 
+            max-width: 1000px; width: 100%; position: relative; 
+            z-index: 10; /* TARJETAS POR DELANTE DE LA LÍNEA */
             display: flex; flex-direction: column; 
             gap: 150px; padding: 20px 20px 100px 20px;
         }
@@ -257,14 +270,24 @@
 
             /* Ajustes Móviles Evolution SVG */
             .evolution-container { gap: 80px; padding-bottom: 50px; }
-            /* 1. OCULTAR EL SVG CURVO EN MÓVIL */
-            .evolution-svg-container { display: none; }
-            /* 2. MOSTRAR LÍNEA RECTA */
-            .mobile-line { display: block; }
             
-            .evo-card { width: 85%; margin-left: auto; margin-right: auto; transform: translateX(0) translateY(50px) !important; text-align: left; height: auto; margin-top: 0 !important; }
+            /* 1. OCULTAR EL SVG CURVO EN MÓVIL */
+            .desktop-svg-container { display: none; }
+            
+            /* 2. MOSTRAR LÍNEA RECTA Y BOLA */
+            .mobile-system { display: block; }
+            
+            /* Tarjetas siempre con fondo oscuro solido para tapar la línea si pasa por detrás */
+            .evo-card { 
+                width: 85%; margin-left: auto; margin-right: auto; 
+                transform: translateX(0) translateY(50px) !important; 
+                text-align: left; height: auto; margin-top: 0 !important; 
+                background: #0f172a; /* Fondo sólido */
+                z-index: 10; /* Encima de la línea */
+            }
             .evo-left { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-right: 0; }
             .evo-right { border-left: 3px solid rgba(255,255,255,0.1); margin-left: 0; align-self: flex-start; }
+            
             .evo-card.active { transform: translateX(0) translateY(0) !important; }
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
@@ -313,7 +336,7 @@
 
     <div id="evolution-section" class="evolution-section">
         
-        <svg class="evolution-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
+        <svg class="desktop-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:var(--accent); stop-opacity:1" />
@@ -322,11 +345,15 @@
             </defs>
             <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
             <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
+            
+            <circle id="desktopBall" cx="0" cy="0" r="7" fill="white" />
         </svg>
 
-        <div class="mobile-line"></div>
-
-        <div class="moving-node" id="movingNode"></div>
+        <div class="mobile-system">
+            <div class="mobile-line-bg"></div>
+            <div class="mobile-line-progress" id="mobileProgress"></div>
+            <div class="mobile-ball" id="mobileBall"></div>
+        </div>
 
         <div class="evolution-container">
             <div class="evo-card evo-left">
@@ -536,18 +563,26 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const section = document.getElementById('evolution-section');
-            const movingNode = document.getElementById('movingNode');
-            // Obtenemos el camino del progreso del SVG
-            const progressPath = document.getElementById('progressPath');
-            const evoCards = document.querySelectorAll('.evo-card');
             const aboutFrame = document.getElementById('aboutFrame');
+            const evoCards = document.querySelectorAll('.evo-card');
 
-            // Calculamos la longitud total del camino SVG
-            const pathLength = progressPath.getTotalLength();
+            // ELEMENTOS DESKTOP
+            const desktopSvg = document.querySelector('.desktop-svg-container');
+            const progressPath = document.getElementById('progressPath');
+            const desktopBall = document.getElementById('desktopBall');
+            
+            // ELEMENTOS MÓVIL
+            const mobileSystem = document.querySelector('.mobile-system');
+            const mobileProgress = document.getElementById('mobileProgress');
+            const mobileBall = document.getElementById('mobileBall');
 
-            // Inicializamos el camino como "no dibujado"
-            progressPath.style.strokeDasharray = pathLength;
-            progressPath.style.strokeDashoffset = pathLength;
+            // Configurar SVG Desktop
+            let pathLength = 0;
+            if(progressPath) {
+                pathLength = progressPath.getTotalLength();
+                progressPath.style.strokeDasharray = pathLength;
+                progressPath.style.strokeDashoffset = pathLength;
+            }
 
             window.addEventListener('scroll', function() {
                 if(!section) return; 
@@ -556,30 +591,31 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Cálculo del porcentaje de scroll relativo a la sección
-                // Ajustamos los valores para que empiece y termine en los momentos adecuados
+                // Cálculo de scroll (0 a 1)
                 let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.8);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
-                // --- LÓGICA HÍBRIDA (MÓVIL vs DESKTOP) ---
+                // --- LÓGICA HÍBRIDA (MOBILE VS DESKTOP) ---
                 if (window.innerWidth <= 768) {
-                    // MÓVIL: La bola sigue una línea recta vertical simple
-                    movingNode.style.left = '50%'; // Siempre al centro
-                    movingNode.style.top = (scrollPercent * 100) + '%'; // Sigue el scroll
-                    movingNode.style.transform = 'translate(-50%, -50%)'; // Centrado exacto
+                    // MÓVIL: Usar el sistema de divs
+                    if(mobileProgress && mobileBall) {
+                        const percent = scrollPercent * 100;
+                        mobileProgress.style.height = percent + '%';
+                        mobileBall.style.top = percent + '%';
+                    }
                 } else {
-                    // DESKTOP: La bola sigue la curva SVG
-                    const drawLength = pathLength * scrollPercent;
-                    progressPath.style.strokeDashoffset = pathLength - drawLength;
-                    
-                    const point = progressPath.getPointAtLength(drawLength);
-                    movingNode.style.transform = `translate(${point.x}px, ${point.y}px) translate(-50%, -50%)`;
-                    // Resetear left/top por si se viene de móvil
-                    movingNode.style.left = '0';
-                    movingNode.style.top = '0';
+                    // DESKTOP: Usar el sistema SVG
+                    if(progressPath && desktopBall) {
+                        const drawLength = pathLength * scrollPercent;
+                        progressPath.style.strokeDashoffset = pathLength - drawLength;
+                        
+                        const point = progressPath.getPointAtLength(drawLength);
+                        desktopBall.setAttribute("cx", point.x);
+                        desktopBall.setAttribute("cy", point.y);
+                    }
                 }
 
-                // 3. Animación de aparición de tarjetas
+                // Aparición Tarjetas
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
                     const triggerPoint = window.innerHeight * 0.8; 
@@ -588,7 +624,7 @@
                     } 
                 });
 
-                // 4. Animación del marco final
+                // Marco Final
                 if (scrollPercent > 0.96) {
                     if(aboutFrame) aboutFrame.classList.add('frame-active');
                 } else {
