@@ -51,38 +51,63 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- MODERN EVOLUTION TRANSITION (MokN Style) --- */
+        /* --- MODERN EVOLUTION TRANSITION (Scroll Effect) --- */
         .evolution-section {
-            padding: 100px 0;
-            background-color: #050a14; /* Fondo ultra oscuro */
+            padding: 150px 0; /* Más altura para dar espacio al scroll */
+            background-color: #050a14;
             position: relative;
             overflow: hidden;
             display: flex;
             justify-content: center;
         }
 
+        /* Línea Base (Gris apagada) */
         .evolution-line {
             position: absolute;
             left: 50%;
             top: 0;
             bottom: 0;
             width: 2px;
-            background: linear-gradient(to bottom, 
-                rgba(59, 130, 246, 0) 0%, 
-                rgba(59, 130, 246, 0.5) 20%, 
-                rgba(251, 191, 36, 1) 50%, 
-                rgba(59, 130, 246, 0.5) 80%, 
-                rgba(59, 130, 246, 0) 100%);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateX(-50%);
             z-index: 1;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Línea de Progreso (La que se ilumina al bajar) */
+        .evolution-line-progress {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 0%; /* Se llenará con JS */
+            background: linear-gradient(to bottom, var(--accent), var(--accent-gold));
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 0 0 15px var(--accent);
+            transition: height 0.1s linear;
+        }
+
+        /* Esfera Brillante (Nodo Móvil) */
+        .moving-node {
+            position: absolute;
+            left: 50%;
+            top: 0%; /* Se moverá con JS */
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            background-color: #fff;
+            border: 2px solid var(--accent-gold);
+            border-radius: 50%;
+            z-index: 10;
+            box-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--accent);
+            transition: top 0.1s linear;
         }
 
         .evolution-container {
             max-width: 1000px;
             width: 100%;
             position: relative;
-            z-index: 2;
+            z-index: 5;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 80px;
@@ -90,81 +115,39 @@
         }
 
         .evo-card {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.4);
             padding: 40px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            backdrop-filter: blur(10px);
-            transition: 0.4s ease;
+            backdrop-filter: blur(5px);
+            transition: all 0.6s ease;
+            opacity: 0.5; /* Empiezan apagadas */
+            transform: scale(0.95);
         }
 
-        .evo-card:hover {
-            background: rgba(15, 23, 42, 0.9);
-            border-color: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+        /* Clase activa cuando el scroll llega */
+        .evo-card.active {
+            opacity: 1;
+            transform: scale(1);
+            background: rgba(15, 23, 42, 0.8);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
         }
 
         /* Esquinas tecnológicas */
         .evo-card::before, .evo-card::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            transition: 0.3s;
+            content: ''; position: absolute; width: 20px; height: 20px; transition: 0.3s;
+        }
+        .evo-card::before { top: -1px; left: -1px; border-top: 2px solid var(--text-muted); border-left: 2px solid var(--text-muted); }
+        .evo-card::after { bottom: -1px; right: -1px; border-bottom: 2px solid var(--text-muted); border-right: 2px solid var(--text-muted); }
+
+        .evo-card.active::before, .evo-card.active::after {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
         }
 
-        .evo-card::before {
-            top: -1px; left: -1px;
-            border-top: 2px solid var(--text-muted);
-            border-left: 2px solid var(--text-muted);
-        }
-        .evo-card::after {
-            bottom: -1px; right: -1px;
-            border-bottom: 2px solid var(--text-muted);
-            border-right: 2px solid var(--text-muted);
-        }
-
-        .evo-legacy::before, .evo-legacy::after { border-color: #64748b; opacity: 0.3; }
-        .evo-modern::before, .evo-modern::after { border-color: var(--accent-gold); opacity: 1; box-shadow: 0 0 10px var(--accent-gold); }
-
-        .evo-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .legacy-title { color: #64748b; }
-        .modern-title { color: var(--accent); text-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
-
-        .evo-header {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.1;
-            color: white;
-        }
-
-        .evo-desc {
-            color: #94a3b8;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-
-        .center-node {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 12px;
-            height: 12px;
-            background-color: var(--bg-dark);
-            border: 2px solid var(--accent-gold);
-            border-radius: 50%;
-            z-index: 10;
-            box-shadow: 0 0 15px var(--accent-gold), inset 0 0 10px var(--accent-gold);
-        }
+        .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 20px; color: white; }
+        .evo-desc { color: #94a3b8; font-size: 1rem; line-height: 1.6; }
 
         /* --- ABOUT ME --- */
         .about-section { padding: 100px 0; background-color: #0f1629; }
@@ -196,8 +179,8 @@
         }
 
         .stack-card {
-            background-color: #0f172a; /* Fondo muy oscuro */
-            border: 1px solid #1e3a8a; /* Borde azul */
+            background-color: #0f172a; 
+            border: 1px solid #1e3a8a; 
             border-radius: 12px;
             padding: 30px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -223,32 +206,13 @@
 
         .skill-list { display: flex; flex-direction: column; gap: 15px; }
         
-        .skill-item { 
-            display: flex; 
-            align-items: center; 
-            color: #e2e8f0; 
-            font-size: 1rem; 
-            font-weight: 500;
-        }
-
-        .skill-item i { 
-            width: 30px; 
-            margin-right: 10px; 
-            color: #64748b; 
-            text-align: center; 
-            font-size: 1.1rem;
-        }
-        
+        .skill-item { display: flex; align-items: center; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
+        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
 
         .tech-level {
-            margin-left: auto;
-            font-size: 0.8rem;
-            color: var(--accent-gold); /* Texto dorado */
-            font-weight: 600;
-            background: rgba(251, 191, 36, 0.1);
-            padding: 2px 8px;
-            border-radius: 4px;
+            margin-left: auto; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600;
+            background: rgba(251, 191, 36, 0.1); padding: 2px 8px; border-radius: 4px;
         }
 
         /* --- PROJECTS --- */
@@ -291,11 +255,12 @@
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
 
-            /* Ajustes para la sección Evolution en móvil */
+            /* Ajustes para Evolution en móvil */
             .evolution-container { grid-template-columns: 1fr; gap: 40px; }
             .evolution-line { left: 20px; }
-            .center-node { left: 20px; }
-            .evo-card { margin-left: 30px; }
+            .evolution-line-progress { left: 20px; }
+            .moving-node { left: 20px; }
+            .evo-card { margin-left: 35px; } /* Espacio para que no tape la línea */
         }
     </style>
 </head>
@@ -330,24 +295,25 @@
         </div>
     </section> 
 
-    <div class="evolution-section">
+    <div id="evolution-section" class="evolution-section">
         <div class="evolution-line"></div>
+        <div class="evolution-line-progress" id="evoLineProgress"></div>
         
-        <div class="center-node"></div>
+        <div class="moving-node" id="movingNode"></div>
 
         <div class="evolution-container">
             
-            <div class="evo-card evo-legacy" style="text-align: right; border-right: none; align-self: center;">
-                <span class="evo-title legacy-title">The Legacy Trap</span>
-                <h3 class="evo-header" style="opacity: 0.6;">Data Silos & <br>Manual Fatigue</h3>
+            <div class="evo-card evo-legacy" id="cardLegacy" style="text-align: right; border-right: none; align-self: start;">
+                <span style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">The Legacy Trap</span>
+                <h3 class="evo-header" style="opacity: 0.7;">Data Silos & <br>Manual Fatigue</h3>
                 <p class="evo-desc">
                     Spreadsheets that crash, fragmented SQL queries, and reactive fixing. 
                     Where data is a burden, not an asset.
                 </p>
             </div>
 
-            <div class="evo-card evo-modern" style="align-self: center;">
-                <span class="evo-title modern-title">The New Standard</span>
+            <div class="evo-card evo-modern" id="cardModern" style="align-self: end; margin-top: 100px;">
+                <span style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">The New Standard</span>
                 <h3 class="evo-header">Automated Engineering <br>& <span class="highlight">True Scalability</span></h3>
                 <p class="evo-desc" style="color: #e2e8f0;">
                     Robust Pipelines (Airflow), Single Source of Truth (BigQuery), and 
@@ -477,6 +443,7 @@
             </div>
         </div>
     </section>
+
     <section id="projects" class="projects-section">
         <div class="container">
             <h2 class="section-title">Selected <span class="highlight">Case Studies</span></h2>
@@ -550,6 +517,57 @@
             <p>© 2025 Javier Moraga. Built for the Global Market.</p>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            const section = document.getElementById('evolution-section');
+            const movingNode = document.getElementById('movingNode');
+            const lineProgress = document.getElementById('evoLineProgress');
+            const cardLegacy = document.getElementById('cardLegacy');
+            const cardModern = document.getElementById('cardModern');
+
+            window.addEventListener('scroll', function() {
+                // Calcular posición
+                const rect = section.getBoundingClientRect();
+                const sectionHeight = section.offsetHeight;
+                const windowHeight = window.innerHeight;
+
+                // Calculamos cuánto ha entrado la sección en pantalla
+                // 0 = la sección empieza a entrar por abajo
+                // 1 = la sección ha salido por arriba (aprox)
+                // Ajustamos para que el efecto ocurra mientras la sección está visible
+                
+                // Queremos que el nodo empiece arriba cuando la sección está centrada
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.6);
+                
+                // Limitar entre 0 y 1
+                scrollPercent = Math.max(0, Math.min(1, scrollPercent));
+
+                // Convertir a porcentaje CSS
+                const cssPercent = scrollPercent * 100;
+
+                // 1. Mover la esfera
+                movingNode.style.top = cssPercent + '%';
+
+                // 2. Llenar la línea
+                lineProgress.style.height = cssPercent + '%';
+
+                // 3. Activar tarjetas según el progreso
+                if (scrollPercent > 0.1) {
+                    cardLegacy.classList.add('active');
+                } else {
+                    cardLegacy.classList.remove('active');
+                }
+
+                if (scrollPercent > 0.6) {
+                    cardModern.classList.add('active');
+                } else {
+                    cardModern.classList.remove('active');
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
