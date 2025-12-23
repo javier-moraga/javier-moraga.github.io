@@ -23,7 +23,7 @@
 
         /* --- GENERAL --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         
@@ -51,9 +51,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- MODERN EVOLUTION TRANSITION (Scroll Effect) --- */
+        /* --- MOKN-STYLE EVOLUTION SECTION --- */
         .evolution-section {
-            padding: 150px 0; /* Más altura para dar espacio al scroll */
+            padding: 120px 0 180px 0;
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -61,46 +61,44 @@
             justify-content: center;
         }
 
-        /* Línea Base (Gris apagada) */
+        /* Línea Central Base */
         .evolution-line {
             position: absolute;
             left: 50%;
             top: 0;
             bottom: 0;
             width: 2px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             transform: translateX(-50%);
             z-index: 1;
         }
 
-        /* Línea de Progreso (La que se ilumina al bajar) */
+        /* Línea Central Iluminada */
         .evolution-line-progress {
             position: absolute;
             left: 50%;
             top: 0;
             width: 2px;
-            height: 0%; /* Se llenará con JS */
+            height: 0%;
             background: linear-gradient(to bottom, var(--accent), var(--accent-gold));
             transform: translateX(-50%);
             z-index: 2;
-            box-shadow: 0 0 15px var(--accent);
+            box-shadow: 0 0 20px var(--accent);
             transition: height 0.1s linear;
         }
 
-        /* Esfera Brillante (Nodo Móvil) */
+        /* Nodo Móvil (La chispa) */
         .moving-node {
             position: absolute;
             left: 50%;
-            top: 0%; /* Se moverá con JS */
+            top: 0%;
             transform: translate(-50%, -50%);
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background-color: #fff;
-            border: 2px solid var(--accent-gold);
             border-radius: 50%;
             z-index: 10;
-            box-shadow: 0 0 20px var(--accent-gold), 0 0 40px var(--accent);
-            transition: top 0.1s linear;
+            box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold);
         }
 
         .evolution-container {
@@ -109,45 +107,104 @@
             position: relative;
             z-index: 5;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
+            grid-template-columns: 1fr 1fr; /* Dos columnas lado a lado */
+            gap: 120px; /* Separación amplia para el efecto 'Side to Side' */
             padding: 20px;
         }
 
+        /* Estilo Base de Tarjeta */
         .evo-card {
             background: rgba(15, 23, 42, 0.4);
-            padding: 40px;
+            padding: 35px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            backdrop-filter: blur(5px);
-            transition: all 0.6s ease;
-            opacity: 0.5; /* Empiezan apagadas */
-            transform: scale(0.95);
+            backdrop-filter: blur(8px);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; /* Invisible al inicio */
         }
 
-        /* Clase activa cuando el scroll llega */
+        /* --- ANIMACIONES LATERALES (SIDE TO SIDE) --- */
+        
+        /* Tarjeta Izquierda (Legacy) */
+        .evo-legacy {
+            transform: translateX(-100px); /* Empieza desplazada a la izquierda */
+            text-align: right;
+            border-right: 3px solid rgba(255,255,255,0.1); /* Borde acento */
+        }
+
+        /* Tarjeta Derecha (Modern) */
+        .evo-modern {
+            transform: translateX(100px); /* Empieza desplazada a la derecha */
+            border-left: 3px solid rgba(255,255,255,0.1); /* Borde acento */
+            margin-top: 150px; /* Desplazamiento vertical para efecto cascada */
+        }
+
+        /* ESTADO ACTIVO (Cuando llega el scroll) */
         .evo-card.active {
             opacity: 1;
-            transform: scale(1);
+            transform: translateX(0); /* Vuelve a su sitio */
             background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .evo-legacy.active { border-right-color: #64748b; }
+        .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 40px rgba(59, 130, 246, 0.1); }
+
+
+        /* --- CONECTORES (Brazos Horizontales) --- */
+        /* Dibujamos una línea desde la tarjeta hasta el centro */
+        .evo-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 60px; /* Largo del brazo */
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            transition: 0.8s ease;
+        }
+
+        /* Posición del brazo izquierdo */
+        .evo-legacy::before {
+            right: -60px; /* Sale hacia la derecha */
+        }
+
+        /* Posición del brazo derecho */
+        .evo-modern::before {
+            left: -60px; /* Sale hacia la izquierda */
+        }
+
+        /* Cuando se activa, el brazo se ilumina */
+        .evo-legacy.active::before { background: #64748b; box-shadow: 0 0 10px #64748b; }
+        .evo-modern.active::before { background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
+
+        /* Puntos de conexión en la línea central */
+        .connector-dot {
+            position: absolute;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #0b1120;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            transition: 0.3s;
+        }
+        
+        .dot-legacy { top: 25%; } /* Alineado visualmente con tarjeta legacy */
+        .dot-modern { top: 75%; } /* Alineado visualmente con tarjeta modern */
+
+        .active-dot {
+            background: var(--accent-gold);
             border-color: var(--accent-gold);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 15px var(--accent-gold);
         }
 
-        /* Esquinas tecnológicas */
-        .evo-card::before, .evo-card::after {
-            content: ''; position: absolute; width: 20px; height: 20px; transition: 0.3s;
-        }
-        .evo-card::before { top: -1px; left: -1px; border-top: 2px solid var(--text-muted); border-left: 2px solid var(--text-muted); }
-        .evo-card::after { bottom: -1px; right: -1px; border-bottom: 2px solid var(--text-muted); border-right: 2px solid var(--text-muted); }
-
-        .evo-card.active::before, .evo-card.active::after {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent);
-        }
-
-        .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 20px; color: white; }
-        .evo-desc { color: #94a3b8; font-size: 1rem; line-height: 1.6; }
+        /* Textos */
+        .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
+        .evo-desc { color: #94a3b8; font-size: 1rem; }
+        .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
 
         /* --- ABOUT ME --- */
         .about-section { padding: 100px 0; background-color: #0f1629; }
@@ -205,15 +262,10 @@
         }
 
         .skill-list { display: flex; flex-direction: column; gap: 15px; }
-        
         .skill-item { display: flex; align-items: center; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
         .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
-
-        .tech-level {
-            margin-left: auto; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600;
-            background: rgba(251, 191, 36, 0.1); padding: 2px 8px; border-radius: 4px;
-        }
+        .tech-level { margin-left: auto; font-size: 0.8rem; color: var(--accent-gold); font-weight: 600; background: rgba(251, 191, 36, 0.1); padding: 2px 8px; border-radius: 4px; }
 
         /* --- PROJECTS --- */
         .projects-section { padding: 100px 0; background-color: #0f1629; }
@@ -235,9 +287,9 @@
         
         /* Buttons */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-fill { padding: 8px 16px; background: var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent); }
         .btn-outline { padding: 8px 16px; border: 1px solid var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; }
         .btn-outline:hover { background: var(--accent); color: white; }
-        .btn-fill { padding: 8px 16px; background: var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent); }
 
         /* Contact & Footer */
         .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); }
@@ -255,12 +307,19 @@
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
 
-            /* Ajustes para Evolution en móvil */
-            .evolution-container { grid-template-columns: 1fr; gap: 40px; }
+            /* Ajustes Móviles Evolution */
+            .evolution-container { grid-template-columns: 1fr; gap: 50px; }
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
-            .evo-card { margin-left: 35px; } /* Espacio para que no tape la línea */
+            .connector-dot { left: 20px; }
+            
+            .evo-card { margin-left: 40px; transform: translateX(0) !important; margin-top: 20px !important; text-align: left; }
+            .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
+            
+            /* En móvil los brazos salen hacia la izquierda para conectar con la línea */
+            .evo-card::before { width: 20px; left: -20px; right: auto; }
+            .evo-legacy::before { left: -20px; right: auto; }
         }
     </style>
 </head>
@@ -299,12 +358,15 @@
         <div class="evolution-line"></div>
         <div class="evolution-line-progress" id="evoLineProgress"></div>
         
+        <div class="connector-dot dot-legacy" id="dotLegacy"></div>
+        <div class="connector-dot dot-modern" id="dotModern"></div>
+        
         <div class="moving-node" id="movingNode"></div>
 
         <div class="evolution-container">
             
-            <div class="evo-card evo-legacy" id="cardLegacy" style="text-align: right; border-right: none; align-self: start;">
-                <span style="color: #64748b; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">The Legacy Trap</span>
+            <div class="evo-card evo-legacy" id="cardLegacy">
+                <span class="evo-label" style="color: #64748b;">The Legacy Trap</span>
                 <h3 class="evo-header" style="opacity: 0.7;">Data Silos & <br>Manual Fatigue</h3>
                 <p class="evo-desc">
                     Spreadsheets that crash, fragmented SQL queries, and reactive fixing. 
@@ -312,8 +374,8 @@
                 </p>
             </div>
 
-            <div class="evo-card evo-modern" id="cardModern" style="align-self: end; margin-top: 100px;">
-                <span style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">The New Standard</span>
+            <div class="evo-card evo-modern" id="cardModern">
+                <span class="evo-label" style="color: var(--accent);">The New Standard</span>
                 <h3 class="evo-header">Automated Engineering <br>& <span class="highlight">True Scalability</span></h3>
                 <p class="evo-desc" style="color: #e2e8f0;">
                     Robust Pipelines (Airflow), Single Source of Truth (BigQuery), and 
@@ -410,7 +472,6 @@
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
             
             <div class="stack-container">
-            
                 <div class="stack-card">
                     <div class="card-header">Cloud & Engineering</div>
                     <div class="skill-list">
@@ -420,7 +481,6 @@
                     <div class="skill-item"><i class="fa-brands fa-aws"></i> AWS Basic</div>
                     </div>
                 </div>
-            
                 <div class="stack-card">
                     <div class="card-header">Languages & Core</div>
                     <div class="skill-list">
@@ -430,7 +490,6 @@
                     <div class="skill-item"><i class="fa-brands fa-html5"></i> HTML/CSS</div>
                     </div>
                 </div>
-            
                 <div class="stack-card">
                     <div class="card-header">Specialized Tools</div>
                     <div class="skill-list">
@@ -439,7 +498,6 @@
                     <div class="skill-item"><i class="fa-solid fa-chart-line"></i> Power BI / Looker <span class="tech-level">Advanced</span></div>
                     </div>
                 </div>
-            
             </div>
         </div>
     </section>
@@ -493,17 +551,12 @@
         <div class="container">
             <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
             <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
-            
             <div style="margin-top: 50px; margin-bottom: 30px;">
                 <img src="rocky.jpg" alt="Rocky" 
                      style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" 
                      onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
-                
-                <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">
-                    (Rocky is also ready for the flight! 🐾)
-                </p>
+                <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">(Rocky is also ready for the flight! 🐾)</p>
             </div>
-
             <div class="contact-icons">
                 <a href="mailto:javierignacio.moraga@gmail.com" class="c-icon"><i class="fa-solid fa-envelope"></i></a>
                 <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" class="c-icon"><i class="fa-brands fa-linkedin"></i></a>
@@ -524,46 +577,45 @@
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
+            
             const cardLegacy = document.getElementById('cardLegacy');
             const cardModern = document.getElementById('cardModern');
+            const dotLegacy = document.getElementById('dotLegacy');
+            const dotModern = document.getElementById('dotModern');
 
             window.addEventListener('scroll', function() {
-                // Calcular posición
                 const rect = section.getBoundingClientRect();
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Calculamos cuánto ha entrado la sección en pantalla
-                // 0 = la sección empieza a entrar por abajo
-                // 1 = la sección ha salido por arriba (aprox)
-                // Ajustamos para que el efecto ocurra mientras la sección está visible
-                
-                // Queremos que el nodo empiece arriba cuando la sección está centrada
-                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.6);
-                
-                // Limitar entre 0 y 1
+                // Calculamos el % de scroll dentro de la sección
+                // Ajustamos para que empiece un poco antes y termine un poco después
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.7);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
-
-                // Convertir a porcentaje CSS
                 const cssPercent = scrollPercent * 100;
 
-                // 1. Mover la esfera
+                // Mover esfera y llenar línea
                 movingNode.style.top = cssPercent + '%';
-
-                // 2. Llenar la línea
                 lineProgress.style.height = cssPercent + '%';
 
-                // 3. Activar tarjetas según el progreso
-                if (scrollPercent > 0.1) {
+                // --- ACTIVACIÓN SECUENCIAL CON EFECTO SIDE-TO-SIDE ---
+                
+                // 1. Tarjeta Legacy (Llega al 25% aprox)
+                if (scrollPercent > 0.20) {
                     cardLegacy.classList.add('active');
+                    dotLegacy.classList.add('active-dot');
                 } else {
                     cardLegacy.classList.remove('active');
+                    dotLegacy.classList.remove('active-dot');
                 }
 
-                if (scrollPercent > 0.6) {
+                // 2. Tarjeta Modern (Llega al 70% aprox)
+                if (scrollPercent > 0.65) {
                     cardModern.classList.add('active');
+                    dotModern.classList.add('active-dot');
                 } else {
                     cardModern.classList.remove('active');
+                    dotModern.classList.remove('active-dot');
                 }
             });
         });
