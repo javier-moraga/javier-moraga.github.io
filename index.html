@@ -67,7 +67,7 @@
 
         .nav-btn span { position: absolute; display: block; }
 
-        /* Animación Snake: Cabeza brillante, cola transparente */
+        /* Animación Snake */
         .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
         @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
         
@@ -90,9 +90,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (3 STEPS ZIG-ZAG) --- */
+        /* --- EVOLUTION SECTION (3 STEPS ZIG-ZAG AJUSTADO) --- */
         .evolution-section {
-            padding: 80px 0 200px 0;
+            padding: 80px 0 350px 0; /* Padding inferior aumentado considerablemente */
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -107,8 +107,8 @@
         .evolution-container { 
             max-width: 1000px; width: 100%; position: relative; z-index: 5; 
             display: grid; grid-template-columns: 1fr 1fr; 
-            /* AUMENTADO: Gap más grande para separar las tarjetas verticalmente */
-            gap: 180px; 
+            /* GAP AUMENTADO A 300PX PARA SEPARACIÓN CLARA */
+            gap: 300px; 
             padding: 20px;
         }
 
@@ -132,7 +132,7 @@
             grid-column: 2; text-align: left; 
             transform: translateX(50px); 
             border-left: 3px solid rgba(255,255,255,0.1); 
-            margin-top: 100px; /* Desfase visual inicial */
+            margin-top: 200px; /* DESFASE AUMENTADO A 200PX */
         }
 
         /* ACTIVACIÓN */
@@ -144,7 +144,7 @@
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         
         /* Ajuste para la 3ra tarjeta */
-        .evo-left-2 { margin-top: 100px; }
+        .evo-left-2 { margin-top: 200px; /* DESFASE AUMENTADO A 200PX */ }
 
         /* --- ABOUT ME SECTION --- */
         .about-frame-container {
@@ -513,7 +513,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. ANIMACIÓN EVOLUTION (3 CARDS SCROLL) --- */
+            /* --- 1. ANIMACIÓN EVOLUTION (3 CARDS ZIG-ZAG) --- */
             const section = document.getElementById('evolution-section');
             const movingNode = document.getElementById('movingNode');
             const lineProgress = document.getElementById('evoLineProgress');
@@ -532,7 +532,7 @@
                 const windowHeight = window.innerHeight;
 
                 // Cálculo del progreso del scroll
-                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.95);
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.9);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
