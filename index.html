@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABLES --- */
+        /* --- VARIABLES GLOBALES --- */
         :root {
             --bg-dark: #0b1120;
             --bg-card: #151e32;
@@ -21,15 +21,14 @@
             --text-muted: #94a3b8;
         }
 
-        /* --- GENERAL --- */
+        /* --- ESTILOS GENERALES --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        
         .highlight { color: var(--accent-gold); font-weight: 700; }
 
-        /* --- HEADER --- */
+        /* --- HEADER (Navegación) --- */
         header {
             padding: 20px 0; position: fixed; width: 100%;
             background-color: rgba(11, 17, 32, 0.95); backdrop-filter: blur(10px);
@@ -41,7 +40,7 @@
         .nav-links a { margin-left: 30px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
-        /* --- HERO --- */
+        /* --- HERO SECTION (Portada) --- */
         .hero { padding: 180px 0 100px; text-align: center; }
         .hero h1 {
             font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
@@ -51,9 +50,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- MOKN-STYLE EVOLUTION SECTION --- */
+        /* --- EVOLUTION SECTION (Estilo MokN) --- */
         .evolution-section {
-            padding: 100px 0 400px 0; /* Mucho espacio para scroll */
+            padding: 100px 0 450px 0; /* Espacio extra inferior para el scroll */
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -61,110 +60,68 @@
             justify-content: center;
         }
 
-        /* Línea Central */
-        .evolution-line {
-            position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
-            background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1;
-        }
+        /* Líneas Centrales */
+        .evolution-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1; }
+        .evolution-line-progress { position: absolute; left: 50%; top: 0; width: 2px; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent); transition: height 0.1s linear; }
+        
+        /* Esfera Móvil */
+        .moving-node { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold); }
 
-        .evolution-line-progress {
-            position: absolute; left: 50%; top: 0; width: 2px; height: 0%;
-            background: linear-gradient(to bottom, var(--accent), var(--accent-gold));
-            transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent);
-            transition: height 0.1s linear;
-        }
+        .evolution-container { max-width: 1000px; width: 100%; position: relative; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px; }
 
-        /* ESFERA MÓVIL (Por encima de todo) */
-        .moving-node {
-            position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%);
-            width: 14px; height: 14px; background-color: #fff; border-radius: 50%;
-            z-index: 20; /* Z-Index alto para brillar sobre todo */
-            box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold);
-        }
-
-        .evolution-container {
-            max-width: 1000px; width: 100%; position: relative; z-index: 5;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px;
-        }
-
-        /* TARJETAS CON TAMAÑO FIJO */
+        /* Tarjetas */
         .evo-card {
-            background: rgba(15, 23, 42, 0.4); 
-            padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            position: relative;
-            backdrop-filter: blur(8px); 
-            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0;
-            /* Tamaño Fijo Rectangular */
-            height: 320px; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: rgba(15, 23, 42, 0.4); padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05); position: relative;
+            backdrop-filter: blur(8px); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; height: 320px; display: flex; flex-direction: column; justify-content: center;
         }
+        .evo-legacy { transform: translateX(-50px); text-align: right; border-right: 3px solid rgba(255,255,255,0.1); margin-top: 50px; }
+        .evo-modern { transform: translateX(50px); border-left: 3px solid rgba(255,255,255,0.1); margin-top: 550px; /* Separación vertical grande */ }
 
-        /* Posicionamiento inicial */
-        .evo-legacy {
-            transform: translateX(-50px);
-            text-align: right;
-            border-right: 3px solid rgba(255,255,255,0.1);
-            margin-top: 50px;
-        }
-
-        .evo-modern {
-            transform: translateX(50px);
-            border-left: 3px solid rgba(255,255,255,0.1);
-            margin-top: 500px; /* Separación vertical grande */
-        }
-
-        /* ESTADO ACTIVO (ILUMINADO) */
-        .evo-card.active {
-            opacity: 1;
-            transform: translateX(0);
-            background: rgba(15, 23, 42, 0.9); /* Más opaco al activarse */
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); /* Glow sutil */
-        }
-
+        /* Estado Activo Tarjetas */
+        .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
         .evo-legacy.active { border-right-color: #64748b; }
         .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
 
         /* Conectores (Brazos) */
-        .evo-card::before {
-            content: ''; position: absolute; top: 50%; width: 60px; height: 1px;
-            background: rgba(255,255,255,0.1); transition: 0.6s ease;
-        }
+        .evo-card::before { content: ''; position: absolute; top: 50%; width: 60px; height: 1px; background: rgba(255,255,255,0.1); transition: 0.6s ease; }
         .evo-legacy::before { right: -60px; }
         .evo-modern::before { left: -60px; }
-
         .evo-legacy.active::before { background: #64748b; box-shadow: 0 0 10px #64748b; }
         .evo-modern.active::before { background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
 
-        /* Puntos en la línea (Dots) */
-        .connector-dot {
-            position: absolute; left: 50%; width: 8px; height: 8px;
-            background: #0b1120; border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; transition: 0.3s;
-        }
-        
-        /* Ajuste fino de posición vertical de los puntos */
-        .dot-legacy { top: 18%; } /* Coincide con el centro de la tarjeta 1 */
-        .dot-modern { top: 82%; } /* Coincide con el centro de la tarjeta 2 */
-
+        /* Puntos Fijos (Dots) - ALINEACIÓN CORREGIDA */
+        .connector-dot { position: absolute; left: 50%; width: 8px; height: 8px; background: #0b1120; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; transition: 0.3s; }
+        .dot-legacy { top: 19.5%; } /* Alineado al centro de la tarjeta 1 */
+        .dot-modern { top: 80.5%; } /* Alineado al centro de la tarjeta 2 */
         .active-dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold); }
 
+        /* Textos Tarjetas */
         .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         .evo-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; font-weight: 600; }
 
-        /* --- ABOUT ME --- */
-        .about-section { padding: 100px 0; background-color: #0f1629; }
+        /* --- ABOUT ME SECTION (Con efecto de marco final) --- */
+        .about-frame-container {
+            padding: 100px 0; background-color: #0f1629;
+            /* Borde inicial invisible */
+            border-top: 2px solid transparent;
+            box-shadow: none;
+            transition: all 0.8s ease;
+        }
+
+        /* Clase que se añade con JS al final del scroll */
+        .about-frame-container.frame-active {
+            border-top-color: var(--accent-gold);
+            box-shadow: 0 -20px 60px rgba(251, 191, 36, 0.2); /* Luz dorada hacia arriba */
+        }
+
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
         .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
-        
         .industries-box { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 3px solid var(--accent-gold); }
         .industries-box h4 { color: var(--accent-gold); margin-bottom: 10px; }
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
@@ -198,7 +155,7 @@
         .btn-outline { padding: 8px 16px; border: 1px solid var(--accent); color: white; border-radius: 5px; font-size: 0.9rem; font-weight: 600; }
         .btn-outline:hover { background: var(--accent); color: white; }
 
-        /* Contact & Footer */
+        /* --- CONTACT & FOOTER --- */
         .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); }
         .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         .c-icon { font-size: 2rem; color: var(--text-muted); transition: 0.3s; }
@@ -214,17 +171,17 @@
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
 
-            /* Ajustes Móviles Evolution */
+            /* Ajustes Móviles Evolution - ALINEACIÓN CORREGIDA */
             .evolution-container { grid-template-columns: 1fr; gap: 50px; }
             .evolution-line { left: 20px; }
             .evolution-line-progress { left: 20px; }
             .moving-node { left: 20px; }
             .connector-dot { left: 20px; }
             
-            .evo-card { margin-left: 40px; transform: translateX(0) !important; margin-top: 50px !important; text-align: left; height: auto; }
-            .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-top: 20px; }
+            /* En móvil quitamos el desplazamiento horizontal para que no se vea cortado */
+            .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; }
+            .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); }
             .evo-modern { margin-top: 80px !important; }
-            
             .evo-card::before { width: 20px; left: -20px; right: auto; }
             .evo-legacy::before { left: -20px; right: auto; }
         }
@@ -269,7 +226,6 @@
         <div class="moving-node" id="movingNode"></div>
 
         <div class="evolution-container">
-            
             <div class="evo-card evo-legacy" id="cardLegacy">
                 <span class="evo-label" style="color: #64748b;">The Conventional Trap</span>
                 <h3 class="evo-header" style="opacity: 0.7;">"Because we've always <br>done it this way."</h3>
@@ -287,11 +243,11 @@
                     <strong>I don't just migrate data; I bring fresh perspectives to redefine how problems are solved.</strong>
                 </p>
             </div>
-
         </div>
     </div>
-    <section id="about" class="about-section">
-        <div class="container about-grid">
+
+    <div id="aboutFrame" class="about-frame-container">
+        <section id="about" class="container about-grid">
             <div class="profile-img-container">
                 <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
                 <div style="margin-top: 25px;">
@@ -313,6 +269,7 @@
             <div class="about-text">
                 <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
                 <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
+                
                 <p>
                     Beyond the code and pipelines, I am a <strong>problem-solver</strong> with over 10 years of resilience and adaptability in high-pressure industries like Healthcare and Aviation. 
                     I am driven by curiosity and the challenge of translating complex scenarios into clear solutions.
@@ -347,8 +304,8 @@
                     <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" target="_blank" class="btn-outline"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <section id="skills" class="skills-section">
         <div class="container">
@@ -463,13 +420,13 @@
             const cardModern = document.getElementById('cardModern');
             const dotLegacy = document.getElementById('dotLegacy');
             const dotModern = document.getElementById('dotModern');
+            
+            const aboutFrame = document.getElementById('aboutFrame');
 
             // Fallback de seguridad
             setTimeout(() => {
                 if(!cardLegacy.classList.contains('active')) {
-                    // Si algo falla, forzar visibilidad inicial
-                    cardLegacy.style.opacity = '0.5';
-                    cardLegacy.style.transform = 'translateX(-20px)';
+                    cardLegacy.style.opacity = '0.5'; cardLegacy.style.transform = 'translateX(-20px)';
                 }
             }, 3000);
 
@@ -480,8 +437,8 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Calculamos el % de scroll con más margen
-                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.85);
+                // Cálculo del % de scroll
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.88);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
@@ -489,7 +446,7 @@
                 if(movingNode) movingNode.style.top = cssPercent + '%';
                 if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // --- ACTIVACIÓN TARJETA 1 (LEGACY) ---
+                // --- ACTIVACIÓN TARJETAS Y PUNTOS ---
                 if (scrollPercent > 0.18) {
                     if(cardLegacy) cardLegacy.classList.add('active');
                     if(dotLegacy) dotLegacy.classList.add('active-dot');
@@ -498,13 +455,20 @@
                     if(dotLegacy) dotLegacy.classList.remove('active-dot');
                 }
 
-                // --- ACTIVACIÓN TARJETA 2 (MODERN) ---
-                if (scrollPercent > 0.82) {
+                if (scrollPercent > 0.78) {
                     if(cardModern) cardModern.classList.add('active');
                     if(dotModern) dotModern.classList.add('active-dot');
                 } else {
                     if(cardModern) cardModern.classList.remove('active');
                     if(dotModern) dotModern.classList.remove('active-dot');
+                }
+
+                // --- EFECTO FINAL DE ILUMINACIÓN DEL MARCO ---
+                // Se activa cuando la esfera llega casi al final (95%)
+                if (scrollPercent > 0.95) {
+                    if(aboutFrame) aboutFrame.classList.add('frame-active');
+                } else {
+                    if(aboutFrame) aboutFrame.classList.remove('frame-active');
                 }
             });
         });
