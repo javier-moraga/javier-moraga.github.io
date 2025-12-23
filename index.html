@@ -15,8 +15,8 @@
         :root {
             --bg-dark: #0b1120;
             --bg-card: #151e32;
-            --accent: #3b82f6; /* Azul Tech */
-            --accent-gold: #fbbf24; /* Dorado para resaltar */
+            --accent: #3b82f6; 
+            --accent-gold: #fbbf24;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
         }
@@ -51,9 +51,9 @@
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- MOKN-STYLE EVOLUTION SECTION (AJUSTADA: MAYOR DISTANCIA) --- */
+        /* --- MOKN-STYLE EVOLUTION SECTION --- */
         .evolution-section {
-            padding: 100px 0 350px 0; /* MUCHO espacio abajo para el scroll */
+            padding: 100px 0 400px 0; /* Mucho espacio para scroll */
             background-color: #050a14;
             position: relative;
             overflow: hidden;
@@ -63,94 +63,76 @@
 
         /* Línea Central */
         .evolution-line {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateX(-50%);
-            z-index: 1;
+            position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+            background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1;
         }
 
         .evolution-line-progress {
-            position: absolute;
-            left: 50%;
-            top: 0;
-            width: 2px;
-            height: 0%;
+            position: absolute; left: 50%; top: 0; width: 2px; height: 0%;
             background: linear-gradient(to bottom, var(--accent), var(--accent-gold));
-            transform: translateX(-50%);
-            z-index: 2;
-            box-shadow: 0 0 20px var(--accent);
+            transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent);
             transition: height 0.1s linear;
         }
 
+        /* ESFERA MÓVIL (Por encima de todo) */
         .moving-node {
-            position: absolute;
-            left: 50%;
-            top: 0%;
-            transform: translate(-50%, -50%);
-            width: 14px;
-            height: 14px;
-            background-color: #fff;
-            border-radius: 50%;
-            z-index: 10;
+            position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%);
+            width: 14px; height: 14px; background-color: #fff; border-radius: 50%;
+            z-index: 20; /* Z-Index alto para brillar sobre todo */
             box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold);
         }
 
         .evolution-container {
-            max-width: 1000px;
-            width: 100%;
-            position: relative;
-            z-index: 5;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 120px;
-            padding: 20px;
+            max-width: 1000px; width: 100%; position: relative; z-index: 5;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 120px; padding: 20px;
         }
 
+        /* TARJETAS CON TAMAÑO FIJO */
         .evo-card {
-            background: rgba(15, 23, 42, 0.4);
-            padding: 35px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.4); 
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05); 
             position: relative;
-            backdrop-filter: blur(8px);
-            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            backdrop-filter: blur(8px); 
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             opacity: 0;
+            /* Tamaño Fijo Rectangular */
+            height: 320px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        /* --- ANIMACIONES Y POSICIONES --- */
-        
+        /* Posicionamiento inicial */
         .evo-legacy {
-            transform: translateX(-100px);
+            transform: translateX(-50px);
             text-align: right;
             border-right: 3px solid rgba(255,255,255,0.1);
-            margin-top: 50px; /* Empieza un poco más abajo del top */
+            margin-top: 50px;
         }
 
         .evo-modern {
-            transform: translateX(100px);
+            transform: translateX(50px);
             border-left: 3px solid rgba(255,255,255,0.1);
-            /* AQUÍ ESTÁ LA CLAVE: */
-            margin-top: 450px; /* Gran separación vertical para obligar al scroll */
+            margin-top: 500px; /* Separación vertical grande */
         }
 
+        /* ESTADO ACTIVO (ILUMINADO) */
         .evo-card.active {
             opacity: 1;
             transform: translateX(0);
-            background: rgba(15, 23, 42, 0.8);
-            border-color: rgba(59, 130, 246, 0.3);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: rgba(15, 23, 42, 0.9); /* Más opaco al activarse */
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); /* Glow sutil */
         }
 
         .evo-legacy.active { border-right-color: #64748b; }
-        .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 40px rgba(59, 130, 246, 0.1); }
+        .evo-modern.active { border-left-color: var(--accent-gold); box-shadow: 0 0 60px rgba(251, 191, 36, 0.15); }
 
         /* Conectores (Brazos) */
         .evo-card::before {
             content: ''; position: absolute; top: 50%; width: 60px; height: 1px;
-            background: rgba(255,255,255,0.1); transition: 0.8s ease;
+            background: rgba(255,255,255,0.1); transition: 0.6s ease;
         }
         .evo-legacy::before { right: -60px; }
         .evo-modern::before { left: -60px; }
@@ -158,19 +140,18 @@
         .evo-legacy.active::before { background: #64748b; box-shadow: 0 0 10px #64748b; }
         .evo-modern.active::before { background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
 
-        /* Puntos de conexión en la línea central (RECALIBRADOS) */
+        /* Puntos en la línea (Dots) */
         .connector-dot {
             position: absolute; left: 50%; width: 8px; height: 8px;
             background: #0b1120; border: 1px solid rgba(255,255,255,0.3);
             border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; transition: 0.3s;
         }
         
-        .dot-legacy { top: 15%; } /* Coincide con la tarjeta de arriba */
-        .dot-modern { top: 85%; } /* Coincide con la tarjeta de abajo (lejos) */
+        /* Ajuste fino de posición vertical de los puntos */
+        .dot-legacy { top: 18%; } /* Coincide con el centro de la tarjeta 1 */
+        .dot-modern { top: 82%; } /* Coincide con el centro de la tarjeta 2 */
 
-        .active-dot {
-            background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 15px var(--accent-gold);
-        }
+        .active-dot { background: var(--accent-gold); border-color: var(--accent-gold); box-shadow: 0 0 20px var(--accent-gold); }
 
         .evo-header { font-size: 2rem; font-weight: 800; margin-bottom: 15px; color: white; line-height: 1.1; }
         .evo-desc { color: #94a3b8; font-size: 1rem; }
@@ -180,17 +161,11 @@
         .about-section { padding: 100px 0; background-color: #0f1629; }
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
         .profile-img-container { text-align: center; position: relative; }
-        .profile-img {
-            width: 280px; height: 280px; object-fit: cover; border-radius: 50%;
-            border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
-        }
+        .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
         .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
         
-        .industries-box {
-            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 10px; margin: 20px 0;
-            border-left: 3px solid var(--accent-gold);
-        }
+        .industries-box { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 3px solid var(--accent-gold); }
         .industries-box h4 { color: var(--accent-gold); margin-bottom: 10px; }
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
@@ -246,7 +221,7 @@
             .moving-node { left: 20px; }
             .connector-dot { left: 20px; }
             
-            .evo-card { margin-left: 40px; transform: translateX(0) !important; margin-top: 50px !important; text-align: left; }
+            .evo-card { margin-left: 40px; transform: translateX(0) !important; margin-top: 50px !important; text-align: left; height: auto; }
             .evo-legacy { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-top: 20px; }
             .evo-modern { margin-top: 80px !important; }
             
@@ -289,10 +264,8 @@
     <div id="evolution-section" class="evolution-section">
         <div class="evolution-line"></div>
         <div class="evolution-line-progress" id="evoLineProgress"></div>
-        
         <div class="connector-dot dot-legacy" id="dotLegacy"></div>
         <div class="connector-dot dot-modern" id="dotModern"></div>
-        
         <div class="moving-node" id="movingNode"></div>
 
         <div class="evolution-container">
@@ -324,17 +297,11 @@
                 <div style="margin-top: 25px;">
                     <span style="
                         background: rgba(16, 185, 129, 0.1); 
-                        color: #10b981; 
-                        padding: 8px 20px; 
-                        border-radius: 50px; 
-                        font-size: 0.95rem; 
-                        border: 1px solid rgba(16, 185, 129, 0.3); 
-                        font-weight: 600; 
-                        letter-spacing: 0.5px; 
+                        color: #10b981; padding: 8px 20px; border-radius: 50px; 
+                        font-size: 0.95rem; border: 1px solid rgba(16, 185, 129, 0.3); 
+                        font-weight: 600; letter-spacing: 0.5px; 
                         box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
-                        display: inline-flex; 
-                        align-items: center; 
-                        gap: 8px;
+                        display: inline-flex; align-items: center; gap: 8px;
                     ">
                         <i class="fa-solid fa-laptop"></i> Remote 
                         <span style="opacity: 0.4; font-weight: 300;">|</span> 
@@ -346,7 +313,6 @@
             <div class="about-text">
                 <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
                 <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
-                
                 <p>
                     Beyond the code and pipelines, I am a <strong>problem-solver</strong> with over 10 years of resilience and adaptability in high-pressure industries like Healthcare and Aviation. 
                     I am driven by curiosity and the challenge of translating complex scenarios into clear solutions.
@@ -359,33 +325,19 @@
                     <div class="industries-box" style="margin:0;">
                         <h4><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
                         <ul style="font-size: 0.9rem;">
-                            <li style="margin-bottom: 8px;">
-                                <strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Bussines & Analytics, Operations, Finance, Marketing, Risk & Collections</em>. I understand the specific KPIs and pain points of each unit.
-                            </li>
-                            <li style="margin-bottom: 8px;">
-                                <strong>Resourcefulness:</strong> Driven by curiosity. If a solution doesn't exist or I don't know the tool, I find a way to learn it and build it from scratch.
-                            </li>
-                            <li>
-                                <strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.
-                            </li>
+                            <li style="margin-bottom: 8px;"><strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Bussines & Analytics, Operations, Finance, Marketing, Risk & Collections</em>.</li>
+                            <li style="margin-bottom: 8px;"><strong>Resourcefulness:</strong> Driven by curiosity. If a solution doesn't exist, I find a way to learn it and build it from scratch.</li>
+                            <li><strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.</li>
                         </ul>
                     </div>
 
                     <div class="industries-box" style="margin:0; border-left-color: #10b981;">
                         <h4 style="color: #10b981;"><i class="fa-solid fa-earth-oceania"></i> Migration & Lifestyle</h4>
                         <ul style="font-size: 0.9rem;">
-                            <li style="margin-bottom: 8px;">
-                                <strong>Family Unit:</strong> Relocating with my partner & <em>Rocky</em> (our dog). This represents a long-term life project, not just a career move.
-                            </li>
-                            <li style="margin-bottom: 8px;">
-                                <strong>Local Support:</strong> My brother (Alexis) is an Industrial Specialist already settled in Australia, ensuring smooth integration.
-                            </li>
-                            <li>
-                                <strong>Readiness:</strong> Financially prepared and currently in intensive English training.
-                            </li>
-                            <li>
-                                <strong>Cultural Fit:</strong> I’ve heard Australians love their BBQ, which is perfect because it’s one of my favorite hobbies. I look forward to firing up the grill.
-                            </li>
+                            <li style="margin-bottom: 8px;"><strong>Family Unit:</strong> Relocating with my partner & <em>Rocky</em> (our dog). This represents a long-term life project.</li>
+                            <li style="margin-bottom: 8px;"><strong>Local Support:</strong> My brother (Alexis) is an Industrial Specialist already settled in Australia.</li>
+                            <li><strong>Readiness:</strong> Financially prepared and currently in intensive English training.</li>
+                            <li><strong>Cultural Fit:</strong> I’ve heard Australians love their BBQ, which is perfect because it’s one of my favorite hobbies.</li>
                         </ul>
                     </div>
                 </div>
@@ -401,7 +353,6 @@
     <section id="skills" class="skills-section">
         <div class="container">
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
-            
             <div class="stack-container">
                 <div class="stack-card">
                     <div class="card-header">Cloud & Engineering</div>
@@ -513,38 +464,47 @@
             const dotLegacy = document.getElementById('dotLegacy');
             const dotModern = document.getElementById('dotModern');
 
+            // Fallback de seguridad
+            setTimeout(() => {
+                if(!cardLegacy.classList.contains('active')) {
+                    // Si algo falla, forzar visibilidad inicial
+                    cardLegacy.style.opacity = '0.5';
+                    cardLegacy.style.transform = 'translateX(-20px)';
+                }
+            }, 3000);
+
             window.addEventListener('scroll', function() {
+                if(!section) return; 
+
                 const rect = section.getBoundingClientRect();
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Calculamos el % de scroll con más margen para el efecto
-                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.8);
+                // Calculamos el % de scroll con más margen
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.85);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
                 const cssPercent = scrollPercent * 100;
 
                 // Mover esfera y llenar línea
-                movingNode.style.top = cssPercent + '%';
-                lineProgress.style.height = cssPercent + '%';
+                if(movingNode) movingNode.style.top = cssPercent + '%';
+                if(lineProgress) lineProgress.style.height = cssPercent + '%';
 
-                // --- ACTIVACIÓN (Thresholds ajustados a la nueva distancia) ---
-                
-                // 1. Tarjeta Legacy (Activa temprano ~15%)
-                if (scrollPercent > 0.15) {
-                    cardLegacy.classList.add('active');
-                    dotLegacy.classList.add('active-dot');
+                // --- ACTIVACIÓN TARJETA 1 (LEGACY) ---
+                if (scrollPercent > 0.18) {
+                    if(cardLegacy) cardLegacy.classList.add('active');
+                    if(dotLegacy) dotLegacy.classList.add('active-dot');
                 } else {
-                    cardLegacy.classList.remove('active');
-                    dotLegacy.classList.remove('active-dot');
+                    if(cardLegacy) cardLegacy.classList.remove('active');
+                    if(dotLegacy) dotLegacy.classList.remove('active-dot');
                 }
 
-                // 2. Tarjeta Modern (Activa tarde ~75% para obligar a scrollear más)
-                if (scrollPercent > 0.75) {
-                    cardModern.classList.add('active');
-                    dotModern.classList.add('active-dot');
+                // --- ACTIVACIÓN TARJETA 2 (MODERN) ---
+                if (scrollPercent > 0.82) {
+                    if(cardModern) cardModern.classList.add('active');
+                    if(dotModern) dotModern.classList.add('active-dot');
                 } else {
-                    cardModern.classList.remove('active');
-                    dotModern.classList.remove('active-dot');
+                    if(cardModern) cardModern.classList.remove('active');
+                    if(dotModern) dotModern.classList.remove('active-dot');
                 }
             });
         });
