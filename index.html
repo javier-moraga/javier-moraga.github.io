@@ -42,88 +42,141 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (SNAKE EFFECT) --- */
+        /* --- BOTÓN DE CONTACTO (EFECTO SNAKE REFINADO) --- */
         .nav-btn {
-            position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
+            position: relative;
+            padding: 10px 25px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            overflow: hidden;
+            transition: 0.3s;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
-        .nav-btn:hover { background: rgba(251, 191, 36, 0.08); color: var(--accent-gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2); }
+
+        .nav-btn:hover {
+            background: rgba(251, 191, 36, 0.08);
+            color: var(--accent-gold);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2);
+        }
+
         .nav-btn span { position: absolute; display: block; }
+
+        /* Animación Snake */
         .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
         @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
+        
         .nav-btn span:nth-child(2) { top: -100%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
         @keyframes btn-anim2 { 0% { top: -100%; } 50%, 100% { top: 100%; } }
+        
         .nav-btn span:nth-child(3) { bottom: 0; right: -100%; width: 100%; height: 2px; background: linear-gradient(270deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim3 2s linear infinite; animation-delay: 1s; }
         @keyframes btn-anim3 { 0% { right: -100%; } 50%, 100% { right: 100%; } }
+        
         .nav-btn span:nth-child(4) { bottom: -100%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim4 2s linear infinite; animation-delay: 1.5s; }
         @keyframes btn-anim4 { 0% { bottom: -100%; } 50%, 100% { bottom: 100%; } }
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
-        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero h1 {
+            font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+            background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
         .hero p { font-size: 1.2rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; }
         .hero-tags { margin-bottom: 30px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin: 0 5px; font-weight: 600; text-transform: uppercase; }
 
-        /* --- VALUE PROPOSITION SECTION (REEMPLAZA A EVOLUTION) --- */
-        .value-section {
-            padding: 50px 0 100px; /* Más compacto, pegado al Hero */
-            background-color: #0b1120;
+        /* --- EVOLUTION SECTION (3 STEPS ZIG-ZAG) --- */
+        .evolution-section {
+            padding: 80px 0 200px 0;
+            background-color: #050a14;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
         }
 
-        .value-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 Columnas */
-            gap: 25px;
+        .evolution-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.05); transform: translateX(-50%); z-index: 1; }
+        .evolution-line-progress { position: absolute; left: 50%; top: 0; width: 2px; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); transform: translateX(-50%); z-index: 2; box-shadow: 0 0 20px var(--accent); transition: height 0.1s linear; }
+        .moving-node { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; z-index: 20; box-shadow: 0 0 15px #fff, 0 0 30px var(--accent-gold); }
+
+        .evolution-container { 
+            max-width: 1000px; width: 100%; position: relative; z-index: 5; 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; padding: 20px;
         }
 
-        .value-card {
-            background: rgba(21, 30, 50, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 12px;
-            transition: all 0.4s ease;
-            opacity: 0; /* Inicialmente invisible */
-            transform: translateY(20px); /* Inicialmente abajo */
+        .evo-card {
+            background: rgba(15, 23, 42, 0.4); padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.05); position: relative;
+            backdrop-filter: blur(8px); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0; display: flex; flex-direction: column; justify-content: center;
         }
 
-        .value-card.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .evo-icon { font-size: 2rem; color: var(--accent-gold); margin-bottom: 15px; }
+
+        /* Estilos Izquierda / Derecha */
+        .evo-left { 
+            grid-column: 1; text-align: right; 
+            transform: translateX(-50px); 
+            border-right: 3px solid rgba(255,255,255,0.1); 
+        }
+        
+        .evo-right { 
+            grid-column: 2; text-align: left; 
+            transform: translateX(50px); 
+            border-left: 3px solid rgba(255,255,255,0.1); 
+            margin-top: 100px; /* Desfase vertical */
         }
 
-        .value-card:hover {
-            background: rgba(21, 30, 50, 0.9);
-            border-color: rgba(59, 130, 246, 0.4);
-            transform: translateY(-5px);
-        }
+        /* ACTIVACIÓN */
+        .evo-card.active { opacity: 1; transform: translateX(0); background: rgba(15, 23, 42, 0.9); border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
+        .evo-left.active { border-right-color: var(--accent-gold); }
+        .evo-right.active { border-left-color: var(--accent); }
 
-        .value-icon {
-            font-size: 1.8rem;
-            color: var(--accent-gold);
-            margin-bottom: 20px;
-        }
-
-        .value-card h3 {
-            color: white;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .value-card p {
-            color: #94a3b8;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .value-card strong {
-            color: #e2e8f0;
+        .evo-header { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: white; line-height: 1.2; }
+        .evo-desc { color: #94a3b8; font-size: 1rem; }
+        
+        /* Ajuste para la 3ra tarjeta (Izquierda otra vez) */
+        .evo-left-2 {
+            margin-top: 100px; /* Desfase respecto a la derecha */
         }
 
         /* --- ABOUT ME SECTION --- */
-        .about-frame-container { padding: 100px 0; background-color: #0f1629; position: relative; overflow: visible; }
-        .about-frame-container::before { content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%) scaleX(1.5); width: 100%; height: 250px; background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); filter: blur(40px); opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; z-index: 0; }
+        .about-frame-container {
+            padding: 100px 0;
+            background-color: #0f1629;
+            position: relative;
+            overflow: visible;
+        }
+
+        .about-frame-container::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(1.5);
+            width: 100%;
+            height: 250px;
+            background: radial-gradient(
+                ellipse at center top,
+                rgba(255, 255, 255, 0.8) 0%,
+                rgba(251, 191, 36, 0.8) 20%,
+                rgba(251, 191, 36, 0.2) 50%,
+                transparent 75%
+            );
+            filter: blur(40px);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .about-frame-container.frame-active::before { opacity: 1; }
+
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
@@ -173,7 +226,11 @@
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); }
 
         /* --- ANIMACIÓN ICONOS --- */
-        @keyframes iconPop { 0% { transform: translateY(0); color: var(--text-muted); } 50% { transform: translateY(-15px); color: var(--accent-gold); } 100% { transform: translateY(0); color: var(--text-muted); } }
+        @keyframes iconPop {
+            0% { transform: translateY(0); color: var(--text-muted); }
+            50% { transform: translateY(-15px); color: var(--accent-gold); }
+            100% { transform: translateY(0); color: var(--text-muted); }
+        }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
         /* --- RESPONSIVE --- */
@@ -184,9 +241,16 @@
             .nav-links { display: none; }
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
+
+            /* Ajustes Móviles Evolution */
+            .evolution-container { grid-template-columns: 1fr; gap: 30px; }
+            .evolution-line { left: 20px; }
+            .evolution-line-progress { left: 20px; }
+            .moving-node { left: 20px; }
             
-            /* Ajuste Value Grid en móvil */
-            .value-grid { grid-template-columns: 1fr; gap: 20px; }
+            /* Tarjetas en móvil: Todo a la izquierda */
+            .evo-card { margin-left: 40px; transform: translateX(0) !important; text-align: left; height: auto; margin-top: 20px !important; border-left: 3px solid rgba(255,255,255,0.1); border-right: none; }
+            .evo-card.active { border-left-color: var(--accent-gold); }
             
             .stack-card { grid-template-columns: 1fr; gap: 15px; } 
             .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
@@ -231,31 +295,39 @@
         </div>
     </section> 
 
-    <section id="value-section" class="value-section">
-        <div class="container">
-            <div class="value-grid">
-                
-                <div class="value-card">
-                    <div class="value-icon"><i class="fa-solid fa-layer-group"></i></div>
-                    <h3>Multi-Industry Adaptability</h3>
-                    <p>Adaptive problem-solving across high-stakes sectors like <strong>Healthcare, Telecom & Aviation</strong>. I speak the language of complex regulated industries.</p>
-                </div>
+    <div id="evolution-section" class="evolution-section">
+        <div class="evolution-line"></div>
+        <div class="evolution-line-progress" id="evoLineProgress"></div>
+        <div class="moving-node" id="movingNode"></div>
 
-                <div class="value-card">
-                    <div class="value-icon"><i class="fa-solid fa-rocket"></i></div>
-                    <h3>Modernization Specialist</h3>
-                    <p>Proven ability to <strong>modernize legacy data systems</strong> (Oracle, Netezza, SAS) and challenge outdated processes with Cloud-native solutions.</p>
-                </div>
-
-                <div class="value-card">
-                    <div class="value-icon"><i class="fa-solid fa-handshake-simple"></i></div>
-                    <h3>Business & Tech Bridge</h3>
-                    <p>I don't just code; I translate. <strong>Bridging the gap</strong> between abstract business strategy and concrete technical execution.</p>
-                </div>
-
+        <div class="evolution-container">
+            
+            <div class="evo-card evo-left" id="card1">
+                <i class="fa-solid fa-layer-group evo-icon"></i>
+                <h3 class="evo-header">Multi-Industry Adaptability</h3>
+                <p class="evo-desc">
+                    Adaptive problem-solving across high-stakes sectors like <strong>Healthcare, Telecom & Aviation</strong>. I speak the language of complex regulated industries.
+                </p>
             </div>
+
+            <div class="evo-card evo-right" id="card2">
+                <i class="fa-solid fa-rocket evo-icon"></i>
+                <h3 class="evo-header">Modernization Specialist</h3>
+                <p class="evo-desc">
+                    Proven ability to <strong>modernize legacy data systems</strong> (Oracle, Netezza, SAS) and challenge outdated processes with Cloud-native solutions.
+                </p>
+            </div>
+
+            <div class="evo-card evo-left evo-left-2" id="card3">
+                <i class="fa-solid fa-handshake-simple evo-icon"></i>
+                <h3 class="evo-header">Business & Tech Bridge</h3>
+                <p class="evo-desc">
+                    I don't just code; I translate. <strong>Bridging the gap</strong> between abstract business strategy and concrete technical execution.
+                </p>
+            </div>
+
         </div>
-    </section>
+    </div>
 
     <div id="aboutFrame" class="about-frame-container">
         <section id="about" class="container about-grid">
@@ -439,39 +511,63 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            
-            /* --- 1. ANIMACIÓN VALUE CARDS (REEMPLAZO DE EVOLUTION) --- */
-            const valueCards = document.querySelectorAll('.value-card');
-            const valueSection = document.getElementById('value-section');
-
-            const observerValue = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        valueCards.forEach((card, index) => {
-                            setTimeout(() => {
-                                card.classList.add('visible');
-                            }, index * 150); 
-                        });
-                        observerValue.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.2 });
-
-            if(valueSection) observerValue.observe(valueSection);
-
-            /* --- 2. ANIMACIÓN ABOUT FRAME (LUZ) --- */
+            /* --- 1. ANIMACIÓN EVOLUTION (3 CARDS SCROLL) --- */
+            const section = document.getElementById('evolution-section');
+            const movingNode = document.getElementById('movingNode');
+            const lineProgress = document.getElementById('evoLineProgress');
             const aboutFrame = document.getElementById('aboutFrame');
+            
+            // Tarjetas individuales
+            const card1 = document.getElementById('card1');
+            const card2 = document.getElementById('card2');
+            const card3 = document.getElementById('card3');
+
             window.addEventListener('scroll', function() {
-                if(!aboutFrame) return;
-                const rect = aboutFrame.getBoundingClientRect();
+                if(!section) return; 
+
+                const rect = section.getBoundingClientRect();
+                const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
-                // Si la sección About entra en pantalla, encender luz
-                if (rect.top < windowHeight * 0.8) {
-                    aboutFrame.classList.add('frame-active');
+
+                // Cálculo del progreso del scroll
+                let scrollPercent = (windowHeight / 2 - rect.top) / (sectionHeight * 0.9);
+                scrollPercent = Math.max(0, Math.min(1, scrollPercent));
+                const cssPercent = scrollPercent * 100;
+
+                // Mover esfera y llenar línea
+                if(movingNode) movingNode.style.top = cssPercent + '%';
+                if(lineProgress) lineProgress.style.height = cssPercent + '%';
+
+                // --- ACTIVACIÓN TARJETA 1 (15%) ---
+                if (scrollPercent > 0.15) {
+                    if(card1) card1.classList.add('active');
+                } else {
+                    if(card1) card1.classList.remove('active');
+                }
+
+                // --- ACTIVACIÓN TARJETA 2 (45%) ---
+                if (scrollPercent > 0.45) {
+                    if(card2) card2.classList.add('active');
+                } else {
+                    if(card2) card2.classList.remove('active');
+                }
+
+                // --- ACTIVACIÓN TARJETA 3 (75%) ---
+                if (scrollPercent > 0.75) {
+                    if(card3) card3.classList.add('active');
+                } else {
+                    if(card3) card3.classList.remove('active');
+                }
+
+                // Activación Luz Final (al llegar al 96%)
+                if (scrollPercent > 0.96) {
+                    if(aboutFrame) aboutFrame.classList.add('frame-active');
+                } else {
+                    if(aboutFrame) aboutFrame.classList.remove('frame-active');
                 }
             });
 
-            /* --- 3. ANIMACIÓN STACK CARDS (STAGGERED FADE UP) --- */
+            /* --- 2. ANIMACIÓN STACK CARDS (STAGGERED FADE UP) --- */
             const stackCards = document.querySelectorAll('.stack-card');
             const stackSection = document.getElementById('skills');
 
@@ -490,7 +586,7 @@
 
             if(stackSection) observerStack.observe(stackSection);
 
-            /* --- 4. ANIMACIÓN ICONOS AL FINAL --- */
+            /* --- 3. ANIMACIÓN ICONOS AL FINAL --- */
             let iconsAnimated = false; 
             window.addEventListener('scroll', () => {
                 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
