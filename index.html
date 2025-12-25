@@ -111,7 +111,7 @@
 
         /* --- CLIENT LOGOS SECTION (FULL WIDTH) --- */
         .logo-section-container {
-            padding: 100px 0;
+            padding: 80px 0;
             background-color: var(--bg-dark);
             border-top: 1px dashed rgba(255,255,255,0.1);
             position: relative;
@@ -124,7 +124,7 @@
         }
 
         .logo-section-header h5 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 3px;
@@ -134,7 +134,7 @@
         .logo-rows-container {
             display: flex;
             flex-direction: column;
-            gap: 60px; /* Separación vertical entre filas */
+            gap: 60px; /* Espacio vertical */
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -147,13 +147,13 @@
             align-items: center;
             justify-items: center;
 
-            /* Animación Base */
+            /* Animación Base: Invisible y abajo */
             opacity: 0;
             transform: translateY(60px);
-            transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Estado Visible */
+        /* Estado Visible (En pantalla) */
         .logo-row.row-visible {
             opacity: 1;
             transform: translateY(0);
@@ -165,7 +165,7 @@
             transform: translateY(-60px);
         }
 
-        /* ITEM */
+        /* ITEM LOGO */
         .logo-item {
             width: 100%;
             height: 120px;
@@ -179,16 +179,17 @@
             transform: scale(1.05);
         }
 
-        /* IMAGEN PNG: Filtro Silueta Blanca */
+        /* IMAGEN LOGO */
         .logo-img {
             max-width: 200px;
             max-height: 90px;
             width: auto;
             object-fit: contain;
             
-            /* TRUCO PARA PNG: Escala de grises + Brillo extremo = Blanco puro */
+            /* Filtro Base: Convierte cualquier PNG a BLANCO (Silhouette) */
+            /* Escala de grises 100% + Brillo al máximo */
             filter: grayscale(100%) brightness(1000%); 
-            opacity: 0.3; /* Tenue por defecto */
+            opacity: 0.4; 
             transition: all 0.4s ease;
         }
 
@@ -255,13 +256,26 @@
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
 
-            /* Ajustes Móviles Evolution */
+            /* Ajustes Móviles Evolution SVG */
             .evolution-container { gap: 80px; padding-bottom: 50px; }
+            
+            /* 1. OCULTAR EL SVG CURVO EN MÓVIL */
             .desktop-svg-container { display: none; }
+            
+            /* 2. MOSTRAR LÍNEA RECTA Y BOLA */
             .mobile-system { display: block; }
-            .evo-card { width: 85%; margin-left: auto; margin-right: auto; transform: translateX(0) translateY(50px) !important; text-align: left; height: auto; margin-top: 0 !important; background: #0f172a; z-index: 10; }
+            
+            /* Tarjetas siempre con fondo oscuro solido para tapar la línea si pasa por detrás */
+            .evo-card { 
+                width: 85%; margin-left: auto; margin-right: auto; 
+                transform: translateX(0) translateY(50px) !important; 
+                text-align: left; height: auto; margin-top: 0 !important; 
+                background: #0f172a; /* Fondo sólido */
+                z-index: 10; /* Encima de la línea */
+            }
             .evo-left { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-right: 0; }
             .evo-right { border-left: 3px solid rgba(255,255,255,0.1); margin-left: 0; align-self: flex-start; }
+            
             .evo-card.active { transform: translateX(0) translateY(0) !important; }
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
@@ -315,6 +329,7 @@
     </section> 
 
     <div id="evolution-section" class="evolution-section">
+        
         <svg class="desktop-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -324,6 +339,7 @@
             </defs>
             <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
             <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
+            
             <circle id="desktopBall" cx="0" cy="0" r="7" fill="white" />
         </svg>
 
@@ -575,14 +591,11 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. ANIMACIÓN EVOLUTION --- */
             const section = document.getElementById('evolution-section');
-            const movingNode = document.getElementById('movingNode');
-            const lineProgress = document.getElementById('evoLineProgress');
-            const evoCards = document.querySelectorAll('.evo-card');
             const aboutFrame = document.getElementById('aboutFrame');
-            
-            // ELEMENTOS SVG
+            const evoCards = document.querySelectorAll('.evo-card');
+
+            // ELEMENTOS DESKTOP
             const desktopSvg = document.querySelector('.desktop-svg-container');
             const progressPath = document.getElementById('progressPath');
             const desktopBall = document.getElementById('desktopBall');
