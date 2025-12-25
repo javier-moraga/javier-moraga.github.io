@@ -109,84 +109,83 @@
         .btn-outline { padding: 12px 24px; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
         .btn-outline:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
-        /* --- LOGO SECTION (NUEVA: FUERA DE ABOUT, ANCHO COMPLETO) --- */
-        .logo-section-container {
-            padding: 100px 0;
-            background-color: var(--bg-dark);
-            border-top: 1px dashed rgba(255,255,255,0.1);
-            position: relative;
-            z-index: 10;
+        /* --- CLIENT LOGOS (IMÁGENES PNG/SVG) --- */
+        .client-logos {
+            margin-top: 80px;
+            padding-top: 60px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
         }
-
-        .logo-section-header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .logo-section-header h5 {
-            font-size: 1rem;
+        
+        .client-logos h5 {
+            font-size: 0.9rem;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            font-weight: 600;
         }
 
-        /* GRILA 3 COLUMNAS */
         .logo-rows-container {
             display: flex;
             flex-direction: column;
-            gap: 60px; /* Espacio vertical entre filas */
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 60px;
         }
 
+        /* SCROLL STAGE ANIMATION */
         .logo-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 Columnas SIEMPRE */
-            gap: 40px;
+            grid-template-columns: repeat(3, 1fr); /* 3 LOGOS POR FILA */
+            gap: 60px;
             align-items: center;
             justify-items: center;
-
-            /* Animación de entrada/salida */
+            
+            /* Estado Inicial */
             opacity: 0;
             transform: translateY(60px);
             transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Clases de animación */
-        .logo-row.row-visible { opacity: 1; transform: translateY(0); }
-        .logo-row.row-exit { opacity: 0; transform: translateY(-60px); }
+        /* Estado Visible */
+        .logo-row.row-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Estado Salida */
+        .logo-row.row-exit {
+            opacity: 0;
+            transform: translateY(-60px);
+        }
 
         /* ITEM LOGO */
         .logo-item {
-            width: 100%;
-            height: 120px; /* Altura generosa */
             display: flex;
             justify-content: center;
             align-items: center;
+            width: 100%;
+            height: 100px;
             transition: transform 0.4s ease;
         }
 
         .logo-item:hover {
-            transform: scale(1.05);
+            transform: scale(1.05); /* Efecto Zoom */
         }
 
-        /* IMAGEN LOGO */
+        /* IMAGEN DEL LOGO (PNG O SVG) */
         .logo-img {
-            max-width: 200px; /* Logos grandes */
-            max-height: 90px;
-            width: auto;
+            max-width: 100%;
+            max-height: 80px; /* Tamaño generoso */
             object-fit: contain;
             
-            /* Filtro Base: Escala de grises + Brillo alto (Blanco) */
-            filter: grayscale(100%) brightness(300%) contrast(0);
-            opacity: 0.3; 
+            /* FILTRO MÁGICO: Blanco y Negro con Brillo para modo Dark */
+            filter: grayscale(100%) brightness(500%) contrast(0); 
+            opacity: 0.4; 
             transition: all 0.4s ease;
         }
 
-        /* Hover: Color Original */
+        /* HOVER: COLOR ORIGINAL */
         .logo-item:hover .logo-img {
-            filter: grayscale(0%) brightness(100%) contrast(100%);
+            filter: grayscale(0%) brightness(100%) contrast(100%); 
             opacity: 1;
         }
 
@@ -267,9 +266,9 @@
             .project-visual { height: 250px; }
             .project-content { padding: 30px; }
 
-            /* LOGOS EN MÓVIL: SE MANTIENEN 3 COLUMNAS COMO PEDISTE, SOLO SE REDUCEN */
-            .logo-row { gap: 20px; } 
-            .logo-img { max-width: 100%; max-height: 60px; }
+            /* LOGO GRID MOBILE */
+            .logo-row { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+            .logo-img { max-height: 50px; }
         }
     </style>
 </head>
@@ -279,9 +278,9 @@
         <div class="container nav-flex">
             <div class="logo">Javier <span>Moraga</span></div>
             <nav class="nav-links">
-                <a href="#about" class="link-text">About Me</a>
-                <a href="#skills" class="link-text">Stack</a>
-                <a href="#projects" class="link-text">Portfolio</a>
+                <a href="#about">About Me</a>
+                <a href="#skills">Stack</a>
+                <a href="#projects">Portfolio</a>
                 <a href="#contact" class="nav-btn">
                     <span></span><span></span><span></span><span></span>Contact
                 </a>
@@ -400,25 +399,25 @@
                 
                 <div class="logo-row">
                     <div class="logo-item">
-                        <img src="logos/claro.svg" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
+                        <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/wom.svg" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
+                        <img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/entel.svg" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
+                        <img src="logos/entel_chile.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
                     </div>
                 </div>
 
                 <div class="logo-row">
                     <div class="logo-item">
-                        <img src="logos/a3d.svg" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
+                        <img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/latam.svg" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
+                        <img src="logos/latam_airlines_chile.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/alemana.svg" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
+                        <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
                     </div>
                 </div>
 
