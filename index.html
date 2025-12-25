@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -199,21 +199,30 @@
         .stack-card { background-color: #0f172a; border: 1px solid #1e3a8a; border-radius: 12px; padding: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
         .stack-card:hover { transform: translateY(-7px); box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25); border-color: var(--accent); }
         .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .skill-list { display: flex; flex-wrap: wrap; gap: 10px; }
-        .skill-item { display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 4px; color: #e2e8f0; font-size: 0.85rem; font-family: 'Fira Code', 'Courier New', monospace; transition: 0.2s; }
-        .skill-item:hover { background: rgba(59, 130, 246, 0.15); border-color: var(--accent); color: white; transform: translateY(-2px); }
-        .skill-item i { margin-right: 8px; color: #64748b; font-size: 1rem; }
+        
+        .skill-list { display: flex; flex-direction: column; gap: 15px; }
+        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
+        .skill-item:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: white; }
+        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
-        .tag-tech { margin-left: 8px; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; background: rgba(59, 130, 246, 0.2); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .tag-highlight { margin-left: 8px; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
+
+        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+
         .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
         .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
         .extended-stack p { color: #64748b; font-size: 0.85rem; line-height: 1.6; }
 
-        /* --- PROJECTS SECTION --- */
+        /* --- PROJECTS SECTION (STICKY STACK) --- */
         .projects-section { padding: 100px 0 150px; background-color: #050a14; position: relative; z-index: 20; }
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-        .project-card { position: sticky; top: 130px; background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; overflow: hidden; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1.2fr; min-height: 480px; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); transform-origin: center top; transition: transform 0.3s ease; }
+        .project-card {
+            position: sticky; top: 130px;
+            background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px;
+            overflow: hidden; margin-bottom: 60px;
+            display: grid; grid-template-columns: 1fr 1.2fr; min-height: 480px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5); transform-origin: center top; transition: transform 0.3s ease;
+        }
         .project-content { padding: 50px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid rgba(255,255,255,0.05); }
         .project-tags { margin-bottom: 20px; }
         .p-tag { display: inline-block; background: rgba(59, 130, 246, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; margin-right: 6px; margin-bottom: 6px; text-transform: uppercase; }
@@ -258,7 +267,7 @@
             .logo-img { max-height: 50px; max-width: 100%; }
             .logo-item { height: 80px; }
 
-            /* Ajustes Móviles Evolution */
+            /* Ajustes Móviles Evolution SVG */
             .evolution-container { gap: 80px; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
@@ -357,7 +366,7 @@
                 <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
                 <div style="margin-top: 25px;">
                     <span style="background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 8px 20px; border-radius: 50px; font-size: 0.95rem; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 600; letter-spacing: 0.5px; box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); display: inline-flex; align-items: center; gap: 8px;">
-                        <i class="fa-solid fa-laptop"></i> Remote <span style="opacity: 0.4; font-weight: 300;">|</span> <i class="fa-solid fa-plane-departure"></i> Relocation
+                        Visa Sponsorship Required <span style="opacity: 0.4; font-weight: 300;">|</span> Available for Relocation
                     </span>
                 </div>
             </div>
@@ -372,9 +381,10 @@
                     <div class="industries-box">
                         <h4><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
                         <ul style="font-size: 0.9rem;">
-                            <li style="margin-bottom: 8px;"><strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Bussines & Analytics, Operations, Finance, Marketing, Risk & Collections</em>.</li>
+                            <li style="margin-bottom: 8px;"><strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Business & Analytics, Operations, Finance, Marketing, Risk & Collections</em>.</li>
                             <li style="margin-bottom: 8px;"><strong>Resourcefulness:</strong> Driven by curiosity. If a solution doesn't exist, I find a way to learn it and build it from scratch.</li>
-                            <li><strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.</li>
+                            <li style="margin-bottom: 8px;"><strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.</li>
+                             <li><strong>Stakeholder Management:</strong> Proven ability to translate technical concepts for non-technical stakeholders (Medical staff, C-Level Execs).</li>
                         </ul>
                     </div>
 
@@ -391,7 +401,6 @@
 
                 <div class="btn-group" style="margin-top: 30px;">
                     <a href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
-                    <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" target="_blank" class="btn-outline"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
                 </div>
             </div>
         </section>
@@ -446,21 +455,33 @@
                         <div class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer / Airflow</div>
                         <div class="skill-item"><i class="fa-solid fa-box-archive"></i> Cloud Storage</div>
                         <div class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</div>
-                        <div class="skill-item"><i class="fa-brands fa-git-alt"></i> Git Workflows</div>
+                        <div class="skill-item"><i class="fa-solid fa-eye"></i> Observability</div>
                     </div>
                 </div>
                 
                 <div class="stack-card">
-                    <div class="card-header" style="color: var(--accent-gold);">Languages & Data Foundations</div>
+                    <div class="card-header" style="color: var(--accent-gold);">Data Foundations</div>
                     <div class="skill-list">
                         <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tag-highlight">ADVANCED</span></div>
                         <div class="skill-item"><i class="fa-brands fa-python"></i> Python / Pandas</div>
-                        <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
+                        <div class="skill-item"><i class="fa-solid fa-sitemap"></i> Dimensional Modeling (Star/Snowflake)</div>
                         <div class="skill-item"><i class="fa-solid fa-database"></i> PostgreSQL / MySQL</div>
                         <div class="skill-item"><i class="fa-solid fa-server"></i> Oracle / Netezza</div>
+                         <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
                     </div>
                 </div>
                 
+                <div class="stack-card">
+                   <div class="card-header">Engineering Practices & Governance</div>
+                   <div class="skill-list">
+                       <div class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git/Bitbucket)</div>
+                       <div class="skill-item"><i class="fa-solid fa-check-double"></i> Data Quality Frameworks</div>
+                       <div class="skill-item"><i class="fa-solid fa-magnifying-glass"></i> Code Reviews</div>
+                       <div class="skill-item"><i class="fa-brands fa-git-alt"></i> Version Control</div>
+                        <div class="skill-item"><i class="fa-solid fa-book"></i> Documentation</div>
+                   </div>
+               </div>
+
                 <div class="stack-card">
                     <div class="card-header">Analytics, BI & Business Tools</div>
                     <div class="skill-list">
@@ -473,74 +494,72 @@
                 </div>
             </div>
             
-            <div class="extended-stack">
-                <h4>Enterprise Tooling & Collaboration</h4>
-                <p>
-                    MS SQL Server • SSIS • Jenkins • Bitbucket • GitHub/GitLab • Jira • Linux (Bash/Awk/Sed) • Draw.io • Miro
-                </p>
-            </div>
         </div>
     </section>
 
     <section id="projects" class="projects-section">
         <div class="container">
-            <h2 class="section-title">Selected <span class="highlight">Case Studies</span></h2>
+            <h2 class="section-title">Featured Projects & <span class="highlight">Impact</span></h2>
             
             <div class="sticky-wrapper">
                 
                 <div class="project-card">
                     <div class="project-content">
                         <div class="project-tags">
-                            <span class="p-tag">Power BI</span>
+                            <span class="p-tag">GCP</span>
                             <span class="p-tag">Python</span>
-                            <span class="p-tag">Data Viz</span>
+                            <span class="p-tag">Optimization</span>
                         </div>
-                        <h3 class="project-title">Australian Housing Market Trends</h3>
+                        <h3 class="project-title">Jira Data Pipeline Optimization</h3>
                         <p class="project-desc">
-                            End-to-end analysis using ABS Public Data to identify high-growth suburbs. 
-                            Demonstrates ability to clean, model, and visualize local market data for strategic insights.
+                            <strong>Problem:</strong> Critical operational reporting was delayed due to a slow data ingestion process.<br>
+                            <strong>Solution:</strong> Engineered a high-performance pipeline connecting Jira (PostgreSQL) to BigQuery via API.<br>
+                            <strong>Impact:</strong> Reduced data ingestion time by <span style="color:white; font-weight:bold;">97% (from 2 hours to 3 minutes)</span>, enabling near real-time decision making for IT Operations.
                         </p>
                         <a href="#" class="btn-project">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/1e293b/ffffff?text=Dashboard+Visual" alt="Housing Dashboard">
+                        <img src="https://via.placeholder.com/600x400/16203c/ffffff?text=Pipeline+Architecture" alt="Cloud Project">
+                    </div>
+                </div>
+
+                 <div class="project-card">
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="p-tag">SQL</span>
+                            <span class="p-tag">Revenue Assurance</span>
+                            <span class="p-tag">Analytics</span>
+                        </div>
+                        <h3 class="project-title">Collections Strategy Optimization</h3>
+                        <p class="project-desc">
+                            <strong>Problem:</strong> Low notification coverage for debt recovery in a base of 5 million subscribers.<br>
+                            <strong>Solution:</strong> Implemented data-driven segmentation strategies based on customer behavior patterns.<br>
+                            <strong>Impact:</strong> Increased notification coverage from <span style="color:white; font-weight:bold;">60% to 99%</span>, directly optimizing revenue recovery strategies.
+                        </p>
+                        <a href="#" class="btn-project">Explore Use Case</a>
+                    </div>
+                    <div class="project-visual">
+                        <img src="https://via.placeholder.com/600x400/1e293b/ffffff?text=Data+Analytics" alt="Analytics Dashboard">
                     </div>
                 </div>
 
                 <div class="project-card">
                     <div class="project-content">
                         <div class="project-tags">
-                            <span class="p-tag" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Healthcare</span>
-                            <span class="p-tag">Python</span>
-                            <span class="p-tag">Automation</span>
-                        </div>
-                        <h3 class="project-title">Medical Records Version Control</h3>
-                        <p class="project-desc">
-                            Automated system to track changes in biomedical templates. 
-                            Solved data inconsistency issues in a clinical setting by implementing a robust Python-based versioning logic.
-                        </p>
-                        <a href="#" class="btn-project">Explore Use Case</a>
-                    </div>
-                    <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Automation+Workflow" alt="Medical Project">
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-content">
-                        <div class="project-tags">
-                            <span class="p-tag" style="background: rgba(251, 191, 36, 0.1); color: var(--accent-gold);">GCP</span>
-                            <span class="p-tag">BigQuery</span>
                             <span class="p-tag">Migration</span>
+                            <span class="p-tag">BigQuery</span>
+                            <span class="p-tag">Architecture</span>
                         </div>
-                        <h3 class="project-title">Legacy to Cloud Migration</h3>
+                        <h3 class="project-title">Enterprise Data Migration & Modernization</h3>
                         <p class="project-desc">
-                            Orchestrated the migration of critical operational data from on-premise SAS/Oracle systems to Google BigQuery, improving query performance by 40%.
+                            <strong>Challenge:</strong> Legacy on-premise systems (Netezza/SAS) were creating bottlenecks and data silos.<br>
+                            <strong>Solution:</strong> Led the migration initiative to Google BigQuery, validating data integrity for <span style="color:white; font-weight:bold;">7 million users</span>.<br>
+                            <strong>Impact:</strong> Modernized the data architecture, ensured zero data loss, and significantly reduced processing times for critical business KPIs.
                         </p>
                         <a href="#" class="btn-project">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/16203c/ffffff?text=Cloud+Architecture" alt="Cloud Project">
+                        <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
                     </div>
                 </div>
 
@@ -660,6 +679,7 @@
                     if (entry.isIntersecting) {
                         entry.target.classList.add('row-visible');
                     } 
+                    // No hay 'else' para salida: el efecto sticky + z-index se encarga de cubrirlo visualmente
                 });
             }, {
                 threshold: 0.2
