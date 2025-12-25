@@ -109,37 +109,45 @@
         .btn-outline { padding: 12px 24px; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
         .btn-outline:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
-        /* --- CLIENT LOGOS (IMÁGENES PNG/SVG) --- */
-        .client-logos {
-            margin-top: 80px;
-            padding-top: 60px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        /* --- CLIENT LOGOS SECTION (FULL WIDTH) --- */
+        .logo-section-container {
+            padding: 100px 0;
+            background-color: var(--bg-dark);
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 10;
         }
-        
-        .client-logos h5 {
-            font-size: 0.9rem;
+
+        .logo-section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo-section-header h5 {
+            font-size: 1rem;
             color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 50px;
-            font-weight: 600;
+            letter-spacing: 3px;
+            font-weight: 700;
         }
 
         .logo-rows-container {
             display: flex;
             flex-direction: column;
-            gap: 60px;
+            gap: 60px; /* Separación vertical entre filas */
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* SCROLL STAGE ANIMATION */
+        /* FILA: SCROLL STAGE ANIMATION */
         .logo-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 LOGOS POR FILA */
-            gap: 60px;
+            grid-template-columns: repeat(3, 1fr); /* 3 Columnas */
+            gap: 40px;
             align-items: center;
             justify-items: center;
-            
-            /* Estado Inicial */
+
+            /* Animación Base */
             opacity: 0;
             transform: translateY(60px);
             transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
@@ -151,41 +159,42 @@
             transform: translateY(0);
         }
 
-        /* Estado Salida */
+        /* Estado Salida (Hacia arriba) */
         .logo-row.row-exit {
             opacity: 0;
             transform: translateY(-60px);
         }
 
-        /* ITEM LOGO */
+        /* ITEM */
         .logo-item {
+            width: 100%;
+            height: 120px;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            height: 100px;
             transition: transform 0.4s ease;
         }
 
         .logo-item:hover {
-            transform: scale(1.05); /* Efecto Zoom */
+            transform: scale(1.05);
         }
 
-        /* IMAGEN DEL LOGO (PNG O SVG) */
+        /* IMAGEN PNG: Filtro Silueta Blanca */
         .logo-img {
-            max-width: 100%;
-            max-height: 80px; /* Tamaño generoso */
+            max-width: 200px;
+            max-height: 90px;
+            width: auto;
             object-fit: contain;
             
-            /* FILTRO MÁGICO: Blanco y Negro con Brillo para modo Dark */
-            filter: grayscale(100%) brightness(500%) contrast(0); 
-            opacity: 0.4; 
+            /* TRUCO PARA PNG: Escala de grises + Brillo extremo = Blanco puro */
+            filter: grayscale(100%) brightness(1000%); 
+            opacity: 0.3; /* Tenue por defecto */
             transition: all 0.4s ease;
         }
 
-        /* HOVER: COLOR ORIGINAL */
+        /* Hover: Color Original */
         .logo-item:hover .logo-img {
-            filter: grayscale(0%) brightness(100%) contrast(100%); 
+            filter: grayscale(0%) brightness(100%);
             opacity: 1;
         }
 
