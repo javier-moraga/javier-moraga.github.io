@@ -186,16 +186,13 @@
             width: auto;
             object-fit: contain;
             
-            /* Filtro Base: Convierte cualquier PNG a BLANCO (Silhouette) */
-            /* Escala de grises 100% + Brillo al máximo */
-            filter: grayscale(100%) brightness(1000%); 
-            opacity: 0.4; 
+            /* SIN FILTROS - COLOR ORIGINAL */
+            opacity: 0.8; /* Ligeramente atenuado para que no brille tanto en reposo */
             transition: all 0.4s ease;
         }
 
-        /* Hover: Color Original */
+        /* Hover: Full Opacity */
         .logo-item:hover .logo-img {
-            filter: grayscale(0%) brightness(100%);
             opacity: 1;
         }
 
@@ -324,7 +321,7 @@
                 I bridge the gap between business strategy and technical execution, delivering solutions 
                 <span style="color:white;">adaptable to any stack: from Advanced Excel to Modern Cloud Architectures</span>.
             </p>
-            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px; background: var(--accent); border-color: var(--accent); color: white;">View Case Studies</a>
+            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px;">View Case Studies</a>
         </div>
     </section> 
 
@@ -424,25 +421,25 @@
                 
                 <div class="logo-row">
                     <div class="logo-item">
-                        <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
+                        <img src="logos/claro.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
+                        <img src="logos/wom.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/entel_chile.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
+                        <img src="logos/entel.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
                     </div>
                 </div>
 
                 <div class="logo-row">
                     <div class="logo-item">
-                        <img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
+                        <img src="logos/a3d.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/latam_airlines_chile.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
+                        <img src="logos/latam.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
                     </div>
                     <div class="logo-item">
-                        <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
+                        <img src="logos/alemana.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
                     </div>
                 </div>
 
