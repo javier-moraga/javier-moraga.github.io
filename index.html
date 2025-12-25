@@ -8,7 +8,6 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230b1120%22/><text x=%2250%22 y=%2270%22 font-family=%22Arial, sans-serif%22 font-weight=%22800%22 font-size=%2255%22 text-anchor=%22middle%22><tspan fill=%22%23ffffff%22>J</tspan><tspan fill=%22%233b82f6%22>M</tspan></text></svg>">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -43,21 +42,85 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (SNAKE) --- */
+        /* --- BOTÓN DE CONTACTO (SNAKE DORADA RESTAURADA) --- */
         .nav-btn {
-            position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
+            position: relative;
+            padding: 10px 25px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            overflow: hidden;
+            transition: 0.3s;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            /* Borde base sutil */
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
-        .nav-btn:hover { background: rgba(251, 191, 36, 0.08); color: var(--accent-gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2); }
-        .nav-btn span { position: absolute; display: block; }
-        
-        .nav-btn span:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
-        @keyframes btn-anim1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
-        .nav-btn span:nth-child(2) { top: -100%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
-        @keyframes btn-anim2 { 0% { top: -100%; } 50%, 100% { top: 100%; } }
-        .nav-btn span:nth-child(3) { bottom: 0; right: -100%; width: 100%; height: 2px; background: linear-gradient(270deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim3 2s linear infinite; animation-delay: 1s; }
-        @keyframes btn-anim3 { 0% { right: -100%; } 50%, 100% { right: 100%; } }
-        .nav-btn span:nth-child(4) { bottom: -100%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim4 2s linear infinite; animation-delay: 1.5s; }
-        @keyframes btn-anim4 { 0% { bottom: -100%; } 50%, 100% { bottom: 100%; } }
+
+        .nav-btn:hover {
+            background: rgba(251, 191, 36, 0.08); /* Fondo dorado muy sutil */
+            color: var(--accent-gold);
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2);
+        }
+
+        .nav-btn span {
+            position: absolute;
+            display: block;
+        }
+
+        /* Top Line */
+        .nav-btn span:nth-child(1) {
+            top: 0; left: -100%;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, transparent, var(--accent-gold));
+            animation: btn-anim1 2s linear infinite;
+        }
+        @keyframes btn-anim1 {
+            0% { left: -100%; }
+            50%, 100% { left: 100%; }
+        }
+
+        /* Right Line */
+        .nav-btn span:nth-child(2) {
+            top: -100%; right: 0;
+            width: 2px; height: 100%;
+            background: linear-gradient(180deg, transparent, transparent, var(--accent-gold));
+            animation: btn-anim2 2s linear infinite;
+            animation-delay: 0.5s;
+        }
+        @keyframes btn-anim2 {
+            0% { top: -100%; }
+            50%, 100% { top: 100%; }
+        }
+
+        /* Bottom Line */
+        .nav-btn span:nth-child(3) {
+            bottom: 0; right: -100%;
+            width: 100%; height: 2px;
+            background: linear-gradient(270deg, transparent, transparent, var(--accent-gold));
+            animation: btn-anim3 2s linear infinite;
+            animation-delay: 1s;
+        }
+        @keyframes btn-anim3 {
+            0% { right: -100%; }
+            50%, 100% { right: 100%; }
+        }
+
+        /* Left Line */
+        .nav-btn span:nth-child(4) {
+            bottom: -100%; left: 0;
+            width: 2px; height: 100%;
+            background: linear-gradient(360deg, transparent, transparent, var(--accent-gold));
+            animation: btn-anim4 2s linear infinite;
+            animation-delay: 1.5s;
+        }
+        @keyframes btn-anim4 {
+            0% { bottom: -100%; }
+            50%, 100% { bottom: 100%; }
+        }
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
@@ -79,7 +142,14 @@
             justify-content: center;
         }
 
-        /* SVG Container (Desktop) */
+        /* SVG Container */
+        .evolution-svg-container {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 1000px; height: 100%;
+            z-index: 1; pointer-events: none; overflow: visible; 
+        }
+
+        /* 1. SVG (Desktop) */
         .desktop-svg-container {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 1000px; height: 100%;
@@ -93,7 +163,7 @@
         }
         #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
 
-        /* Mobile System */
+        /* 2. MOBILE SYSTEM */
         .mobile-system {
             display: none; position: absolute;
             top: 0; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -113,7 +183,7 @@
 
         /* Container */
         .evolution-container { 
-            max-width: 1000px; width: 100%; position: relative; z-index: 10;
+            max-width: 1000px; width: 100%; position: relative; z-index: 5; 
             display: flex; flex-direction: column; 
             gap: 150px; padding: 20px 20px 100px 20px;
         }
@@ -162,76 +232,33 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- STACK CARDS (ESTILO TECH/MODERNO) --- */
+        /* --- BOTONES GENERALES (AMARILLOS) --- */
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-fill { padding: 12px 24px; background: var(--accent-gold); color: var(--bg-dark); border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent-gold); transition: 0.3s; }
+        .btn-fill:hover { background: transparent; color: var(--accent-gold); }
+        .btn-outline { padding: 12px 24px; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
+        .btn-outline:hover { background: var(--accent-gold); color: var(--bg-dark); }
+
+        /* --- STACK CARDS --- */
         .skills-section { padding: 80px 0; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        
         .stack-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        
-        .stack-card { 
-            background-color: #0f172a; 
-            border: 1px solid #1e3a8a; 
-            border-radius: 12px; 
-            padding: 30px; 
-            transition: transform 0.3s ease, box-shadow 0.3s ease; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); 
-        }
+        .stack-card { background-color: #0f172a; border: 1px solid #1e3a8a; border-radius: 12px; padding: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
         .stack-card:hover { transform: translateY(-7px); box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25); border-color: var(--accent); }
+        .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         
-        .card-header { 
-            color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; 
-            text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); 
-            padding-bottom: 15px; 
-        }
-        
-        /* CAMBIO TECH: Lista como Chips/Grid */
-        .skill-list { 
-            display: flex; 
-            flex-wrap: wrap; /* Permite que se acomoden */
-            gap: 10px; /* Espacio entre chips */
-        }
-        
-        /* CAMBIO TECH: Estilo Chip */
-        .skill-item { 
-            display: inline-flex; align-items: center; 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            color: #e2e8f0; 
-            font-size: 0.85rem; 
-            font-family: 'Fira Code', 'Courier New', monospace; /* Fuente Monospace */
-            transition: 0.2s;
-        }
-        
-        .skill-item:hover { 
-            background: rgba(59, 130, 246, 0.15); 
-            border-color: var(--accent); 
-            color: white; 
-            transform: translateY(-2px);
-        }
-        
-        .skill-item i { margin-right: 8px; color: #64748b; font-size: 1rem; }
+        .skill-list { display: flex; flex-direction: column; gap: 15px; }
+        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
+        .skill-item:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: white; }
+        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
         .skill-item:hover i { color: var(--accent); }
 
-        /* Las etiquetas Expert/Adv ahora son badges dentro del chip */
-        .tag-tech, .tag-highlight { 
-            margin-left: 8px; 
-            font-size: 0.65rem; 
-            font-weight: 700; 
-            padding: 2px 6px; 
-            border-radius: 3px; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            font-family: 'Inter', sans-serif; /* Volver a Sans para legibilidad */
-        }
+        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .tag-tech { background: rgba(59, 130, 246, 0.2); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .tag-highlight { background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
-
-        .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; font-family: 'Fira Code', monospace; font-size: 0.8rem; }
-        .extended-stack h4 { color: #94a3b8; font-family: 'Inter', sans-serif; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
-        .extended-stack p { color: #64748b; line-height: 1.8; }
+        .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
+        .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
+        .extended-stack p { color: #64748b; font-size: 0.85rem; line-height: 1.6; }
 
         /* --- PROJECTS SECTION (STICKY STACK) --- */
         .projects-section { padding: 100px 0 150px; background-color: #050a14; }
@@ -253,13 +280,6 @@
         .project-visual { background-color: #1e293b; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .project-visual img { width: 85%; height: auto; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.5s ease; }
         .project-card:hover .project-visual img { transform: scale(1.02); }
-
-        /* Botones Generales */
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-fill { padding: 12px 24px; background: var(--accent-gold); color: var(--bg-dark); border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent-gold); transition: 0.3s; }
-        .btn-fill:hover { background: transparent; color: var(--accent-gold); }
-        .btn-outline { padding: 12px 24px; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
-        .btn-outline:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
         /* --- CONTACT & FOOTER --- */
         .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); }
@@ -287,12 +307,24 @@
 
             /* Ajustes Móviles Evolution SVG */
             .evolution-container { gap: 80px; padding-bottom: 50px; }
+            
+            /* 1. OCULTAR EL SVG CURVO EN MÓVIL */
             .desktop-svg-container { display: none; }
+            
+            /* 2. MOSTRAR LÍNEA RECTA Y BOLA */
             .mobile-system { display: block; }
             
-            .evo-card { width: 85%; margin-left: auto; margin-right: auto; transform: translateX(0) translateY(50px) !important; text-align: left; height: auto; margin-top: 0 !important; background: #0f172a; z-index: 10; }
+            /* Tarjetas siempre con fondo oscuro solido para tapar la línea si pasa por detrás */
+            .evo-card { 
+                width: 85%; margin-left: auto; margin-right: auto; 
+                transform: translateX(0) translateY(50px) !important; 
+                text-align: left; height: auto; margin-top: 0 !important; 
+                background: #0f172a; /* Fondo sólido */
+                z-index: 10; /* Encima de la línea */
+            }
             .evo-left { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-right: 0; }
             .evo-right { border-left: 3px solid rgba(255,255,255,0.1); margin-left: 0; align-self: flex-start; }
+            
             .evo-card.active { transform: translateX(0) translateY(0) !important; }
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
@@ -342,6 +374,7 @@
     </section> 
 
     <div id="evolution-section" class="evolution-section">
+        
         <svg class="desktop-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -351,6 +384,7 @@
             </defs>
             <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
             <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
+            
             <circle id="desktopBall" cx="0" cy="0" r="7" fill="white" />
         </svg>
 
