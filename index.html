@@ -109,95 +109,86 @@
         .btn-outline { padding: 12px 24px; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
         .btn-outline:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
-        /* --- CLIENT LOGOS GRID (GRANDE Y LIMPIA) --- */
-        .client-logos {
-            margin-top: 80px; /* Más espacio arriba */
-            padding-top: 60px;
-            border-top: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-        
-        .client-logos h5 {
-            font-size: 0.9rem;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 50px; /* Más espacio con los logos */
-            font-weight: 600;
+        /* --- LOGO SECTION (NUEVA: FUERA DE ABOUT, ANCHO COMPLETO) --- */
+        .logo-section-container {
+            padding: 100px 0;
+            background-color: var(--bg-dark);
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 10;
         }
 
+        .logo-section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo-section-header h5 {
+            font-size: 1rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        /* GRILA 3 COLUMNAS */
         .logo-rows-container {
             display: flex;
             flex-direction: column;
-            gap: 60px; /* Espacio vertical generoso entre filas */
+            gap: 60px; /* Espacio vertical entre filas */
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* FILAS LOGOS */
         .logo-row {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 COLUMNAS PARA LOGOS GRANDES */
-            gap: 60px; /* Espacio lateral amplio */
+            grid-template-columns: repeat(3, 1fr); /* 3 Columnas SIEMPRE */
+            gap: 40px;
             align-items: center;
             justify-items: center;
-            
-            /* Animación Base */
+
+            /* Animación de entrada/salida */
             opacity: 0;
             transform: translateY(60px);
             transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Activo */
-        .logo-row.row-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* Clases de animación */
+        .logo-row.row-visible { opacity: 1; transform: translateY(0); }
+        .logo-row.row-exit { opacity: 0; transform: translateY(-60px); }
 
-        /* Salida */
-        .logo-row.row-exit {
-            opacity: 0;
-            transform: translateY(-60px);
-        }
-
-        /* LOGO ITEM (SIN CAJAS, SOLO LOGO) */
+        /* ITEM LOGO */
         .logo-item {
+            width: 100%;
+            height: 120px; /* Altura generosa */
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            cursor: default;
             transition: transform 0.4s ease;
         }
 
         .logo-item:hover {
-            transform: scale(1.05); /* Zoom sutil al hover */
+            transform: scale(1.05);
         }
 
-        /* TEXTO/ICONO ESTILO LOGO */
-        .logo-text {
-            font-family: 'Inter', sans-serif;
-            font-weight: 800;
-            font-size: 2.2rem; /* FUENTE GRANDE */
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #ffffff; 
-            opacity: 0.3; /* Estado inactivo tenue */
+        /* IMAGEN LOGO */
+        .logo-img {
+            max-width: 200px; /* Logos grandes */
+            max-height: 90px;
+            width: auto;
+            object-fit: contain;
+            
+            /* Filtro Base: Escala de grises + Brillo alto (Blanco) */
+            filter: grayscale(100%) brightness(300%) contrast(0);
+            opacity: 0.3; 
             transition: all 0.4s ease;
-            white-space: nowrap;
         }
 
-        .logo-item:hover .logo-text {
+        /* Hover: Color Original */
+        .logo-item:hover .logo-img {
+            filter: grayscale(0%) brightness(100%) contrast(100%);
             opacity: 1;
-            text-shadow: 0 0 30px rgba(255,255,255,0.2);
         }
-
-        /* COLORES MARCAS */
-        .claro:hover .logo-text { color: #da291c; }
-        .wom:hover .logo-text { color: #9b2c8c; }
-        .entel:hover .logo-text { color: #002eff; }
-        .latam:hover .logo-text { color: #1b0088; }
-        .alemana:hover .logo-text { color: #00a499; }
-        .a3d:hover .logo-text { color: #ff6600; }
-
 
         /* --- STACK CARDS --- */
         .skills-section { padding: 80px 0; }
@@ -276,9 +267,9 @@
             .project-visual { height: 250px; }
             .project-content { padding: 30px; }
 
-            /* LOGO GRID MOBILE */
-            .logo-row { grid-template-columns: 1fr; gap: 40px; }
-            .logo-text { font-size: 1.8rem; }
+            /* LOGOS EN MÓVIL: SE MANTIENEN 3 COLUMNAS COMO PEDISTE, SOLO SE REDUCEN */
+            .logo-row { gap: 20px; } 
+            .logo-img { max-width: 100%; max-height: 60px; }
         }
     </style>
 </head>
@@ -288,9 +279,9 @@
         <div class="container nav-flex">
             <div class="logo">Javier <span>Moraga</span></div>
             <nav class="nav-links">
-                <a href="#about">About Me</a>
-                <a href="#skills">Stack</a>
-                <a href="#projects">Portfolio</a>
+                <a href="#about" class="link-text">About Me</a>
+                <a href="#skills" class="link-text">Stack</a>
+                <a href="#projects" class="link-text">Portfolio</a>
                 <a href="#contact" class="nav-btn">
                     <span></span><span></span><span></span><span></span>Contact
                 </a>
@@ -395,54 +386,45 @@
                     <a href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
                     <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" target="_blank" class="btn-outline"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
                 </div>
-
-                <div class="client-logos">
-                    <h5>Trusted By / Previous Experience</h5>
-                    
-                    <div class="logo-rows-container">
-                        
-                        <div class="logo-row">
-                            <div class="logo-item claro" title="Claro Chile">
-                                <div class="logo-text">
-                                    <i class="fa-solid fa-circle"></i> Claro
-                                </div>
-                            </div>
-                            <div class="logo-item wom" title="WOM">
-                                <div class="logo-text">
-                                    <i class="fa-solid fa-bolt"></i> WOM
-                                </div>
-                            </div>
-                            <div class="logo-item entel" title="Entel Chile">
-                                <div class="logo-text">
-                                    <i class="fa-solid fa-signal"></i> entel
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="logo-row">
-                            <div class="logo-item a3d" title="A3D">
-                                <div class="logo-text">
-                                    <i class="fa-solid fa-tv"></i> A3D
-                                </div>
-                            </div>
-                            <div class="logo-item latam" title="LATAM Airlines">
-                                <div class="logo-text">
-                                    <i class="fa-solid fa-plane-up"></i> LATAM
-                                </div>
-                            </div>
-                            <div class="logo-item alemana" title="Clínica Alemana">
-                                <div class="logo-text">
-                                    <i class="fa-solid fa-heart-pulse"></i> Clínica Alemana
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                </div>
+            </div>
         </section>
     </div>
 
+    <section class="logo-section-container">
+        <div class="container">
+            <div class="logo-section-header">
+                <h5>Trusted By / Previous Experience</h5>
+            </div>
+            
+            <div class="logo-rows-container">
+                
+                <div class="logo-row">
+                    <div class="logo-item">
+                        <img src="logos/claro.svg" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
+                    </div>
+                    <div class="logo-item">
+                        <img src="logos/wom.svg" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
+                    </div>
+                    <div class="logo-item">
+                        <img src="logos/entel.svg" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
+                    </div>
+                </div>
+
+                <div class="logo-row">
+                    <div class="logo-item">
+                        <img src="logos/a3d.svg" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
+                    </div>
+                    <div class="logo-item">
+                        <img src="logos/latam.svg" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
+                    </div>
+                    <div class="logo-item">
+                        <img src="logos/alemana.svg" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
     <section id="skills" class="skills-section">
         <div class="container">
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
@@ -585,49 +567,24 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. LOGO SCROLL STAGE ANIMATION (MEJORADO) --- */
-            const logoRows = document.querySelectorAll('.logo-row');
-            
-            // Observer más robusto para detectar entrada y salida superior
-            const rowObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    // Si entra en pantalla (cualquier parte visible)
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('row-visible');
-                        entry.target.classList.remove('row-exit');
-                    } else {
-                        // Si sale por arriba (boundingClientRect.top < 0)
-                        if (entry.boundingClientRect.top < 0) {
-                            entry.target.classList.add('row-exit'); // Se esfuma hacia arriba
-                            entry.target.classList.remove('row-visible');
-                        } else {
-                            // Si sale por abajo, reseteamos a estado inicial (invisible abajo)
-                            entry.target.classList.remove('row-visible');
-                            entry.target.classList.remove('row-exit');
-                        }
-                    }
-                });
-            }, {
-                threshold: 0.1, // Se activa cuando el 10% es visible
-                rootMargin: "-10% 0px -20% 0px" // Márgenes para anticipar la salida superior
-            });
-
-            logoRows.forEach(row => rowObserver.observe(row));
-
-
-            /* --- 2. EVOLUTION, STACK Y OTROS --- */
+            /* --- 1. ANIMACIÓN EVOLUTION --- */
             const section = document.getElementById('evolution-section');
-            const aboutFrame = document.getElementById('aboutFrame');
+            const movingNode = document.getElementById('movingNode');
+            const lineProgress = document.getElementById('evoLineProgress');
             const evoCards = document.querySelectorAll('.evo-card');
+            const aboutFrame = document.getElementById('aboutFrame');
             
+            // ELEMENTOS SVG
             const desktopSvg = document.querySelector('.desktop-svg-container');
             const progressPath = document.getElementById('progressPath');
             const desktopBall = document.getElementById('desktopBall');
             
+            // ELEMENTOS MÓVIL
             const mobileSystem = document.querySelector('.mobile-system');
             const mobileProgress = document.getElementById('mobileProgress');
             const mobileBall = document.getElementById('mobileBall');
 
+            // Configurar SVG Desktop
             let pathLength = 0;
             if(progressPath) {
                 pathLength = progressPath.getTotalLength();
@@ -635,30 +592,39 @@
                 progressPath.style.strokeDashoffset = pathLength;
             }
 
+            // FUNCIÓN CENTRALIZADA DE UPDATE SCROLL
             function updateScroll() {
                 if(!section) return; 
+
                 const rect = section.getBoundingClientRect();
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
+
+                // Cálculo de scroll (0 a 1)
                 let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.8);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
+                // --- LÓGICA HÍBRIDA (MOBILE VS DESKTOP) ---
                 if (window.innerWidth <= 768) {
+                    // MÓVIL: Usar el sistema de divs
                     if(mobileProgress && mobileBall) {
                         const percent = scrollPercent * 100;
                         mobileProgress.style.height = percent + '%';
                         mobileBall.style.top = percent + '%';
                     }
                 } else {
+                    // DESKTOP: Usar el sistema SVG
                     if(progressPath && desktopBall) {
                         const drawLength = pathLength * scrollPercent;
                         progressPath.style.strokeDashoffset = pathLength - drawLength;
+                        
                         const point = progressPath.getPointAtLength(drawLength);
                         desktopBall.setAttribute("cx", point.x);
                         desktopBall.setAttribute("cy", point.y);
                     }
                 }
 
+                // Aparición Tarjetas
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
                     const triggerPoint = window.innerHeight * 0.8; 
@@ -667,6 +633,7 @@
                     } 
                 });
 
+                // Marco Final
                 if (scrollPercent > 0.96) {
                     if(aboutFrame) aboutFrame.classList.add('frame-active');
                 } else {
@@ -674,9 +641,40 @@
                 }
             }
 
+            // EVENT LISTENERS
             window.addEventListener('scroll', updateScroll);
             window.addEventListener('resize', updateScroll);
+            
+            // LLAMADA INICIAL PARA CORREGIR POSICIÓN AL CARGAR
             updateScroll();
+
+            /* --- 2. LOGO GRID ANIMATION (SCROLL STAGE MEJORADO) --- */
+            const logoRows = document.querySelectorAll('.logo-row');
+            
+            const rowObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('row-visible');
+                        entry.target.classList.remove('row-exit');
+                    } else {
+                        // Si sale por ARRIBA, esfumar
+                        if (entry.boundingClientRect.top < 0) {
+                            entry.target.classList.add('row-exit');
+                            entry.target.classList.remove('row-visible');
+                        } else {
+                            // Si sale por ABAJO, resetear
+                            entry.target.classList.remove('row-visible');
+                            entry.target.classList.remove('row-exit');
+                        }
+                    }
+                });
+            }, {
+                threshold: 0.3,
+                rootMargin: "-15% 0px -15% 0px"
+            });
+
+            logoRows.forEach(row => rowObserver.observe(row));
+
 
             /* --- 3. STACK CARDS ANIMATION --- */
             const stackCards = document.querySelectorAll('.stack-card');
