@@ -176,24 +176,25 @@
         }
 
         .logo-item:hover {
-            transform: scale(1.05);
+            transform: scale(1.1); /* Zoom suave al hover */
         }
 
         /* IMAGEN LOGO */
         .logo-img {
-            max-width: 200px;
-            max-height: 90px;
+            max-width: 220px;
+            max-height: 100px; /* Tamaño generoso */
             width: auto;
             object-fit: contain;
             
-            /* SIN FILTROS - COLOR ORIGINAL */
-            opacity: 0.8; /* Ligeramente atenuado para que no brille tanto en reposo */
+            /* CERO FILTROS = Colores Originales */
+            opacity: 0.7; /* Sutilmente atenuado en reposo */
             transition: all 0.4s ease;
         }
 
-        /* Hover: Full Opacity */
+        /* Hover: Full Opacity y Color Vibrante */
         .logo-item:hover .logo-img {
             opacity: 1;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.1));
         }
 
         /* --- STACK CARDS --- */
@@ -288,7 +289,7 @@
 
             /* LOGO GRID MOBILE */
             .logo-row { grid-template-columns: repeat(2, 1fr); gap: 40px; }
-            .logo-img { max-height: 50px; }
+            .logo-img { max-height: 60px; }
         }
     </style>
 </head>
