@@ -134,7 +134,7 @@
             padding-bottom: 15px;
         }
 
-        /* LÍNEA NEÓN BAJO TÍTULO */
+        /* LÍNEA BLANCA NEÓN BAJO EL TÍTULO */
         .logo-section-header h5::after {
             content: '';
             position: absolute;
@@ -156,7 +156,7 @@
             margin: 0 auto;
         }
 
-        /* FILA: SCROLL STAGE ANIMATION (SIN REBOTE) */
+        /* FILA: SCROLL STAGE ANIMATION */
         .logo-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 Columnas */
@@ -164,26 +164,16 @@
             align-items: center;
             justify-items: center;
 
-            /* Estado 1: Inicial (Abajo e Invisible) */
+            /* Animación Base: Invisible y abajo */
             opacity: 0;
             transform: translateY(60px);
-            transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Estado 2: Visible (En sitio) */
-        .logo-row.row-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .logo-row.row-visible { opacity: 1; transform: translateY(0); }
+        .logo-row.row-exit { opacity: 0; transform: translateY(0); } /* Salida SIN movimiento para evitar rebote */
 
-        /* Estado 3: Salida (SOLO OPACIDAD - SIN MOVIMIENTO) */
-        /* Esto elimina el "rebote" o choque visual al bajar */
-        .logo-row.row-exit {
-            opacity: 0;
-            transform: translateY(0); /* Se mantiene en su sitio, solo desaparece */
-        }
-
-        /* ITEM LOGO (SIN MARCO) */
+        /* ITEM LOGO (ENLACE) */
         .logo-item {
             width: 100%;
             height: 120px;
@@ -191,41 +181,40 @@
             justify-content: center;
             align-items: center;
             transition: transform 0.4s ease;
+            text-decoration: none; /* Quitar subrayado de enlace */
         }
 
         .logo-item:hover {
             transform: scale(1.1);
         }
 
-        /* IMAGEN LOGO: CONTORNO FINO Y NÍTIDO */
+        /* IMAGEN LOGO */
         .logo-img {
             max-width: 220px;
             max-height: 90px;
             width: auto;
             object-fit: contain;
             
-            /* TRUCO PARA CONTORNO FINO (0.5px simulado) */
-            /* Usamos sombras duras con 0 desenfoque y opacidad media */
+            /* TRUCO CONTORNO SOLIDO (1PX EN 4 DIRECCIONES) */
+            /* Esto soluciona el problema de que la base se vea plana */
             filter: 
-                drop-shadow(0.5px 0 0 rgba(255,255,255,0.6)) 
-                drop-shadow(-0.5px 0 0 rgba(255,255,255,0.6)) 
-                drop-shadow(0 0.5px 0 rgba(255,255,255,0.6)) 
-                drop-shadow(0 -0.5px 0 rgba(255,255,255,0.6));
+                drop-shadow(0 1px 0 rgba(255,255,255,0.9))   /* Abajo */
+                drop-shadow(0 -1px 0 rgba(255,255,255,0.9))  /* Arriba */
+                drop-shadow(1px 0 0 rgba(255,255,255,0.9))   /* Derecha */
+                drop-shadow(-1px 0 0 rgba(255,255,255,0.9)); /* Izquierda */
             
-            opacity: 0.8; /* Levemente transparente en reposo */
+            opacity: 0.8;
             transition: all 0.4s ease;
         }
 
         /* HOVER: CONTORNO + NEÓN + COLOR ORIGINAL */
         .logo-item:hover .logo-img {
             opacity: 1;
-            
-            /* Se mantiene el contorno fino Y se agrega el resplandor difuso */
             filter: 
-                drop-shadow(0.5px 0 0 white) 
-                drop-shadow(-0.5px 0 0 white) 
-                drop-shadow(0 0.5px 0 white) 
-                drop-shadow(0 -0.5px 0 white)
+                drop-shadow(0 1px 0 white) 
+                drop-shadow(0 -1px 0 white) 
+                drop-shadow(1px 0 0 white) 
+                drop-shadow(-1px 0 0 white)
                 drop-shadow(0 0 15px rgba(255,255,255,0.6)); /* Neón */
         }
 
@@ -451,27 +440,27 @@
             <div class="logo-rows-container">
                 
                 <div class="logo-row">
-                    <div class="logo-item">
-                         <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
-                    </div>
-                    <div class="logo-item">
+                    <a href="https://www.clarochile.cl/" target="_blank" class="logo-item">
+                        <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
+                    </a>
+                    <a href="https://www.wom.cl/" target="_blank" class="logo-item">
                         <img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
-                    </div>
-                    <div class="logo-item">
+                    </a>
+                    <a href="https://www.entel.cl/" target="_blank" class="logo-item">
                         <img src="logos/entel_chile.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
-                    </div>
+                    </a>
                 </div>
 
                 <div class="logo-row">
-                    <div class="logo-item">
+                    <a href="https://www.a3d.cl/" target="_blank" class="logo-item">
                         <img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
-                    </div>
-                    <div class="logo-item">
+                    </a>
+                    <a href="https://www.latamairlines.com/" target="_blank" class="logo-item">
                         <img src="logos/latam_airlines_chile.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
-                    </div>
-                    <div class="logo-item">
+                    </a>
+                    <a href="https://www.clinicaalemana.cl/" target="_blank" class="logo-item">
                         <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
-                    </div>
+                    </a>
                 </div>
 
             </div>
@@ -700,15 +689,13 @@
             /* --- 2. LOGO GRID ANIMATION (SCROLL STAGE MEJORADO) --- */
             const logoRows = document.querySelectorAll('.logo-row');
             
-            // Observer más robusto para detectar entrada y salida superior
             const rowObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    // Si entra en pantalla (cualquier parte visible)
                     if (entry.isIntersecting) {
                         entry.target.classList.add('row-visible');
                         entry.target.classList.remove('row-exit');
                     } else {
-                        // Si sale por arriba (boundingClientRect.top < 0)
+                        // Si sale por ARRIBA, esfumar
                         if (entry.boundingClientRect.top < 0) {
                             entry.target.classList.add('row-exit'); // Se esfuma (OPACITY ONLY)
                             entry.target.classList.remove('row-visible');
