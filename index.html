@@ -109,59 +109,58 @@
         .btn-outline { padding: 12px 24px; border: 1px solid var(--accent-gold); color: var(--accent-gold); border-radius: 50px; font-size: 0.9rem; font-weight: 600; transition: 0.3s; }
         .btn-outline:hover { background: var(--accent-gold); color: var(--bg-dark); }
 
-        /* --- CLIENT LOGOS GRID (EFECTO SCROLL REVEAL/HIDE) --- */
+        /* --- CLIENT LOGOS GRID (COMPACTA Y LIMPIA) --- */
         .client-logos {
-            margin-top: 50px;
-            padding-top: 40px;
+            margin-top: 30px; /* Reducido */
+            padding-top: 20px; /* Reducido */
             border-top: 1px dashed rgba(255, 255, 255, 0.1);
         }
         
         .client-logos h5 {
-            font-size: 0.8rem;
+            font-size: 0.75rem; /* Más pequeño */
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 30px;
+            margin-bottom: 20px; /* Reducido */
             font-weight: 600;
         }
 
-        /* Contenedor de las filas */
         .logo-rows-container {
             display: flex;
             flex-direction: column;
-            gap: 40px; /* Espacio entre filas */
+            gap: 15px; /* Reducido drásticamente para compactar */
         }
 
-        /* Filas individuales */
+        /* CONFIGURACIÓN FILA LOGOS (SCROLL STAGE) */
         .logo-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
+            gap: 15px; /* Espacio lateral entre logos reducido */
             align-items: center;
             
-            /* Estado base: Invisible y abajo */
+            /* ESTADO 1: INICIAL (ABAJO) */
             opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(30px); /* Menos recorrido */
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
 
-        /* Clase activa (visible) */
+        /* ESTADO 2: VISIBLE (CENTRO) */
         .logo-row.row-visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        /* Clase salida (se va hacia arriba) */
+        /* ESTADO 3: SALIDA (ARRIBA - ESFUMADO) */
         .logo-row.row-exit {
             opacity: 0;
-            transform: translateY(-50px);
+            transform: translateY(-30px); /* Se va hacia arriba suavemente */
         }
 
         .logo-item {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
+            font-size: 1.5rem; /* Iconos más pequeños */
             color: white;
             opacity: 0.3;
             transition: 0.3s;
@@ -171,20 +170,7 @@
         .logo-item:hover {
             opacity: 1;
             color: var(--accent-gold);
-            transform: translateY(-3px);
-        }
-
-        .logo-item img {
-            width: 100%;
-            max-width: 120px;
-            filter: grayscale(100%) brightness(200%);
-            opacity: 0.4;
-            transition: 0.3s;
-        }
-
-        .logo-item:hover img {
-            filter: grayscale(0%) brightness(100%);
-            opacity: 1;
+            transform: translateY(-2px); /* Movimiento sutil */
         }
 
         /* --- STACK CARDS --- */
@@ -265,7 +251,7 @@
             .project-content { padding: 30px; }
 
             /* LOGO GRID MOBILE */
-            .logo-row { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .logo-row { grid-template-columns: repeat(2, 1fr); gap: 15px; }
         }
     </style>
 </head>
@@ -275,9 +261,9 @@
         <div class="container nav-flex">
             <div class="logo">Javier <span>Moraga</span></div>
             <nav class="nav-links">
-                <a href="#about">About Me</a>
-                <a href="#skills">Stack</a>
-                <a href="#projects">Portfolio</a>
+                <a href="#about" class="link-text">About Me</a>
+                <a href="#skills" class="link-text">Stack</a>
+                <a href="#projects" class="link-text">Portfolio</a>
                 <a href="#contact" class="nav-btn">
                     <span></span><span></span><span></span><span></span>Contact
                 </a>
@@ -303,7 +289,6 @@
     </section> 
 
     <div id="evolution-section" class="evolution-section">
-        
         <svg class="desktop-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -313,7 +298,6 @@
             </defs>
             <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
             <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
-            
             <circle id="desktopBall" cx="0" cy="0" r="7" fill="white" />
         </svg>
 
@@ -552,32 +536,31 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            /* --- 1. LOGO SCROLL STAGE ANIMATION (NUEVO) --- */
+            /* --- 1. LOGO SCROLL STAGE ANIMATION (MEJORADO) --- */
             const logoRows = document.querySelectorAll('.logo-row');
             
-            // Observer especial con rootMargin negativo para crear "zona central"
+            // Observer más simple y robusto
             const rowObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
+                    // Si entra en pantalla (cualquier parte visible)
                     if (entry.isIntersecting) {
-                        // Está en la zona central: Se ve normal
                         entry.target.classList.add('row-visible');
                         entry.target.classList.remove('row-exit');
                     } else {
-                        // Salió de la zona central
+                        // Si sale por arriba (boundingClientRect.top < 0)
                         if (entry.boundingClientRect.top < 0) {
-                            // Se fue para arriba -> Salida con fade up
-                            entry.target.classList.add('row-exit');
+                            entry.target.classList.add('row-exit'); // Se esfuma hacia arriba
                             entry.target.classList.remove('row-visible');
                         } else {
-                            // Se fue para abajo -> Resetear a invisible
+                            // Si sale por abajo, reseteamos a estado inicial (invisible abajo)
                             entry.target.classList.remove('row-visible');
                             entry.target.classList.remove('row-exit');
                         }
                     }
                 });
             }, {
-                threshold: 0.1, // Apenas entra
-                rootMargin: "-25% 0px -25% 0px" // Zona activa solo en el centro 50%
+                threshold: 0.2, // Se activa cuando el 20% es visible
+                rootMargin: "-10% 0px -10% 0px" // Márgenes seguros para evitar flickering
             });
 
             logoRows.forEach(row => rowObserver.observe(row));
