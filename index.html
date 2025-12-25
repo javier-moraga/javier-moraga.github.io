@@ -121,6 +121,8 @@
         .logo-section-header {
             text-align: center;
             margin-bottom: 60px;
+            /* LÍNEA NEÓN BAJO EL TÍTULO */
+            position: relative;
         }
 
         .logo-section-header h5 {
@@ -129,6 +131,23 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             font-weight: 700;
+            display: inline-block;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        /* LÍNEA BLANCA NEÓN */
+        .logo-section-header h5::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff; /* Efecto Neón Blanco */
+            border-radius: 2px;
         }
 
         .logo-rows-container {
@@ -143,7 +162,7 @@
         .logo-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr); /* 3 Columnas */
-            gap: 30px;
+            gap: 40px;
             align-items: center;
             justify-items: center;
 
@@ -165,51 +184,37 @@
             transform: translateY(-60px);
         }
 
-        /* ITEM LOGO (ESTILO TARJETA CON MARCO Y BRILLO) */
+        /* ITEM LOGO (SIN MARCO, SOLO CONTENEDOR) */
         .logo-item {
             width: 100%;
-            height: 140px; /* Altura más generosa para que se vea la tarjeta */
+            height: 120px;
             display: flex;
             justify-content: center;
             align-items: center;
-            
-            /* ESTILO MARCO Y BRILLO POR DEFECTO */
-            background: rgba(255, 255, 255, 0.02); /* Fondo sutil para dar cuerpo */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* MARCO BLANCO VISIBLE */
-            border-radius: 16px; /* Bordes redondeados modernos */
-            
-            /* GLOW CONSTANTE (Brillo por defecto) */
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); 
-            
-            backdrop-filter: blur(5px); /* Efecto vidrio sutil */
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease;
         }
 
         .logo-item:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-gold); /* Borde dorado al hover */
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15); /* Brillo dorado intenso al hover */
-            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.1); /* Zoom al hover */
         }
 
-        /* IMAGEN LOGO */
+        /* IMAGEN LOGO - BRILLO SUTIL PARA DESPEGAR DEL FONDO */
         .logo-img {
-            max-width: 80%; /* Asegura margen dentro de la tarjeta */
-            max-height: 80px;
+            max-width: 220px;
+            max-height: 90px;
             width: auto;
             object-fit: contain;
             
-            /* SIN FILTROS DE COLOR (Colores originales) */
-            opacity: 1; 
-            
-            /* Sutil sombra para que la imagen se despeque del fondo de la tarjeta */
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); 
-            
+            /* Sombra blanca sutil para separar del fondo negro */
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.15));
+            opacity: 0.9; 
             transition: all 0.4s ease;
         }
-        
+
+        /* Hover: Más brillo */
         .logo-item:hover .logo-img {
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.2)); /* Más brillo en la imagen al hover */
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+            opacity: 1;
         }
 
         /* --- STACK CARDS --- */
@@ -226,11 +231,11 @@
         .skill-item:hover i { color: var(--accent); }
         .tag-tech { margin-left: 8px; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; background: rgba(59, 130, 246, 0.2); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.3); }
         .tag-highlight { margin-left: 8px; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Inter', sans-serif; background: rgba(251, 191, 36, 0.2); color: var(--accent-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
-        .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; font-family: 'Fira Code', monospace; font-size: 0.8rem; }
-        .extended-stack h4 { color: #94a3b8; font-family: 'Inter', sans-serif; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
-        .extended-stack p { color: #64748b; line-height: 1.8; }
+        .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
+        .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
+        .extended-stack p { color: #64748b; font-size: 0.85rem; line-height: 1.6; }
 
-        /* --- PROJECTS SECTION --- */
+        /* --- PROJECTS SECTION (STICKY STACK) --- */
         .projects-section { padding: 100px 0 150px; background-color: #050a14; }
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
         .project-card { position: sticky; top: 130px; background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; overflow: hidden; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1.2fr; min-height: 480px; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); transform-origin: center top; transition: transform 0.3s ease; }
