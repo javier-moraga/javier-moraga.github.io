@@ -43,7 +43,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (SNAKE DORADA) --- */
+        /* --- BOTÓN DE CONTACTO --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -164,7 +164,6 @@
         
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         
-        /* CONTENEDOR DEL CARROUSEL */
         .stack-scroll-wrapper {
             position: relative;
             width: 100%;
@@ -172,43 +171,44 @@
             align-items: center;
         }
 
+        /* SOMBRA DE DESVANECIMIENTO AL FINAL */
+        .stack-scroll-wrapper::after {
+            content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 80px;
+            background: linear-gradient(to right, transparent, var(--bg-dark));
+            pointer-events: none; z-index: 22;
+        }
+
         .stack-container { 
             display: flex; 
             gap: 25px; 
             overflow-x: auto; 
             scroll-snap-type: x mandatory; 
-            padding: 20px 5px; /* Espacio para sombras */
-            scrollbar-width: none; /* Ocultar scrollbar Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            padding: 20px 5px; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
             scroll-behavior: smooth;
             width: 100%;
+            /* CENTRADO SI NO HAY DESBORDAMIENTO */
+            justify-content: flex-start; 
         }
         
-        .stack-container::-webkit-scrollbar { display: none; } /* Ocultar scrollbar Chrome/Safari */
+        .stack-container::-webkit-scrollbar { display: none; }
 
         /* BOTONES DE NAVEGACIÓN */
         .scroll-btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 45px; height: 45px;
+            color: white; width: 45px; height: 45px;
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-            z-index: 25;
-            transition: 0.3s;
+            cursor: pointer; z-index: 25; transition: 0.3s;
             flex-shrink: 0;
         }
-        
-        .scroll-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-        }
-
+        .scroll-btn:hover { background: var(--accent); border-color: var(--accent); }
         .scroll-btn.left { margin-right: 15px; }
         .scroll-btn.right { margin-left: 15px; }
 
-        /* TARJETA INDIVIDUAL (TAMAÑO FIJO) */
+        /* TARJETA INDIVIDUAL (ANCHO AJUSTADO PARA FIT 4) */
         .stack-card { 
             background-color: #0f172a; 
             border: 1px solid #1e3a8a; 
@@ -217,11 +217,11 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease; 
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); 
             
-            /* Ajustes para Carrusel */
-            min-width: 320px; 
-            max-width: 320px;
-            flex: 0 0 auto; /* No encoger ni estirar */
-            scroll-snap-align: center; /* Centrar al soltar */
+            /* Ancho reducido para que quepan 4 en ~1200px */
+            min-width: 275px; 
+            max-width: 275px;
+            flex: 0 0 auto; 
+            scroll-snap-align: center; 
             height: auto;
             display: flex; flex-direction: column;
         }
@@ -230,13 +230,13 @@
         .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         
         .skill-list { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; }
-        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
+        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 6px; color: #e2e8f0; font-size: 0.85rem; font-weight: 500; transition: 0.3s; }
         .skill-item:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: white; }
-        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
+        .skill-item i { width: 25px; margin-right: 8px; color: #64748b; text-align: center; font-size: 1rem; }
         .skill-item:hover i { color: var(--accent); }
 
-        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-tech { margin-left: auto; font-size: 0.7rem; font-weight: 700; background: var(--accent); color: white; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-highlight { margin-left: auto; font-size: 0.7rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
         .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
@@ -311,7 +311,7 @@
             .evo-right.active { border-left-color: var(--accent); }
 
             /* RESET STACK EN MOVIL */
-            .stack-card { min-width: 85vw; max-width: 85vw; } /* Tarjetas casi ancho completo en móvil */
+            .stack-card { min-width: 85vw; max-width: 85vw; } 
             .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
             
             /* STICKY PROJECTS MÓVIL */
