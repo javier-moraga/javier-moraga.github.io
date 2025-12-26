@@ -75,7 +75,7 @@
         .hero-tags { margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION --- */
+        /* --- EVOLUTION SECTION (RESTAURADA A ESTILO ANTIGUO) --- */
         .evolution-section { 
             padding: 50px 0 200px 0; 
             position: relative; 
@@ -91,7 +91,7 @@
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            height: 4000px; 
+            height: 3500px; /* Altura ajustada para 6 tarjetas */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -101,10 +101,10 @@
         .path-progress { 
             fill: none; 
             stroke: url(#lineGradient); 
-            stroke-width: 3px; 
+            stroke-width: 2px; 
             stroke-linecap: round; 
-            stroke-dasharray: 5000; 
-            stroke-dashoffset: 5000; 
+            stroke-dasharray: 4000; 
+            stroke-dashoffset: 4000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
         #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
@@ -119,49 +119,47 @@
             max-width: 1000px; width: 100%; 
             position: relative; 
             z-index: 10; 
-            display: flex; flex-direction: column; gap: 80px; 
+            display: flex; flex-direction: column; 
+            gap: 120px; /* Espacio vertical similar al index antiguo */
             padding: 50px 20px 100px 20px; 
         }
         
-        /* EVOLUTION CARD STYLES */
+        /* EVOLUTION CARD STYLES (NEUTRAL - SIN COLORINES) */
         .evo-card { 
-            width: 42%; 
-            padding: 30px; 
-            background: rgba(17, 25, 40, 0.6); 
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.125);
-            border-radius: 16px;
+            width: 45%; 
+            padding: 35px; 
+            /* Estilo neutro como el index antiguo */
+            background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
             overflow: hidden;
             position: relative; 
             transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); 
             opacity: 0; 
             display: flex; flex-direction: column; justify-content: center; 
         }
+        
+        /* Eliminado el ::before de color superior para mantenerlas neutras */
 
-        .evo-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--accent); 
-            box-shadow: 0 0 10px var(--accent);
-        }
-        .evo-card.past::before {
-            background: var(--accent-gold);
-            box-shadow: none;
-            opacity: 0.8;
-        }
-
-        .evo-left { align-self: flex-start; text-align: right; transform: translateX(-50px); margin-right: 50px; }
-        .evo-right { align-self: flex-end; text-align: left; transform: translateX(50px); margin-left: 50px; }
+        .evo-left { align-self: flex-start; text-align: right; transform: translateX(-50px); margin-right: 20px; }
+        .evo-right { align-self: flex-end; text-align: left; transform: translateX(50px); margin-left: 20px; }
         
         .evo-card.active { opacity: 1; transform: translateX(0); }
-        .evo-card:hover { border-color: rgba(255,255,255,0.3); background: rgba(17, 25, 40, 0.8); transform: translateY(-5px) !important; }
+        /* Efecto hover sutil */
+        .evo-card:hover { 
+            border-color: rgba(255,255,255,0.2); 
+            background: rgba(15, 23, 42, 0.8); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
 
-        .evo-industry { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 5px; font-weight: 700; }
+        .evo-industry { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-gold); margin-bottom: 5px; font-weight: 700; }
         .evo-header { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; color: white; line-height: 1.2; }
         .evo-company { font-size: 1.1rem; color: var(--accent); font-weight: 600; margin-bottom: 5px; display: block; }
-        .evo-date { font-size: 0.85rem; color: #64748b; font-family: 'Fira Code', monospace; margin-bottom: 15px; display: block; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;}
+        .evo-date { font-size: 0.85rem; color: #64748b; font-family: 'Fira Code', monospace; margin-bottom: 15px; display: block; padding-bottom: 10px;}
         
-        .evo-desc ul { list-style: none; padding: 0; }
+        .evo-desc ul { list-style: none; padding: 0; margin: 0; }
         .evo-desc li { 
             font-size: 0.95rem; 
             color: #cbd5e1; 
@@ -169,12 +167,10 @@
             display: flex; 
             align-items: center; 
             gap: 10px; 
-            /* CORRECCIÓN: Siempre a la izquierda */
             justify-content: flex-start;
             text-align: left;
         }
         
-        /* CORRECCIÓN: Punto siempre a la izquierda */
         .evo-desc li::before { 
             content: '•'; 
             color: var(--accent-gold); 
@@ -250,7 +246,7 @@
         }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS (MIRROR GLASS MODERN) --- */
+        /* --- STACK CARDS (COLORFUL MIRROR GLASS) --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
@@ -435,7 +431,7 @@
 
     <div id="evolution-section" class="evolution-section">
         
-        <svg class="desktop-svg-container" viewBox="0 0 1000 4000" preserveAspectRatio="xMidYMin meet">
+        <svg class="desktop-svg-container" viewBox="0 0 1000 3500" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:var(--accent); stop-opacity:1" />
@@ -446,22 +442,24 @@
             
             <path id="trackPath" class="path-bg" d="
                 M 500 0 
-                C 500 100, 380 200, 380 500 
-                S 500 800, 620 1100
-                S 380 1400, 380 1700
-                S 620 2000, 620 2300
-                S 380 2600, 380 2900
-                S 500 3200, 500 3400
+                C 500 150, 400 300, 400 500 
+                C 400 700, 600 800, 600 1000 
+                C 600 1200, 400 1300, 400 1500 
+                C 400 1700, 600 1800, 600 2000
+                C 600 2200, 400 2300, 400 2500
+                C 400 2700, 600 2800, 600 3000
+                C 600 3200, 500 3350, 500 3500
                 " />
             
             <path id="progressPath" class="path-progress" d="
                 M 500 0 
-                C 500 100, 380 200, 380 500 
-                S 500 800, 620 1100
-                S 380 1400, 380 1700
-                S 620 2000, 620 2300
-                S 380 2600, 380 2900
-                S 500 3200, 500 3400
+                C 500 150, 400 300, 400 500 
+                C 400 700, 600 800, 600 1000 
+                C 600 1200, 400 1300, 400 1500 
+                C 400 1700, 600 1800, 600 2000
+                C 600 2200, 400 2300, 400 2500
+                C 400 2700, 600 2800, 600 3000
+                C 600 3200, 500 3350, 500 3500
                 " />
             
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
@@ -476,7 +474,7 @@
         <div class="evolution-container">
             
             <div class="evo-card evo-left">
-                <span class="evo-industry" style="color: #10b981;">Healthcare</span>
+                <span class="evo-industry">Healthcare</span>
                 <h3 class="evo-header">Data Engineer</h3>
                 <span class="evo-company">Clínica Alemana</span>
                 <span class="evo-date">2025 – Present</span>
@@ -489,8 +487,8 @@
                 </div>
             </div>
 
-            <div class="evo-card evo-right past">
-                <span class="evo-industry" style="color: #3b82f6;">Aviation</span>
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Aviation</span>
                 <h3 class="evo-header">Data Engineer</h3>
                 <span class="evo-company">LATAM Airlines</span>
                 <span class="evo-date">2023 – 2025</span>
@@ -503,8 +501,8 @@
                 </div>
             </div>
 
-            <div class="evo-card evo-left past">
-                <span class="evo-industry" style="color: #a855f7;">Consulting</span>
+            <div class="evo-card evo-left">
+                <span class="evo-industry">Consulting</span>
                 <h3 class="evo-header">Data Analyst</h3>
                 <span class="evo-company">A3D</span>
                 <span class="evo-date">2023</span>
@@ -517,8 +515,8 @@
                 </div>
             </div>
 
-            <div class="evo-card evo-right past">
-                <span class="evo-industry" style="color: #fbbf24;">Telecom</span>
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Telecom</span>
                 <h3 class="evo-header">Senior Collections Analyst</h3>
                 <span class="evo-company">ENTEL</span>
                 <span class="evo-date">2022 – 2023</span>
@@ -530,8 +528,8 @@
                 </div>
             </div>
 
-            <div class="evo-card evo-left past">
-                <span class="evo-industry" style="color: #f43f5e;">Telecom</span>
+            <div class="evo-card evo-left">
+                <span class="evo-industry">Telecom</span>
                 <h3 class="evo-header">Senior Data Analyst</h3>
                 <span class="evo-company">WOM Chile</span>
                 <span class="evo-date">2018 – 2022</span>
@@ -544,8 +542,8 @@
                 </div>
             </div>
 
-            <div class="evo-card evo-right past">
-                <span class="evo-industry" style="color: #ef4444;">Telecom</span>
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Telecom</span>
                 <h3 class="evo-header">Operations Control Engineer</h3>
                 <span class="evo-company">Claro Chile</span>
                 <span class="evo-date">2015 – 2018</span>
