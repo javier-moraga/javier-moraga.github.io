@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABLES GLOBALES --- */
+        /* --- GLOBAL VARIABLES --- */
         :root {
             --bg-dark: #0b1120;
             --bg-card: #111827; 
@@ -22,12 +22,12 @@
             --text-muted: #94a3b8;
         }
 
-        /* --- ESTILOS GENERALES --- */
+        /* --- GENERAL STYLES --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         
-        /* MARCO ESTRUCTURAL */
+        /* CONTENT FRAME */
         .content-frame {
             max-width: 1200px; margin: 0 auto; padding: 60px;
             background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08);
@@ -53,7 +53,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO --- */
+        /* --- CONTACT BUTTON --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -75,7 +75,7 @@
         .hero-tags { margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION (ACTUALIZADA PARA 6 TARJETAS Y ESTILO ESPEJO) --- */
+        /* --- EVOLUTION SECTION --- */
         .evolution-section { 
             padding: 50px 0 200px 0; 
             position: relative; 
@@ -84,13 +84,14 @@
             justify-content: center; 
         }
 
+        /* SVG CONTAINER (Z-Index 1 to stay behind cards) */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            height: 3400px; /* Aumentado para soportar 6 tarjetas */
+            height: 4000px; /* HEIGHT INCREASED FOR 6 CARDS + CENTER RETURN */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -102,8 +103,8 @@
             stroke: url(#lineGradient); 
             stroke-width: 3px; 
             stroke-linecap: round; 
-            stroke-dasharray: 4500; 
-            stroke-dashoffset: 4500; 
+            stroke-dasharray: 5000; 
+            stroke-dashoffset: 5000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
         #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
@@ -113,35 +114,31 @@
         .mobile-line-progress { position: absolute; top: 0; left: 0; right: 0; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); box-shadow: 0 0 15px var(--accent); }
         .mobile-ball { position: absolute; left: 50%; top: 0%; transform: translate(-50%, -50%); width: 14px; height: 14px; background-color: #fff; border-radius: 50%; box-shadow: 0 0 15px #fff, 0 0 20px var(--accent-gold); z-index: 2; }
         
+        /* CARD CONTAINER (Z-Index 10 to stay ON TOP of line) */
         .evolution-container { 
             max-width: 1000px; width: 100%; 
-            position: relative; z-index: 10; 
+            position: relative; 
+            z-index: 10; 
             display: flex; flex-direction: column; gap: 80px; 
             padding: 50px 20px 100px 20px; 
         }
         
-        /* ESTILO TARJETA ESPEJO (EVOLUTION) */
+        /* EVOLUTION CARD STYLES */
         .evo-card { 
             width: 42%; 
             padding: 30px; 
-            
-            /* Glassmorphism */
             background: rgba(17, 25, 40, 0.6); 
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.125);
             border-radius: 16px;
             overflow: hidden;
-
             position: relative; 
             transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); 
             opacity: 0; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
+            display: flex; flex-direction: column; justify-content: center; 
         }
 
-        /* Barra superior de color */
         .evo-card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
             background: var(--accent); 
@@ -167,7 +164,6 @@
         .evo-desc ul { list-style: none; padding: 0; }
         .evo-desc li { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
         
-        /* Bullets alineados */
         .evo-left .evo-desc li { justify-content: flex-end; }
         .evo-right .evo-desc li { justify-content: flex-start; }
         .evo-desc li::before { content: '•'; color: var(--accent-gold); font-size: 1.2rem; line-height: 0; }
@@ -175,7 +171,7 @@
         .evo-left .evo-desc li::after { content: '•'; color: var(--accent-gold); font-size: 1.2rem; line-height: 0; }
 
 
-        /* --- ABOUT ME SECTION (CON EXPLOSIÓN AMARILLA) --- */
+        /* --- ABOUT ME SECTION --- */
         .about-section-wrapper { padding: 50px 0; position: relative; }
         
         .about-section-wrapper::before {
@@ -203,7 +199,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- BOTONES --- */
+        /* --- BUTTONS --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-fill { padding: 12px 24px; background: var(--accent-gold); color: var(--bg-dark); border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent-gold); transition: 0.3s; }
         .btn-fill:hover { background: transparent; color: var(--accent-gold); }
@@ -252,26 +248,19 @@
             flex-wrap: nowrap; justify-content: center;
         }
         
-        /* ESTILO NUEVO: GLASSMORPHISM & BORDES CORREGIDOS */
+        /* MIRROR CARD STYLE */
         .mirror-card {
             position: relative;
             width: 300px; 
             height: 480px;
             display: flex; flex-direction: column;
             padding: 30px;
-            
-            /* 1. Fondo semitransparente oscuro + Blur */
             background: rgba(17, 25, 40, 0.6); 
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            
-            /* Borde fino de cristal */
             border: 1px solid rgba(255, 255, 255, 0.125);
             border-radius: 16px;
-            
-            /* 2. CORRECCIÓN: Overflow hidden para que los bordes de color no escapen */
             overflow: hidden; 
-            
             transition: 0.3s;
             flex-shrink: 0;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -284,14 +273,11 @@
             background: rgba(17, 25, 40, 0.75);
         }
 
-        /* Indicador de Color (Top Line) - AHORA PERMANENTE */
         .mirror-card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-            background: transparent; 
-            z-index: 2;
+            background: transparent; z-index: 2;
         }
 
-        /* 3. Colores Fijos (Sin :hover) */
         .mirror-card.blue::before { background: #3b82f6; box-shadow: 0 0 15px #3b82f6; }
         .mirror-card.gold::before { background: #fbbf24; box-shadow: 0 0 15px #fbbf24; }
         .mirror-card.green::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
@@ -311,7 +297,7 @@
         .skill-item i { width: 20px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* PUNTOS DE NAVEGACIÓN (Solo Móvil) */
+        /* DOTS */
         .pagination-dots { display: none; gap: 10px; margin-top: 10px; margin-bottom: 20px; }
         .dot { width: 10px; height: 10px; background-color: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; transition: 0.3s; }
         .dot.active { background-color: var(--accent-gold); transform: scale(1.2); }
@@ -345,7 +331,7 @@
         .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10; background: transparent; }
 
-        /* --- ANIMACIÓN ICONOS --- */
+        /* --- ICON ANIMATION --- */
         @keyframes iconPop {
             0% { transform: translateY(0); color: var(--text-muted); }
             50% { transform: translateY(-15px); color: var(--accent-gold); }
@@ -384,7 +370,7 @@
             .logo-img { max-height: 50px; max-width: 100%; }
             .logo-item { height: 80px; }
             
-            /* Ajustes Mobile Evolution */
+            /* Mobile Evolution Adjustments */
             .evolution-section { height: auto; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
@@ -437,7 +423,7 @@
 
     <div id="evolution-section" class="evolution-section">
         
-        <svg class="desktop-svg-container" viewBox="0 0 1000 3400" preserveAspectRatio="xMidYMin meet">
+        <svg class="desktop-svg-container" viewBox="0 0 1000 4000" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:var(--accent); stop-opacity:1" />
@@ -447,20 +433,24 @@
             </defs>
             <path id="trackPath" class="path-bg" d="
                 M 500 0 
-                Q 500 200, 300 400 T 300 600 
-                Q 300 800, 700 1000 T 700 1200 
-                Q 700 1400, 300 1600 T 300 1800 
-                Q 300 2000, 700 2200 T 700 2400
-                Q 700 2600, 300 2800 T 300 3000
-                Q 300 3200, 500 3400" />
+                Q 500 200, 250 400 T 250 600 
+                Q 250 800, 750 1000 T 750 1200 
+                Q 750 1400, 250 1600 T 250 1800 
+                Q 250 2000, 750 2200 T 750 2400
+                Q 750 2600, 250 2800 T 250 3000
+                Q 250 3200, 750 3400 T 750 3600
+                Q 750 3700, 500 3800 T 500 4000" />
+            
             <path id="progressPath" class="path-progress" d="
                 M 500 0 
-                Q 500 200, 300 400 T 300 600 
-                Q 300 800, 700 1000 T 700 1200 
-                Q 700 1400, 300 1600 T 300 1800 
-                Q 300 2000, 700 2200 T 700 2400
-                Q 700 2600, 300 2800 T 300 3000
-                Q 300 3200, 500 3400" />
+                Q 500 200, 250 400 T 250 600 
+                Q 250 800, 750 1000 T 750 1200 
+                Q 750 1400, 250 1600 T 250 1800 
+                Q 250 2000, 750 2200 T 750 2400
+                Q 750 2600, 250 2800 T 250 3000
+                Q 250 3200, 750 3400 T 750 3600
+                Q 750 3700, 500 3800 T 500 4000" />
+            
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
         </svg>
 
@@ -473,84 +463,84 @@
         <div class="evolution-container">
             
             <div class="evo-card evo-left">
-                <span class="evo-industry" style="color: #10b981;">Sanidad</span>
-                <h3 class="evo-header">Ingeniero de Datos</h3>
+                <span class="evo-industry" style="color: #10b981;">Healthcare</span>
+                <h3 class="evo-header">Data Engineer</h3>
                 <span class="evo-company">Clínica Alemana</span>
-                <span class="evo-date">2025 – Presente</span>
+                <span class="evo-date">2025 – Present</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Migración SAS → BigQuery</li>
-                        <li>Canalizaciones de Datos Clínicos</li>
-                        <li>Automatización de la calidad de datos</li>
+                        <li>SAS → BigQuery Migration</li>
+                        <li>Clinical Data Pipelines</li>
+                        <li>Data Quality Automation</li>
                     </ul>
                 </div>
             </div>
 
             <div class="evo-card evo-right past">
-                <span class="evo-industry" style="color: #3b82f6;">Aviación</span>
-                <h3 class="evo-header">Ingeniero de Datos</h3>
+                <span class="evo-industry" style="color: #3b82f6;">Aviation</span>
+                <h3 class="evo-header">Data Engineer</h3>
                 <span class="evo-company">LATAM Airlines</span>
                 <span class="evo-date">2023 – 2025</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Ingestión Jira → BigQuery</li>
-                        <li>Reportaje casi en tiempo real</li>
-                        <li>Entrega continua (CI/CD)</li>
+                        <li>Jira → BigQuery Ingestion</li>
+                        <li>Near Real-time Reporting</li>
+                        <li>CI/CD Delivery</li>
                     </ul>
                 </div>
             </div>
 
             <div class="evo-card evo-left past">
-                <span class="evo-industry" style="color: #a855f7;">Consultoría</span>
-                <h3 class="evo-header">Analista de Datos</h3>
+                <span class="evo-industry" style="color: #a855f7;">Consulting</span>
+                <h3 class="evo-header">Data Analyst</h3>
                 <span class="evo-company">A3D</span>
                 <span class="evo-date">2023</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Documentación de datos empresariales</li>
-                        <li>Catalogación de fuentes</li>
-                        <li>Estandarización del conocimiento</li>
+                        <li>Enterprise Data Documentation</li>
+                        <li>Source Cataloging</li>
+                        <li>Knowledge Standardization</li>
                     </ul>
                 </div>
             </div>
 
             <div class="evo-card evo-right past">
-                <span class="evo-industry" style="color: #fbbf24;">Telecomunicaciones</span>
-                <h3 class="evo-header">Analista Sr. de Colecciones</h3>
+                <span class="evo-industry" style="color: #fbbf24;">Telecom</span>
+                <h3 class="evo-header">Senior Collections Analyst</h3>
                 <span class="evo-company">ENTEL</span>
                 <span class="evo-date">2022 – 2023</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Segmentación basada en comportamiento</li>
-                        <li>Análisis de recuperación de ingresos</li>
+                        <li>Behavior-based Segmentation</li>
+                        <li>Revenue Recovery Analysis</li>
                     </ul>
                 </div>
             </div>
 
             <div class="evo-card evo-left past">
-                <span class="evo-industry" style="color: #f43f5e;">Telecomunicaciones</span>
-                <h3 class="evo-header">Analista Sr. de Datos</h3>
+                <span class="evo-industry" style="color: #f43f5e;">Telecom</span>
+                <h3 class="evo-header">Senior Data Analyst</h3>
                 <span class="evo-company">WOM Chile</span>
                 <span class="evo-date">2018 – 2022</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Análisis de Churn (Fuga)</li>
-                        <li>Segmentación de clientes</li>
-                        <li>Migración Netezza → BigQuery</li>
+                        <li>Churn Analysis</li>
+                        <li>Customer Segmentation</li>
+                        <li>Netezza → BigQuery Migration</li>
                     </ul>
                 </div>
             </div>
 
             <div class="evo-card evo-right past">
-                <span class="evo-industry" style="color: #ef4444;">Telecomunicaciones</span>
-                <h3 class="evo-header">Ing. Control de Operaciones</h3>
+                <span class="evo-industry" style="color: #ef4444;">Telecom</span>
+                <h3 class="evo-header">Operations Control Engineer</h3>
                 <span class="evo-company">Claro Chile</span>
                 <span class="evo-date">2015 – 2018</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Automatización de KPI</li>
-                        <li>Controles ETL</li>
-                        <li>Monitorización de procesos</li>
+                        <li>KPI Automation</li>
+                        <li>ETL Controls</li>
+                        <li>Process Monitoring</li>
                     </ul>
                 </div>
             </div>
@@ -862,11 +852,11 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Ajuste fino para que la bola termine justo al final de la sección
+                // Fine-tuning the scroll percentage calculation
                 let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.9);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
-                // ANIMACION BOLA
+                // BALL ANIMATION
                 if (window.innerWidth <= 1199) {
                     if(mobileProgress && mobileBall) {
                         const percent = scrollPercent * 100;
@@ -878,7 +868,7 @@
                         const drawLength = pathLength * scrollPercent;
                         progressPath.style.strokeDashoffset = pathLength - drawLength;
                         
-                        // Protección por si drawLength excede ligeramente
+                        // Ensure we don't exceed the total length
                         const safeLength = Math.min(drawLength, pathLength);
                         const point = progressPath.getPointAtLength(safeLength);
                         
@@ -887,7 +877,7 @@
                     }
                 }
 
-                // ANIMACION CARDS EVOLUTION
+                // CARD ACTIVATION ANIMATION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
                     const triggerPoint = window.innerHeight * 0.85; 
@@ -896,7 +886,7 @@
                     } 
                 });
 
-                // ANIMACION EXPLOSIÓN AMARILLA
+                // YELLOW EXPLOSION ANIMATION
                 if (scrollPercent > 0.95) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
@@ -918,7 +908,7 @@
             }, { threshold: 0.2 });
             logoRows.forEach(row => rowObserver.observe(row));
 
-            // PUNTOS DE PAGINACIÓN (MÓVIL)
+            // MOBILE DOTS
             container.addEventListener('scroll', () => {
                 const scrollLeft = container.scrollLeft;
                 const cardWidth = container.offsetWidth * 0.85; 
