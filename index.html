@@ -154,12 +154,12 @@
             filter: drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 0 15px rgba(255,255,255,0.6));
         }
 
-        /* --- STACK CARDS (HORIZONTAL SCROLL DRIVEN) --- */
+        /* --- STACK CARDS (HORIZONTAL SCROLL DRIVEN - FIXED MATH) --- */
         .skills-section { 
             position: relative; 
-            height: 500vh; /* ALTURA AUMENTADA PARA SCROLL MAS LARGO */
+            height: 400vh; /* ALTURA PERFECTA PARA LA DURACIÓN */
             z-index: 10; 
-            pointer-events: none; /* Permite scroll a través */
+            pointer-events: none; 
         }
         
         .skills-sticky-mask {
@@ -170,26 +170,23 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            overflow: hidden; /* CORTAR LO QUE SALE */
+            overflow: hidden; 
             pointer-events: auto;
             background-color: var(--bg-dark); 
-            /* Sombra superior para tapar logos */
             box-shadow: 0 -100px 150px rgba(0,0,0,1);
         }
 
         .section-title { font-size: 2.5rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
 
-        /* PISTA HORIZONTAL DE TARJETAS */
+        /* PISTA HORIZONTAL */
         .horizontal-track {
             display: flex;
-            gap: 40px; /* Espacio entre tarjetas */
-            /* ALINEACIÓN IZQUIERDA: Empieza a la izquierda pero con margen para que se vea */
-            padding-left: 10vw; 
+            gap: 40px; 
+            padding-left: 5vw; /* ALINEACIÓN IZQUIERDA PARA MOSTRAR 1.5 TARJETAS */
             width: max-content;
             will-change: transform;
         }
 
-        /* TARJETA UNIFICADA (DESKTOP) */
         .tech-card {
             width: 350px;
             height: 480px;
@@ -199,7 +196,7 @@
             padding: 40px; 
             display: flex; flex-direction: column;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            flex-shrink: 0; /* No encoger */
+            flex-shrink: 0; 
         }
         
         .tech-card:hover { border-color: var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); transform: translateY(-5px); transition: 0.3s; }
@@ -219,7 +216,7 @@
             background-color: #050a14; 
             padding: 100px 0 150px; 
             box-shadow: 0 -100px 200px rgba(0,0,0,1);
-            margin-top: -10vh; /* Ajuste fino para la transición */
+            margin-top: 0; /* Reset */
         }
         
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
@@ -256,7 +253,7 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- RESPONSIVE --- */
+        /* --- RESPONSIVE (MÓVIL) --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .about-grid, .project-card { grid-template-columns: 1fr; }
@@ -723,23 +720,34 @@
             function updateHorizontalScroll() {
                 if (window.innerWidth <= 768) return; // Desactivar en móvil (usa swipe nativo)
 
-                const rect = skillsSection.getBoundingClientRect();
-                const totalHeight = skillsSection.offsetHeight - window.innerHeight;
-                
-                // Cuanto hemos scrolleado dentro de la sección
-                let scrollProgress = -rect.top / totalHeight;
-                // Clamp entre 0 y 1
-                scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+                const sectionTop = skillsSection.offsetTop;
+                const sectionHeight = skillsSection.offsetHeight;
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
 
-                // Ancho total del track (tarjetas + gaps) - ancho de la ventana
+                // MATEMÁTICA PURA (SCROLL ABSOLUTO)
+                // Calculamos el progreso basándonos en cuánto hemos recorrido de la sección sticky
+                // El inicio es cuando el top de la sección toca el top de la ventana
+                const startPoint = sectionTop;
+                // El final es cuando terminamos de recorrer la altura extra
+                const endPoint = sectionTop + sectionHeight - windowHeight;
+
+                let progress = (scrollY - startPoint) / (endPoint - startPoint);
+                
+                // Aseguramos límites 0 y 1
+                progress = Math.max(0, Math.min(1, progress));
+
+                // Ancho total del track (tarjetas + gaps)
                 const trackWidth = track.scrollWidth;
                 const windowWidth = window.innerWidth;
                 
-                // AJUSTE: Mover más rápido para asegurar que llegue al final
-                // El "100" era poco, usamos un factor mayor para garantizar
-                const maxTranslate = trackWidth - windowWidth + 200; 
+                // CUÁNTO MOVER: 
+                // Queremos que el final del track llegue al borde derecho de la pantalla
+                // trackWidth - windowWidth nos da el exceso. 
+                // Le sumamos un "padding" (200px) para asegurar que la última tarjeta entre completa y sobre espacio.
+                const totalDistanceToMove = trackWidth - windowWidth + 200; 
                 
-                const translateX = scrollProgress * maxTranslate;
+                const translateX = progress * totalDistanceToMove;
 
                 // Aplicar movimiento
                 track.style.transform = `translateX(-${translateX}px)`;
@@ -747,6 +755,7 @@
 
             window.addEventListener('scroll', updateHorizontalScroll);
             window.addEventListener('resize', updateHorizontalScroll);
+            // Llamada inicial para setear posición
             updateHorizontalScroll();
 
 
