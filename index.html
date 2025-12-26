@@ -157,7 +157,7 @@
         /* --- STACK CARDS (HORIZONTAL SCROLL DRIVEN) --- */
         .skills-section { 
             position: relative; 
-            height: 400vh; /* ALTURA DE SCROLL NECESARIA PARA COMPLETAR EL VIAJE */
+            height: 500vh; /* ALTURA AUMENTADA PARA SCROLL MAS LARGO */
             z-index: 10; 
             pointer-events: none; /* Permite scroll a través */
         }
@@ -183,7 +183,8 @@
         .horizontal-track {
             display: flex;
             gap: 40px; /* Espacio entre tarjetas */
-            padding-left: 50vw; /* Empieza al centro/derecha */
+            /* ALINEACIÓN IZQUIERDA: Empieza a la izquierda pero con margen para que se vea */
+            padding-left: 10vw; 
             width: max-content;
             will-change: transform;
         }
@@ -255,7 +256,7 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- RESPONSIVE (MÓVIL) --- */
+        /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .about-grid, .project-card { grid-template-columns: 1fr; }
@@ -734,9 +735,9 @@
                 const trackWidth = track.scrollWidth;
                 const windowWidth = window.innerWidth;
                 
-                // Calculamos cuánto mover hacia la izquierda
-                // Restamos un poco para que no se pase del final
-                const maxTranslate = trackWidth - windowWidth + 100; // 100px buffer
+                // AJUSTE: Mover más rápido para asegurar que llegue al final
+                // El "100" era poco, usamos un factor mayor para garantizar
+                const maxTranslate = trackWidth - windowWidth + 200; 
                 
                 const translateX = scrollProgress * maxTranslate;
 
