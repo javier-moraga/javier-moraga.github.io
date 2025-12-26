@@ -49,7 +49,6 @@
         }
         .nav-btn:hover { background: rgba(251, 191, 36, 0.08); color: var(--accent-gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.15), inset 0 0 0 1px rgba(251, 191, 36, 0.2); }
         .nav-btn span { position: absolute; display: block; opacity: 0; }
-        
         .nav-btn span:nth-child(1) { top: 0; left: -150%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim1 2s linear infinite; }
         @keyframes btn-anim1 { 0% { left: -150%; opacity: 0; } 10% { opacity: 1; } 50%, 100% { left: 100%; opacity: 1; } }
         .nav-btn span:nth-child(2) { top: -150%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim2 2s linear infinite; animation-delay: 0.5s; }
@@ -113,13 +112,12 @@
 
         /* --- CLIENT LOGOS SECTION --- */
         .logo-section-container {
-            position: relative; /* NORMAL - SIN CORTINA */
+            position: relative; 
             padding: 80px 0;
-            background-color: var(--bg-dark); /* FONDO ÚNICO */
+            background-color: var(--bg-dark);
             border-top: 1px dashed rgba(255,255,255,0.1);
             z-index: 10;
         }
-        
         .logo-section-header { text-align: center; margin-bottom: 60px; position: relative; }
         .logo-section-header h5 {
             font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 3px; font-weight: 700;
@@ -129,61 +127,63 @@
             content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 60px; height: 2px; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; border-radius: 2px;
         }
-
         .logo-rows-container { display: flex; flex-direction: column; gap: 50px; max-width: 1200px; margin: 0 auto; }
         .logo-row {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; align-items: center; justify-items: center;
             opacity: 0; transform: translateY(60px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .logo-row.row-visible { opacity: 1; transform: translateY(0); }
-
         .logo-item {
             width: 100%; height: 120px; display: flex; justify-content: center; align-items: center;
             transition: transform 0.4s ease; text-decoration: none;
         }
         .logo-item:hover { transform: scale(1.1); }
-
-        /* IMAGEN LOGO - SOLUCIÓN PARA BASE RECTA: SOMBRA PERIMETRAL CENTRADA */
+        
+        /* IMAGEN LOGO: Sombra centrada (Glow) para evitar base plana */
         .logo-img {
             max-width: 220px; max-height: 90px; width: auto; object-fit: contain;
-            
-            /* Sombra centrada (0 0) con radio de 4px para envolver la forma completa */
-            filter: drop-shadow(0 0 4px rgba(255,255,255,0.7));
-            
+            filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); /* Sombra uniforme alrededor */
             opacity: 0.8; transition: all 0.4s ease;
         }
-
         .logo-item:hover .logo-img {
             opacity: 1;
-            /* Resplandor más fuerte y definido al hover */
-            filter: drop-shadow(0 0 8px rgba(255,255,255,0.9));
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.9));
         }
 
-        /* --- STACK CARDS (GLASSMORPHISM CAROUSEL) --- */
+        /* --- STACK CARDS (GLASSMORPHISM + FLEXIBLE) --- */
         .skills-section { 
-            position: relative; padding: 100px 0; 
-            z-index: 10;
+            position: relative; padding: 100px 0; z-index: 10;
         }
-        
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        
-        .stack-scroll-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
+        .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
         .stack-container { 
-            display: flex; gap: 40px; overflow-x: auto; 
-            scroll-snap-type: x mandatory; 
-            padding: 40px 20px; /* Padding extra para que el hover no se corte */
-            scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; width: 100%;
+            display: flex; gap: 40px; 
+            padding: 40px 20px; 
+            width: 100%;
+            /* COMPORTAMIENTO FLEXIBLE */
+            flex-wrap: nowrap; /* Por defecto en una línea */
+            justify-content: center; /* Centrado en pantallas grandes */
         }
-        .stack-container::-webkit-scrollbar { display: none; }
+        
+        /* PAGINACIÓN (PUNTOS) */
+        .pagination-dots {
+            display: flex; gap: 10px; margin-top: 20px;
+        }
+        .dot {
+            width: 10px; height: 10px; background-color: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; transition: 0.3s;
+        }
+        .dot.active { background-color: var(--accent-gold); transform: scale(1.2); }
 
-        /* --- NUEVO ESTILO DE TARJETA (GLASSMORPHISM + GRADIENT) --- */
+
+        /* ESTILO TARJETA GLASSMORPHISM */
         .glass-card {
             position: relative;
-            min-width: 320px; max-width: 320px;
+            /* Tamaño base */
+            width: 300px; 
             height: 480px;
             display: flex; justify-content: center; align-items: center;
-            flex: 0 0 auto; scroll-snap-align: center;
+            flex-shrink: 0; /* No encogerse en desktop */
             transition: 0.5s;
         }
 
@@ -198,34 +198,16 @@
             background: #fff; border-radius: 8px;
             transform: skewX(15deg); transition: 0.5s; filter: blur(30px);
         }
+        .glass-card:hover:before, .glass-card:hover:after { transform: skewX(0deg); left: 20px; width: calc(100% - 90px); }
 
-        .glass-card:hover:before, .glass-card:hover:after {
-            transform: skewX(0deg); left: 20px; width: calc(100% - 90px);
-        }
+        /* Colores Tarjetas */
+        .glass-card:nth-child(1):before, .glass-card:nth-child(1):after { background: linear-gradient(315deg, #3b82f6, #06b6d4); }
+        .glass-card:nth-child(2):before, .glass-card:nth-child(2):after { background: linear-gradient(315deg, #fbbf24, #f59e0b); }
+        .glass-card:nth-child(3):before, .glass-card:nth-child(3):after { background: linear-gradient(315deg, #10b981, #34d399); }
+        .glass-card:nth-child(4):before, .glass-card:nth-child(4):after { background: linear-gradient(315deg, #8b5cf6, #ec4899); }
 
-        /* Colores Específicos por Tarjeta */
-        /* Card 1: Blue/Cyan (GCP) */
-        .glass-card:nth-child(1):before, .glass-card:nth-child(1):after {
-            background: linear-gradient(315deg, #3b82f6, #06b6d4);
-        }
-        /* Card 2: Gold/Orange (Data) */
-        .glass-card:nth-child(2):before, .glass-card:nth-child(2):after {
-            background: linear-gradient(315deg, #fbbf24, #f59e0b);
-        }
-        /* Card 3: Green/Emerald (Engineering) */
-        .glass-card:nth-child(3):before, .glass-card:nth-child(3):after {
-            background: linear-gradient(315deg, #10b981, #34d399);
-        }
-        /* Card 4: Purple/Pink (Analytics) */
-        .glass-card:nth-child(4):before, .glass-card:nth-child(4):after {
-            background: linear-gradient(315deg, #8b5cf6, #ec4899);
-        }
-
-        /* Span Animations (Cuadrados flotantes) */
-        .glass-card span {
-            display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 5; pointer-events: none;
-        }
+        /* Span Animations */
+        .glass-card span { display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; pointer-events: none; }
         .glass-card span::before {
             content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0;
             border-radius: 8px; background: rgba(255, 255, 255, 0.1);
@@ -233,7 +215,6 @@
             animation: animate 2s ease-in-out infinite; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
         .glass-card:hover span::before { top: -50px; left: 50px; width: 100px; height: 100px; opacity: 1; }
-
         .glass-card span::after {
             content: ''; position: absolute; bottom: 0; right: 0; width: 100%; height: 100%;
             border-radius: 8px; background: rgba(255, 255, 255, 0.1);
@@ -241,45 +222,25 @@
             animation: animate 2s ease-in-out infinite; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             animation-delay: -1s;
         }
-        .glass-card:hover span:after { bottom: -50px; right: 50px; width: 100px; height: 100px; opacity: 1; }
+        .glass-card:hover span::after { bottom: -50px; right: 50px; width: 100px; height: 100px; opacity: 1; }
+        @keyframes animate { 0%, 100% { transform: translateY(10px); } 50% { transform: translate(-10px); } }
 
-        @keyframes animate {
-            0%, 100% { transform: translateY(10px); }
-            50% { transform: translate(-10px); }
-        }
-
-        /* Content Styles */
+        /* Content */
         .glass-content {
             position: relative; left: 0; padding: 20px 30px;
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); border-radius: 8px;
             z-index: 1; transition: 0.5s; color: #fff;
-            width: 280px; height: 380px;
+            width: 260px; height: 400px; /* Ajuste interior */
             display: flex; flex-direction: column;
         }
-
         .glass-card:hover .glass-content { left: -25px; padding: 30px 30px; }
-
-        .glass-content h2 { font-size: 1.5em; color: #fff; margin-bottom: 20px; font-weight: 700; text-transform: uppercase; }
-        
-        /* Lista de Skills dentro de la tarjeta */
+        .glass-content h2 { font-size: 1.3em; color: #fff; margin-bottom: 20px; font-weight: 700; text-transform: uppercase; }
         .glass-skill-list { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
-        .glass-skill-item { 
-            font-size: 0.9em; margin-bottom: 12px; display: flex; align-items: center; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;
-        }
+        .glass-skill-item { font-size: 0.85em; margin-bottom: 10px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
         .glass-skill-item i { width: 25px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .glass-skill-item strong { margin-left: auto; font-size: 0.8em; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; }
 
-
-        .scroll-btn {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white; width: 45px; height: 45px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 25; transition: 0.3s; flex-shrink: 0;
-        }
-        .scroll-btn:hover { background: var(--accent); border-color: var(--accent); }
-        .scroll-btn.left { margin-right: 5px; }
-        .scroll-btn.right { margin-left: 5px; }
 
         /* --- PROJECTS SECTION --- */
         .projects-section { padding: 100px 0 150px; position: relative; z-index: 10; margin-top: 0; }
@@ -317,8 +278,38 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- RESPONSIVE --- */
-        @media (max-width: 768px) {
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        
+        /* PANTALLAS GRANDES (DESKTOP) */
+        @media (min-width: 1200px) {
+            /* Liberar el contenedor del Stack para que quepan las 4 tarjetas */
+            .skills-section .container {
+                max-width: 100% !important; /* Usar todo el ancho */
+                padding: 0 50px;
+            }
+            .stack-container {
+                justify-content: center; /* Centrar tarjetas */
+                overflow-x: visible; /* Quitar scroll */
+            }
+            .pagination-dots { display: none; } /* Ocultar puntos en desktop */
+        }
+
+        /* PANTALLAS PEQUEÑAS (TABLET/MOVIL) */
+        @media (max-width: 1199px) {
+            .stack-container {
+                justify-content: flex-start; /* Alinear a la izquierda para scroll */
+                overflow-x: auto; /* Habilitar scroll horizontal */
+                scroll-snap-type: x mandatory;
+                padding-left: 20px; /* Padding para ver borde izquierdo */
+            }
+            
+            .glass-card {
+                min-width: 85vw; /* Tarjeta ocupa 85% del ancho (se ve la siguiente) */
+                scroll-snap-align: center;
+                margin-right: 15px;
+            }
+            
+            /* Ajustes generales móvil */
             .hero h1 { font-size: 2.5rem; }
             .about-grid, .project-card { grid-template-columns: 1fr; }
             .project-img { height: 250px; }
@@ -327,7 +318,6 @@
             .container { padding: 0 25px; }
             .about-info-grid { grid-template-columns: 1fr; gap: 20px; }
             
-            /* Logos responsive */
             .logo-rows-container { gap: 30px; }
             .logo-row { grid-template-columns: repeat(3, 1fr); gap: 15px; }
             .logo-img { max-height: 50px; max-width: 100%; }
@@ -342,15 +332,6 @@
             .evo-card.active { transform: translateX(0) translateY(0) !important; }
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
-
-            /* STACK RESPONSIVE (MÓVIL = 85% ANCHO) */
-            .scroll-btn { display: none; } /* Ocultar flechas en móvil */
-            .glass-card { 
-                min-width: 85vw; max-width: 85vw; /* Tarjetas anchas */
-                height: 420px; /* Un poco menos altas */
-                margin-right: 0; /* Controlado por gap del container */
-            }
-            .stack-container { gap: 15px; padding: 40px 20px; }
             
             .project-card { grid-template-columns: 1fr; min-height: auto; top: 80px; margin-bottom: 40px; }
             .project-visual { height: 250px; }
@@ -516,7 +497,6 @@
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
             
             <div class="stack-scroll-wrapper">
-                <button class="scroll-btn left" onclick="scrollStack('left')"><i class="fa-solid fa-chevron-left"></i></button>
 
                 <div class="stack-container" id="stackContainer">
                     
@@ -579,10 +559,15 @@
                     </div>
 
                 </div>
+                
+                <div class="pagination-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
 
-                <button class="scroll-btn right" onclick="scrollStack('right')"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
-            
         </div>
     </section>
 
@@ -685,6 +670,8 @@
             const section = document.getElementById('evolution-section');
             const aboutFrame = document.getElementById('aboutFrame');
             const evoCards = document.querySelectorAll('.evo-card');
+            const container = document.getElementById('stackContainer');
+            const dots = document.querySelectorAll('.dot');
 
             // ELEMENTOS DESKTOP
             const desktopSvg = document.querySelector('.desktop-svg-container');
@@ -768,6 +755,7 @@
                     if (entry.isIntersecting) {
                         entry.target.classList.add('row-visible');
                     } 
+                    // No hay 'else' para salida: el efecto sticky + z-index se encarga de cubrirlo visualmente
                 });
             }, {
                 threshold: 0.2
@@ -775,29 +763,18 @@
 
             logoRows.forEach(row => rowObserver.observe(row));
 
-            /* --- 3. FUNCIONES SCROLL STACK (HORIZONTAL + LOOP) --- */
-            window.scrollStack = function(direction) {
-                const container = document.getElementById('stackContainer');
-                const scrollAmount = 340; // Ancho de tarjeta + gap aprox
+            /* --- 3. ACTUALIZACIÓN PUNTOS CARRUSEL (SOLO MÓVIL) --- */
+            container.addEventListener('scroll', () => {
+                const scrollLeft = container.scrollLeft;
+                const cardWidth = container.offsetWidth * 0.85; // Aprox ancho tarjeta
+                const index = Math.round(scrollLeft / cardWidth);
                 
-                // LÓGICA DE LOOP PARA BOTONES DESKTOP
-                if (direction === 'left') {
-                    if(container.scrollLeft <= 5) {
-                        // Si está al principio, ir al final (Loop)
-                        container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-                    } else {
-                        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                    }
-                } else {
-                    // Si llegamos al final (con margen de error), ir al principio (Loop)
-                    // (scrollWidth - clientWidth) es el máximo scroll posible
-                    if(Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth) {
-                        container.scrollTo({ left: 0, behavior: 'smooth' });
-                    } else {
-                        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                    }
-                }
-            };
+                dots.forEach((dot, i) => {
+                    if(i === index) dot.classList.add('active');
+                    else dot.classList.remove('active');
+                });
+            });
+
 
             /* --- 4. ANIMACIÓN ICONOS AL FINAL --- */
             let iconsAnimated = false; 
