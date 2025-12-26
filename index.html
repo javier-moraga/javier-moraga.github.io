@@ -190,7 +190,7 @@
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 1s ease-in-out; 
+            transition: opacity 0.5s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
@@ -441,24 +441,24 @@
             
             <path id="trackPath" class="path-bg" d="
                 M 500 0 
-                C 500 150, 350 300, 350 500 
-                C 350 700, 650 800, 650 1000 
-                C 650 1200, 350 1300, 350 1500 
-                C 350 1700, 650 1800, 650 2000
-                C 650 2200, 350 2300, 350 2500
-                C 350 2700, 650 2800, 650 3000
-                C 650 3200, 500 3350, 500 3500
+                C 500 150, 250 300, 250 500 
+                C 250 700, 750 800, 750 1000 
+                C 750 1200, 250 1300, 250 1500 
+                C 250 1700, 750 1800, 750 2000
+                C 750 2200, 250 2300, 250 2500
+                C 250 2700, 750 2800, 750 3000
+                C 750 3200, 500 3350, 500 3500
                 " />
             
             <path id="progressPath" class="path-progress" d="
                 M 500 0 
-                C 500 150, 350 300, 350 500 
-                C 350 700, 650 800, 650 1000 
-                C 650 1200, 350 1300, 350 1500 
-                C 350 1700, 650 1800, 650 2000
-                C 650 2200, 350 2300, 350 2500
-                C 350 2700, 650 2800, 650 3000
-                C 650 3200, 500 3350, 500 3500
+                C 500 150, 250 300, 250 500 
+                C 250 700, 750 800, 750 1000 
+                C 750 1200, 250 1300, 250 1500 
+                C 250 1700, 750 1800, 750 2000
+                C 750 2200, 250 2300, 250 2500
+                C 250 2700, 750 2800, 750 3000
+                C 750 3200, 500 3350, 500 3500
                 " />
             
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
@@ -862,8 +862,14 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Adjust scroll logic so it finishes exactly at the end
-                let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.85);
+                // Start drawing when the section enters the middle of the screen
+                const startOffset = windowHeight / 2;
+                // Determine how far the section top has passed the start offset
+                const scrolledPastStart = startOffset - rect.top;
+                // Calculate percentage based on the total section height
+                let scrollPercent = scrolledPastStart / sectionHeight;
+
+                // Clamp between 0 and 1
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
                 // BALL ANIMATION
@@ -878,7 +884,7 @@
                         const drawLength = pathLength * scrollPercent;
                         progressPath.style.strokeDashoffset = pathLength - drawLength;
                         
-                        // Limit ball position to path length
+                        // Ensure we don't exceed the total length for getPointAtLength
                         const safeLength = Math.min(drawLength, pathLength);
                         const point = progressPath.getPointAtLength(safeLength);
                         
@@ -887,7 +893,7 @@
                     }
                 }
 
-                // CARD ACTIVATION
+                // CARD ACTIVATION ANIMATION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
                     const triggerPoint = window.innerHeight * 0.85; 
@@ -896,8 +902,8 @@
                     } 
                 });
 
-                // LIGHT EXPLOSION ACTIVATION (At the end of scroll)
-                if (scrollPercent > 0.98) {
+                // LIGHT EXPLOSION ACTIVATION (When ball hits the end)
+                if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
                     if(aboutWrapper) aboutWrapper.classList.remove('frame-active');
@@ -906,7 +912,8 @@
 
             window.addEventListener('scroll', updateScroll);
             window.addEventListener('resize', updateScroll);
-            updateScroll();
+            // Initial call to set positions
+            setTimeout(updateScroll, 100); 
 
             const logoRows = document.querySelectorAll('.logo-row');
             const rowObserver = new IntersectionObserver((entries) => {
