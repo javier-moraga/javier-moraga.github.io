@@ -43,7 +43,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO --- */
+        /* --- BOTÓN DE CONTACTO (SNAKE DORADA) --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -154,59 +154,89 @@
             filter: drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 0 15px rgba(255,255,255,0.6));
         }
 
-        /* --- STACK CARDS (3D CAROUSEL / SCROLL DRIVEN) --- */
+        /* --- STACK CARDS (NATGEO STYLE - SCROLL DRIVEN) --- */
         .skills-section { 
-            position: sticky; top: 0; /* Sticky para efecto de entrada */
-            height: 400vh; /* Altura extra para el scroll-trigger */
-            background-color: transparent; 
-            z-index: 10; 
-        }
-
-        /* Contenedor que "arrastra" el fondo negro sobre los logos */
-        .skills-sticky-mask {
-            position: sticky; 
-            top: 0; 
-            height: 100vh; 
-            background-color: var(--bg-dark); /* Fondo solido que hace la cortina */
-            display: flex; flex-direction: column; justify-content: center;
-            overflow: hidden;
-            box-shadow: 0 -80px 150px rgba(0,0,0,1); /* Sombra de arrastre superior */
+            position: relative; 
+            height: 500vh; /* MUCHA ALTURA PARA SCROLL LARGO */
+            z-index: 10; /* Encima de logos (0) pero debajo de proyectos (30) */
+            pointer-events: none; /* Dejar pasar eventos hasta que sea sticky */
         }
         
+        .skills-sticky-mask {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            pointer-events: auto;
+            /* CORTINA OSCURA QUE TAPA LOS LOGOS */
+            background-color: var(--bg-dark); 
+            box-shadow: 0 -100px 150px rgba(0,0,0,1);
+        }
+
         .section-title { font-size: 2.5rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
 
-        /* ESCENARIO 3D */
         .carousel-scene {
             position: relative;
             width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 600px; /* Ancho controlado para centrar */
             height: 500px;
-            perspective: 1200px; /* Perspectiva profunda */
-            display: flex; justify-content: center; align-items: center;
+            perspective: 1000px;
         }
 
         .carousel-card {
             position: absolute;
-            width: 350px;
-            height: 480px;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background-color: #0f172a; 
             border: 1px solid #1e3a8a; 
-            border-radius: 16px; 
-            padding: 30px; 
+            border-radius: 20px; 
+            padding: 40px; 
             display: flex; flex-direction: column;
-            transition: transform 0.1s linear, opacity 0.3s ease, filter 0.3s ease; /* Transición fluida */
+            
+            /* ESTADO INICIAL (FUERA/ATRÁS) */
+            opacity: 0;
+            transform: translateZ(-200px) translateY(50px);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             will-change: transform, opacity;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            transform-style: preserve-3d;
+        }
+        
+        /* CLASE ACTIVA (EN FRENTE) */
+        .carousel-card.active {
+            opacity: 1;
+            transform: translateZ(0) translateY(0);
+            z-index: 10;
+            border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
         }
 
-        .card-header { color: var(--accent); font-size: 1.3rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        .skill-list { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; }
-        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; }
-        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
-        .tag-tech { margin-left: auto; font-size: 0.7rem; font-weight: 700; background: var(--accent); color: white; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; }
-        .tag-highlight { margin-left: auto; font-size: 0.7rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; }
+        /* CLASE SALIENTE (SE VA ARRIBA/ESFUMA) */
+        .carousel-card.exit {
+            opacity: 0;
+            transform: translateZ(100px) translateY(-100px) scale(1.1);
+            z-index: 20;
+        }
+
+        /* CLASE ENTRANTE (ESPERANDO) */
+        .carousel-card.waiting {
+            opacity: 0.4;
+            transform: translateZ(-100px) translateY(50px) scale(0.9);
+            z-index: 5;
+            filter: blur(2px);
+        }
+
+        .card-header { color: var(--accent); font-size: 1.4rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .skill-list { display: flex; flex-direction: column; gap: 15px; }
+        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 6px; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
+        .skill-item i { width: 35px; margin-right: 15px; color: #64748b; text-align: center; font-size: 1.2rem; }
+        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+
 
         /* --- PROJECTS SECTION (CURTAIN EFFECT OVER STACK) --- */
         .projects-section { 
@@ -214,7 +244,9 @@
             z-index: 30; /* Encima de todo al final */
             background-color: #050a14; /* Fondo distinto */
             padding: 100px 0 150px; 
-            box-shadow: 0 -50px 100px rgba(0,0,0,1);
+            /* SOMBRA GIGANTE PARA TAPAR EL STACK SUAVEMENTE */
+            box-shadow: 0 -100px 200px rgba(0,0,0,1);
+            margin-top: -50vh; /* Truco para que empiece a tapar antes */
         }
         
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
@@ -261,13 +293,11 @@
             .container { padding: 0 25px; }
 
             .about-info-grid { grid-template-columns: 1fr; gap: 20px; }
-
             .logo-rows-container { gap: 30px; }
             .logo-row { grid-template-columns: repeat(3, 1fr); gap: 15px; }
             .logo-img { max-height: 50px; max-width: 100%; }
             .logo-item { height: 80px; }
 
-            /* Ajustes Móviles Evolution */
             .evolution-container { gap: 80px; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
@@ -278,16 +308,13 @@
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
 
-            /* STACK EN MOVIL: DESACTIVAR 3D, USAR SCROLL NORMAL */
-            .skills-section { height: auto; position: relative; }
-            .skills-sticky-mask { height: auto; position: relative; overflow: visible; box-shadow: none; }
-            .carousel-scene { display: block; height: auto; overflow-x: auto; white-space: nowrap; padding: 20px; }
-            .carousel-card { 
-                position: relative; display: inline-flex; width: 85vw; height: auto; 
-                margin-right: 20px; white-space: normal; transform: none !important; opacity: 1 !important; 
-            }
+            /* STACK EN MOVIL: RESET A NORMAL */
+            .skills-section { height: auto; position: relative; padding: 50px 0; }
+            .skills-sticky-mask { position: relative; height: auto; background: transparent; box-shadow: none; top: 0; }
+            .carousel-scene { height: auto; display: grid; gap: 20px; perspective: none; }
+            .carousel-card { position: relative; width: 100%; height: auto; transform: none !important; opacity: 1 !important; filter: none !important; }
             
-            /* STICKY PROJECTS MÓVIL */
+            .projects-section { margin-top: 0; box-shadow: none; }
             .project-card { grid-template-columns: 1fr; min-height: auto; top: 80px; margin-bottom: 40px; }
             .project-visual { height: 250px; }
             .project-content { padding: 30px; }
@@ -603,17 +630,21 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // ELEMENTOS SCROLL GENERAL
             const section = document.getElementById('evolution-section');
             const aboutFrame = document.getElementById('aboutFrame');
             const evoCards = document.querySelectorAll('.evo-card');
+
+            // ELEMENTOS DESKTOP
             const desktopSvg = document.querySelector('.desktop-svg-container');
             const progressPath = document.getElementById('progressPath');
             const desktopBall = document.getElementById('desktopBall');
+            
+            // ELEMENTOS MÓVIL
             const mobileSystem = document.querySelector('.mobile-system');
             const mobileProgress = document.getElementById('mobileProgress');
             const mobileBall = document.getElementById('mobileBall');
 
+            // Configurar SVG Desktop
             let pathLength = 0;
             if(progressPath) {
                 pathLength = progressPath.getTotalLength();
@@ -621,51 +652,76 @@
                 progressPath.style.strokeDashoffset = pathLength;
             }
 
+            // FUNCIÓN CENTRALIZADA DE UPDATE SCROLL
             function updateScroll() {
                 if(!section) return; 
+
                 const rect = section.getBoundingClientRect();
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
+
+                // Cálculo de scroll (0 a 1)
                 let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.8);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
+                // --- LÓGICA HÍBRIDA (MOBILE VS DESKTOP) ---
                 if (window.innerWidth <= 768) {
+                    // MÓVIL: Usar el sistema de divs
                     if(mobileProgress && mobileBall) {
                         const percent = scrollPercent * 100;
                         mobileProgress.style.height = percent + '%';
                         mobileBall.style.top = percent + '%';
                     }
                 } else {
+                    // DESKTOP: Usar el sistema SVG
                     if(progressPath && desktopBall) {
                         const drawLength = pathLength * scrollPercent;
                         progressPath.style.strokeDashoffset = pathLength - drawLength;
+                        
                         const point = progressPath.getPointAtLength(drawLength);
                         desktopBall.setAttribute("cx", point.x);
                         desktopBall.setAttribute("cy", point.y);
                     }
                 }
 
+                // Aparición Tarjetas
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
                     const triggerPoint = window.innerHeight * 0.8; 
-                    if (cardTop < triggerPoint) { card.classList.add('active'); } 
+                    if (cardTop < triggerPoint) {
+                        card.classList.add('active');
+                    } 
                 });
 
-                if (scrollPercent > 0.96) { if(aboutFrame) aboutFrame.classList.add('frame-active'); } 
-                else { if(aboutFrame) aboutFrame.classList.remove('frame-active'); }
+                // Marco Final
+                if (scrollPercent > 0.96) {
+                    if(aboutFrame) aboutFrame.classList.add('frame-active');
+                } else {
+                    if(aboutFrame) aboutFrame.classList.remove('frame-active');
+                }
             }
 
+            // EVENT LISTENERS
             window.addEventListener('scroll', updateScroll);
             window.addEventListener('resize', updateScroll);
+            
+            // LLAMADA INICIAL PARA CORREGIR POSICIÓN AL CARGAR
             updateScroll();
 
             /* --- 2. LOGO GRID ANIMATION (ENTRADA SUAVE) --- */
             const logoRows = document.querySelectorAll('.logo-row');
+            
             const rowObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) { entry.target.classList.add('row-visible'); } 
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('row-visible');
+                    } 
+                    // No hay 'else' para salida: el efecto sticky + z-index se encarga de cubrirlo visualmente
                 });
-            }, { threshold: 0.2 });
+            }, {
+                threshold: 0.2
+            });
+
             logoRows.forEach(row => rowObserver.observe(row));
 
 
@@ -689,40 +745,54 @@
                 const activeIndex = scrollProgress * 3; 
 
                 cards.forEach((card, i) => {
-                    const offset = i - activeIndex; // Distancia desde el "centro" virtual
+                    const offset = i - activeIndex; 
                     
-                    // Configuración Visual Estilo CoverFlow/NatGeo
-                    const absOffset = Math.abs(offset);
+                    // LÓGICA DE TARJETAS EN PILA (STACK/DECK)
                     
-                    // 1. Desplazamiento X: Las cartas se separan
-                    let translateX = offset * 360; 
-                    
-                    // 2. Escala: La central es grande (1), las otras bajan
-                    let scale = 1 - (absOffset * 0.2); 
-                    scale = Math.max(0.6, scale); // No hacerlas minusculas
+                    // 1. Visibilidad básica
+                    let opacity = 0;
+                    let transform = "";
+                    let zIndex = 0;
+                    let blur = 0;
 
-                    // 3. Rotación Y: Girar hacia el centro
-                    let rotateY = offset * -45; 
-                    // Limitar rotación para que no den la vuelta completa
-                    if(rotateY > 60) rotateY = 60;
-                    if(rotateY < -60) rotateY = -60;
+                    if (offset > 0.5) {
+                        // TARJETAS FUTURAS (ESPERANDO ATRÁS)
+                        // Se quedan quietas en el fondo, apiladas
+                        let stackOffset = offset * 20; // Pequeño desplazamiento visual
+                        let scale = 1 - (offset * 0.1); // Más pequeñas
+                        transform = `translateY(${stackOffset}px) scale(${scale})`;
+                        zIndex = 10 - i; // Las de más adelante tapan a las de atrás
+                        opacity = 1 - (offset * 0.5); // Se desvanecen
+                        blur = offset * 2; // Desenfocadas
+                    } 
+                    else if (offset <= 0.5 && offset >= -0.5) {
+                        // TARJETA ACTIVA (EN FRENTE)
+                        transform = `translateY(0) scale(1)`;
+                        zIndex = 20;
+                        opacity = 1;
+                        blur = 0;
+                    } 
+                    else {
+                        // TARJETAS PASADAS (SE VAN ARRIBA Y SE ESFUMAN)
+                        // Efecto "Fly away"
+                        let exitOffset = offset * 100; // Se van rápido hacia arriba
+                        transform = `translateY(${exitOffset}px) scale(1.1)`;
+                        zIndex = 20 + i; // Para que tapen al salir? No, que se vayan.
+                        opacity = 1 + offset; // Se desvanecen rápido (offset es negativo)
+                        blur = Math.abs(offset) * 5;
+                    }
 
-                    // 4. Z-Index y Opacidad (Profundidad)
-                    let zIndex = 100 - Math.round(absOffset * 10);
-                    let opacity = 1 - (absOffset * 0.3);
-                    let brightness = 1 - (absOffset * 0.4); // Oscurecer las de atrás
-
-                    // Aplicar Transformación
+                    // APLICAR ESTILOS
                     card.style.zIndex = zIndex;
-                    card.style.opacity = opacity;
-                    card.style.filter = `brightness(${brightness})`;
-                    card.style.transform = `translateX(${translateX}px) scale(${scale}) rotateY(${rotateY}deg)`;
+                    card.style.opacity = Math.max(0, opacity);
+                    card.style.transform = transform;
+                    card.style.filter = `blur(${blur}px)`;
                 });
             }
 
             window.addEventListener('scroll', updateCarousel);
-            // Llamada inicial
             updateCarousel();
+
 
             /* --- 4. ANIMACIÓN ICONOS AL FINAL --- */
             let iconsAnimated = false; 
@@ -732,7 +802,9 @@
                         iconsAnimated = true;
                         const icons = document.querySelectorAll('.c-icon');
                         icons.forEach((icon, index) => {
-                            setTimeout(() => { icon.classList.add('icon-pop'); }, index * 200);
+                            setTimeout(() => {
+                                icon.classList.add('icon-pop');
+                            }, index * 200);
                         });
                     }
                 }
