@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,7 +43,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO --- */
+        /* --- BOTÓN DE CONTACTO (SNAKE DORADA) --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -113,112 +113,108 @@
 
         /* --- CLIENT LOGOS SECTION (STICKY + PARALLAX CURTAIN) --- */
         .logo-section-container {
-            position: sticky; top: 0; z-index: 0; 
-            min-height: 100vh; 
+            /* EFECTO CORTINA: STICKY + Z-INDEX BAJO */
+            position: sticky;
+            top: 0;
+            z-index: 0; 
+            min-height: 100vh; /* Altura completa para que dure el efecto */
             background-color: var(--bg-dark);
             border-top: 1px dashed rgba(255,255,255,0.1);
-            display: flex; align-items: center; padding: 0;
+            display: flex;
+            align-items: center;
+            padding: 0;
         }
         
         .logo-content-wrapper { width: 100%; padding: 50px 0; }
+
         .logo-section-header { text-align: center; margin-bottom: 60px; position: relative; }
         .logo-section-header h5 {
             font-size: 0.9rem; color: #64748b; text-transform: uppercase; letter-spacing: 3px; font-weight: 700;
             display: inline-block; position: relative; padding-bottom: 15px;
         }
+
+        /* LÍNEA BLANCA NEÓN */
         .logo-section-header h5::after {
             content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 2px; background: #fff; box-shadow: 0 0 10px #fff, 0 0 20px #fff; border-radius: 2px;
+            width: 60px; height: 2px; background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff; border-radius: 2px;
         }
 
         .logo-rows-container { display: flex; flex-direction: column; gap: 50px; max-width: 1200px; margin: 0 auto; }
-        .logo-row {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; align-items: center; justify-items: center;
-            opacity: 0; transform: translateY(60px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .logo-row.row-visible { opacity: 1; transform: translateY(0); }
-        .logo-row.row-exit { opacity: 0; transform: translateY(0); }
 
+        /* FILA: SCROLL STAGE ANIMATION */
+        .logo-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+            align-items: center; justify-items: center;
+            opacity: 0; transform: translateY(60px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .logo-row.row-visible { opacity: 1; transform: translateY(0); }
+        .logo-row.row-exit { opacity: 0; transform: translateY(0); } /* Solo opacidad para evitar rebote */
+
+        /* ITEM LOGO */
         .logo-item {
-            width: 100%; height: 120px; display: flex; justify-content: center; align-items: center;
+            width: 100%; height: 120px;
+            display: flex; justify-content: center; align-items: center;
             transition: transform 0.4s ease; text-decoration: none;
         }
         .logo-item:hover { transform: scale(1.1); }
+
+        /* IMAGEN LOGO - CONTORNO FINO Y NEÓN */
         .logo-img {
             max-width: 220px; max-height: 90px; width: auto; object-fit: contain;
-            filter: drop-shadow(0 1px 0 rgba(255,255,255,0.9)) drop-shadow(0 -1px 0 rgba(255,255,255,0.9)) drop-shadow(1px 0 0 rgba(255,255,255,0.9)) drop-shadow(-1px 0 0 rgba(255,255,255,0.9));
+            
+            /* CONTORNO FINO (1PX) */
+            filter: 
+                drop-shadow(0 1px 0 rgba(255,255,255,0.9))   
+                drop-shadow(0 -1px 0 rgba(255,255,255,0.9))  
+                drop-shadow(1px 0 0 rgba(255,255,255,0.9))   
+                drop-shadow(-1px 0 0 rgba(255,255,255,0.9));
+            
             opacity: 0.8; transition: all 0.4s ease;
         }
+
         .logo-item:hover .logo-img {
             opacity: 1;
-            filter: drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 0 15px rgba(255,255,255,0.6));
+            /* CONTORNO + NEÓN */
+            filter: 
+                drop-shadow(0 1px 0 white) 
+                drop-shadow(0 -1px 0 white) 
+                drop-shadow(1px 0 0 white) 
+                drop-shadow(-1px 0 0 white)
+                drop-shadow(0 0 15px rgba(255,255,255,0.6));
         }
 
-        /* --- STACK CARDS (HORIZONTAL SCROLL DRIVEN - FIXED MATH) --- */
+        /* --- STACK CARDS (CORTINA QUE TAPA LOS LOGOS) --- */
         .skills-section { 
-            position: relative; 
-            height: 400vh; /* ALTURA PERFECTA PARA LA DURACIÓN */
-            z-index: 10; 
-            pointer-events: none; 
+            position: relative; padding: 100px 0; 
+            z-index: 20; /* Z-INDEX MAYOR PARA TAPAR */
+            background-color: var(--bg-dark); /* FONDO SÓLIDO */
+            box-shadow: 0 -50px 100px rgba(0,0,0,1); /* SOMBRA SUPERIOR */
         }
         
-        .skills-sticky-mask {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            overflow: hidden; 
-            pointer-events: auto;
-            background-color: var(--bg-dark); 
-            box-shadow: 0 -100px 150px rgba(0,0,0,1);
-        }
-
-        .section-title { font-size: 2.5rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-
-        /* PISTA HORIZONTAL */
-        .horizontal-track {
-            display: flex;
-            gap: 40px; 
-            padding-left: 5vw; /* ALINEACIÓN IZQUIERDA PARA MOSTRAR 1.5 TARJETAS */
-            width: max-content;
-            will-change: transform;
-        }
-
-        .tech-card {
-            width: 350px;
-            height: 480px;
-            background-color: #0f172a; 
-            border: 1px solid #1e3a8a; 
-            border-radius: 20px; 
-            padding: 40px; 
-            display: flex; flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            flex-shrink: 0; 
-        }
+        .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
+        .stack-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .stack-card { background-color: #0f172a; border: 1px solid #1e3a8a; border-radius: 12px; padding: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+        .stack-card:hover { transform: translateY(-7px); box-shadow: 0 10px 25px rgba(30, 64, 175, 0.25); border-color: var(--accent); }
+        .card-header { color: var(--accent); font-size: 1.1rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         
-        .tech-card:hover { border-color: var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); transform: translateY(-5px); transition: 0.3s; }
-
-        .card-header { color: var(--accent); font-size: 1.4rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         .skill-list { display: flex; flex-direction: column; gap: 15px; }
-        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 6px; color: #e2e8f0; font-size: 1rem; font-weight: 500; }
-        .skill-item i { width: 35px; margin-right: 15px; color: #64748b; text-align: center; font-size: 1.2rem; }
-        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
-        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+        .skill-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 6px; color: #e2e8f0; font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
+        .skill-item:hover { background: rgba(59, 130, 246, 0.1); border-color: var(--accent); color: white; }
+        .skill-item i { width: 30px; margin-right: 10px; color: #64748b; text-align: center; font-size: 1.1rem; }
+        .skill-item:hover i { color: var(--accent); }
 
+        .tag-tech { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent); color: white; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* --- PROJECTS SECTION (CURTAIN EFFECT) --- */
-        .projects-section { 
-            position: relative; 
-            z-index: 30; /* TAPAR AL STACK AL TERMINAR */
-            background-color: #050a14; 
-            padding: 100px 0 150px; 
-            box-shadow: 0 -100px 200px rgba(0,0,0,1);
-            margin-top: 0; /* Reset */
-        }
-        
+        .extended-stack { max-width: 900px; margin: 40px auto 0; text-align: center; background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; }
+        .extended-stack h4 { color: #94a3b8; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; opacity: 0.8; }
+        .extended-stack p { color: #64748b; font-size: 0.85rem; line-height: 1.6; }
+
+        /* --- PROJECTS SECTION (STICKY STACK) --- */
+        .projects-section { padding: 100px 0 150px; background-color: #050a14; position: relative; z-index: 20; }
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
         .project-card {
             position: sticky; top: 130px;
@@ -239,11 +235,11 @@
         .project-card:hover .project-visual img { transform: scale(1.02); }
 
         /* --- CONTACT & FOOTER --- */
-        .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); position: relative; z-index: 30; }
+        .contact-section { padding: 80px 0; text-align: center; background: radial-gradient(circle at 50% 100%, #1e293b 0%, var(--bg-dark) 70%); position: relative; z-index: 20; }
         .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         .c-icon { font-size: 2rem; color: var(--text-muted); transition: 0.3s; }
         .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
-        footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 30; background: var(--bg-dark); }
+        footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 20; background: var(--bg-dark); }
 
         /* --- ANIMACIÓN ICONOS --- */
         @keyframes iconPop {
@@ -253,7 +249,7 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- RESPONSIVE (MÓVIL) --- */
+        /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .about-grid, .project-card { grid-template-columns: 1fr; }
@@ -262,12 +258,16 @@
             .about-text p { text-align: left; }
             .container { padding: 0 25px; }
 
+            /* CORRECCIÓN 1: APILAR BLOQUES DE TEXTO EN MÓVIL */
             .about-info-grid { grid-template-columns: 1fr; gap: 20px; }
+
+            /* CORRECCIÓN 2: LOGOS 3 COLUMNAS EN MÓVIL */
             .logo-rows-container { gap: 30px; }
             .logo-row { grid-template-columns: repeat(3, 1fr); gap: 15px; }
             .logo-img { max-height: 50px; max-width: 100%; }
             .logo-item { height: 80px; }
 
+            /* Ajustes Móviles Evolution SVG */
             .evolution-container { gap: 80px; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
@@ -278,32 +278,11 @@
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
 
-            /* STACK EN MOVIL: SWIPE NORMAL (NO SCROLL-DRIVEN) */
-            .skills-section { height: auto; position: relative; padding: 50px 0; z-index: 20; pointer-events: auto; }
-            .skills-sticky-mask { 
-                position: relative; height: auto; background: transparent; box-shadow: none; top: 0; 
-                display: block; width: 100%;
-            }
-            .horizontal-track { 
-                display: flex; /* Horizontal flex */
-                overflow-x: auto; /* Scrollable */
-                scroll-snap-type: x mandatory; /* Snap */
-                gap: 20px;
-                padding: 20px 20px 40px 20px;
-                width: 100%; 
-                transform: none !important; /* Desactivar JS translation */
-            }
-            .horizontal-track::-webkit-scrollbar { display: none; }
-
-            .tech-card { 
-                position: relative; 
-                min-width: 85vw; /* Tarjeta ancha */
-                max-width: 85vw;
-                height: auto; 
-                scroll-snap-align: center;
-            }
+            /* RESET STACK EN MOVIL */
+            .stack-card { grid-template-columns: 1fr; gap: 15px; } 
+            .card-header { margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
             
-            .projects-section { margin-top: 0; box-shadow: none; }
+            /* STICKY PROJECTS MÓVIL */
             .project-card { grid-template-columns: 1fr; min-height: auto; top: 80px; margin-bottom: 40px; }
             .project-visual { height: 250px; }
             .project-content { padding: 30px; }
@@ -462,63 +441,59 @@
             </div>
         </div>
     </section>
-
     <section id="skills" class="skills-section">
-        
-        <div class="skills-sticky-mask">
-            <div class="container" style="overflow: hidden;"> <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
+        <div class="container">
+            <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
+            <div class="stack-container">
                 
-                <div class="horizontal-track" id="cardTrack">
-                    
-                    <div class="tech-card">
-                        <div class="card-header">Cloud & Engineering</div>
-                        <div class="skill-list">
-                            <div class="skill-item"><i class="fa-brands fa-google"></i> GCP <span class="tag-tech">CORE</span></div>
-                            <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tag-highlight">EXPERT</span></div>
-                            <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform <span class="tag-tech">MODERN</span></div>
-                            <div class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer / Airflow</div>
-                            <div class="skill-item"><i class="fa-solid fa-box-archive"></i> Cloud Storage</div>
-                            <div class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</div>
-                            <div class="skill-item"><i class="fa-solid fa-eye"></i> Observability</div>
-                        </div>
+                <div class="stack-card">
+                    <div class="card-header">Cloud & Engineering</div>
+                    <div class="skill-list">
+                        <div class="skill-item"><i class="fa-brands fa-google"></i> GCP <span class="tag-tech">CORE</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="tag-highlight">EXPERT</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-server"></i> Dataform <span class="tag-tech">MODERN</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer / Airflow</div>
+                        <div class="skill-item"><i class="fa-solid fa-box-archive"></i> Cloud Storage</div>
+                        <div class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</div>
+                        <div class="skill-item"><i class="fa-solid fa-eye"></i> Observability</div>
                     </div>
-                    
-                    <div class="tech-card">
-                        <div class="card-header" style="color: var(--accent-gold);">Data Foundations</div>
-                        <div class="skill-list">
-                            <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tag-highlight">ADVANCED</span></div>
-                            <div class="skill-item"><i class="fa-brands fa-python"></i> Python / Pandas</div>
-                            <div class="skill-item"><i class="fa-solid fa-sitemap"></i> Dimensional Modeling (Star/Snowflake)</div>
-                            <div class="skill-item"><i class="fa-solid fa-database"></i> PostgreSQL / MySQL</div>
-                            <div class="skill-item"><i class="fa-solid fa-server"></i> Oracle / Netezza</div>
-                             <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
-                        </div>
+                </div>
+                
+                <div class="stack-card">
+                    <div class="card-header" style="color: var(--accent-gold);">Data Foundations</div>
+                    <div class="skill-list">
+                        <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tag-highlight">ADVANCED</span></div>
+                        <div class="skill-item"><i class="fa-brands fa-python"></i> Python / Pandas</div>
+                        <div class="skill-item"><i class="fa-solid fa-sitemap"></i> Dimensional Modeling (Star/Snowflake)</div>
+                        <div class="skill-item"><i class="fa-solid fa-database"></i> PostgreSQL / MySQL</div>
+                        <div class="skill-item"><i class="fa-solid fa-server"></i> Oracle / Netezza</div>
+                         <div class="skill-item"><i class="fa-solid fa-terminal"></i> SAS</div>
                     </div>
-                    
-                    <div class="tech-card">
-                       <div class="card-header">Engineering Practices & Governance</div>
-                       <div class="skill-list">
-                           <div class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git/Bitbucket)</div>
-                           <div class="skill-item"><i class="fa-solid fa-check-double"></i> Data Quality Frameworks</div>
-                           <div class="skill-item"><i class="fa-solid fa-magnifying-glass"></i> Code Reviews</div>
-                           <div class="skill-item"><i class="fa-brands fa-git-alt"></i> Version Control</div>
-                            <div class="skill-item"><i class="fa-solid fa-book"></i> Documentation</div>
-                       </div>
+                </div>
+                
+                <div class="stack-card">
+                   <div class="card-header">Engineering Practices & Governance</div>
+                   <div class="skill-list">
+                       <div class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git/Bitbucket)</div>
+                       <div class="skill-item"><i class="fa-solid fa-check-double"></i> Data Quality Frameworks</div>
+                       <div class="skill-item"><i class="fa-solid fa-magnifying-glass"></i> Code Reviews</div>
+                       <div class="skill-item"><i class="fa-brands fa-git-alt"></i> Version Control</div>
+                        <div class="skill-item"><i class="fa-solid fa-book"></i> Documentation</div>
                    </div>
+               </div>
 
-                    <div class="tech-card">
-                        <div class="card-header">Analytics, BI & Business Tools</div>
-                        <div class="skill-list">
-                            <div class="skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI <span class="tag-tech">ADVANCED</span></div>
-                            <div class="skill-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Looker</div>
-                            <div class="skill-item"><i class="fa-solid fa-table"></i> Excel / Sheets <span class="tag-highlight">EXPERT</span></div>
-                            <div class="skill-item"><i class="fa-solid fa-file-medical"></i> REDCap <span class="tag-tech">HEALTH</span></div>
-                            <div class="skill-item"><i class="fa-solid fa-file-powerpoint"></i> PowerPoint</div>
-                        </div>
+                <div class="stack-card">
+                    <div class="card-header">Analytics, BI & Business Tools</div>
+                    <div class="skill-list">
+                        <div class="skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI <span class="tag-tech">ADVANCED</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Looker</div>
+                        <div class="skill-item"><i class="fa-solid fa-table"></i> Excel / Sheets <span class="tag-highlight">EXPERT</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-file-medical"></i> REDCap <span class="tag-tech">HEALTH</span></div>
+                        <div class="skill-item"><i class="fa-solid fa-file-powerpoint"></i> PowerPoint</div>
                     </div>
-
                 </div>
             </div>
+            
         </div>
     </section>
 
@@ -713,51 +688,24 @@
             logoRows.forEach(row => rowObserver.observe(row));
 
 
-            /* --- 3. HORIZONTAL SCROLL DRIVEN LOGIC (DESKTOP) --- */
-            const skillsSection = document.getElementById('skills');
-            const track = document.getElementById('cardTrack');
-            
-            function updateHorizontalScroll() {
-                if (window.innerWidth <= 768) return; // Desactivar en móvil (usa swipe nativo)
+            /* --- 3. STACK CARDS ANIMATION --- */
+            const stackCards = document.querySelectorAll('.stack-card');
+            const stackSection = document.getElementById('skills');
 
-                const sectionTop = skillsSection.offsetTop;
-                const sectionHeight = skillsSection.offsetHeight;
-                const scrollY = window.scrollY;
-                const windowHeight = window.innerHeight;
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        stackCards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.classList.add('visible');
+                            }, index * 150); 
+                        });
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, { threshold: 0.2 });
 
-                // MATEMÁTICA PURA (SCROLL ABSOLUTO)
-                // Calculamos el progreso basándonos en cuánto hemos recorrido de la sección sticky
-                // El inicio es cuando el top de la sección toca el top de la ventana
-                const startPoint = sectionTop;
-                // El final es cuando terminamos de recorrer la altura extra
-                const endPoint = sectionTop + sectionHeight - windowHeight;
-
-                let progress = (scrollY - startPoint) / (endPoint - startPoint);
-                
-                // Aseguramos límites 0 y 1
-                progress = Math.max(0, Math.min(1, progress));
-
-                // Ancho total del track (tarjetas + gaps)
-                const trackWidth = track.scrollWidth;
-                const windowWidth = window.innerWidth;
-                
-                // CUÁNTO MOVER: 
-                // Queremos que el final del track llegue al borde derecho de la pantalla
-                // trackWidth - windowWidth nos da el exceso. 
-                // Le sumamos un "padding" (200px) para asegurar que la última tarjeta entre completa y sobre espacio.
-                const totalDistanceToMove = trackWidth - windowWidth + 200; 
-                
-                const translateX = progress * totalDistanceToMove;
-
-                // Aplicar movimiento
-                track.style.transform = `translateX(-${translateX}px)`;
-            }
-
-            window.addEventListener('scroll', updateHorizontalScroll);
-            window.addEventListener('resize', updateHorizontalScroll);
-            // Llamada inicial para setear posición
-            updateHorizontalScroll();
-
+            if(stackSection) observer.observe(stackSection);
 
             /* --- 4. ANIMACIÓN ICONOS AL FINAL --- */
             let iconsAnimated = false; 
