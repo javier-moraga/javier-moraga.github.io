@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,15 +14,8 @@
     <style>
         /* --- VARIABLES GLOBALES --- */
         :root {
-            /* FONDO PRINCIPAL (Deep Dark) */
-            --bg-body: #0b1120;
-            
-            /* FONDO DEL "MARCO" (Ligeramente más claro para separar) */
-            --bg-frame: #111827; 
-            
-            /* BORDES DEL MARCO */
-            --border-frame: rgba(255, 255, 255, 0.08);
-
+            --bg-dark: #0b1120; /* Fondo único */
+            --bg-card: #111827; 
             --accent: #3b82f6; 
             --accent-gold: #fbbf24;
             --text-main: #ffffff;
@@ -31,21 +24,15 @@
 
         /* --- ESTILOS GENERALES --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         
-        /* --- EL MARCO ESTRUCTURAL (NUEVO) --- */
-        /* Esta clase centraliza y "enmarca" el contenido */
+        /* MARCO ESTRUCTURAL (Para dar orden) */
         .content-frame {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 60px;
-            background-color: var(--bg-frame);
-            border: 1px solid var(--border-frame);
-            border-radius: 24px;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 0 50px rgba(0,0,0,0.3); /* Sombra suave para separar del fondo */
+            max-width: 1200px; margin: 0 auto; padding: 60px;
+            background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px; position: relative; z-index: 2;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
         }
 
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; }
@@ -81,7 +68,7 @@
         .nav-btn span:nth-child(4) { bottom: -150%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, transparent, var(--accent-gold)); box-shadow: 0 0 10px var(--accent-gold); animation: btn-anim4 2s linear infinite; animation-delay: 1.5s; }
         @keyframes btn-anim4 { 0% { bottom: -150%; opacity: 0; } 10% { opacity: 1; } 50%, 100% { bottom: 100%; opacity: 1; } }
 
-        /* --- HERO SECTION (NO FRAME - FULL WIDTH FEEL) --- */
+        /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
         .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero p { font-size: 1.1rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; text-align: center;}
@@ -108,10 +95,8 @@
         
         .evo-card { 
             width: 45%; 
-            /* Fondo Tarjeta Evolution */
-            background: var(--bg-frame); 
-            padding: 35px; 
-            border: 1px solid var(--border-frame); 
+            background: #111827; 
+            padding: 35px; border: 1px solid rgba(255,255,255,0.08); 
             position: relative; backdrop-filter: blur(8px); 
             transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); opacity: 0; 
             display: flex; flex-direction: column; justify-content: center; 
@@ -127,10 +112,25 @@
         .evo-desc { color: #94a3b8; font-size: 1rem; }
         .evo-left-2 { margin-top: 100px; }
 
-        /* --- ABOUT ME SECTION (FRAME) --- */
-        .about-section-wrapper { padding: 50px 0; }
-        /* .content-frame class se aplica en el HTML */
+        /* --- ABOUT ME SECTION (EXPLOSIÓN AMARILLA) --- */
+        .about-section-wrapper { padding: 50px 0; position: relative; }
         
+        /* LA EXPLOSIÓN */
+        .about-section-wrapper::before {
+            content: ''; position: absolute; 
+            top: -150px; left: 50%; transform: translateX(-50%) scaleX(1.5); 
+            width: 100%; height: 300px; 
+            /* Gradiente de explosión dorada */
+            background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
+            filter: blur(50px); 
+            opacity: 0; /* Empieza invisible */
+            transition: opacity 1.5s ease-in-out; 
+            pointer-events: none; z-index: 0;
+        }
+        
+        /* Clase activada por JS */
+        .about-section-wrapper.frame-active::before { opacity: 1; }
+
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
@@ -152,8 +152,7 @@
 
         /* --- CLIENT LOGOS SECTION --- */
         .logo-section-container {
-            position: relative; 
-            padding: 80px 0;
+            position: relative; padding: 80px 0;
             background-color: transparent; 
             z-index: 10;
         }
@@ -172,10 +171,9 @@
             opacity: 0; transform: translateY(60px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .logo-row.row-visible { opacity: 1; transform: translateY(0); }
-        .logo-item { width: 100%; height: 120px; display: flex; justify-content: center; align-items: center; transition: transform 0.4s ease; }
+        .logo-item { width: 100%; height: 120px; display: flex; justify-content: center; align-items: center; transition: transform 0.4s ease; text-decoration: none; position: relative; }
         .logo-item:hover { transform: scale(1.1); }
         
-        /* IMAGEN LOGO: Sombra centrada (Glow) */
         .logo-img {
             max-width: 220px; max-height: 90px; width: auto; object-fit: contain;
             filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); 
@@ -183,89 +181,100 @@
         }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS (FRAME + CAROUSEL) --- */
+        /* --- STACK CARDS (GLASS SKEW) --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
         .stack-container { 
-            display: flex; gap: 40px; 
-            padding: 40px 20px; width: 100%;
-            flex-wrap: nowrap; justify-content: center; 
+            display: flex; gap: 50px; 
+            padding: 50px 20px; width: 100%;
+            flex-wrap: wrap; justify-content: center; 
         }
-        .pagination-dots { display: flex; gap: 10px; margin-top: 20px; }
-        .dot { width: 10px; height: 10px; background-color: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .dot.active { background-color: var(--accent-gold); transform: scale(1.2); }
-
-        /* GLASS CARD */
-        .glass-card {
-            position: relative; width: 300px; height: 520px;
+        
+        /* ESTILO BOX SKEW (GLASSMORPHISM) */
+        .box {
+            position: relative;
+            width: 300px; height: 460px;
             display: flex; justify-content: center; align-items: center;
-            flex-shrink: 0; transition: 0.5s;
+            transition: 0.5s; margin: 10px;
         }
-        .glass-card::before {
+
+        /* Neón Background */
+        .box::before {
             content: ' '; position: absolute; top: 0; left: 50px; width: 50%; height: 100%;
-            background: #fff; border-radius: 8px; transform: skewX(15deg); transition: 0.5s;
+            text-decoration: none; background: #fff; border-radius: 8px;
+            transform: skewX(15deg); transition: 0.5s;
         }
-        .glass-card::after {
-            content: ''; position: absolute; top: 0; left: 50; width: 50%; height: 100%;
-            background: #fff; border-radius: 8px; transform: skewX(15deg); transition: 0.5s; filter: blur(30px);
+        .box::after {
+            content: ''; position: absolute; top: 0; left: 50px; width: 50%; height: 100%;
+            background: #fff; border-radius: 8px;
+            transform: skewX(15deg); transition: 0.5s; filter: blur(30px);
         }
-        .glass-card:hover:before, .glass-card:hover:after { transform: skewX(0deg); left: 20px; width: calc(100% - 90px); }
 
-        .glass-card:nth-child(1):before, .glass-card:nth-child(1):after { background: linear-gradient(315deg, #3b82f6, #06b6d4); }
-        .glass-card:nth-child(2):before, .glass-card:nth-child(2):after { background: linear-gradient(315deg, #fbbf24, #f59e0b); }
-        .glass-card:nth-child(3):before, .glass-card:nth-child(3):after { background: linear-gradient(315deg, #10b981, #34d399); }
-        .glass-card:nth-child(4):before, .glass-card:nth-child(4):after { background: linear-gradient(315deg, #8b5cf6, #ec4899); }
+        .box:hover:before, .box:hover:after {
+            transform: skewX(0deg); left: 20px; width: calc(100% - 90px);
+        }
 
-        .glass-card span { display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; pointer-events: none; }
-        .glass-card span::before {
+        /* Colores Específicos */
+        /* Card 1: Blue (GCP) */
+        .box:nth-child(1):before, .box:nth-child(1):after { background: linear-gradient(315deg, #3b82f6, #06b6d4); }
+        /* Card 2: Gold (Foundations) */
+        .box:nth-child(2):before, .box:nth-child(2):after { background: linear-gradient(315deg, #fbbf24, #f59e0b); }
+        /* Card 3: Green (Engineering) */
+        .box:nth-child(3):before, .box:nth-child(3):after { background: linear-gradient(315deg, #10b981, #34d399); }
+        /* Card 4: Purple (Analytics) */
+        .box:nth-child(4):before, .box:nth-child(4):after { background: linear-gradient(315deg, #8b5cf6, #ec4899); }
+
+        /* Span Animations (Brillos flotantes) */
+        .box span { display: block; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 5; pointer-events: none; }
+        .box span::before {
             content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0;
             border-radius: 8px; background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px); opacity: 0; transition: 0.1s;  
             animation: animate 2s ease-in-out infinite; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
-        .glass-card:hover span::before { top: -50px; left: 50px; width: 100px; height: 100px; opacity: 1; }
-        .glass-card span::after {
+        .box:hover span::before { top: -50px; left: 50px; width: 100px; height: 100px; opacity: 1; }
+        .box span::after {
             content: ''; position: absolute; bottom: 0; right: 0; width: 100%; height: 100%;
             border-radius: 8px; background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px); opacity: 0; transition: 0.5s;
-            animation: animate 2s ease-in-out infinite; box-shadow: 0 5px 15px rgba(0,0,0,0.08); animation-delay: -1s;
+            animation: animate 2s ease-in-out infinite; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            animation-delay: -1s;
         }
-        .glass-card:hover span::after { bottom: -50px; right: 50px; width: 100px; height: 100px; opacity: 1; }
+        .box:hover span::after { bottom: -50px; right: 50px; width: 100px; height: 100px; opacity: 1; }
         @keyframes animate { 0%, 100% { transform: translateY(10px); } 50% { transform: translate(-10px); } }
 
-        .glass-content {
-            position: relative; left: 0; padding: 20px 25px;
+        /* Contenido de la Tarjeta */
+        .box .content {
+            position: relative; left: 0; padding: 20px 30px;
             background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); border-radius: 8px;
             z-index: 1; transition: 0.5s; color: #fff;
-            width: 260px; height: 440px; display: flex; flex-direction: column;
+            width: 270px; height: 400px;
+            display: flex; flex-direction: column;
         }
-        .glass-card:hover .glass-content { left: -25px; padding: 30px 25px; }
-        .glass-content h2 { font-size: 1.2em; color: #fff; margin-bottom: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .box:hover .content { left: -25px; padding: 30px 30px; }
+        .box .content h2 { font-size: 1.4em; color: #fff; margin-bottom: 20px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
         
-        .glass-skill-group { margin-bottom: 15px; }
-        .glass-skill-title { font-size: 0.75rem; color: rgba(255,255,255,0.5); text-transform: uppercase; margin-bottom: 5px; font-weight: 600; }
-        .glass-skill-list { list-style: none; padding: 0; margin: 0; }
-        .glass-skill-item { font-size: 0.85em; margin-bottom: 5px; display: flex; align-items: center; color: #e2e8f0; }
-        .glass-skill-item i { width: 20px; text-align: center; margin-right: 8px; opacity: 0.8; font-size: 0.9em; }
+        /* Lista de skills dentro de glass card */
+        .skill-list-glass { list-style: none; padding: 0; margin: 0; }
+        .skill-item-glass { font-size: 0.9em; margin-bottom: 8px; display: flex; align-items: center; color: #e2e8f0; }
+        .skill-item-glass i { width: 22px; text-align: center; margin-right: 10px; opacity: 0.8; }
+        .skill-badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 
-        .scroll-btn {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white; width: 45px; height: 45px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 25; transition: 0.3s; flex-shrink: 0;
-        }
-        .scroll-btn:hover { background: var(--accent); border-color: var(--accent); }
-        .scroll-btn.left { margin-right: 15px; }
-        .scroll-btn.right { margin-left: 15px; }
+        /* PUNTOS DE NAVEGACIÓN (Solo Móvil) */
+        .pagination-dots { display: none; gap: 10px; margin-top: 20px; margin-bottom: 20px; }
+        .dot { width: 10px; height: 10px; background-color: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .dot.active { background-color: var(--accent-gold); transform: scale(1.2); }
 
-        /* --- PROJECTS SECTION (FRAME) --- */
+        .scroll-btn { display: none; } /* Ocultar botones desktop, usaremos flex wrap en desktop */
+
+        /* --- PROJECTS SECTION --- */
         .projects-section { padding: 50px 0 150px; position: relative; z-index: 10; margin-top: 0; }
         
         .project-card {
-            background-color: var(--bg-frame); /* Usar fondo marco */
-            border: 1px solid var(--border-frame); 
+            background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08); 
             border-radius: 20px; overflow: hidden; margin-bottom: 60px;
             display: grid; grid-template-columns: 1fr 1.2fr; min-height: 480px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.3s ease;
@@ -303,22 +312,26 @@
         /* PANTALLAS GRANDES (DESKTOP) */
         @media (min-width: 1200px) {
             .skills-section .container { max-width: 100% !important; padding: 0 50px; }
-            .stack-container { justify-content: center; overflow-x: visible; }
-            .pagination-dots { display: none; }
+            /* Se alinean solas con flex-wrap */
+            .stack-container { justify-content: center; overflow: visible; }
         }
 
         /* PANTALLAS PEQUEÑAS (TABLET/MOVIL) */
         @media (max-width: 1199px) {
-            /* Adaptar el "Marco" para móvil: quitar padding grande */
-            .content-frame {
-                padding: 30px 20px;
-                border: none;
-                background: transparent;
-                box-shadow: none;
+            .content-frame { padding: 30px 20px; border: none; background: transparent; box-shadow: none; }
+            
+            /* Carrusel Horizontal */
+            .stack-container { 
+                justify-content: flex-start; flex-wrap: nowrap; 
+                overflow-x: auto; scroll-snap-type: x mandatory; 
+                padding-left: 20px; padding-bottom: 40px; 
             }
-
-            .stack-container { justify-content: flex-start; overflow-x: auto; scroll-snap-type: x mandatory; padding-left: 20px; }
-            .glass-card { min-width: 85vw; scroll-snap-align: center; margin-right: 15px; }
+            .box { 
+                min-width: 85vw; /* Ocupa 85% para ver la siguiente */
+                scroll-snap-align: center; margin-right: 15px; 
+            }
+            
+            .pagination-dots { display: flex; justify-content: center; }
             
             .hero h1 { font-size: 2.5rem; }
             .about-grid, .project-card { grid-template-columns: 1fr; }
@@ -336,15 +349,13 @@
             .evolution-container { gap: 80px; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
-            .evo-card { width: 85%; margin-left: auto; margin-right: auto; transform: translateX(0) translateY(50px) !important; text-align: left; height: auto; margin-top: 0 !important; background: var(--bg-frame); z-index: 10; }
+            .evo-card { width: 85%; margin-left: auto; margin-right: auto; transform: translateX(0) translateY(50px) !important; text-align: left; height: auto; margin-top: 0 !important; background: #111827; z-index: 10; }
             .evo-left { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-right: 0; }
             .evo-right { border-left: 3px solid rgba(255,255,255,0.1); margin-left: 0; align-self: flex-start; }
             .evo-card.active { transform: translateX(0) translateY(0) !important; }
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
-
-            .scroll-btn { display: none; }
-            .stack-card { min-width: 85vw; max-width: 85vw; }
+            
             .project-card { grid-template-columns: 1fr; min-height: auto; top: 80px; margin-bottom: 40px; }
             .project-visual { height: 250px; }
             .project-content { padding: 30px; }
@@ -471,13 +482,12 @@
     </div>
 
     <section class="logo-section-container">
-        <div class="content-frame" style="padding: 40px; border-color: rgba(255,255,255,0.02); background: transparent;">
+        <div class="content-frame" style="padding: 40px; border-color: rgba(255,255,255,0.02); background: transparent; box-shadow: none;">
             <div class="logo-section-header">
                 <h5>Trusted By / Previous Experience</h5>
             </div>
             
             <div class="logo-rows-container">
-                
                 <div class="logo-row">
                     <a href="https://www.clarochile.cl/" target="_blank" class="logo-item" title="Claro Chile">
                         <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
@@ -501,7 +511,6 @@
                         <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
                     </a>
                 </div>
-
             </div>
         </div>
     </section>
@@ -511,89 +520,61 @@
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
             
             <div class="stack-scroll-wrapper">
-                <button class="scroll-btn left" onclick="scrollStack('left')"><i class="fa-solid fa-chevron-left"></i></button>
 
                 <div class="stack-container" id="stackContainer">
                     
-                    <div class="glass-card">
+                    <div class="box">
                         <span></span>
-                        <div class="glass-content">
+                        <div class="content">
                             <h2>Cloud & Eng</h2>
-                            <div class="glass-skill-group">
-                                <div class="glass-skill-title">Core Skills</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-brands fa-google"></i> GCP</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-database"></i> BigQuery</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-server"></i> Dataform</li>
-                                </ul>
-                            </div>
-                            <div class="glass-skill-group">
-                                <div class="glass-skill-title">Proficient</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-eye"></i> Observability</li>
-                                </ul>
-                            </div>
+                            <ul class="skill-list-glass">
+                                <li class="skill-item-glass"><i class="fa-brands fa-google"></i> GCP <span class="skill-badge">CORE</span></li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-database"></i> BigQuery <span class="skill-badge">EXPERT</span></li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-server"></i> Dataform</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-wind"></i> Cloud Composer</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-route"></i> Pipelines</li>
+                            </ul>
                         </div>
                     </div>
                     
-                    <div class="glass-card">
+                    <div class="box">
                         <span></span>
-                        <div class="glass-content">
+                        <div class="content">
                             <h2>Foundations</h2>
-                             <div class="glass-skill-group">
-                                <div class="glass-skill-title">Advanced</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-solid fa-code"></i> SQL (Adv)</li>
-                                    <li class="glass-skill-item"><i class="fa-brands fa-python"></i> Python / Pandas</li>
-                                </ul>
-                            </div>
-                             <div class="glass-skill-group">
-                                <div class="glass-skill-title">Modeling & Legacy</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-solid fa-sitemap"></i> Dimensional Model</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-database"></i> PostgreSQL</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-terminal"></i> SAS / Oracle</li>
-                                </ul>
-                            </div>
+                            <ul class="skill-list-glass">
+                                <li class="skill-item-glass"><i class="fa-solid fa-code"></i> SQL <span class="skill-badge">ADV</span></li>
+                                <li class="skill-item-glass"><i class="fa-brands fa-python"></i> Python / Pandas</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-sitemap"></i> Dimensional Model</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-database"></i> PostgreSQL</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-server"></i> Oracle / Netezza</li>
+                            </ul>
                         </div>
                     </div>
                     
-                    <div class="glass-card">
+                    <div class="box">
                         <span></span>
-                        <div class="glass-content">
+                        <div class="content">
                             <h2>Engineering</h2>
-                             <div class="glass-skill-group">
-                                <div class="glass-skill-title">Best Practices</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git)</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-check-double"></i> Data Quality</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-magnifying-glass"></i> Code Reviews</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-book"></i> Documentation</li>
-                                </ul>
-                            </div>
+                            <ul class="skill-list-glass">
+                                <li class="skill-item-glass"><i class="fa-solid fa-code-branch"></i> CI/CD (Git)</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-check-double"></i> Data Quality</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-magnifying-glass"></i> Code Reviews</li>
+                                <li class="skill-item-glass"><i class="fa-brands fa-git-alt"></i> Version Control</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-book"></i> Documentation</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="glass-card">
+                    <div class="box">
                         <span></span>
-                        <div class="glass-content">
+                        <div class="content">
                             <h2>Analytics & BI</h2>
-                            <div class="glass-skill-group">
-                                <div class="glass-skill-title">Visualization</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Looker Studio</li>
-                                </ul>
-                            </div>
-                             <div class="glass-skill-group">
-                                <div class="glass-skill-title">Business</div>
-                                <ul class="glass-skill-list">
-                                    <li class="glass-skill-item"><i class="fa-solid fa-table"></i> Excel Expert</li>
-                                    <li class="glass-skill-item"><i class="fa-solid fa-file-medical"></i> REDCap (Health)</li>
-                                </ul>
-                            </div>
+                            <ul class="skill-list-glass">
+                                <li class="skill-item-glass"><i class="fa-solid fa-chart-simple"></i> Power BI</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-magnifying-glass-chart"></i> Looker Studio</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-table"></i> Excel Expert</li>
+                                <li class="skill-item-glass"><i class="fa-solid fa-file-medical"></i> REDCap (Health)</li>
+                            </ul>
                         </div>
                     </div>
 
@@ -603,7 +584,6 @@
                     <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
 
-                <button class="scroll-btn right" onclick="scrollStack('right')"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
         </div>
     </section>
@@ -706,6 +686,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             const section = document.getElementById('evolution-section');
             const aboutFrame = document.getElementById('aboutFrame');
+            const aboutWrapper = document.querySelector('.about-section-wrapper');
             const evoCards = document.querySelectorAll('.evo-card');
             const container = document.getElementById('stackContainer');
             const dots = document.querySelectorAll('.dot');
@@ -735,6 +716,7 @@
                 let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.8);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
+                // ANIMACION BOLA
                 if (window.innerWidth <= 768) {
                     if(mobileProgress && mobileBall) {
                         const percent = scrollPercent * 100;
@@ -751,6 +733,7 @@
                     }
                 }
 
+                // ANIMACION CARDS EVOLUTION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
                     const triggerPoint = window.innerHeight * 0.8; 
@@ -758,6 +741,13 @@
                         card.classList.add('active');
                     } 
                 });
+
+                // ANIMACION EXPLOSIÓN AMARILLA
+                if (scrollPercent > 0.95) {
+                    if(aboutWrapper) aboutWrapper.classList.add('frame-active');
+                } else {
+                    if(aboutWrapper) aboutWrapper.classList.remove('frame-active');
+                }
             }
 
             window.addEventListener('scroll', updateScroll);
@@ -774,25 +764,7 @@
             }, { threshold: 0.2 });
             logoRows.forEach(row => rowObserver.observe(row));
 
-            window.scrollStack = function(direction) {
-                const container = document.getElementById('stackContainer');
-                const scrollAmount = 340; 
-                
-                if (direction === 'left') {
-                    if(container.scrollLeft <= 5) {
-                        container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-                    } else {
-                        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                    }
-                } else {
-                    if(Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth) {
-                        container.scrollTo({ left: 0, behavior: 'smooth' });
-                    } else {
-                        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                    }
-                }
-            };
-
+            // PUNTOS DE PAGINACIÓN (MÓVIL)
             container.addEventListener('scroll', () => {
                 const scrollLeft = container.scrollLeft;
                 const cardWidth = container.offsetWidth * 0.85; 
