@@ -75,12 +75,39 @@
         .hero-tags { margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 
-        /* --- EVOLUTION SECTION --- */
-        .evolution-section { padding: 50px 0 200px 0; position: relative; overflow: hidden; display: flex; justify-content: center; }
-        .desktop-svg-container { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1000px; height: 100%; z-index: 1; pointer-events: none; overflow: visible; }
+        /* --- EVOLUTION SECTION (ACTUALIZADA PARA 6 TARJETAS Y ESTILO ESPEJO) --- */
+        .evolution-section { 
+            padding: 50px 0 200px 0; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+        }
+
+        .desktop-svg-container { 
+            position: absolute; 
+            top: 0; left: 50%; 
+            transform: translateX(-50%); 
+            width: 100%; 
+            max-width: 1000px; 
+            height: 3400px; /* Aumentado para soportar 6 tarjetas */
+            z-index: 1; 
+            pointer-events: none; 
+            overflow: visible; 
+        }
+
         .path-bg { fill: none; stroke: rgba(255, 255, 255, 0.03); stroke-width: 2px; }
-        .path-progress { fill: none; stroke: url(#lineGradient); stroke-width: 2px; stroke-linecap: round; stroke-dasharray: 3000; stroke-dashoffset: 3000; transition: stroke-dashoffset 0.1s linear; }
+        .path-progress { 
+            fill: none; 
+            stroke: url(#lineGradient); 
+            stroke-width: 3px; 
+            stroke-linecap: round; 
+            stroke-dasharray: 4500; 
+            stroke-dashoffset: 4500; 
+            transition: stroke-dashoffset 0.1s linear; 
+        }
         #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
+
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; z-index: 0; }
         .mobile-line-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.05); }
         .mobile-line-progress { position: absolute; top: 0; left: 0; right: 0; height: 0%; background: linear-gradient(to bottom, var(--accent), var(--accent-gold)); box-shadow: 0 0 15px var(--accent); }
@@ -89,45 +116,79 @@
         .evolution-container { 
             max-width: 1000px; width: 100%; 
             position: relative; z-index: 10; 
-            display: flex; flex-direction: column; gap: 150px; 
-            padding: 20px 20px 100px 20px; 
+            display: flex; flex-direction: column; gap: 80px; 
+            padding: 50px 20px 100px 20px; 
         }
         
+        /* ESTILO TARJETA ESPEJO (EVOLUTION) */
         .evo-card { 
-            width: 45%; 
-            background: #111827; 
-            padding: 35px; border: 1px solid rgba(255,255,255,0.08); 
-            position: relative; backdrop-filter: blur(8px); 
-            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); opacity: 0; 
-            display: flex; flex-direction: column; justify-content: center; 
-            border-radius: 12px;
+            width: 42%; 
+            padding: 30px; 
+            
+            /* Glassmorphism */
+            background: rgba(17, 25, 40, 0.6); 
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            border-radius: 16px;
+            overflow: hidden;
+
+            position: relative; 
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); 
+            opacity: 0; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
         }
-        .evo-icon { font-size: 2rem; color: var(--accent-gold); margin-bottom: 15px; }
-        .evo-left { align-self: flex-start; text-align: right; border-right: 3px solid rgba(255,255,255,0.1); transform: translateX(-50px) translateY(80px); margin-top: 100px; margin-right: 20px; }
-        .evo-right { align-self: flex-end; text-align: left; border-left: 3px solid rgba(255,255,255,0.1); transform: translateX(50px) translateY(80px); margin-top: 100px; margin-left: 20px; }
-        .evo-card.active { opacity: 1; }
-        .evo-left.active { transform: translateX(0) translateY(0); border-right-color: var(--accent-gold); background: #162032; box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
-        .evo-right.active { transform: translateX(0) translateY(0); border-left-color: var(--accent); background: #162032; box-shadow: 0 0 60px rgba(59, 130, 246, 0.15); }
-        .evo-header { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: white; line-height: 1.2; }
-        .evo-desc { color: #94a3b8; font-size: 1rem; }
-        .evo-left-2 { margin-top: 100px; }
+
+        /* Barra superior de color */
+        .evo-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--accent); 
+            box-shadow: 0 0 10px var(--accent);
+        }
+        .evo-card.past::before {
+            background: var(--accent-gold);
+            box-shadow: none;
+            opacity: 0.8;
+        }
+
+        .evo-left { align-self: flex-start; text-align: right; transform: translateX(-50px); margin-right: 50px; }
+        .evo-right { align-self: flex-end; text-align: left; transform: translateX(50px); margin-left: 50px; }
+        
+        .evo-card.active { opacity: 1; transform: translateX(0); }
+        .evo-card:hover { border-color: rgba(255,255,255,0.3); background: rgba(17, 25, 40, 0.8); transform: translateY(-5px) !important; }
+
+        .evo-industry { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 5px; font-weight: 700; }
+        .evo-header { font-size: 1.4rem; font-weight: 800; margin-bottom: 5px; color: white; line-height: 1.2; }
+        .evo-company { font-size: 1.1rem; color: var(--accent); font-weight: 600; margin-bottom: 5px; display: block; }
+        .evo-date { font-size: 0.85rem; color: #64748b; font-family: 'Fira Code', monospace; margin-bottom: 15px; display: block; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;}
+        
+        .evo-desc ul { list-style: none; padding: 0; }
+        .evo-desc li { font-size: 0.95rem; color: #cbd5e1; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+        
+        /* Bullets alineados */
+        .evo-left .evo-desc li { justify-content: flex-end; }
+        .evo-right .evo-desc li { justify-content: flex-start; }
+        .evo-desc li::before { content: '•'; color: var(--accent-gold); font-size: 1.2rem; line-height: 0; }
+        .evo-left .evo-desc li::before { content: none; }
+        .evo-left .evo-desc li::after { content: '•'; color: var(--accent-gold); font-size: 1.2rem; line-height: 0; }
+
 
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN AMARILLA) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; }
         
-        /* LA EXPLOSIÓN AMARILLA (Restaurada) */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
             top: -150px; left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 300px; 
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(50px); 
-            opacity: 0; /* Invisible por defecto */
+            opacity: 0; 
             transition: opacity 1.5s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
-        /* Clase que activa la explosión (JS) */
         .about-section-wrapper.frame-active::before { opacity: 1; }
 
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; }
@@ -322,15 +383,19 @@
             .logo-row { grid-template-columns: repeat(3, 1fr); gap: 15px; }
             .logo-img { max-height: 50px; max-width: 100%; }
             .logo-item { height: 80px; }
-            .evolution-container { gap: 80px; padding-bottom: 50px; }
+            
+            /* Ajustes Mobile Evolution */
+            .evolution-section { height: auto; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
-            .evo-card { width: 85%; margin-left: auto; margin-right: auto; transform: translateX(0) translateY(50px) !important; text-align: left; height: auto; margin-top: 0 !important; background: var(--bg-card); z-index: 10; }
-            .evo-left { border-right: none; border-left: 3px solid rgba(255,255,255,0.1); margin-right: 0; }
-            .evo-right { border-left: 3px solid rgba(255,255,255,0.1); margin-left: 0; align-self: flex-start; }
-            .evo-card.active { transform: translateX(0) translateY(0) !important; }
-            .evo-left.active { border-left-color: var(--accent-gold); }
-            .evo-right.active { border-left-color: var(--accent); }
+            .evolution-container { gap: 40px; padding: 40px 20px; }
+            .evo-card { width: 100%; margin: 0 !important; transform: translateY(30px); text-align: left; }
+            .evo-left { border-right: none; text-align: left; }
+            .evo-left .evo-desc li { justify-content: flex-start; }
+            .evo-left .evo-desc li::before { content: '•'; }
+            .evo-left .evo-desc li::after { content: none; }
+            .evo-card.active { transform: translateY(0); }
+
             .project-card { grid-template-columns: 1fr; min-height: auto; top: 80px; margin-bottom: 40px; }
             .project-visual { height: 250px; }
             .project-content { padding: 30px; }
@@ -371,16 +436,32 @@
     </section> 
 
     <div id="evolution-section" class="evolution-section">
-        <svg class="desktop-svg-container" viewBox="0 0 1000 2000" preserveAspectRatio="xMidYMin meet">
+        
+        <svg class="desktop-svg-container" viewBox="0 0 1000 3400" preserveAspectRatio="xMidYMin meet">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:var(--accent); stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:var(--accent-gold); stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:var(--accent-gold); stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:var(--accent); stop-opacity:1" />
                 </linearGradient>
             </defs>
-            <path id="trackPath" class="path-bg" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
-            <path id="progressPath" class="path-progress" d="M 500 0 C 500 150, 400 300, 400 500 C 400 700, 600 800, 600 1000 C 600 1200, 400 1300, 400 1500 C 400 1700, 500 1850, 500 2000" />
-            <circle id="desktopBall" cx="0" cy="0" r="7" fill="white" />
+            <path id="trackPath" class="path-bg" d="
+                M 500 0 
+                Q 500 200, 300 400 T 300 600 
+                Q 300 800, 700 1000 T 700 1200 
+                Q 700 1400, 300 1600 T 300 1800 
+                Q 300 2000, 700 2200 T 700 2400
+                Q 700 2600, 300 2800 T 300 3000
+                Q 300 3200, 500 3400" />
+            <path id="progressPath" class="path-progress" d="
+                M 500 0 
+                Q 500 200, 300 400 T 300 600 
+                Q 300 800, 700 1000 T 700 1200 
+                Q 700 1400, 300 1600 T 300 1800 
+                Q 300 2000, 700 2200 T 700 2400
+                Q 700 2600, 300 2800 T 300 3000
+                Q 300 3200, 500 3400" />
+            <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
         </svg>
 
         <div class="mobile-system">
@@ -390,21 +471,90 @@
         </div>
 
         <div class="evolution-container">
+            
             <div class="evo-card evo-left">
-                <i class="fa-solid fa-layer-group evo-icon"></i>
-                <h3 class="evo-header">Multi-Industry Adaptability</h3>
-                <p class="evo-desc">Adaptive problem-solving across high-stakes sectors like <strong>Healthcare, Telecom & Aviation</strong>. I speak the language of complex regulated industries.</p>
+                <span class="evo-industry" style="color: #10b981;">Sanidad</span>
+                <h3 class="evo-header">Ingeniero de Datos</h3>
+                <span class="evo-company">Clínica Alemana</span>
+                <span class="evo-date">2025 – Presente</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Migración SAS → BigQuery</li>
+                        <li>Canalizaciones de Datos Clínicos</li>
+                        <li>Automatización de la calidad de datos</li>
+                    </ul>
+                </div>
             </div>
-            <div class="evo-card evo-right">
-                <i class="fa-solid fa-rocket evo-icon"></i>
-                <h3 class="evo-header">Modernization Specialist</h3>
-                <p class="evo-desc">Proven ability to <strong>modernize legacy data systems</strong> (Oracle, Netezza, SAS) and challenge outdated processes with Cloud-native solutions.</p>
+
+            <div class="evo-card evo-right past">
+                <span class="evo-industry" style="color: #3b82f6;">Aviación</span>
+                <h3 class="evo-header">Ingeniero de Datos</h3>
+                <span class="evo-company">LATAM Airlines</span>
+                <span class="evo-date">2023 – 2025</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Ingestión Jira → BigQuery</li>
+                        <li>Reportaje casi en tiempo real</li>
+                        <li>Entrega continua (CI/CD)</li>
+                    </ul>
+                </div>
             </div>
-            <div class="evo-card evo-left evo-left-2">
-                <i class="fa-solid fa-handshake-simple evo-icon"></i>
-                <h3 class="evo-header">Business & Tech Bridge</h3>
-                <p class="evo-desc">I don't just code; I translate. <strong>Bridging the gap</strong> between abstract business strategy and concrete technical execution.</p>
+
+            <div class="evo-card evo-left past">
+                <span class="evo-industry" style="color: #a855f7;">Consultoría</span>
+                <h3 class="evo-header">Analista de Datos</h3>
+                <span class="evo-company">A3D</span>
+                <span class="evo-date">2023</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Documentación de datos empresariales</li>
+                        <li>Catalogación de fuentes</li>
+                        <li>Estandarización del conocimiento</li>
+                    </ul>
+                </div>
             </div>
+
+            <div class="evo-card evo-right past">
+                <span class="evo-industry" style="color: #fbbf24;">Telecomunicaciones</span>
+                <h3 class="evo-header">Analista Sr. de Colecciones</h3>
+                <span class="evo-company">ENTEL</span>
+                <span class="evo-date">2022 – 2023</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Segmentación basada en comportamiento</li>
+                        <li>Análisis de recuperación de ingresos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-left past">
+                <span class="evo-industry" style="color: #f43f5e;">Telecomunicaciones</span>
+                <h3 class="evo-header">Analista Sr. de Datos</h3>
+                <span class="evo-company">WOM Chile</span>
+                <span class="evo-date">2018 – 2022</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Análisis de Churn (Fuga)</li>
+                        <li>Segmentación de clientes</li>
+                        <li>Migración Netezza → BigQuery</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-right past">
+                <span class="evo-industry" style="color: #ef4444;">Telecomunicaciones</span>
+                <h3 class="evo-header">Ing. Control de Operaciones</h3>
+                <span class="evo-company">Claro Chile</span>
+                <span class="evo-date">2015 – 2018</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Automatización de KPI</li>
+                        <li>Controles ETL</li>
+                        <li>Monitorización de procesos</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -712,11 +862,12 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.8);
+                // Ajuste fino para que la bola termine justo al final de la sección
+                let scrollPercent = (windowHeight / 1.8 - rect.top) / (sectionHeight * 0.9);
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
                 // ANIMACION BOLA
-                if (window.innerWidth <= 768) {
+                if (window.innerWidth <= 1199) {
                     if(mobileProgress && mobileBall) {
                         const percent = scrollPercent * 100;
                         mobileProgress.style.height = percent + '%';
@@ -726,7 +877,11 @@
                     if(progressPath && desktopBall) {
                         const drawLength = pathLength * scrollPercent;
                         progressPath.style.strokeDashoffset = pathLength - drawLength;
-                        const point = progressPath.getPointAtLength(drawLength);
+                        
+                        // Protección por si drawLength excede ligeramente
+                        const safeLength = Math.min(drawLength, pathLength);
+                        const point = progressPath.getPointAtLength(safeLength);
+                        
                         desktopBall.setAttribute("cx", point.x);
                         desktopBall.setAttribute("cy", point.y);
                     }
@@ -735,7 +890,7 @@
                 // ANIMACION CARDS EVOLUTION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
-                    const triggerPoint = window.innerHeight * 0.8; 
+                    const triggerPoint = window.innerHeight * 0.85; 
                     if (cardTop < triggerPoint) {
                         card.classList.add('active');
                     } 
