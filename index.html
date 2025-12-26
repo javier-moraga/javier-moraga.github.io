@@ -43,7 +43,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO (SNAKE DORADA) --- */
+        /* --- BOTÓN DE CONTACTO --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -154,12 +154,12 @@
             filter: drop-shadow(0 1px 0 white) drop-shadow(0 -1px 0 white) drop-shadow(1px 0 0 white) drop-shadow(-1px 0 0 white) drop-shadow(0 0 15px rgba(255,255,255,0.6));
         }
 
-        /* --- STACK CARDS (NATGEO STYLE - SCROLL DRIVEN) --- */
+        /* --- STACK CARDS (HORIZONTAL SCROLL DRIVEN) --- */
         .skills-section { 
             position: relative; 
-            height: 500vh; /* MUCHA ALTURA PARA SCROLL LARGO */
-            z-index: 10; /* Encima de logos (0) pero debajo de proyectos (30) */
-            pointer-events: none; /* Dejar pasar eventos hasta que sea sticky */
+            height: 400vh; /* ALTURA DE SCROLL NECESARIA PARA COMPLETAR EL VIAJE */
+            z-index: 10; 
+            pointer-events: none; /* Permite scroll a través */
         }
         
         .skills-sticky-mask {
@@ -170,65 +170,38 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            overflow: hidden; /* CORTAR LO QUE SALE */
             pointer-events: auto;
-            /* CORTINA OSCURA QUE TAPA LOS LOGOS */
             background-color: var(--bg-dark); 
+            /* Sombra superior para tapar logos */
             box-shadow: 0 -100px 150px rgba(0,0,0,1);
         }
 
         .section-title { font-size: 2.5rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
 
-        .carousel-scene {
-            position: relative;
-            width: 100%;
-            max-width: 600px; /* Ancho controlado para centrar */
-            height: 500px;
-            perspective: 1000px;
+        /* PISTA HORIZONTAL DE TARJETAS */
+        .horizontal-track {
+            display: flex;
+            gap: 40px; /* Espacio entre tarjetas */
+            padding-left: 50vw; /* Empieza al centro/derecha */
+            width: max-content;
+            will-change: transform;
         }
 
-        .carousel-card {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+        /* TARJETA UNIFICADA (DESKTOP) */
+        .tech-card {
+            width: 350px;
+            height: 480px;
             background-color: #0f172a; 
             border: 1px solid #1e3a8a; 
             border-radius: 20px; 
             padding: 40px; 
             display: flex; flex-direction: column;
-            
-            /* ESTADO INICIAL (FUERA/ATRÁS) */
-            opacity: 0;
-            transform: translateZ(-200px) translateY(50px);
-            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            will-change: transform, opacity;
+            flex-shrink: 0; /* No encoger */
         }
         
-        /* CLASE ACTIVA (EN FRENTE) */
-        .carousel-card.active {
-            opacity: 1;
-            transform: translateZ(0) translateY(0);
-            z-index: 10;
-            border-color: var(--accent);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
-        }
-
-        /* CLASE SALIENTE (SE VA ARRIBA/ESFUMA) */
-        .carousel-card.exit {
-            opacity: 0;
-            transform: translateZ(100px) translateY(-100px) scale(1.1);
-            z-index: 20;
-        }
-
-        /* CLASE ENTRANTE (ESPERANDO) */
-        .carousel-card.waiting {
-            opacity: 0.4;
-            transform: translateZ(-100px) translateY(50px) scale(0.9);
-            z-index: 5;
-            filter: blur(2px);
-        }
+        .tech-card:hover { border-color: var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); transform: translateY(-5px); transition: 0.3s; }
 
         .card-header { color: var(--accent); font-size: 1.4rem; font-weight: 800; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         .skill-list { display: flex; flex-direction: column; gap: 15px; }
@@ -238,15 +211,14 @@
         .tag-highlight { margin-left: auto; font-size: 0.75rem; font-weight: 700; background: var(--accent-gold); color: #0b1120; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
 
 
-        /* --- PROJECTS SECTION (CURTAIN EFFECT OVER STACK) --- */
+        /* --- PROJECTS SECTION (CURTAIN EFFECT) --- */
         .projects-section { 
             position: relative; 
-            z-index: 30; /* Encima de todo al final */
-            background-color: #050a14; /* Fondo distinto */
+            z-index: 30; /* TAPAR AL STACK AL TERMINAR */
+            background-color: #050a14; 
             padding: 100px 0 150px; 
-            /* SOMBRA GIGANTE PARA TAPAR EL STACK SUAVEMENTE */
             box-shadow: 0 -100px 200px rgba(0,0,0,1);
-            margin-top: -50vh; /* Truco para que empiece a tapar antes */
+            margin-top: -10vh; /* Ajuste fino para la transición */
         }
         
         .sticky-wrapper { position: relative; max-width: 1000px; margin: 0 auto; padding: 0 20px; }
@@ -283,7 +255,7 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- RESPONSIVE --- */
+        /* --- RESPONSIVE (MÓVIL) --- */
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.5rem; }
             .about-grid, .project-card { grid-template-columns: 1fr; }
@@ -308,11 +280,30 @@
             .evo-left.active { border-left-color: var(--accent-gold); }
             .evo-right.active { border-left-color: var(--accent); }
 
-            /* STACK EN MOVIL: RESET A NORMAL */
-            .skills-section { height: auto; position: relative; padding: 50px 0; }
-            .skills-sticky-mask { position: relative; height: auto; background: transparent; box-shadow: none; top: 0; }
-            .carousel-scene { height: auto; display: grid; gap: 20px; perspective: none; }
-            .carousel-card { position: relative; width: 100%; height: auto; transform: none !important; opacity: 1 !important; filter: none !important; }
+            /* STACK EN MOVIL: SWIPE NORMAL (NO SCROLL-DRIVEN) */
+            .skills-section { height: auto; position: relative; padding: 50px 0; z-index: 20; pointer-events: auto; }
+            .skills-sticky-mask { 
+                position: relative; height: auto; background: transparent; box-shadow: none; top: 0; 
+                display: block; width: 100%;
+            }
+            .horizontal-track { 
+                display: flex; /* Horizontal flex */
+                overflow-x: auto; /* Scrollable */
+                scroll-snap-type: x mandatory; /* Snap */
+                gap: 20px;
+                padding: 20px 20px 40px 20px;
+                width: 100%; 
+                transform: none !important; /* Desactivar JS translation */
+            }
+            .horizontal-track::-webkit-scrollbar { display: none; }
+
+            .tech-card { 
+                position: relative; 
+                min-width: 85vw; /* Tarjeta ancha */
+                max-width: 85vw;
+                height: auto; 
+                scroll-snap-align: center;
+            }
             
             .projects-section { margin-top: 0; box-shadow: none; }
             .project-card { grid-template-columns: 1fr; min-height: auto; top: 80px; margin-bottom: 40px; }
@@ -477,12 +468,11 @@
     <section id="skills" class="skills-section">
         
         <div class="skills-sticky-mask">
-            <div class="container">
-                <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
+            <div class="container" style="overflow: hidden;"> <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
                 
-                <div class="carousel-scene">
+                <div class="horizontal-track" id="cardTrack">
                     
-                    <div class="carousel-card card-0">
+                    <div class="tech-card">
                         <div class="card-header">Cloud & Engineering</div>
                         <div class="skill-list">
                             <div class="skill-item"><i class="fa-brands fa-google"></i> GCP <span class="tag-tech">CORE</span></div>
@@ -495,7 +485,7 @@
                         </div>
                     </div>
                     
-                    <div class="carousel-card card-1">
+                    <div class="tech-card">
                         <div class="card-header" style="color: var(--accent-gold);">Data Foundations</div>
                         <div class="skill-list">
                             <div class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="tag-highlight">ADVANCED</span></div>
@@ -507,7 +497,7 @@
                         </div>
                     </div>
                     
-                    <div class="carousel-card card-2">
+                    <div class="tech-card">
                        <div class="card-header">Engineering Practices & Governance</div>
                        <div class="skill-list">
                            <div class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git/Bitbucket)</div>
@@ -518,7 +508,7 @@
                        </div>
                    </div>
 
-                    <div class="carousel-card card-3">
+                    <div class="tech-card">
                         <div class="card-header">Analytics, BI & Business Tools</div>
                         <div class="skill-list">
                             <div class="skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI <span class="tag-tech">ADVANCED</span></div>
@@ -725,73 +715,38 @@
             logoRows.forEach(row => rowObserver.observe(row));
 
 
-            /* --- 3. 3D CAROUSEL SCROLL DRIVEN LOGIC (NATGEO STYLE) --- */
+            /* --- 3. HORIZONTAL SCROLL DRIVEN LOGIC (DESKTOP) --- */
             const skillsSection = document.getElementById('skills');
-            const cards = document.querySelectorAll('.carousel-card');
+            const track = document.getElementById('cardTrack');
             
-            function updateCarousel() {
-                if (window.innerWidth <= 768) return; // Desactivar en móvil
+            function updateHorizontalScroll() {
+                if (window.innerWidth <= 768) return; // Desactivar en móvil (usa swipe nativo)
 
                 const rect = skillsSection.getBoundingClientRect();
                 const totalHeight = skillsSection.offsetHeight - window.innerHeight;
-                // Cuanto hemos scrolleado dentro de la sección (desde que el top toca 0)
-                let scrollProgress = -rect.top / totalHeight;
                 
+                // Cuanto hemos scrolleado dentro de la sección
+                let scrollProgress = -rect.top / totalHeight;
                 // Clamp entre 0 y 1
                 scrollProgress = Math.max(0, Math.min(1, scrollProgress));
 
-                // Mapear progreso (0 a 1) al índice de tarjetas (0 a 3)
-                // Usamos 3.5 para asegurar que llegamos bien al último
-                const activeIndex = scrollProgress * 3; 
+                // Ancho total del track (tarjetas + gaps) - ancho de la ventana
+                const trackWidth = track.scrollWidth;
+                const windowWidth = window.innerWidth;
+                
+                // Calculamos cuánto mover hacia la izquierda
+                // Restamos un poco para que no se pase del final
+                const maxTranslate = trackWidth - windowWidth + 100; // 100px buffer
+                
+                const translateX = scrollProgress * maxTranslate;
 
-                cards.forEach((card, i) => {
-                    const offset = i - activeIndex; 
-                    
-                    // LÓGICA DE TARJETAS EN PILA (STACK/DECK)
-                    
-                    // 1. Visibilidad básica
-                    let opacity = 0;
-                    let transform = "";
-                    let zIndex = 0;
-                    let blur = 0;
-
-                    if (offset > 0.5) {
-                        // TARJETAS FUTURAS (ESPERANDO ATRÁS)
-                        // Se quedan quietas en el fondo, apiladas
-                        let stackOffset = offset * 20; // Pequeño desplazamiento visual
-                        let scale = 1 - (offset * 0.1); // Más pequeñas
-                        transform = `translateY(${stackOffset}px) scale(${scale})`;
-                        zIndex = 10 - i; // Las de más adelante tapan a las de atrás
-                        opacity = 1 - (offset * 0.5); // Se desvanecen
-                        blur = offset * 2; // Desenfocadas
-                    } 
-                    else if (offset <= 0.5 && offset >= -0.5) {
-                        // TARJETA ACTIVA (EN FRENTE)
-                        transform = `translateY(0) scale(1)`;
-                        zIndex = 20;
-                        opacity = 1;
-                        blur = 0;
-                    } 
-                    else {
-                        // TARJETAS PASADAS (SE VAN ARRIBA Y SE ESFUMAN)
-                        // Efecto "Fly away"
-                        let exitOffset = offset * 100; // Se van rápido hacia arriba
-                        transform = `translateY(${exitOffset}px) scale(1.1)`;
-                        zIndex = 20 + i; // Para que tapen al salir? No, que se vayan.
-                        opacity = 1 + offset; // Se desvanecen rápido (offset es negativo)
-                        blur = Math.abs(offset) * 5;
-                    }
-
-                    // APLICAR ESTILOS
-                    card.style.zIndex = zIndex;
-                    card.style.opacity = Math.max(0, opacity);
-                    card.style.transform = transform;
-                    card.style.filter = `blur(${blur}px)`;
-                });
+                // Aplicar movimiento
+                track.style.transform = `translateX(-${translateX}px)`;
             }
 
-            window.addEventListener('scroll', updateCarousel);
-            updateCarousel();
+            window.addEventListener('scroll', updateHorizontalScroll);
+            window.addEventListener('resize', updateHorizontalScroll);
+            updateHorizontalScroll();
 
 
             /* --- 4. ANIMACIÓN ICONOS AL FINAL --- */
