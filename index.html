@@ -84,15 +84,14 @@
             justify-content: center; 
         }
 
-        /* SVG CONTAINER - preserveAspectRatio none para ajuste exacto */
+        /* SVG CONTAINER - Actualizado para que esté detrás de las tarjetas */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Height se calcula en JS */
-            z-index: 1; 
+            z-index: 1; /* Nivel bajo para que la tarjeta de About lo tape */
             pointer-events: none; 
             overflow: visible; 
         }
@@ -107,7 +106,12 @@
             stroke-dashoffset: 10000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
-        #desktopBall { filter: drop-shadow(0 0 10px var(--accent-gold)); }
+        
+        /* Transición suave para la bola */
+        #desktopBall { 
+            filter: drop-shadow(0 0 10px var(--accent-gold)); 
+            transition: cx 0.1s linear, cy 0.1s linear;
+        }
 
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; z-index: 0; }
         .mobile-line-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.05); }
@@ -174,13 +178,11 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* EL PUNTO DE ANCLAJE INVISIBLE (TARGET) */
-        #connector-target {
-            position: absolute; 
-            top: -16px; /* Ajuste fino: 2 veces el radio de la bola (8px) para que toque justo */
-            left: 50%; 
-            width: 1px; height: 1px; 
-            visibility: hidden;
+        /* Corrección de Z-Index y Fondo para tapar la bola */
+        .about-section-wrapper .content-frame {
+            position: relative;
+            z-index: 10; /* Debe estar por encima del SVG */
+            background-color: #111827; /* Fondo sólido para ocultar la mitad de la bola */
         }
 
         /* LUZ DE EXPLOSIÓN */
@@ -197,9 +199,6 @@
         }
         
         .about-section-wrapper.frame-active::before { opacity: 1; }
-
-        /* Para que el target funcione, el frame debe ser relative */
-        .content-frame-relative { position: relative; }
 
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
@@ -835,56 +834,81 @@
 
             let pathLength = 0;
 
-            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY ---
+            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY (NUEVA LÓGICA) ---
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. BUSCAR EL PUNTO DE ANCLAJE (TARGET INVISIBLE)
-                const targetAnchor = document.getElementById('connector-target');
+                // Referencias a elementos
+                const svgContainer = document.querySelector('.desktop-svg-container');
+                const cards = document.querySelectorAll('.evo-card');
+                const aboutFrame = document.querySelector('#aboutFrame .content-frame'); // El contenedor objetivo
                 
-                // Get positions relative to the viewport
-                const sectionRect = section.getBoundingClientRect();
-                const anchorRect = targetAnchor.getBoundingClientRect();
-                
-                // Distancia exacta desde el top de Evolución hasta el anclaje
-                // Se resta el radio de la bola (8px) para que "descanse" sobre el borde
-                const endY = (anchorRect.top - sectionRect.top) - 8; 
-                
-                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
-                desktopSvg.style.height = `${endY}px`;
-                desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
+                if (!svgContainer || cards.length === 0 || !aboutFrame) return;
 
-                // 3. DEFINIR PUNTOS DE LAS TARJETAS (ZIG ZAGS)
-                // Dividimos el espacio en 7 segmentos iguales para mantener la proporción
-                const segment = endY / 7;
+                // 1. OBTENER COORDENADAS RELATIVAS AL CONTENEDOR SVG
+                // El SVG empieza en top:0 de .evolution-section.
+                const sectionRect = document.getElementById('evolution-section').getBoundingClientRect();
+                const svgTop = sectionRect.top;
+
+                // 2. CONFIGURAR EL PUNTO FINAL (El borde superior de la tarjeta About)
+                const aboutRect = aboutFrame.getBoundingClientRect();
+                // Queremos que la línea termine EXACTAMENTE en el borde superior del div siguiente
+                const endY = aboutRect.top - svgTop; 
+
+                // Ajustar altura del SVG
+                svgContainer.style.height = `${endY}px`;
+                svgContainer.setAttribute('viewBox', `0 0 1000 ${endY}`);
+
+                // 3. CONSTRUIR LOS PUNTOS DE LA RUTA (PATH)
+                // Coordenadas X fijas
+                const centerX = 500;
+                const leftX = 236;  // Ajustado para tocar el borde de las tarjetas izquierdas
+                const rightX = 764; // Ajustado para tocar el borde de las tarjetas derechas
                 
-                // Coordenadas fijas
-                const center = 500;
-                const left = 236;
-                const right = 764;
-
-                // 4. CONSTRUIR EL PATH "SIMÉTRICO" (SINTAXIS CORRECTA PARA SVG)
-                // Se usa 'Q' y 'T' para curvas suaves y continuas que se ajustan solas
-                // M = Move to (Inicio)
-                // Q = Quadratic Bézier (Control, Fin)
-                // T = Smooth Quadratic Bézier (Fin) - infiere el control point del anterior
+                // Iniciar Path en el centro arriba
+                let d = `M ${centerX} 0`;
                 
-                const newPath = `
-                    M ${center} 0 
-                    Q ${center} ${segment * 0.5} ${left} ${segment * 1} 
-                    T ${right} ${segment * 2} 
-                    T ${left} ${segment * 3} 
-                    T ${right} ${segment * 4} 
-                    T ${left} ${segment * 5} 
-                    T ${right} ${segment * 6} 
-                    T ${center} ${endY}
-                `;
+                let currentX = centerX;
+                let currentY = 0;
 
-                // NOTA: El último 'T' automáticamente suaviza la curva desde la derecha hacia el centro.
-                // Si la distancia 'segment' es adecuada, caerá casi verticalmente.
+                // Recorrer cada tarjeta para encontrar su centro vertical exacto
+                cards.forEach((card, index) => {
+                    const cardRect = card.getBoundingClientRect();
+                    
+                    // Calcular el Y central de la tarjeta relativo al SVG
+                    const cardMiddleY = (cardRect.top - svgTop) + (cardRect.height / 2);
+                    
+                    // Determinar si vamos a la izquierda o derecha (impares izquierda, pares derecha)
+                    // Index 0 = Izquierda (Clase evo-left), Index 1 = Derecha (Clase evo-right), etc.
+                    const targetX = (index % 2 === 0) ? leftX : rightX;
+                    const targetY = cardMiddleY;
 
-                trackPath.setAttribute('d', newPath);
-                progressPath.setAttribute('d', newPath);
+                    // Crear una curva suave (Cubic Bezier) hacia el punto
+                    const cp1x = currentX;
+                    const cp1y = currentY + (targetY - currentY) * 0.5;
+                    
+                    const cp2x = targetX;
+                    const cp2y = currentY + (targetY - currentY) * 0.5;
+
+                    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
+
+                    // Actualizar coordenadas actuales para la siguiente iteración
+                    currentX = targetX;
+                    currentY = targetY;
+                });
+
+                // 4. CONECTAR EL ÚLTIMO PUNTO CON EL DESTINO FINAL (About Section)
+                const finalCp1x = currentX;
+                const finalCp1y = currentY + (endY - currentY) * 0.5;
+                
+                const finalCp2x = centerX;
+                const finalCp2y = currentY + (endY - currentY) * 0.5;
+
+                d += ` C ${finalCp1x} ${finalCp1y}, ${finalCp2x} ${finalCp2y}, ${centerX} ${endY}`;
+
+                // 5. APLICAR AL SVG
+                trackPath.setAttribute('d', d);
+                progressPath.setAttribute('d', d);
                 
                 pathLength = progressPath.getTotalLength();
                 progressPath.style.strokeDasharray = pathLength;
@@ -901,10 +925,10 @@
                 const windowHeight = window.innerHeight;
 
                 // --- LÓGICA DE SCROLL (0% A 100% REAL) ---
-                const startOffset = windowHeight / 2;
                 const sectionTop = rect.top;
                 const sectionHeight = rect.height; 
                 
+                // Ajuste para que empiece a dibujar cuando la sección entra en pantalla
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
                 let scrollPercent = scrolledDistance / sectionHeight;
 
