@@ -174,15 +174,6 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* EL PUNTO DE ANCLAJE INVISIBLE (TARGET) */
-        #connector-target {
-            position: absolute; 
-            top: -16px; /* Ajuste fino: 2 veces el radio de la bola (8px) para que toque justo */
-            left: 50%; 
-            width: 1px; height: 1px; 
-            visibility: hidden;
-        }
-
         /* LUZ DE EXPLOSIÓN */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
@@ -192,7 +183,7 @@
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 0.5s ease-in-out; 
+            transition: opacity 0.3s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
@@ -856,8 +847,8 @@
 
                 // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL SUAVE
                 // Calculamos puntos de control para una transición fluida
-                const cp1Y = lastZigZagY + 250; // Sale hacia abajo suavemente
-                const cp1X = lastZigZagX;       // Mantiene la posición horizontal inicial
+                const cp1Y = lastZigZagY + 150; // Sale hacia abajo suavemente
+                const cp1X = 764;       // Mantiene la posición horizontal inicial
                 
                 // El segundo control point debe estar verticalmente encima del final
                 // para garantizar que la línea entre recta
