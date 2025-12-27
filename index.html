@@ -77,7 +77,7 @@
 
         /* --- EVOLUTION SECTION --- */
         .evolution-section { 
-            padding: 50px 0 200px 0; 
+            padding: 50px 0 0 0; /* Padding bottom 0 to connect seamlessly */
             position: relative; 
             overflow: visible; 
             display: flex; 
@@ -91,7 +91,7 @@
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            height: 3500px; 
+            /* Height will be set via JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -103,11 +103,11 @@
             stroke: url(#lineGradient); 
             stroke-width: 2px; 
             stroke-linecap: round; 
-            stroke-dasharray: 5000; 
-            stroke-dashoffset: 5000; 
+            stroke-dasharray: 10000; /* Max buffer */
+            stroke-dashoffset: 10000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
-        #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
+        #desktopBall { filter: drop-shadow(0 0 10px var(--accent-gold)); }
 
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; z-index: 0; }
         .mobile-line-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.05); }
@@ -121,7 +121,7 @@
             z-index: 10; 
             display: flex; flex-direction: column; 
             gap: 120px; 
-            padding: 50px 20px 100px 20px; 
+            padding: 50px 20px 200px 20px; /* Padding bottom to ensure distance */
         }
         
         /* NEUTRAL GLASS CARDS */
@@ -177,13 +177,13 @@
         }
 
 
-        /* --- ABOUT ME SECTION --- */
+        /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
         /* LIGHT EXPLOSION */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
-            top: -100px; 
+            top: -100px; /* Luz justo en el borde superior */
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 250px; 
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
@@ -207,7 +207,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- BUTTONS --- */
+        /* --- BOTONES --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-fill { padding: 12px 24px; background: var(--accent-gold); color: var(--bg-dark); border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent-gold); transition: 0.3s; }
         .btn-fill:hover { background: transparent; color: var(--accent-gold); }
@@ -436,27 +436,8 @@
                 </linearGradient>
             </defs>
             
-            <path id="trackPath" class="path-bg" d="
-                M 500 0 
-                C 500 100, 236 150, 236 350 
-                S 764 600, 764 850 
-                S 236 1100, 236 1350 
-                S 764 1600, 764 1850 
-                S 236 2100, 236 2350 
-                S 764 2600, 764 2850 
-                C 764 3100, 500 3150, 500 3500
-                " />
-            
-            <path id="progressPath" class="path-progress" d="
-                M 500 0 
-                C 500 100, 236 150, 236 350 
-                S 764 600, 764 850 
-                S 236 1100, 236 1350 
-                S 764 1600, 764 1850 
-                S 236 2100, 236 2350 
-                S 764 2600, 764 2850 
-                C 764 3100, 500 3150, 500 3500
-                " />
+            <path id="trackPath" class="path-bg" />
+            <path id="progressPath" class="path-progress" />
             
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
         </svg>
@@ -831,13 +812,13 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const section = document.getElementById('evolution-section');
-            const aboutFrame = document.getElementById('aboutFrame');
             const aboutWrapper = document.querySelector('.about-section-wrapper');
             const evoCards = document.querySelectorAll('.evo-card');
             const container = document.getElementById('stackContainer');
             const dots = document.querySelectorAll('.dot');
 
             const desktopSvg = document.querySelector('.desktop-svg-container');
+            const trackPath = document.getElementById('trackPath');
             const progressPath = document.getElementById('progressPath');
             const desktopBall = document.getElementById('desktopBall');
             
@@ -846,27 +827,70 @@
             const mobileBall = document.getElementById('mobileBall');
 
             let pathLength = 0;
-            if(progressPath) {
+
+            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY ---
+            function recalculatePath() {
+                if (window.innerWidth <= 1199) return; // Don't recalc for mobile
+
+                const evoRect = section.getBoundingClientRect();
+                const aboutRect = aboutWrapper.getBoundingClientRect();
+                
+                // Calculate the exact distance from top of Evolution to top of About
+                // Note: getBoundingClientRect is relative to viewport, so we check difference
+                // Or use offsetTop if parent is body/relative. 
+                // Best method for dynamic content is relative position difference:
+                const distanceToTarget = aboutWrapper.offsetTop - section.offsetTop;
+                
+                // Ensure SVG fits this height
+                desktopSvg.style.height = `${distanceToTarget}px`;
+                desktopSvg.setAttribute('viewBox', `0 0 1000 ${distanceToTarget}`);
+
+                // Generate new Path String
+                // We keep the zig-zags for cards, but stretch the final tail
+                // Cards roughly at: 350, 850, 1350, 1850, 2350, 2850.
+                // The final curve needs to go from 764 (last card) back to 500 (center) at distanceToTarget.
+                
+                const newPath = `
+                    M 500 0 
+                    C 500 100, 236 150, 236 350 
+                    S 764 600, 764 850 
+                    S 236 1100, 236 1350 
+                    S 764 1600, 764 1850 
+                    S 236 2100, 236 2350 
+                    S 764 2600, 764 2850 
+                    C 764 3100, 500 ${distanceToTarget - 200}, 500 ${distanceToTarget}
+                `;
+
+                trackPath.setAttribute('d', newPath);
+                progressPath.setAttribute('d', newPath);
+                
+                // Update length for scroll calculation
                 pathLength = progressPath.getTotalLength();
                 progressPath.style.strokeDasharray = pathLength;
                 progressPath.style.strokeDashoffset = pathLength;
             }
 
+            // Initial calculation
+            recalculatePath();
+
             function updateScroll() {
                 if(!section) return; 
 
                 const rect = section.getBoundingClientRect();
-                const sectionHeight = section.offsetHeight;
+                const sectionHeight = section.offsetHeight; // This includes the padding now
                 const windowHeight = window.innerHeight;
 
-                // LOGIC: Scroll 0% to 100% of the section height
+                // SCROLL LOGIC
+                // Start: When top of section hits middle of screen
                 const startOffset = windowHeight / 2;
                 const scrolledPastStart = startOffset - rect.top;
                 
-                // Using rect.height ensures accurate mapping to container height
-                let scrollPercent = scrolledPastStart / rect.height;
+                // The drawing area is defined by the SVG height we calculated
+                const drawingHeight = parseFloat(desktopSvg.getAttribute('viewBox').split(' ')[3]) || sectionHeight;
 
-                // CLAMPING to strictly 0 to 1
+                let scrollPercent = scrolledPastStart / drawingHeight;
+
+                // Clamp strictly
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
                 // BALL ANIMATION
@@ -877,19 +901,21 @@
                         mobileBall.style.top = percent + '%';
                     }
                 } else {
-                    if(progressPath && desktopBall) {
+                    if(progressPath && desktopBall && pathLength > 0) {
                         const drawLength = pathLength * scrollPercent;
-                        
                         const newOffset = Math.max(0, pathLength - drawLength);
                         progressPath.style.strokeDashoffset = newOffset;
                         
-                        // Point Calculation
-                        // We clamp slightly under length to avoid calculation errors at exact end
+                        // Prevent calculation errors at very end
                         const safeLength = Math.min(drawLength, pathLength - 0.1);
-                        const point = progressPath.getPointAtLength(safeLength);
                         
-                        desktopBall.setAttribute("cx", point.x);
-                        desktopBall.setAttribute("cy", point.y);
+                        try {
+                            const point = progressPath.getPointAtLength(safeLength);
+                            desktopBall.setAttribute("cx", point.x);
+                            desktopBall.setAttribute("cy", point.y);
+                        } catch(e) {
+                            // Fallback if length error
+                        }
                     }
                 }
 
@@ -901,7 +927,7 @@
                     } 
                 });
 
-                // LIGHT EXPLOSION - Triggers exactly when ball finishes
+                // LIGHT EXPLOSION - EXACT TRIGGER
                 if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
@@ -910,10 +936,16 @@
             }
 
             window.addEventListener('scroll', updateScroll);
-            window.addEventListener('resize', updateScroll);
+            window.addEventListener('resize', () => {
+                recalculatePath();
+                updateScroll();
+            });
             
-            // Initial call
-            setTimeout(updateScroll, 100); 
+            // Initial calls
+            setTimeout(() => {
+                recalculatePath();
+                updateScroll();
+            }, 100);
 
             const logoRows = document.querySelectorAll('.logo-row');
             const rowObserver = new IntersectionObserver((entries) => {
