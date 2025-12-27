@@ -77,21 +77,21 @@
 
         /* --- EVOLUTION SECTION --- */
         .evolution-section { 
-            padding: 50px 0 0 0; /* Padding bottom 0 to connect seamlessly */
+            padding: 50px 0 0 0; /* Padding bottom 0 para conectar */
             position: relative; 
             overflow: visible; 
             display: flex; 
             justify-content: center; 
         }
 
-        /* SVG CONTAINER */
+        /* SVG CONTAINER - Ahora es crucial el preserveAspectRatio="none" */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Height will be set via JS */
+            /* Height se calcula en JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -103,7 +103,7 @@
             stroke: url(#lineGradient); 
             stroke-width: 2px; 
             stroke-linecap: round; 
-            stroke-dasharray: 10000; /* Max buffer */
+            stroke-dasharray: 10000; 
             stroke-dashoffset: 10000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
@@ -121,7 +121,7 @@
             z-index: 10; 
             display: flex; flex-direction: column; 
             gap: 120px; 
-            padding: 50px 20px 200px 20px; /* Padding bottom to ensure distance */
+            padding: 50px 20px 100px 20px; 
         }
         
         /* NEUTRAL GLASS CARDS */
@@ -140,6 +140,7 @@
             display: flex; flex-direction: column; justify-content: center; 
         }
         
+        /* Cards alignment */
         .evo-left { align-self: flex-start; text-align: right; transform: translateX(-50px); margin-right: 20px; }
         .evo-right { align-self: flex-end; text-align: left; transform: translateX(50px); margin-left: 20px; }
         
@@ -168,22 +169,16 @@
             text-align: left;
         }
         
-        .evo-desc li::before { 
-            content: '•'; 
-            color: var(--accent-gold); 
-            font-size: 1.2rem; 
-            line-height: 0; 
-            margin-right: 5px;
-        }
+        .evo-desc li::before { content: '•'; color: var(--accent-gold); font-size: 1.2rem; line-height: 0; margin-right: 5px; }
 
 
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* LIGHT EXPLOSION */
+        /* LUZ DE EXPLOSIÓN: Posicionada justo en el borde superior */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
-            top: -100px; /* Luz justo en el borde superior */
+            top: -100px; /* Sube la luz para coincidir con el choque */
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 250px; 
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
@@ -427,7 +422,7 @@
 
     <div id="evolution-section" class="evolution-section">
         
-        <svg class="desktop-svg-container" viewBox="0 0 1000 3500" preserveAspectRatio="xMidYMin meet">
+        <svg class="desktop-svg-container" preserveAspectRatio="none">
             <defs>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" style="stop-color:var(--accent); stop-opacity:1" />
@@ -830,67 +825,71 @@
 
             // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY ---
             function recalculatePath() {
-                if (window.innerWidth <= 1199) return; // Don't recalc for mobile
+                if (window.innerWidth <= 1199) return; 
 
-                const evoRect = section.getBoundingClientRect();
-                const aboutRect = aboutWrapper.getBoundingClientRect();
+                // 1. OBTENER ALTURA EXACTA ENTRE INICIO DE EVOLUCIÓN Y TOPE DE ABOUT
+                // Usamos offsetTop relativo al documento para mayor precisión
+                const startY = 0; 
+                const endY = aboutWrapper.offsetTop - section.offsetTop; 
                 
-                // Calculate the exact distance from top of Evolution to top of About
-                // Note: getBoundingClientRect is relative to viewport, so we check difference
-                // Or use offsetTop if parent is body/relative. 
-                // Best method for dynamic content is relative position difference:
-                const distanceToTarget = aboutWrapper.offsetTop - section.offsetTop;
-                
-                // Ensure SVG fits this height
-                desktopSvg.style.height = `${distanceToTarget}px`;
-                desktopSvg.setAttribute('viewBox', `0 0 1000 ${distanceToTarget}`);
+                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
+                // Establecemos tanto el estilo como el viewBox para que coincidan 1:1
+                desktopSvg.style.height = `${endY}px`;
+                desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
 
-                // Generate new Path String
-                // We keep the zig-zags for cards, but stretch the final tail
-                // Cards roughly at: 350, 850, 1350, 1850, 2350, 2850.
-                // The final curve needs to go from 764 (last card) back to 500 (center) at distanceToTarget.
+                // 3. DEFINIR PUNTOS DE LAS TARJETAS (APROXIMADOS POR CSS GAP)
+                // Cards están separadas por 120px gap + altura card.
+                // Estimamos puntos de paso para suavizar la curva.
+                // NOTA: Con preserveAspectRatio="none", la coordenada Y se estira para encajar
+                // si el viewBox Y es distinto. Pero aquí lo igualamos, así que Y es pixel real.
                 
+                // Distribuimos los 6 hitos a lo largo de la altura disponible (menos el tramo final recto)
+                const segmentHeight = (endY - 200) / 6; 
+
                 const newPath = `
                     M 500 0 
-                    C 500 100, 236 150, 236 350 
-                    S 764 600, 764 850 
-                    S 236 1100, 236 1350 
-                    S 764 1600, 764 1850 
-                    S 236 2100, 236 2350 
-                    S 764 2600, 764 2850 
-                    C 764 3100, 500 ${distanceToTarget - 200}, 500 ${distanceToTarget}
+                    C 500 ${segmentHeight * 0.5}, 230 ${segmentHeight * 0.5}, 230 ${segmentHeight * 1} 
+                    S 770 ${segmentHeight * 1.5}, 770 ${segmentHeight * 2} 
+                    S 230 ${segmentHeight * 2.5}, 230 ${segmentHeight * 3} 
+                    S 770 ${segmentHeight * 3.5}, 770 ${segmentHeight * 4} 
+                    S 230 ${segmentHeight * 4.5}, 230 ${segmentHeight * 5} 
+                    S 770 ${segmentHeight * 5.5}, 770 ${segmentHeight * 6} 
+                    C 770 ${endY - 100}, 500 ${endY - 100}, 500 ${endY}
                 `;
 
                 trackPath.setAttribute('d', newPath);
                 progressPath.setAttribute('d', newPath);
                 
-                // Update length for scroll calculation
                 pathLength = progressPath.getTotalLength();
                 progressPath.style.strokeDasharray = pathLength;
                 progressPath.style.strokeDashoffset = pathLength;
             }
 
             // Initial calculation
-            recalculatePath();
+            setTimeout(recalculatePath, 100); // Pequeño delay para asegurar carga DOM
 
             function updateScroll() {
                 if(!section) return; 
 
                 const rect = section.getBoundingClientRect();
-                const sectionHeight = section.offsetHeight; // This includes the padding now
                 const windowHeight = window.innerHeight;
 
-                // SCROLL LOGIC
-                // Start: When top of section hits middle of screen
-                const startOffset = windowHeight / 2;
-                const scrolledPastStart = startOffset - rect.top;
+                // --- NUEVA LÓGICA DE SCROLL (0% A 100% REAL) ---
+                // Start: Cuando el top de la sección toca el centro de la pantalla
+                // End: Cuando el bottom de la sección (que coincide con el inicio de About) toca el centro
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height; // Altura real calculada por navegador
                 
-                // The drawing area is defined by the SVG height we calculated
-                const drawingHeight = parseFloat(desktopSvg.getAttribute('viewBox').split(' ')[3]) || sectionHeight;
+                // Distancia total scrolleable para completar la animación
+                // Queremos que la animación dure exactamente lo que mide la sección
+                const totalScrollDistance = sectionHeight;
+                
+                // Cuánto hemos scrolleado dentro de la sección (ajustado por offset visual)
+                const scrolledDistance = (windowHeight / 2) - sectionTop;
 
-                let scrollPercent = scrolledPastStart / drawingHeight;
+                let scrollPercent = scrolledDistance / totalScrollDistance;
 
-                // Clamp strictly
+                // Clamp estricto
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
                 // BALL ANIMATION
@@ -906,15 +905,13 @@
                         const newOffset = Math.max(0, pathLength - drawLength);
                         progressPath.style.strokeDashoffset = newOffset;
                         
-                        // Prevent calculation errors at very end
-                        const safeLength = Math.min(drawLength, pathLength - 0.1);
+                        // Calculo de punto seguro
+                        const safeLength = Math.min(drawLength, pathLength - 0.5); 
                         
-                        try {
+                        if (safeLength >= 0) {
                             const point = progressPath.getPointAtLength(safeLength);
                             desktopBall.setAttribute("cx", point.x);
                             desktopBall.setAttribute("cy", point.y);
-                        } catch(e) {
-                            // Fallback if length error
                         }
                     }
                 }
@@ -922,12 +919,13 @@
                 // CARD ACTIVATION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
-                    if (cardTop < windowHeight * 0.85) {
+                    if (cardTop < windowHeight * 0.8) {
                         card.classList.add('active');
                     } 
                 });
 
-                // LIGHT EXPLOSION - EXACT TRIGGER
+                // LIGHT EXPLOSION TRIGGER
+                // Se activa exactamente al llegar al final (99%+)
                 if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
@@ -941,12 +939,6 @@
                 updateScroll();
             });
             
-            // Initial calls
-            setTimeout(() => {
-                recalculatePath();
-                updateScroll();
-            }, 100);
-
             const logoRows = document.querySelectorAll('.logo-row');
             const rowObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
