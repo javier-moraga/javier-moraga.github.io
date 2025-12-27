@@ -91,7 +91,7 @@
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Altura se define en JS */
+            /* Height se calcula en JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -174,6 +174,15 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
+        /* EL PUNTO DE ANCLAJE INVISIBLE (TARGET) */
+        #connector-target {
+            position: absolute; 
+            top: -16px; /* Ajuste fino: 2 veces el radio de la bola (8px) para que toque justo */
+            left: 50%; 
+            width: 1px; height: 1px; 
+            visibility: hidden;
+        }
+
         /* LUZ DE EXPLOSIÓN */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
@@ -183,7 +192,7 @@
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 0.3s ease-in-out; 
+            transition: opacity 0.5s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
@@ -531,7 +540,8 @@
     </div>
 
     <div id="aboutFrame" class="about-section-wrapper">
-        <div class="content-frame">
+        <div class="content-frame" style="position: relative;"> <div id="connector-target" style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 2px; height: 2px;"></div>
+
             <section id="about" class="about-grid">
                 <div class="profile-img-container">
                     <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
@@ -826,16 +836,15 @@
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. Target the actual visual card (content-frame) inside the wrapper
-                const targetBox = aboutWrapper.querySelector('.content-frame');
+                // 1. BUSCAR EL PUNTO DE ANCLAJE (TARGET INVISIBLE)
+                const targetAnchor = document.getElementById('connector-target');
                 
                 // Get positions relative to the viewport
                 const sectionRect = section.getBoundingClientRect();
-                const boxRect = targetBox.getBoundingClientRect();
+                const anchorRect = targetAnchor.getBoundingClientRect();
                 
-                // Calculate precise distance from top of Evolution to top of the Box
-                // We subtract 8px (ball radius) so it "kisses" the border
-                const endY = (boxRect.top - sectionRect.top) - 8; 
+                // Distancia exacta desde el top de Evolución hasta el anclaje
+                const endY = (anchorRect.top - sectionRect.top); 
                 
                 // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
                 desktopSvg.style.height = `${endY}px`;
@@ -845,21 +854,17 @@
                 const lastZigZagY = 2850;
                 const lastZigZagX = 764;
 
-                // 4. CALCULAR "PUNTO DE DESVIACIÓN" (% DE ALTURA RESTANTE)
-                // Queremos que la línea baje recta desde la tarjeta un poco, luego curve al centro, y luego caiga recta.
-                // Altura disponible desde la ultima tarjeta hasta el final
-                const remainingHeight = endY - lastZigZagY;
+                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL SUAVE
+                // Calculamos puntos de control para una transición fluida
+                const cp1Y = lastZigZagY + 250; // Sale hacia abajo suavemente
+                const cp1X = lastZigZagX;       // Mantiene la posición horizontal inicial
                 
-                // Puntos de control para forzar la verticalidad final
-                // CP1: Sale de la tarjeta hacia abajo (mantiene X=764)
-                const cp1X = 764;
-                const cp1Y = lastZigZagY + (remainingHeight * 0.4); // Baja el 40% del espacio restante recto
+                // El segundo control point debe estar verticalmente encima del final
+                // para garantizar que la línea entre recta
+                const verticalDrop = 300; // Cuánto tramo recto queremos al final
+                const cp2Y = endY - verticalDrop; 
+                const cp2X = 500;               // Alineado al centro
 
-                // CP2: Se alinea con el centro (X=500) pero arriba del final
-                const cp2X = 500;
-                const cp2Y = endY - (remainingHeight * 0.2); // Se alinea al centro al 80% del recorrido
-
-                // Esto crea una curva que "tarda" en irse al centro y luego "cae" recta
                 const newPath = `
                     M 500 0 
                     C 500 100, 236 150, 236 350 
