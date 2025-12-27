@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- GLOBAL VARIABLES --- */
+        /* --- VARIABLES GLOBALES --- */
         :root {
             --bg-dark: #0b1120;
             --bg-card: #111827; 
@@ -22,12 +22,12 @@
             --text-muted: #94a3b8;
         }
 
-        /* --- GENERAL STYLES --- */
+        /* --- ESTILOS GENERALES --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         
-        /* CONTENT FRAME */
+        /* MARCO ESTRUCTURAL */
         .content-frame {
             max-width: 1200px; margin: 0 auto; padding: 60px;
             background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08);
@@ -53,7 +53,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- CONTACT BUTTON --- */
+        /* --- BOTÓN DE CONTACTO --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -84,7 +84,7 @@
             justify-content: center; 
         }
 
-        /* SVG CONTAINER - Ahora es crucial el preserveAspectRatio="none" */
+        /* SVG CONTAINER */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
@@ -140,7 +140,6 @@
             display: flex; flex-direction: column; justify-content: center; 
         }
         
-        /* Cards alignment */
         .evo-left { align-self: flex-start; text-align: right; transform: translateX(-50px); margin-right: 20px; }
         .evo-right { align-self: flex-end; text-align: left; transform: translateX(50px); margin-left: 20px; }
         
@@ -175,10 +174,10 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* LUZ DE EXPLOSIÓN: Posicionada justo en el borde superior */
+        /* LUZ DE EXPLOSIÓN */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
-            top: -100px; /* Sube la luz para coincidir con el choque */
+            top: -120px; 
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 250px; 
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
@@ -846,6 +845,11 @@
                 // Distribuimos los 6 hitos a lo largo de la altura disponible (menos el tramo final recto)
                 const segmentHeight = (endY - 200) / 6; 
 
+                // CURVA FINAL AJUSTADA: "MECHA" VERTICAL
+                // La última curva 'C' ahora va de 770 hacia 500 pero con control points verticales
+                // Control Point 1 (Salida): 770, Y-150 (Sale vertical)
+                // Control Point 2 (Entrada): 500, Y-150 (Entra vertical desde arriba)
+                // Destino: 500, endY (Centro exacto)
                 const newPath = `
                     M 500 0 
                     C 500 ${segmentHeight * 0.5}, 230 ${segmentHeight * 0.5}, 230 ${segmentHeight * 1} 
@@ -854,7 +858,7 @@
                     S 770 ${segmentHeight * 3.5}, 770 ${segmentHeight * 4} 
                     S 230 ${segmentHeight * 4.5}, 230 ${segmentHeight * 5} 
                     S 770 ${segmentHeight * 5.5}, 770 ${segmentHeight * 6} 
-                    C 770 ${endY - 100}, 500 ${endY - 100}, 500 ${endY}
+                    C 770 ${endY - 200}, 500 ${endY - 150}, 500 ${endY}
                 `;
 
                 trackPath.setAttribute('d', newPath);
