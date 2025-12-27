@@ -79,7 +79,6 @@
         .evolution-section { 
             padding: 50px 0 0 0; 
             position: relative; 
-            /* IMPORTANTE: Visible para que la bola se vea al chocar abajo */
             overflow: visible; 
             display: flex; 
             justify-content: center; 
@@ -92,7 +91,7 @@
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Height se asigna dinámicamente */
+            /* Height se calcula en JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -104,11 +103,10 @@
             stroke: url(#lineGradient); 
             stroke-width: 2px; 
             stroke-linecap: round; 
-            /* Dasharray se calcula en JS */
+            stroke-dasharray: 10000; 
+            stroke-dashoffset: 10000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
-        
-        /* BOLA */
         #desktopBall { filter: drop-shadow(0 0 10px var(--accent-gold)); }
 
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; z-index: 0; }
@@ -176,11 +174,10 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* PUNTO DE ANCLAJE (TARGET) */
-        /* Lo posicionamos en el borde superior exacto del content-frame */
+        /* ELEMENTO INVISIBLE: ANCLA PARA LA LÍNEA */
         #connector-target {
             position: absolute; 
-            top: 0; 
+            top: 0; /* En el borde superior exacto del content-frame */
             left: 50%; 
             width: 1px; height: 1px; 
             visibility: hidden;
@@ -195,13 +192,13 @@
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 0.3s ease-in-out; 
+            transition: opacity 0.5s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
         .about-section-wrapper.frame-active::before { opacity: 1; }
 
-        /* Para que el target funcione, el frame debe ser relative */
+        /* Contenedor relativo para el ancla */
         .content-frame-relative { position: relative; }
 
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
@@ -725,100 +722,6 @@
         </div>
     </section>
 
-    <section id="projects" class="projects-section">
-        <div class="content-frame">
-            <h2 class="section-title">Featured Projects & <span class="highlight">Impact</span></h2>
-            
-            <div class="sticky-wrapper">
-                
-                <div class="project-card">
-                    <div class="project-content">
-                        <div class="project-tags">
-                            <span class="p-tag">GCP</span>
-                            <span class="p-tag">Python</span>
-                            <span class="p-tag">Optimization</span>
-                        </div>
-                        <h3 class="project-title">Jira Data Pipeline Optimization</h3>
-                        <p class="project-desc">
-                            <strong>Problem:</strong> Critical operational reporting was delayed due to a slow data ingestion process.<br>
-                            <strong>Solution:</strong> Engineered a high-performance pipeline connecting Jira (PostgreSQL) to BigQuery via API.<br>
-                            <strong>Impact:</strong> Reduced data ingestion time by <span style="color:white; font-weight:bold;">97% (from 2 hours to 3 minutes)</span>, enabling near real-time decision making for IT Operations.
-                        </p>
-                        <a href="#" class="btn-project">Explore Use Case</a>
-                    </div>
-                    <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/16203c/ffffff?text=Pipeline+Architecture" alt="Cloud Project">
-                    </div>
-                </div>
-
-                 <div class="project-card">
-                    <div class="project-content">
-                        <div class="project-tags">
-                            <span class="p-tag">SQL</span>
-                            <span class="p-tag">Revenue Assurance</span>
-                            <span class="p-tag">Analytics</span>
-                        </div>
-                        <h3 class="project-title">Collections Strategy Optimization</h3>
-                        <p class="project-desc">
-                            <strong>Problem:</strong> Low notification coverage for debt recovery in a base of 5 million subscribers.<br>
-                            <strong>Solution:</strong> Implemented data-driven segmentation strategies based on customer behavior patterns.<br>
-                            <strong>Impact:</strong> Increased notification coverage from <span style="color:white; font-weight:bold;">60% to 99%</span>, directly optimizing revenue recovery strategies.
-                        </p>
-                        <a href="#" class="btn-project">Explore Use Case</a>
-                    </div>
-                    <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/1e293b/ffffff?text=Data+Analytics" alt="Analytics Dashboard">
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-content">
-                        <div class="project-tags">
-                            <span class="p-tag">Migration</span>
-                            <span class="p-tag">BigQuery</span>
-                            <span class="p-tag">Architecture</span>
-                        </div>
-                        <h3 class="project-title">Enterprise Data Migration & Modernization</h3>
-                        <p class="project-desc">
-                            <strong>Challenge:</strong> Legacy on-premise systems (Netezza/SAS) were creating bottlenecks and data silos.<br>
-                            <strong>Solution:</strong> Led the migration initiative to Google BigQuery, validating data integrity for <span style="color:white; font-weight:bold;">7 million users</span>.<br>
-                            <strong>Impact:</strong> Modernized the data architecture, ensured zero data loss, and significantly reduced processing times for critical business KPIs.
-                        </p>
-                        <a href="#" class="btn-project">Explore Use Case</a>
-                    </div>
-                    <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="contact-section">
-        <div class="content-frame" style="padding: 40px; background: transparent; border: none; box-shadow: none;">
-            <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
-            <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
-            <div style="margin-top: 50px; margin-bottom: 30px;">
-                <img src="rocky.jpg" alt="Rocky" 
-                     style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" 
-                     onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
-                <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">(Rocky is also ready for the flight! 🐾)</p>
-            </div>
-            <div class="contact-icons">
-                <a href="mailto:javierignacio.moraga@gmail.com" class="c-icon"><i class="fa-solid fa-envelope"></i></a>
-                <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" class="c-icon"><i class="fa-brands fa-linkedin"></i></a>
-            </div>
-            <p style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>© 2025 Javier Moraga. Built for the Global Market.</p>
-        </div>
-    </footer>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const section = document.getElementById('evolution-section');
@@ -842,16 +745,16 @@
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. BUSCAR EL PUNTO DE ANCLAJE (TARGET INVISIBLE)
-                const targetAnchor = document.getElementById('connector-target');
+                // 1. Target the actual visual card (content-frame) inside the wrapper
+                const targetBox = aboutWrapper.querySelector('.content-frame');
                 
                 // Get positions relative to the viewport
                 const sectionRect = section.getBoundingClientRect();
-                const anchorRect = targetAnchor.getBoundingClientRect();
+                const boxRect = targetBox.getBoundingClientRect();
                 
-                // Distancia exacta desde el top de Evolución hasta el anclaje
-                // Se resta el radio de la bola para que "descanse" sobre el borde
-                const endY = (anchorRect.top - sectionRect.top) - 8; 
+                // Calculate precise distance from top of Evolution to top of the Box
+                // We subtract 8px (ball radius) so it "kisses" the border
+                const endY = (boxRect.top - sectionRect.top) - 8; 
                 
                 // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
                 desktopSvg.style.height = `${endY}px`;
@@ -861,25 +764,28 @@
                 const lastZigZagY = 2850;
                 const lastZigZagX = 764;
 
-                // 4. CURVA FINAL "MECHA VERTICAL"
-                // CP1: Sale hacia abajo desde la tarjeta
-                const cp1X = 764;
-                const cp1Y = lastZigZagY + 300; 
+                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL
+                // Utilizando Q + T para suavidad natural y forzando verticalidad final
 
-                // CP2: Alineado al centro, pero arriba del final
-                // Esto garantiza que el tramo final sea una recta vertical en x=500
-                const cp2X = 500;
-                const cp2Y = endY - 300; 
+                // Primero, una curva suave desde la tarjeta hacia el centro
+                // Q (ControlX, ControlY) (EndX, EndY)
+                // Usamos un punto de control que está a mitad de camino horizontal y verticalmente
+                const midY = (lastZigZagY + endY) / 2;
+                
+                // Para lograr la "caída recta", la curva debe terminar en X=500 ANTES de endY.
+                // Digamos que la curva termina 150px antes del final, y luego es una línea recta.
+                const curveEndY = endY - 150;
 
                 const newPath = `
                     M 500 0 
-                    C 500 100, 236 150, 236 350 
-                    S 764 600, 764 850 
-                    S 236 1100, 236 1350 
-                    S 764 1600, 764 1850 
-                    S 236 2100, 236 2350 
-                    S 764 2600, 764 ${lastZigZagY} 
-                    C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, 500 ${endY}
+                    Q 500 150 236 350 
+                    T 764 850 
+                    T 236 1350 
+                    T 764 1850 
+                    T 236 2350 
+                    T 764 2850 
+                    Q 764 ${midY} 500 ${curveEndY} 
+                    L 500 ${endY}
                 `;
 
                 trackPath.setAttribute('d', newPath);
@@ -900,10 +806,9 @@
                 const windowHeight = window.innerHeight;
 
                 // --- LÓGICA DE SCROLL (0% A 100% REAL) ---
-                // Start: Cuando el top de la sección toca el centro de la pantalla
-                // End: Cuando el bottom de la sección (que coincide con el inicio de About) toca el centro
+                const startOffset = windowHeight / 2;
                 const sectionTop = rect.top;
-                const sectionHeight = rect.height; 
+                const sectionHeight = rect.height; // Altura real calculada por navegador
                 
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
                 let scrollPercent = scrolledDistance / sectionHeight;
