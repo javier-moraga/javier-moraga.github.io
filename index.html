@@ -174,6 +174,15 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
+        /* EL PUNTO DE ANCLAJE INVISIBLE (TARGET) */
+        #connector-target {
+            position: absolute; 
+            top: -16px; /* Ajuste fino para choque */
+            left: 50%; 
+            width: 1px; height: 1px; 
+            visibility: hidden;
+        }
+
         /* LUZ DE EXPLOSIÓN */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
@@ -183,7 +192,7 @@
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 0.3s ease-in-out; 
+            transition: opacity 0.5s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
@@ -827,15 +836,16 @@
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. BUSCAR EL PUNTO DE ANCLAJE (TARGET INVISIBLE)
-                const targetAnchor = document.getElementById('connector-target');
+                // 1. Target the actual visual card (content-frame) inside the wrapper
+                const targetBox = aboutWrapper.querySelector('.content-frame');
                 
                 // Get positions relative to the viewport
                 const sectionRect = section.getBoundingClientRect();
-                const anchorRect = targetAnchor.getBoundingClientRect();
+                const boxRect = targetBox.getBoundingClientRect();
                 
-                // Distancia exacta desde el top de Evolución hasta el anclaje
-                const endY = (anchorRect.top - sectionRect.top); 
+                // Calculate precise distance from top of Evolution to top of the Box
+                // We subtract 8px (ball radius) so it "kisses" the border
+                const endY = (boxRect.top - sectionRect.top) - 8; 
                 
                 // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
                 desktopSvg.style.height = `${endY}px`;
@@ -845,16 +855,18 @@
                 const lastZigZagY = 2850;
                 const lastZigZagX = 764;
 
-                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL SUAVE
-                // Calculamos puntos de control para una transición fluida
-                const cp1Y = lastZigZagY + 150; // Sale hacia abajo suavemente
-                const cp1X = 764;       // Mantiene la posición horizontal inicial
+                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL
+                // Calculamos puntos de control para una transición fluida que termina RECTA
                 
-                // El segundo control point debe estar verticalmente encima del final
-                // para garantizar que la línea entre recta
-                const verticalDrop = 300; // Cuánto tramo recto queremos al final
-                const cp2Y = endY - verticalDrop; 
-                const cp2X = 500;               // Alineado al centro
+                // CP1: Sale de la tarjeta hacia abajo (mantiene X=764)
+                const cp1X = 764;
+                const cp1Y = lastZigZagY + 300; 
+
+                // CP2: SE ALINEA AL CENTRO MUCHO ANTES DE LLEGAR AL FINAL
+                // Esto fuerza a que la curva termine su movimiento horizontal antes
+                // y los últimos pixeles sean una caída libre vertical.
+                const cp2X = 500;
+                const cp2Y = endY - 300; // 300px antes del final ya está alineado al centro
 
                 const newPath = `
                     M 500 0 
@@ -907,6 +919,7 @@
                         // FORZAR FINAL: Si pasamos el 99%, forzar la bola al final exacto
                         if (scrollPercent >= 0.99) {
                             desktopBall.setAttribute("cx", 500);
+                            // La altura final es la que definimos en el SVG
                             const endY = parseFloat(desktopSvg.style.height);
                             desktopBall.setAttribute("cy", endY);
                             progressPath.style.strokeDashoffset = 0;
