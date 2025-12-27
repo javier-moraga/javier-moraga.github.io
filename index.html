@@ -27,7 +27,7 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         
-        /* CONTENT FRAME */
+        /* MARCO ESTRUCTURAL */
         .content-frame {
             max-width: 1200px; margin: 0 auto; padding: 60px;
             background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08);
@@ -53,7 +53,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- CONTACT BUTTON --- */
+        /* --- BOTÓN DE CONTACTO --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -91,7 +91,7 @@
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Height se calcula en JS */
+            /* Altura se define en JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -841,20 +841,25 @@
                 desktopSvg.style.height = `${endY}px`;
                 desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
 
-                // 3. MANTENER ZIGZAGS FIJOS PARA RITMO CONSTANTE
-                // Usamos coordenadas fijas para los puntos de las tarjetas
+                // 3. MANTENER ZIGZAGS FIJOS
                 const lastZigZagY = 2850;
                 const lastZigZagX = 764;
 
-                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL SUAVE
-                // Calculamos puntos de control para una transición fluida
-                const cp1Y = lastZigZagY + 250; // Sale hacia abajo suavemente
-                const cp1X = lastZigZagX;       // Mantiene la posición horizontal inicial
+                // 4. CALCULAR "PUNTO DE DESVIACIÓN" (% DE ALTURA RESTANTE)
+                // Queremos que la línea baje recta desde la tarjeta un poco, luego curve al centro, y luego caiga recta.
+                // Altura disponible desde la ultima tarjeta hasta el final
+                const remainingHeight = endY - lastZigZagY;
                 
-                const dropLength = Math.max(150, (endY - lastZigZagY) * 0.3); // Longitud de la caída vertical
-                const cp2Y = endY - dropLength; // Entra verticalmente desde arriba
-                const cp2X = 500;               // Alineado al centro
+                // Puntos de control para forzar la verticalidad final
+                // CP1: Sale de la tarjeta hacia abajo (mantiene X=764)
+                const cp1X = 764;
+                const cp1Y = lastZigZagY + (remainingHeight * 0.4); // Baja el 40% del espacio restante recto
 
+                // CP2: Se alinea con el centro (X=500) pero arriba del final
+                const cp2X = 500;
+                const cp2Y = endY - (remainingHeight * 0.2); // Se alinea al centro al 80% del recorrido
+
+                // Esto crea una curva que "tarda" en irse al centro y luego "cae" recta
                 const newPath = `
                     M 500 0 
                     C 500 100, 236 150, 236 350 
@@ -906,7 +911,6 @@
                         // FORZAR FINAL: Si pasamos el 99%, forzar la bola al final exacto
                         if (scrollPercent >= 0.99) {
                             desktopBall.setAttribute("cx", 500);
-                            // La altura final es la que definimos en el SVG
                             const endY = parseFloat(desktopSvg.style.height);
                             desktopBall.setAttribute("cy", endY);
                             progressPath.style.strokeDashoffset = 0;
