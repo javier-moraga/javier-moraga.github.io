@@ -27,7 +27,7 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         
-        /* MARCO ESTRUCTURAL */
+        /* CONTENT FRAME */
         .content-frame {
             max-width: 1200px; margin: 0 auto; padding: 60px;
             background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08);
@@ -53,7 +53,7 @@
         .nav-links a.link-text { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a.link-text:hover { color: var(--accent); }
 
-        /* --- BOTÓN DE CONTACTO --- */
+        /* --- CONTACT BUTTON --- */
         .nav-btn {
             position: relative; padding: 10px 25px; color: white; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; border-radius: 4px; background: rgba(255, 255, 255, 0.02); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
         }
@@ -84,14 +84,14 @@
             justify-content: center; 
         }
 
-        /* SVG CONTAINER */
+        /* SVG CONTAINER - preserveAspectRatio none para ajuste exacto */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Height se calcula en JS */
+            /* Altura se define en JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -177,13 +177,13 @@
         /* LUZ DE EXPLOSIÓN */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
-            top: -120px; 
+            top: -100px; 
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 250px; 
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 0.5s ease-in-out; 
+            transition: opacity 0.3s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
@@ -827,38 +827,37 @@
                 if (window.innerWidth <= 1199) return; 
 
                 // 1. OBTENER ALTURA EXACTA ENTRE INICIO DE EVOLUCIÓN Y TOPE DE ABOUT
-                // Usamos offsetTop relativo al documento para mayor precisión
-                const startY = 0; 
-                const endY = aboutWrapper.offsetTop - section.offsetTop; 
+                // Usamos coords absolutas para evitar problemas de anidamiento
+                const sectionRect = section.getBoundingClientRect();
+                const aboutRect = aboutWrapper.getBoundingClientRect();
                 
-                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
-                // Establecemos tanto el estilo como el viewBox para que coincidan 1:1
-                desktopSvg.style.height = `${endY}px`;
-                desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
+                // Radio de la bola (definido en SVG como r="8")
+                const ballRadius = 8; 
 
-                // 3. DEFINIR PUNTOS DE LAS TARJETAS (APROXIMADOS POR CSS GAP)
-                // Cards están separadas por 120px gap + altura card.
-                // Estimamos puntos de paso para suavizar la curva.
-                // NOTA: Con preserveAspectRatio="none", la coordenada Y se estira para encajar
-                // si el viewBox Y es distinto. Pero aquí lo igualamos, así que Y es pixel real.
+                // Distancia total entre el top de Evolution y el top de About
+                const totalDistance = (aboutRect.top + window.scrollY) - (sectionRect.top + window.scrollY);
                 
-                // Distribuimos los 6 hitos a lo largo de la altura disponible (menos el tramo final recto)
+                // EL PUNTO FINAL DEL PATH debe ser la distancia total MENOS el radio
+                // Así el borde de la bola toca la línea, no el centro
+                const endY = totalDistance - ballRadius;
+                
+                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO
+                desktopSvg.style.height = `${totalDistance}px`;
+                desktopSvg.setAttribute('viewBox', `0 0 1000 ${totalDistance}`);
+
+                // 3. DEFINIR PUNTOS DE LAS TARJETAS (APROXIMADOS)
                 const segmentHeight = (endY - 200) / 6; 
 
-                // CURVA FINAL AJUSTADA: "MECHA" VERTICAL
-                // La última curva 'C' ahora va de 770 hacia 500 pero con control points verticales
-                // Control Point 1 (Salida): 770, Y-150 (Sale vertical)
-                // Control Point 2 (Entrada): 500, Y-150 (Entra vertical desde arriba)
-                // Destino: 500, endY (Centro exacto)
+                // 4. CURVA FINAL: "MECHA" VERTICAL
                 const newPath = `
                     M 500 0 
-                    C 500 ${segmentHeight * 0.5}, 230 ${segmentHeight * 0.5}, 230 ${segmentHeight * 1} 
-                    S 770 ${segmentHeight * 1.5}, 770 ${segmentHeight * 2} 
-                    S 230 ${segmentHeight * 2.5}, 230 ${segmentHeight * 3} 
-                    S 770 ${segmentHeight * 3.5}, 770 ${segmentHeight * 4} 
-                    S 230 ${segmentHeight * 4.5}, 230 ${segmentHeight * 5} 
-                    S 770 ${segmentHeight * 5.5}, 770 ${segmentHeight * 6} 
-                    C 770 ${endY - 200}, 500 ${endY - 150}, 500 ${endY}
+                    C 500 ${segmentHeight * 0.5}, 236 150, 236 350 
+                    S 764 600, 764 850 
+                    S 236 1100, 236 1350 
+                    S 764 1600, 764 1850 
+                    S 236 2100, 236 2350 
+                    S 764 2600, 764 2850 
+                    C 764 ${endY - 300}, 500 ${endY - 200}, 500 ${endY}
                 `;
 
                 trackPath.setAttribute('d', newPath);
@@ -870,7 +869,7 @@
             }
 
             // Initial calculation
-            setTimeout(recalculatePath, 100); // Pequeño delay para asegurar carga DOM
+            setTimeout(recalculatePath, 100); 
 
             function updateScroll() {
                 if(!section) return; 
@@ -878,20 +877,13 @@
                 const rect = section.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
 
-                // --- NUEVA LÓGICA DE SCROLL (0% A 100% REAL) ---
-                // Start: Cuando el top de la sección toca el centro de la pantalla
-                // End: Cuando el bottom de la sección (que coincide con el inicio de About) toca el centro
+                // --- LÓGICA DE SCROLL (0% A 100% REAL) ---
+                const startOffset = windowHeight / 2;
                 const sectionTop = rect.top;
-                const sectionHeight = rect.height; // Altura real calculada por navegador
+                const sectionHeight = rect.height; 
                 
-                // Distancia total scrolleable para completar la animación
-                // Queremos que la animación dure exactamente lo que mide la sección
-                const totalScrollDistance = sectionHeight;
-                
-                // Cuánto hemos scrolleado dentro de la sección (ajustado por offset visual)
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
-
-                let scrollPercent = scrolledDistance / totalScrollDistance;
+                let scrollPercent = scrolledDistance / sectionHeight;
 
                 // Clamp estricto
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
@@ -905,17 +897,28 @@
                     }
                 } else {
                     if(progressPath && desktopBall && pathLength > 0) {
-                        const drawLength = pathLength * scrollPercent;
-                        const newOffset = Math.max(0, pathLength - drawLength);
-                        progressPath.style.strokeDashoffset = newOffset;
-                        
-                        // Calculo de punto seguro
-                        const safeLength = Math.min(drawLength, pathLength - 0.5); 
-                        
-                        if (safeLength >= 0) {
-                            const point = progressPath.getPointAtLength(safeLength);
-                            desktopBall.setAttribute("cx", point.x);
-                            desktopBall.setAttribute("cy", point.y);
+                        // FORZAR FINAL: Si pasamos el 99%, forzar la bola al final exacto
+                        if (scrollPercent >= 0.99) {
+                            // Coordenadas finales exactas del path
+                            // X=500 (centro), Y=endY (calculado antes, pero aquí lo recuperamos del SVG height - radio)
+                            const svgHeight = parseFloat(desktopSvg.style.height);
+                            // Recuperamos el radio (8)
+                            const endY = svgHeight - 8; 
+                            
+                            desktopBall.setAttribute("cx", 500);
+                            desktopBall.setAttribute("cy", endY);
+                            progressPath.style.strokeDashoffset = 0;
+                        } else {
+                            const drawLength = pathLength * scrollPercent;
+                            const newOffset = Math.max(0, pathLength - drawLength);
+                            progressPath.style.strokeDashoffset = newOffset;
+                            
+                            const safeLength = Math.min(drawLength, pathLength - 0.1);
+                            if (safeLength >= 0) {
+                                const point = progressPath.getPointAtLength(safeLength);
+                                desktopBall.setAttribute("cx", point.x);
+                                desktopBall.setAttribute("cy", point.y);
+                            }
                         }
                     }
                 }
@@ -923,13 +926,12 @@
                 // CARD ACTIVATION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
-                    if (cardTop < windowHeight * 0.8) {
+                    if (cardTop < windowHeight * 0.85) {
                         card.classList.add('active');
                     } 
                 });
 
                 // LIGHT EXPLOSION TRIGGER
-                // Se activa exactamente al llegar al final (99%+)
                 if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
