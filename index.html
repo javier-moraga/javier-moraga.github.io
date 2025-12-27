@@ -84,14 +84,14 @@
             justify-content: center; 
         }
 
-        /* SVG CONTAINER - preserveAspectRatio none para ajuste exacto */
+        /* SVG CONTAINER */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Altura se define en JS */
+            /* Height se calcula en JS */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -826,29 +826,27 @@
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. OBTENER ALTURA EXACTA ENTRE INICIO DE EVOLUCIÓN Y TOPE DE ABOUT
-                // Usamos coords absolutas para evitar problemas de anidamiento
+                // 1. Target the actual visual card (content-frame) instead of the wrapper
+                const targetBox = aboutWrapper.querySelector('.content-frame');
+                
+                // Get positions relative to the viewport
                 const sectionRect = section.getBoundingClientRect();
-                const aboutRect = aboutWrapper.getBoundingClientRect();
+                const boxRect = targetBox.getBoundingClientRect();
                 
-                // Radio de la bola (definido en SVG como r="8")
-                const ballRadius = 8; 
+                // Calculate precise distance from top of Evolution to top of the Box
+                // (boxRect.top - sectionRect.top) gives the distance relative to current view
+                // We subtract 8px (ball radius) so it "kisses" the border
+                const endY = (boxRect.top - sectionRect.top) - 8; 
+                
+                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
+                desktopSvg.style.height = `${endY}px`;
+                desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
 
-                // Distancia total entre el top de Evolution y el top de About
-                const totalDistance = (aboutRect.top + window.scrollY) - (sectionRect.top + window.scrollY);
-                
-                // EL PUNTO FINAL DEL PATH debe ser la distancia total MENOS el radio
-                // Así el borde de la bola toca la línea, no el centro
-                const endY = totalDistance - ballRadius;
-                
-                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO
-                desktopSvg.style.height = `${totalDistance}px`;
-                desktopSvg.setAttribute('viewBox', `0 0 1000 ${totalDistance}`);
-
-                // 3. DEFINIR PUNTOS DE LAS TARJETAS (APROXIMADOS)
+                // 3. DEFINIR PUNTOS DE LAS TARJETAS (APROXIMADOS POR CSS GAP)
                 const segmentHeight = (endY - 200) / 6; 
 
-                // 4. CURVA FINAL: "MECHA" VERTICAL
+                // 4. CURVA FINAL AJUSTADA: "MECHA" VERTICAL
+                // Subimos el punto de control a -300 para forzar la verticalidad
                 const newPath = `
                     M 500 0 
                     C 500 ${segmentHeight * 0.5}, 236 150, 236 350 
@@ -880,7 +878,7 @@
                 // --- LÓGICA DE SCROLL (0% A 100% REAL) ---
                 const startOffset = windowHeight / 2;
                 const sectionTop = rect.top;
-                const sectionHeight = rect.height; 
+                const sectionHeight = rect.height; // Altura real calculada por navegador
                 
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
                 let scrollPercent = scrolledDistance / sectionHeight;
@@ -899,13 +897,9 @@
                     if(progressPath && desktopBall && pathLength > 0) {
                         // FORZAR FINAL: Si pasamos el 99%, forzar la bola al final exacto
                         if (scrollPercent >= 0.99) {
-                            // Coordenadas finales exactas del path
-                            // X=500 (centro), Y=endY (calculado antes, pero aquí lo recuperamos del SVG height - radio)
-                            const svgHeight = parseFloat(desktopSvg.style.height);
-                            // Recuperamos el radio (8)
-                            const endY = svgHeight - 8; 
-                            
                             desktopBall.setAttribute("cx", 500);
+                            // La altura final es la que definimos en el SVG
+                            const endY = parseFloat(desktopSvg.style.height);
                             desktopBall.setAttribute("cy", endY);
                             progressPath.style.strokeDashoffset = 0;
                         } else {
