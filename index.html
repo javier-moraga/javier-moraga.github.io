@@ -103,7 +103,7 @@
             stroke: url(#lineGradient); 
             stroke-width: 2px; 
             stroke-linecap: round; 
-            stroke-dasharray: 5000; /* Increased buffer */
+            stroke-dasharray: 5000; 
             stroke-dashoffset: 5000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
@@ -438,22 +438,24 @@
             
             <path id="trackPath" class="path-bg" d="
                 M 500 0 
-                C 500 200, 150 400, 150 600 
-                S 850 1000, 850 1200 
-                S 150 1600, 150 1800 
-                S 850 2200, 850 2400 
-                S 150 2800, 150 3000 
-                S 500 3400, 500 3500
+                C 500 100, 230 150, 230 350 
+                S 770 600, 770 850 
+                S 230 1100, 230 1350 
+                S 770 1600, 770 1850 
+                S 230 2100, 230 2350 
+                S 770 2600, 770 2850 
+                S 500 3200, 500 3500
                 " />
             
             <path id="progressPath" class="path-progress" d="
                 M 500 0 
-                C 500 200, 150 400, 150 600 
-                S 850 1000, 850 1200 
-                S 150 1600, 150 1800 
-                S 850 2200, 850 2400 
-                S 150 2800, 150 3000 
-                S 500 3400, 500 3500
+                C 500 100, 230 150, 230 350 
+                S 770 600, 770 850 
+                S 230 1100, 230 1350 
+                S 770 1600, 770 1850 
+                S 230 2100, 230 2350 
+                S 770 2600, 770 2850 
+                S 500 3200, 500 3500
                 " />
             
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
@@ -861,9 +863,8 @@
                 const startOffset = windowHeight / 2;
                 const scrolledPastStart = startOffset - rect.top;
                 
-                // Adjust this divisor to control speed relative to scroll
                 // Using rect.height ensures it maps 1:1 with the container
-                let scrollPercent = scrolledPastStart / (sectionHeight * 0.9);
+                let scrollPercent = scrolledPastStart / rect.height;
 
                 // CLAMPING to prevent overshoot or disappearance
                 scrollPercent = Math.max(0, Math.min(0.999, scrollPercent));
