@@ -84,15 +84,15 @@
             justify-content: center; 
         }
 
-        /* SVG CONTAINER - DETRÁS PERO VISIBLE EN CRISTAL */
+        /* SVG CONTAINER */
         .desktop-svg-container { 
             position: absolute; 
             top: 0; left: 50%; 
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            height: 3500px; /* Cubre las 6 tarjetas */
-            z-index: 1; /* Detrás de las tarjetas */
+            height: 3500px; 
+            z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
         }
@@ -103,8 +103,8 @@
             stroke: url(#lineGradient); 
             stroke-width: 2px; 
             stroke-linecap: round; 
-            stroke-dasharray: 4000; 
-            stroke-dashoffset: 4000; 
+            stroke-dasharray: 5000; /* Increased buffer */
+            stroke-dashoffset: 5000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
         #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
@@ -124,7 +124,7 @@
             padding: 50px 20px 100px 20px; 
         }
         
-        /* TARJETAS SIN COLORES (NEUTRAL GLASS) */
+        /* NEUTRAL GLASS CARDS */
         .evo-card { 
             width: 45%; 
             padding: 35px; 
@@ -177,16 +177,15 @@
         }
 
 
-        /* --- ABOUT ME SECTION (EL "LIMITE" DONDE CHOCA LA BOLA) --- */
+        /* --- ABOUT ME SECTION --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; }
         
-        /* LA LUZ QUE APARECE AL CHOCAR */
+        /* LIGHT EXPLOSION */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
-            top: -100px; /* Justo donde termina la línea */
+            top: -100px; 
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 250px; 
-            /* Gradiente de luz */
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
@@ -208,7 +207,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- BOTONES --- */
+        /* --- BUTTONS --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-fill { padding: 12px 24px; background: var(--accent-gold); color: var(--bg-dark); border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent-gold); transition: 0.3s; }
         .btn-fill:hover { background: transparent; color: var(--accent-gold); }
@@ -246,7 +245,7 @@
         }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS (COLORFUL MIRROR GLASS) --- */
+        /* --- STACK CARDS --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
@@ -339,7 +338,7 @@
         .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10; background: transparent; }
 
-        /* --- ICON ANIMATION --- */
+        /* --- ANIMATION --- */
         @keyframes iconPop {
             0% { transform: translateY(0); color: var(--text-muted); }
             50% { transform: translateY(-15px); color: var(--accent-gold); }
@@ -347,7 +346,7 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- RESPONSIVE MEDIA QUERIES --- */
+        /* --- RESPONSIVE --- */
         @media (min-width: 1200px) {
             .skills-section .container { max-width: 100% !important; padding: 0 50px; }
             .stack-container { justify-content: center; overflow-x: visible; }
@@ -378,14 +377,12 @@
             .logo-img { max-height: 50px; max-width: 100%; }
             .logo-item { height: 80px; }
             
-            /* Mobile Evolution Adjustments */
             .evolution-section { height: auto; padding-bottom: 50px; }
             .desktop-svg-container { display: none; }
             .mobile-system { display: block; }
             .evolution-container { gap: 40px; padding: 40px 20px; }
             .evo-card { width: 100%; margin: 0 !important; transform: translateY(30px); text-align: left; }
             .evo-left { border-right: none; text-align: left; }
-            /* Force left align on mobile too */
             .evo-desc li { justify-content: flex-start; }
             .evo-card.active { transform: translateY(0); }
 
@@ -441,24 +438,22 @@
             
             <path id="trackPath" class="path-bg" d="
                 M 500 0 
-                C 500 150, 250 300, 250 500 
-                C 250 700, 750 800, 750 1000 
-                C 750 1200, 250 1300, 250 1500 
-                C 250 1700, 750 1800, 750 2000
-                C 750 2200, 250 2300, 250 2500
-                C 250 2700, 750 2800, 750 3000
-                C 750 3200, 500 3350, 500 3500
+                C 500 200, 150 400, 150 600 
+                S 850 1000, 850 1200 
+                S 150 1600, 150 1800 
+                S 850 2200, 850 2400 
+                S 150 2800, 150 3000 
+                S 500 3400, 500 3500
                 " />
             
             <path id="progressPath" class="path-progress" d="
                 M 500 0 
-                C 500 150, 250 300, 250 500 
-                C 250 700, 750 800, 750 1000 
-                C 750 1200, 250 1300, 250 1500 
-                C 250 1700, 750 1800, 750 2000
-                C 750 2200, 250 2300, 250 2500
-                C 250 2700, 750 2800, 750 3000
-                C 750 3200, 500 3350, 500 3500
+                C 500 200, 150 400, 150 600 
+                S 850 1000, 850 1200 
+                S 150 1600, 150 1800 
+                S 850 2200, 850 2400 
+                S 150 2800, 150 3000 
+                S 500 3400, 500 3500
                 " />
             
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
@@ -862,15 +857,16 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // Start drawing when the section enters the middle of the screen
+                // LOGIC: Start when top enters middle, end when bottom enters middle
                 const startOffset = windowHeight / 2;
-                // Determine how far the section top has passed the start offset
                 const scrolledPastStart = startOffset - rect.top;
-                // Calculate percentage based on the total section height
-                let scrollPercent = scrolledPastStart / sectionHeight;
+                
+                // Adjust this divisor to control speed relative to scroll
+                // Using rect.height ensures it maps 1:1 with the container
+                let scrollPercent = scrolledPastStart / (sectionHeight * 0.9);
 
-                // Clamp between 0 and 1
-                scrollPercent = Math.max(0, Math.min(1, scrollPercent));
+                // CLAMPING to prevent overshoot or disappearance
+                scrollPercent = Math.max(0, Math.min(0.999, scrollPercent));
 
                 // BALL ANIMATION
                 if (window.innerWidth <= 1199) {
@@ -882,10 +878,13 @@
                 } else {
                     if(progressPath && desktopBall) {
                         const drawLength = pathLength * scrollPercent;
-                        progressPath.style.strokeDashoffset = pathLength - drawLength;
                         
-                        // Ensure we don't exceed the total length for getPointAtLength
-                        const safeLength = Math.min(drawLength, pathLength);
+                        // Prevent negative dashoffset
+                        const newOffset = Math.max(0, pathLength - drawLength);
+                        progressPath.style.strokeDashoffset = newOffset;
+                        
+                        // Prevent point calculation error
+                        const safeLength = Math.min(drawLength, pathLength - 0.1);
                         const point = progressPath.getPointAtLength(safeLength);
                         
                         desktopBall.setAttribute("cx", point.x);
@@ -893,16 +892,15 @@
                     }
                 }
 
-                // CARD ACTIVATION ANIMATION
+                // CARD ACTIVATION
                 evoCards.forEach(card => {
                     const cardTop = card.getBoundingClientRect().top;
-                    const triggerPoint = window.innerHeight * 0.85; 
-                    if (cardTop < triggerPoint) {
+                    if (cardTop < windowHeight * 0.85) {
                         card.classList.add('active');
                     } 
                 });
 
-                // LIGHT EXPLOSION ACTIVATION (When ball hits the end)
+                // LIGHT EXPLOSION - Strict trigger at end
                 if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
@@ -912,7 +910,8 @@
 
             window.addEventListener('scroll', updateScroll);
             window.addEventListener('resize', updateScroll);
-            // Initial call to set positions
+            
+            // Initial call
             setTimeout(updateScroll, 100); 
 
             const logoRows = document.querySelectorAll('.logo-row');
