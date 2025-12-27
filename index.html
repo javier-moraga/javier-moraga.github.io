@@ -79,7 +79,7 @@
         .evolution-section { 
             padding: 50px 0 200px 0; 
             position: relative; 
-            overflow: hidden; 
+            overflow: visible; /* PERMITE VER LA BOLA AL FINAL */
             display: flex; 
             justify-content: center; 
         }
@@ -107,7 +107,8 @@
             stroke-dashoffset: 5000; 
             transition: stroke-dashoffset 0.1s linear; 
         }
-        #desktopBall { filter: drop-shadow(0 0 8px var(--accent-gold)); }
+        /* BOLA: Sombra intensa para el efecto luz */
+        #desktopBall { filter: drop-shadow(0 0 10px var(--accent-gold)); }
 
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; z-index: 0; }
         .mobile-line-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.05); }
@@ -124,7 +125,7 @@
             padding: 50px 20px 100px 20px; 
         }
         
-        /* NEUTRAL GLASS CARDS */
+        /* TARJETAS GLASS SIN COLORINES */
         .evo-card { 
             width: 45%; 
             padding: 35px; 
@@ -177,19 +178,19 @@
         }
 
 
-        /* --- ABOUT ME SECTION --- */
-        .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; }
+        /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
+        .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* LIGHT EXPLOSION */
+        /* EXPLOSIÓN DE LUZ AMARILLA */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
-            top: -100px; 
+            top: -120px; /* Posicionada para coincidir con la bola */
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
-            width: 100%; height: 250px; 
-            background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.8) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
-            filter: blur(40px); 
+            width: 100%; height: 300px; 
+            background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.1) 60%, transparent 80%); 
+            filter: blur(45px); 
             opacity: 0; 
-            transition: opacity 0.5s ease-in-out; 
+            transition: opacity 0.8s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
@@ -207,7 +208,7 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 5px; }
 
-        /* --- BUTTONS --- */
+        /* --- BOTONES --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-fill { padding: 12px 24px; background: var(--accent-gold); color: var(--bg-dark); border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--accent-gold); transition: 0.3s; }
         .btn-fill:hover { background: transparent; color: var(--accent-gold); }
@@ -444,7 +445,7 @@
                 S 770 1600, 770 1850 
                 S 230 2100, 230 2350 
                 S 770 2600, 770 2850 
-                S 500 3200, 500 3500
+                C 770 3100, 500 3150, 500 3500
                 " />
             
             <path id="progressPath" class="path-progress" d="
@@ -455,7 +456,7 @@
                 S 770 1600, 770 1850 
                 S 230 2100, 230 2350 
                 S 770 2600, 770 2850 
-                S 500 3200, 500 3500
+                C 770 3100, 500 3150, 500 3500
                 " />
             
             <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
@@ -859,15 +860,15 @@
                 const sectionHeight = section.offsetHeight;
                 const windowHeight = window.innerHeight;
 
-                // LOGIC: Start when top enters middle, end when bottom enters middle
+                // LOGIC: Scroll 0% to 100% of the section height
                 const startOffset = windowHeight / 2;
                 const scrolledPastStart = startOffset - rect.top;
                 
-                // Using rect.height ensures it maps 1:1 with the container
+                // Using rect.height ensures accurate mapping to container height
                 let scrollPercent = scrolledPastStart / rect.height;
 
-                // CLAMPING to prevent overshoot or disappearance
-                scrollPercent = Math.max(0, Math.min(0.999, scrollPercent));
+                // CLAMPING to strictly 0 to 1
+                scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
                 // BALL ANIMATION
                 if (window.innerWidth <= 1199) {
@@ -880,11 +881,11 @@
                     if(progressPath && desktopBall) {
                         const drawLength = pathLength * scrollPercent;
                         
-                        // Prevent negative dashoffset
                         const newOffset = Math.max(0, pathLength - drawLength);
                         progressPath.style.strokeDashoffset = newOffset;
                         
-                        // Prevent point calculation error
+                        // Point Calculation
+                        // We clamp slightly under length to avoid calculation errors at exact end
                         const safeLength = Math.min(drawLength, pathLength - 0.1);
                         const point = progressPath.getPointAtLength(safeLength);
                         
@@ -901,7 +902,7 @@
                     } 
                 });
 
-                // LIGHT EXPLOSION - Strict trigger at end
+                // LIGHT EXPLOSION - Triggers exactly when ball finishes
                 if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
