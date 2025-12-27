@@ -826,7 +826,7 @@
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. Target the actual visual card (content-frame) instead of the wrapper
+                // 1. Target the actual visual card (content-frame) inside the wrapper
                 const targetBox = aboutWrapper.querySelector('.content-frame');
                 
                 // Get positions relative to the viewport
@@ -834,7 +834,6 @@
                 const boxRect = targetBox.getBoundingClientRect();
                 
                 // Calculate precise distance from top of Evolution to top of the Box
-                // (boxRect.top - sectionRect.top) gives the distance relative to current view
                 // We subtract 8px (ball radius) so it "kisses" the border
                 const endY = (boxRect.top - sectionRect.top) - 8; 
                 
@@ -842,20 +841,29 @@
                 desktopSvg.style.height = `${endY}px`;
                 desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
 
-                // 3. DEFINIR PUNTOS DE LAS TARJETAS (APROXIMADOS POR CSS GAP)
-                const segmentHeight = (endY - 200) / 6; 
+                // 3. MANTENER ZIGZAGS FIJOS PARA RITMO CONSTANTE
+                // Usamos coordenadas fijas para los puntos de las tarjetas
+                const lastZigZagY = 2850;
+                const lastZigZagX = 764;
 
-                // 4. CURVA FINAL AJUSTADA: "MECHA" VERTICAL
-                // Subimos el punto de control a -300 para forzar la verticalidad
+                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL SUAVE
+                // Calculamos puntos de control para una transición fluida
+                const cp1Y = lastZigZagY + 250; // Sale hacia abajo suavemente
+                const cp1X = lastZigZagX;       // Mantiene la posición horizontal inicial
+                
+                const dropLength = Math.max(150, (endY - lastZigZagY) * 0.3); // Longitud de la caída vertical
+                const cp2Y = endY - dropLength; // Entra verticalmente desde arriba
+                const cp2X = 500;               // Alineado al centro
+
                 const newPath = `
                     M 500 0 
-                    C 500 ${segmentHeight * 0.5}, 236 150, 236 350 
+                    C 500 100, 236 150, 236 350 
                     S 764 600, 764 850 
                     S 236 1100, 236 1350 
                     S 764 1600, 764 1850 
                     S 236 2100, 236 2350 
-                    S 764 2600, 764 2850 
-                    C 764 ${endY - 300}, 500 ${endY - 200}, 500 ${endY}
+                    S 764 2600, 764 ${lastZigZagY} 
+                    C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, 500 ${endY}
                 `;
 
                 trackPath.setAttribute('d', newPath);
