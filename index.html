@@ -77,8 +77,9 @@
 
         /* --- EVOLUTION SECTION --- */
         .evolution-section { 
-            padding: 50px 0 0 0; /* Padding bottom 0 para conectar */
+            padding: 50px 0 0 0; 
             position: relative; 
+            /* IMPORTANTE: Visible para que la bola se vea al chocar abajo */
             overflow: visible; 
             display: flex; 
             justify-content: center; 
@@ -91,7 +92,7 @@
             transform: translateX(-50%); 
             width: 100%; 
             max-width: 1000px; 
-            /* Height se calcula en JS */
+            /* Height se asigna dinámicamente */
             z-index: 1; 
             pointer-events: none; 
             overflow: visible; 
@@ -103,10 +104,11 @@
             stroke: url(#lineGradient); 
             stroke-width: 2px; 
             stroke-linecap: round; 
-            stroke-dasharray: 10000; 
-            stroke-dashoffset: 10000; 
+            /* Dasharray se calcula en JS */
             transition: stroke-dashoffset 0.1s linear; 
         }
+        
+        /* BOLA */
         #desktopBall { filter: drop-shadow(0 0 10px var(--accent-gold)); }
 
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); width: 2px; z-index: 0; }
@@ -174,10 +176,11 @@
         /* --- ABOUT ME SECTION (CON EXPLOSIÓN) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
-        /* EL PUNTO DE ANCLAJE INVISIBLE (TARGET) */
+        /* PUNTO DE ANCLAJE (TARGET) */
+        /* Lo posicionamos en el borde superior exacto del content-frame */
         #connector-target {
             position: absolute; 
-            top: -16px; /* Ajuste fino para choque */
+            top: 0; 
             left: 50%; 
             width: 1px; height: 1px; 
             visibility: hidden;
@@ -192,11 +195,14 @@
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.9) 0%, rgba(251, 191, 36, 0.8) 20%, rgba(251, 191, 36, 0.2) 50%, transparent 75%); 
             filter: blur(40px); 
             opacity: 0; 
-            transition: opacity 0.5s ease-in-out; 
+            transition: opacity 0.3s ease-in-out; 
             pointer-events: none; z-index: 0;
         }
         
         .about-section-wrapper.frame-active::before { opacity: 1; }
+
+        /* Para que el target funcione, el frame debe ser relative */
+        .content-frame-relative { position: relative; }
 
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
@@ -540,7 +546,7 @@
     </div>
 
     <div id="aboutFrame" class="about-section-wrapper">
-        <div class="content-frame" style="position: relative;"> <div id="connector-target" style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%); width: 2px; height: 2px;"></div>
+        <div class="content-frame content-frame-relative"> <div id="connector-target"></div>
 
             <section id="about" class="about-grid">
                 <div class="profile-img-container">
@@ -836,16 +842,16 @@
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. Target the actual visual card (content-frame) inside the wrapper
-                const targetBox = aboutWrapper.querySelector('.content-frame');
+                // 1. BUSCAR EL PUNTO DE ANCLAJE (TARGET INVISIBLE)
+                const targetAnchor = document.getElementById('connector-target');
                 
                 // Get positions relative to the viewport
                 const sectionRect = section.getBoundingClientRect();
-                const boxRect = targetBox.getBoundingClientRect();
+                const anchorRect = targetAnchor.getBoundingClientRect();
                 
-                // Calculate precise distance from top of Evolution to top of the Box
-                // We subtract 8px (ball radius) so it "kisses" the border
-                const endY = (boxRect.top - sectionRect.top) - 8; 
+                // Distancia exacta desde el top de Evolución hasta el anclaje
+                // Se resta el radio de la bola para que "descanse" sobre el borde
+                const endY = (anchorRect.top - sectionRect.top) - 8; 
                 
                 // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
                 desktopSvg.style.height = `${endY}px`;
@@ -855,18 +861,15 @@
                 const lastZigZagY = 2850;
                 const lastZigZagX = 764;
 
-                // 4. CURVA FINAL DINÁMICA: "MECHA" VERTICAL
-                // Calculamos puntos de control para una transición fluida que termina RECTA
-                
-                // CP1: Sale de la tarjeta hacia abajo (mantiene X=764)
+                // 4. CURVA FINAL "MECHA VERTICAL"
+                // CP1: Sale hacia abajo desde la tarjeta
                 const cp1X = 764;
                 const cp1Y = lastZigZagY + 300; 
 
-                // CP2: SE ALINEA AL CENTRO MUCHO ANTES DE LLEGAR AL FINAL
-                // Esto fuerza a que la curva termine su movimiento horizontal antes
-                // y los últimos pixeles sean una caída libre vertical.
+                // CP2: Alineado al centro, pero arriba del final
+                // Esto garantiza que el tramo final sea una recta vertical en x=500
                 const cp2X = 500;
-                const cp2Y = endY - 300; // 300px antes del final ya está alineado al centro
+                const cp2Y = endY - 300; 
 
                 const newPath = `
                     M 500 0 
@@ -897,9 +900,10 @@
                 const windowHeight = window.innerHeight;
 
                 // --- LÓGICA DE SCROLL (0% A 100% REAL) ---
-                const startOffset = windowHeight / 2;
+                // Start: Cuando el top de la sección toca el centro de la pantalla
+                // End: Cuando el bottom de la sección (que coincide con el inicio de About) toca el centro
                 const sectionTop = rect.top;
-                const sectionHeight = rect.height; // Altura real calculada por navegador
+                const sectionHeight = rect.height; 
                 
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
                 let scrollPercent = scrolledDistance / sectionHeight;
@@ -919,7 +923,6 @@
                         // FORZAR FINAL: Si pasamos el 99%, forzar la bola al final exacto
                         if (scrollPercent >= 0.99) {
                             desktopBall.setAttribute("cx", 500);
-                            // La altura final es la que definimos en el SVG
                             const endY = parseFloat(desktopSvg.style.height);
                             desktopBall.setAttribute("cy", endY);
                             progressPath.style.strokeDashoffset = 0;
