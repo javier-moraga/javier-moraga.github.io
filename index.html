@@ -70,9 +70,8 @@
 
         /* --- HERO SECTION --- */
         .hero { padding: 180px 0 100px; text-align: center; }
-        .hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 25px; color: #fff; }
-        .hero p { font-size: 1.1rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 30px; text-align: center; line-height: 1.8; }
-        
+        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; margin-bottom: 20px; background: -webkit-linear-gradient(0deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 1.1rem; color: var(--text-muted); max-width: 800px; margin: 0 auto 40px; text-align: center;}
         .hero-tags { margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 
@@ -184,7 +183,7 @@
             align-items: center; 
             justify-content: flex-start; 
             text-align: left;         
-            flex-direction: row;
+            flex-direction: row; 
         }
         
         .evo-desc li::before { 
@@ -198,7 +197,7 @@
         }
 
 
-        /* --- ABOUT ME SECTION --- */
+        /* --- ABOUT ME SECTION (CON LUZ MEJORADA) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
         /* Contenedor con fondo sólido para TAPAR la bola */
@@ -211,32 +210,34 @@
         /* LUZ DE EXPLOSIÓN - AJUSTADA */
         .about-section-wrapper::before {
             content: ''; position: absolute; 
+            /* Posición bajada para iluminar la tarjeta, no el vacío */
             top: -50px; 
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 450px; 
+            
+            /* Color ajustado para mezcla suave */
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.4) 0%, rgba(251, 191, 36, 0.3) 25%, rgba(251, 191, 36, 0.05) 60%, transparent 80%); 
+            
             filter: blur(40px); 
             opacity: 0; 
             transition: opacity 0.5s ease-in-out; 
-            pointer-events: none; 
+            pointer-events: none; /* Permite clicks a través de la luz */
+            
+            /* Z-Index mayor que la tarjeta para iluminarla por encima */
             z-index: 12; 
-            mix-blend-mode: screen; 
+            mix-blend-mode: screen; /* Efecto de luz brillante */
         }
         
         .about-section-wrapper.frame-active::before { opacity: 1; }
 
-        /* ABOUT GRID */
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         .profile-img-container { text-align: center; position: relative; }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
         .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
         
-        /* Grid de Info modificada para 1 sola caja */
-        .about-info-grid { 
-            display: block; /* Cambio a bloque para ocupar todo el ancho */
-            margin-top: 30px; 
-        }
+        /* Grid de Info ajustada a 1 sola columna */
+        .about-info-grid { display: grid; grid-template-columns: 1fr; margin-top: 30px; }
         .industries-box { background: rgba(255,255,255,0.03); padding: 25px; border-radius: 10px; margin: 0; border-left: 3px solid var(--accent-gold); }
         .industries-box h4 { color: var(--accent-gold); margin-bottom: 15px; font-size: 1.1rem; }
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
@@ -450,16 +451,16 @@
                 <span class="hero-tag">Aviation</span>
                 <span class="hero-tag">Telecom</span>
             </div>
-            <h1><strong>Senior Data Analyst / Analytics Engineer</strong><br>10+ Years Experience</h1>
+            <h1>Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span></h1>
             <p>
                 Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
-                <br><br>
-                <span class="text-accent" style="font-weight: 600;">Open to Relocation & Remote (Australia) — Visa Sponsorship Required</span>
+                <br>
+                <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Visa Sponsorship Required</span>
             </p>
             
-            <div style="margin-bottom: 40px; font-size: 0.9rem; color: #94a3b8; display: flex; flex-direction: column; gap: 5px; align-items: center;">
-                <span><i class="fa-regular fa-clock" style="margin-right: 8px; color: var(--accent-gold);"></i> Local Timezone: GMT-3 (Santiago, Chile) | Available for overlap</span>
-                <span><i class="fa-solid fa-plane-departure" style="margin-right: 8px; color: var(--accent-gold);"></i> Relocation Availability: ~2 Months (Tentative)</span>
+            <div style="margin-bottom: 40px; font-size: 0.95rem; color: #94a3b8; display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                 <span><i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 (Santiago, Chile) | Available for overlap</span>
+                 <span><i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:8px;"></i> Relocation Availability: ~2 Months (Tentative)</span>
             </div>
 
             <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px;">View Case Studies</a>
@@ -856,50 +857,81 @@
 
             let pathLength = 0;
 
-            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY ---
+            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY (NUEVA LÓGICA) ---
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // 1. BUSCAR EL PUNTO DE ANCLAJE (TARGET INVISIBLE)
-                const targetAnchor = document.getElementById('connector-target');
+                // Referencias a elementos
+                const svgContainer = document.querySelector('.desktop-svg-container');
+                const cards = document.querySelectorAll('.evo-card');
+                const aboutFrame = document.querySelector('#aboutFrame .content-frame'); // El contenedor objetivo
                 
-                if (!section || !targetAnchor || !desktopSvg) return;
+                if (!svgContainer || cards.length === 0 || !aboutFrame) return;
 
-                // Get positions relative to the viewport
-                const sectionRect = section.getBoundingClientRect();
-                const anchorRect = targetAnchor.getBoundingClientRect();
+                // 1. OBTENER COORDENADAS RELATIVAS AL CONTENEDOR SVG
+                // El SVG empieza en top:0 de .evolution-section.
+                const sectionRect = document.getElementById('evolution-section').getBoundingClientRect();
+                const svgTop = sectionRect.top;
+
+                // 2. CONFIGURAR EL PUNTO FINAL (El borde superior de la tarjeta About)
+                const aboutRect = aboutFrame.getBoundingClientRect();
+                // Queremos que la línea termine EXACTAMENTE en el borde superior del div siguiente
+                const endY = aboutRect.top - svgTop; 
+
+                // Ajustar altura del SVG
+                svgContainer.style.height = `${endY}px`;
+                svgContainer.setAttribute('viewBox', `0 0 1000 ${endY}`);
+
+                // 3. CONSTRUIR LOS PUNTOS DE LA RUTA (PATH)
+                // Coordenadas X fijas
+                const centerX = 500;
+                const leftX = 236;  // Ajustado para tocar el borde de las tarjetas izquierdas
+                const rightX = 764; // Ajustado para tocar el borde de las tarjetas derechas
                 
-                // Distancia exacta desde el top de Evolución hasta el anclaje
-                // Se resta el radio de la bola (8px) para que "descanse" sobre el borde
-                const endY = (anchorRect.top - sectionRect.top) - 8; 
+                // Iniciar Path en el centro arriba
+                let d = `M ${centerX} 0`;
                 
-                // 2. AJUSTAR EL SVG AL TAMAÑO EXACTO DEL RECORRIDO
-                desktopSvg.style.height = `${endY}px`;
-                desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
+                let currentX = centerX;
+                let currentY = 0;
 
-                // 3. DEFINIR PUNTOS DE LAS TARJETAS (ZIG ZAGS)
-                // Dividimos el espacio en 7 segmentos iguales para mantener la proporción
-                const segment = endY / 7;
+                // Recorrer cada tarjeta para encontrar su centro vertical exacto
+                cards.forEach((card, index) => {
+                    const cardRect = card.getBoundingClientRect();
+                    
+                    // Calcular el Y central de la tarjeta relativo al SVG
+                    const cardMiddleY = (cardRect.top - svgTop) + (cardRect.height / 2);
+                    
+                    // Determinar si vamos a la izquierda o derecha (impares izquierda, pares derecha)
+                    // Index 0 = Izquierda (Clase evo-left), Index 1 = Derecha (Clase evo-right), etc.
+                    const targetX = (index % 2 === 0) ? leftX : rightX;
+                    const targetY = cardMiddleY;
+
+                    // Crear una curva suave (Cubic Bezier) hacia el punto
+                    const cp1x = currentX;
+                    const cp1y = currentY + (targetY - currentY) * 0.5;
+                    
+                    const cp2x = targetX;
+                    const cp2y = currentY + (targetY - currentY) * 0.5;
+
+                    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
+
+                    // Actualizar coordenadas actuales para la siguiente iteración
+                    currentX = targetX;
+                    currentY = targetY;
+                });
+
+                // 4. CONECTAR EL ÚLTIMO PUNTO CON EL DESTINO FINAL (About Section)
+                const finalCp1x = currentX;
+                const finalCp1y = currentY + (endY - currentY) * 0.5;
                 
-                // Coordenadas fijas
-                const center = 500;
-                const left = 236;
-                const right = 764;
+                const finalCp2x = centerX;
+                const finalCp2y = currentY + (endY - currentY) * 0.5;
 
-                // 4. CONSTRUIR EL PATH "SIMÉTRICO" (SINTAXIS CORRECTA PARA SVG)
-                const newPath = `
-                    M ${center} 0 
-                    Q ${center} ${segment * 0.5} ${left} ${segment * 1} 
-                    T ${right} ${segment * 2} 
-                    T ${left} ${segment * 3} 
-                    T ${right} ${segment * 4} 
-                    T ${left} ${segment * 5} 
-                    T ${right} ${segment * 6} 
-                    T ${center} ${endY}
-                `;
+                d += ` C ${finalCp1x} ${finalCp1y}, ${finalCp2x} ${finalCp2y}, ${centerX} ${endY}`;
 
-                trackPath.setAttribute('d', newPath);
-                progressPath.setAttribute('d', newPath);
+                // 5. APLICAR AL SVG
+                trackPath.setAttribute('d', d);
+                progressPath.setAttribute('d', d);
                 
                 pathLength = progressPath.getTotalLength();
                 progressPath.style.strokeDasharray = pathLength;
@@ -919,6 +951,7 @@
                 const sectionTop = rect.top;
                 const sectionHeight = rect.height; 
                 
+                // Ajuste para que empiece a dibujar cuando la sección entra en pantalla
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
                 let scrollPercent = scrolledDistance / sectionHeight;
 
