@@ -160,31 +160,32 @@
         .logo-img { max-width: 220px; max-height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); opacity: 0.8; transition: all 0.4s ease; }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS (SWIPER 3D STYLES) --- */
+        /* --- STACK CARDS (SWIPER 3D) --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         
-        /* Contenedor Swiper Ajustado */
+        /* Contenedor Swiper */
         .swiper-container {
             width: 100%;
             padding-top: 50px;
-            padding-bottom: 60px;
+            padding-bottom: 60px; /* Espacio para la paginación */
             overflow: hidden;
             z-index: 1;
         }
 
+        /* Swiper Slide (El contenedor de la tarjeta) */
         .swiper-container.two .swiper-slide {
-            width: 300px; /* Ancho de la tarjeta en el carrusel */
+            width: 300px; /* Ancho fijo para mantener la forma */
             height: auto;
             position: relative;
         }
 
         .slider-image { width: 100%; height: 100%; }
 
-        /* Ajustes visuales de la Tarjeta dentro del Slide */
+        /* Estilo de Tarjeta (Mirror Card) */
         .mirror-card {
             position: relative; 
-            width: 100%; 
+            width: 100%; /* Ocupa el ancho del swiper-slide (300px) */
             min-height: 480px; 
             display: flex; flex-direction: column; padding: 30px;
             background: rgba(17, 25, 40, 0.6); 
@@ -209,7 +210,8 @@
             border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
             background: linear-gradient(90deg, #fff 0%, #cbd5e1 100%); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            min-height: 50px; display: flex; align-items: center;
+            min-height: 50px; 
+            display: flex; align-items: center;
         }
         
         .skill-group { margin-bottom: 20px; }
@@ -219,10 +221,11 @@
         .skill-item i { width: 20px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Estilos de los puntos de paginación (Swiper) */
+        /* Estilos de la paginación Swiper */
+        .swiper-pagination { bottom: 0px !important; }
         .swiper-pagination-bullet {
             background: transparent;
-            border: 1px solid var(--accent); /* Azul */
+            border: 1px solid var(--accent);
             border-radius: 10px;
             display: inline-block;
             height: 10px;
@@ -232,7 +235,6 @@
             margin: 0 5px;
             cursor: pointer;
         }
-
         .swiper-pagination-bullet-active {
             background: linear-gradient(to right, var(--accent) 0%, var(--accent-gold) 100%);
             border: none;
@@ -784,7 +786,6 @@
 
             let pathLength = 0;
 
-            // --- RECALCULATE PATH DYNAMICALLY (Original Logic) ---
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
@@ -943,9 +944,10 @@
                 clickable: true,
             },
             effect: 'coverflow',
-            loop: true,           
+            loop: false,          // DESACTIVADO PARA EVITAR CLONACIONES
             centeredSlides: true, 
             slidesPerView: 'auto',
+            initialSlide: 2,      // COMENZAR EN EL CENTRO (Tarjeta 3 de 5)
             coverflowEffect: {
                 rotate: 0,        
                 stretch: 100,     
