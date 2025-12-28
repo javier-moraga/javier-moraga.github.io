@@ -26,6 +26,12 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
+        html { scroll-behavior: smooth; }
+
+        /* CORRECCIÓN DE SCROLL: Esto hace que al dar click en el menú, no quede tapado por el header */
+        section, #about, #skills, #projects, #contact {
+            scroll-margin-top: 120px;
+        }
         
         /* MARCO ESTRUCTURAL */
         .content-frame {
@@ -184,7 +190,7 @@
             align-items: center; 
             justify-content: flex-start; 
             text-align: left;         
-            flex-direction: row;
+            flex-direction: row; 
         }
         
         .evo-desc li::before { 
@@ -198,7 +204,7 @@
         }
 
 
-        /* --- ABOUT ME SECTION --- */
+        /* --- ABOUT ME SECTION (CON LUZ MEJORADA) --- */
         .about-section-wrapper { padding: 50px 0; position: relative; overflow: visible; z-index: 5; }
         
         /* Contenedor con fondo sólido para TAPAR la bola */
@@ -228,11 +234,11 @@
         /* ABOUT GRID */
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
         
-        /* MODIFICACIÓN: FOTO DE PERFIL CON Z-INDEX SUPERIOR PARA EVITAR EL BRILLO */
+        /* FOTO DE PERFIL CON Z-INDEX SUPERIOR PARA EVITAR EL BRILLO */
         .profile-img-container { 
             text-align: center; 
             position: relative;
-            z-index: 20; /* Superior a la luz (12) */
+            z-index: 20; 
         }
         
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
@@ -254,7 +260,6 @@
 
         /* --- CLIENT LOGOS SECTION --- */
         .logo-section-container {
-            /* MODIFICACIÓN: PADDING REDUCIDO PARA ACORTAR DISTANCIA */
             position: relative; padding: 20px 0; 
             background-color: transparent; 
             z-index: 10;
@@ -349,7 +354,6 @@
         .dot.active { background-color: var(--accent-gold); transform: scale(1.2); }
 
         /* --- PROJECTS SECTION --- */
-        /* MODIFICACIÓN: PADDING INFERIOR REDUCIDO */
         .projects-section { padding: 50px 0 50px; position: relative; z-index: 10; margin-top: 0; }
         
         .project-card {
@@ -372,7 +376,6 @@
         .project-card:hover .project-visual img { transform: scale(1.02); }
 
         /* --- CONTACT & FOOTER --- */
-        /* MODIFICACIÓN: PADDING AJUSTADO */
         .contact-section { padding: 50px 0 80px; text-align: center; position: relative; z-index: 10; }
         .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         .c-icon { font-size: 2rem; color: var(--text-muted); transition: 0.3s; }
@@ -468,8 +471,7 @@
                  <span><i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:8px;"></i> Relocation Availability: ~2 Months (Tentative)</span>
             </div>
 
-            <a href="#projects" class="btn-fill" style="padding: 15px 30px; border-radius: 50px;">View Case Studies</a>
-        </div>
+            </div>
     </section> 
 
     <div id="evolution-section" class="evolution-section">
@@ -498,61 +500,20 @@
         <div class="evolution-container">
             
             <div class="evo-card evo-left">
-                <span class="evo-industry">Healthcare</span>
-                <h3 class="evo-header">Data Engineer</h3>
-                <span class="evo-company">Clínica Alemana</span>
-                <span class="evo-date">2025 – Present</span>
-                <div class="evo-desc">
-                    <ul>
-                        <li>SAS → BigQuery Migration</li>
-                        <li>Clinical Data Pipelines</li>
-                        <li>Data Quality Automation</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="evo-card evo-right">
-                <span class="evo-industry">Aviation</span>
-                <h3 class="evo-header">Data Engineer</h3>
-                <span class="evo-company">LATAM Airlines</span>
-                <span class="evo-date">2023 – 2025</span>
-                <div class="evo-desc">
-                    <ul>
-                        <li>Jira → BigQuery Ingestion</li>
-                        <li>Near Real-time Reporting</li>
-                        <li>CI/CD Delivery</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="evo-card evo-left">
-                <span class="evo-industry">Consulting</span>
-                <h3 class="evo-header">Data Analyst</h3>
-                <span class="evo-company">A3D</span>
-                <span class="evo-date">2023</span>
-                <div class="evo-desc">
-                    <ul>
-                        <li>Enterprise Data Documentation</li>
-                        <li>Source Cataloging</li>
-                        <li>Knowledge Standardization</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="evo-card evo-right">
                 <span class="evo-industry">Telecom</span>
-                <h3 class="evo-header">Senior Collections Analyst</h3>
-                <span class="evo-company">ENTEL</span>
-                <span class="evo-date">2022 – 2023</span>
+                <h3 class="evo-header">Operations Control Engineer</h3>
+                <span class="evo-company">Claro Chile</span>
+                <span class="evo-date">2015 – 2018</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>Behavior-based Segmentation</li>
-                        <li>Revenue Recovery Analysis</li>
+                        <li>KPI Automation</li>
+                        <li>ETL Controls</li>
+                        <li>Process Monitoring</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="evo-card evo-left">
+            <div class="evo-card evo-right">
                 <span class="evo-industry">Telecom</span>
                 <h3 class="evo-header">Senior Data Analyst</h3>
                 <span class="evo-company">WOM Chile</span>
@@ -566,16 +527,57 @@
                 </div>
             </div>
 
-            <div class="evo-card evo-right">
+            <div class="evo-card evo-left">
                 <span class="evo-industry">Telecom</span>
-                <h3 class="evo-header">Operations Control Engineer</h3>
-                <span class="evo-company">Claro Chile</span>
-                <span class="evo-date">2015 – 2018</span>
+                <h3 class="evo-header">Senior Collections Analyst</h3>
+                <span class="evo-company">ENTEL</span>
+                <span class="evo-date">2022 – 2023</span>
                 <div class="evo-desc">
                     <ul>
-                        <li>KPI Automation</li>
-                        <li>ETL Controls</li>
-                        <li>Process Monitoring</li>
+                        <li>Behavior-based Segmentation</li>
+                        <li>Revenue Recovery Analysis</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Consulting</span>
+                <h3 class="evo-header">Data Analyst</h3>
+                <span class="evo-company">A3D</span>
+                <span class="evo-date">2023</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Enterprise Data Documentation</li>
+                        <li>Source Cataloging</li>
+                        <li>Knowledge Standardization</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-left">
+                <span class="evo-industry">Aviation</span>
+                <h3 class="evo-header">Data Engineer</h3>
+                <span class="evo-company">LATAM Airlines</span>
+                <span class="evo-date">2023 – 2025</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Jira → BigQuery Ingestion</li>
+                        <li>Near Real-time Reporting</li>
+                        <li>CI/CD Delivery</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Healthcare</span>
+                <h3 class="evo-header">Data Engineer</h3>
+                <span class="evo-company">Clínica Alemana</span>
+                <span class="evo-date">2025 – Present</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>SAS → BigQuery Migration</li>
+                        <li>Clinical Data Pipelines</li>
+                        <li>Data Quality Automation</li>
                     </ul>
                 </div>
             </div>
