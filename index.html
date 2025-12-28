@@ -160,38 +160,35 @@
         .logo-img { max-width: 220px; max-height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); opacity: 0.8; transition: all 0.4s ease; }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS (SWIPER ADAPTATION) --- */
+        /* --- STACK CARDS (SWIPER 3D STYLES) --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         
-        /* Swiper Container Styles */
+        /* Contenedor Swiper Ajustado */
         .swiper-container {
             width: 100%;
             padding-top: 50px;
-            padding-bottom: 60px; /* Espacio para la paginación */
+            padding-bottom: 60px;
             overflow: hidden;
             z-index: 1;
         }
 
-        /* Swiper Slide (El contenedor de la tarjeta) */
         .swiper-container.two .swiper-slide {
-            width: 300px; /* Ancho fijo para el efecto 3D correcto */
+            width: 300px; /* Ancho de la tarjeta en el carrusel */
             height: auto;
             position: relative;
         }
 
-        .slider-image {
-            width: 100%;
-            height: 100%;
-        }
+        .slider-image { width: 100%; height: 100%; }
 
-        /* La Tarjeta (Mirror Card) ajustada para estar dentro del slide */
+        /* Ajustes visuales de la Tarjeta dentro del Slide */
         .mirror-card {
             position: relative; 
-            width: 100%; /* Ocupa todo el ancho del swiper-slide (300px) */
+            width: 100%; 
             min-height: 480px; 
             display: flex; flex-direction: column; padding: 30px;
-            background: rgba(17, 25, 40, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            background: rgba(17, 25, 40, 0.6); 
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.125); border-radius: 16px; overflow: hidden; transition: 0.3s;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
@@ -212,8 +209,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
             background: linear-gradient(90deg, #fff 0%, #cbd5e1 100%); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            min-height: 50px; 
-            display: flex; align-items: center;
+            min-height: 50px; display: flex; align-items: center;
         }
         
         .skill-group { margin-bottom: 20px; }
@@ -223,14 +219,10 @@
         .skill-item i { width: 20px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* --- SWIPER PAGINATION CUSTOMIZATION --- */
-        .swiper-pagination {
-            bottom: 0px !important; /* Ajuste de posición */
-        }
-        
+        /* Estilos de los puntos de paginación (Swiper) */
         .swiper-pagination-bullet {
             background: transparent;
-            border: 1px solid var(--accent); /* Borde Azul (Theme) */
+            border: 1px solid var(--accent); /* Azul */
             border-radius: 10px;
             display: inline-block;
             height: 10px;
@@ -242,11 +234,10 @@
         }
 
         .swiper-pagination-bullet-active {
-            /* Gradiente usando tus colores (Azul -> Dorado) en lugar de Rosado -> Naranja */
             background: linear-gradient(to right, var(--accent) 0%, var(--accent-gold) 100%);
             border: none;
             height: 12px;
-            width: 12px; /* Se convierte en circulo al activarse, como el modelo */
+            width: 12px;
             opacity: 1;
             vertical-align: middle;
         }
@@ -280,7 +271,7 @@
         }
         .icon-pop { animation: iconPop 0.5s ease forwards; }
 
-        /* --- MEDIA QUERIES --- */
+        /* --- MEDIA QUERIES (MOBILE OPTIMIZATION) --- */
         @media (min-width: 1200px) {
             .skills-section .container { max-width: 100% !important; padding: 0 50px; }
         }
@@ -290,8 +281,6 @@
             .logo { font-size: 1.2rem; }
             header { padding: 15px 0; }
             .mobile-nav-container { display: block; }
-            
-            .swiper-container.two .swiper-slide { width: 280px; } /* Ajuste móvil */
 
             .hero { padding: 120px 0 40px; }
             .hero h1 { font-size: 2.2rem; }
@@ -308,8 +297,12 @@
             .container { padding: 0 20px; }
             .content-frame::before { top: 0px; height: 350px; width: 120%; left: -10%; transform: none; }
 
+            /* Ajuste Swiper Móvil */
+            .swiper-container.two .swiper-slide { width: 280px; }
+
             .about-grid, .project-card { grid-template-columns: 1fr; }
             .about-info-grid { display: grid; gap: 15px; }
+            .project-img { height: 200px; }
             
             .project-card { grid-template-columns: 1fr; min-height: auto; margin-bottom: 40px; }
             .project-visual { height: 220px; }
@@ -394,26 +387,108 @@
         </div>
 
         <div class="evolution-container">
-            <div class="evo-card evo-left"><span class="evo-industry">Telecom</span><h3 class="evo-header">Operations Control Engineer</h3><span class="evo-company">Claro Chile</span><span class="evo-date">2015 – 2018</span><div class="evo-desc"><ul><li>KPI Automation</li><li>ETL Controls</li><li>Process Monitoring</li></ul></div></div>
-            <div class="evo-card evo-right"><span class="evo-industry">Telecom</span><h3 class="evo-header">Senior Data Analyst</h3><span class="evo-company">WOM Chile</span><span class="evo-date">2018 – 2022</span><div class="evo-desc"><ul><li>Churn Analysis</li><li>Customer Segmentation</li><li>Netezza → BigQuery Migration</li></ul></div></div>
-            <div class="evo-card evo-left"><span class="evo-industry">Telecom</span><h3 class="evo-header">Senior Collections Analyst</h3><span class="evo-company">ENTEL</span><span class="evo-date">2022 – 2023</span><div class="evo-desc"><ul><li>Behavior-based Segmentation</li><li>Revenue Recovery Analysis</li></ul></div></div>
-            <div class="evo-card evo-right"><span class="evo-industry">Consulting</span><h3 class="evo-header">Data Analyst</h3><span class="evo-company">A3D</span><span class="evo-date">2023</span><div class="evo-desc"><ul><li>Enterprise Data Documentation</li><li>Source Cataloging</li><li>Knowledge Standardization</li></ul></div></div>
-            <div class="evo-card evo-left"><span class="evo-industry">Aviation</span><h3 class="evo-header">Data Analyst (Data Engineering scope)</h3><span class="evo-company">LATAM Airlines</span><span class="evo-date">2023 – 2025</span><div class="evo-desc"><ul><li>Jira → BigQuery Ingestion</li><li>Near Real-time Reporting</li><li>CI/CD Delivery</li></ul></div></div>
-            <div class="evo-card evo-right"><span class="evo-industry">Healthcare</span><h3 class="evo-header">Data Analyst (Data Engineering scope)</h3><span class="evo-company">Clínica Alemana</span><span class="evo-date">2025 – Present</span><div class="evo-desc"><ul><li>SAS → BigQuery Migration</li><li>Clinical Data Pipelines</li><li>Data Quality Automation</li></ul></div></div>
+            
+            <div class="evo-card evo-left">
+                <span class="evo-industry">Telecom</span>
+                <h3 class="evo-header">Operations Control Engineer</h3>
+                <span class="evo-company">Claro Chile</span>
+                <span class="evo-date">2015 – 2018</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>KPI Automation</li>
+                        <li>ETL Controls</li>
+                        <li>Process Monitoring</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Telecom</span>
+                <h3 class="evo-header">Senior Data Analyst</h3>
+                <span class="evo-company">WOM Chile</span>
+                <span class="evo-date">2018 – 2022</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Churn Analysis</li>
+                        <li>Customer Segmentation</li>
+                        <li>Netezza → BigQuery Migration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-left">
+                <span class="evo-industry">Telecom</span>
+                <h3 class="evo-header">Senior Collections Analyst</h3>
+                <span class="evo-company">ENTEL</span>
+                <span class="evo-date">2022 – 2023</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Behavior-based Segmentation</li>
+                        <li>Revenue Recovery Analysis</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Consulting</span>
+                <h3 class="evo-header">Data Analyst</h3>
+                <span class="evo-company">A3D</span>
+                <span class="evo-date">2023</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Enterprise Data Documentation</li>
+                        <li>Source Cataloging</li>
+                        <li>Knowledge Standardization</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-left">
+                <span class="evo-industry">Aviation</span>
+                <h3 class="evo-header">Data Analyst (Data Engineering scope)</h3>
+                <span class="evo-company">LATAM Airlines</span>
+                <span class="evo-date">2023 – 2025</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>Jira → BigQuery Ingestion</li>
+                        <li>Near Real-time Reporting</li>
+                        <li>CI/CD Delivery</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="evo-card evo-right">
+                <span class="evo-industry">Healthcare</span>
+                <h3 class="evo-header">Data Analyst (Data Engineering scope)</h3>
+                <span class="evo-company">Clínica Alemana</span>
+                <span class="evo-date">2025 – Present</span>
+                <div class="evo-desc">
+                    <ul>
+                        <li>SAS → BigQuery Migration</li>
+                        <li>Clinical Data Pipelines</li>
+                        <li>Data Quality Automation</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <div id="aboutFrame" class="about-section-wrapper">
         <div class="content-frame content-frame-relative"> <div id="connector-target"></div>
+
             <section id="about" class="about-grid">
                 <div class="profile-img-container">
                     <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
                 </div>
+
                 <div class="about-text">
                     <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
                     <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
                     <p>I specialize in translating complex data into clear, actionable insights through well-designed data models, high-impact dashboards, and scalable cloud data solutions. I have a strong background in GCP, BigQuery, and SQL, with proven success modernizing legacy architectures.</p>
+                    
                     <p><strong>Why Australia?</strong> This is a structured life project. With family already settled in the country, I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.</p>
+
                     <div class="about-info-grid">
                         <div class="industries-box">
                             <h4><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
@@ -425,24 +500,40 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                    </div>
             </section>
         </div>
     </div>
 
     <section class="logo-section-container">
         <div class="content-frame" style="padding: 40px; border-color: rgba(255,255,255,0.02); background: transparent; box-shadow: none;">
-            <div class="logo-section-header"><h5>Trusted By / Previous Experience</h5></div>
+            <div class="logo-section-header">
+                <h5>Trusted By / Previous Experience</h5>
+            </div>
+            
             <div class="logo-rows-container">
                 <div class="logo-row">
-                    <a href="#" class="logo-item"><img src="logos/claro_chile.png" alt="Claro" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100?text=Claro'"></a>
-                    <a href="#" class="logo-item"><img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100?text=WOM'"></a>
-                    <a href="#" class="logo-item"><img src="logos/entel_chile.png" alt="Entel" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100?text=Entel'"></a>
+                    <a href="https://www.clarochile.cl/" target="_blank" class="logo-item" title="Claro Chile">
+                        <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
+                    </a>
+                    <a href="https://www.wom.cl/" target="_blank" class="logo-item" title="WOM">
+                        <img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
+                    </a>
+                    <a href="https://www.entel.cl/" target="_blank" class="logo-item" title="Entel">
+                        <img src="logos/entel_chile.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
+                    </a>
                 </div>
+
                 <div class="logo-row">
-                    <a href="#" class="logo-item"><img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100?text=A3D'"></a>
-                    <a href="#" class="logo-item"><img src="logos/latam_airlines_chile.png" alt="LATAM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100?text=LATAM'"></a>
-                    <a href="#" class="logo-item"><img src="logos/clinica_alemana_chile.png" alt="Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100?text=Alemana'"></a>
+                    <a href="https://www.a3d.cl/" target="_blank" class="logo-item" title="A3D">
+                        <img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
+                    </a>
+                    <a href="https://www.latamairlines.com/" target="_blank" class="logo-item" title="LATAM Airlines">
+                        <img src="logos/latam_airlines_chile.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
+                    </a>
+                    <a href="https://www.clinicaalemana.cl/" target="_blank" class="logo-item" title="Clínica Alemana">
+                        <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
+                    </a>
                 </div>
             </div>
         </div>
@@ -459,7 +550,7 @@
                         <div class="slider-image">
                             <div class="mirror-card blue">
                                 <div class="mirror-content">
-                                    <h2>Cloud & Engineering</h2>
+                                    <h2>Cloud & Eng</h2>
                                     <div class="skill-group">
                                         <div class="skill-group-title">Core Skills</div>
                                         <ul class="skill-list">
@@ -554,7 +645,7 @@
                         <div class="slider-image">
                             <div class="mirror-card cyan">
                                 <div class="mirror-content">
-                                    <h2>Data Management</h2>
+                                    <h2>Data Mgmt & Gov</h2>
                                     <div class="skill-group">
                                         <div class="skill-group-title">Governance Scope</div>
                                         <ul class="skill-list">
@@ -579,17 +670,70 @@
     <section id="projects" class="projects-section">
         <div class="content-frame">
             <h2 class="section-title">Featured Projects & <span class="highlight">Impact</span></h2>
+            
             <div class="sticky-wrapper">
+                
                 <div class="project-card">
                     <div class="project-content">
-                        <div class="project-tags"><span class="p-tag">GCP</span><span class="p-tag">Python</span><span class="p-tag">Optimization</span></div>
+                        <div class="project-tags">
+                            <span class="p-tag">GCP</span>
+                            <span class="p-tag">Python</span>
+                            <span class="p-tag">Optimization</span>
+                        </div>
                         <h3 class="project-title">Jira Data Pipeline Optimization</h3>
-                        <p class="project-desc"><strong>Problem:</strong> Critical operational reporting was delayed...<br><strong>Solution:</strong> Engineered a high-performance pipeline...<br><strong>Impact:</strong> Reduced data ingestion time by <span style="color:white; font-weight:bold;">97%</span>.</p>
+                        <p class="project-desc">
+                            <strong>Problem:</strong> Critical operational reporting was delayed due to a slow data ingestion process.<br>
+                            <strong>Solution:</strong> Engineered a high-performance pipeline connecting Jira (PostgreSQL) to BigQuery via API.<br>
+                            <strong>Impact:</strong> Reduced data ingestion time by <span style="color:white; font-weight:bold;">97% (from 2 hours to 3 minutes)</span>, enabling near real-time decision making for IT Operations.
+                        </p>
                         <a href="#" class="btn-project">Explore Use Case</a>
                     </div>
-                    <div class="project-visual"><img src="https://via.placeholder.com/600x400/16203c/ffffff?text=Pipeline+Architecture" alt="Cloud Project"></div>
+                    <div class="project-visual">
+                        <img src="https://via.placeholder.com/600x400/16203c/ffffff?text=Pipeline+Architecture" alt="Cloud Project">
+                    </div>
                 </div>
+
+                 <div class="project-card">
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="p-tag">SQL</span>
+                            <span class="p-tag">Revenue Assurance</span>
+                            <span class="p-tag">Analytics</span>
+                        </div>
+                        <h3 class="project-title">Collections Strategy Optimization</h3>
+                        <p class="project-desc">
+                            <strong>Problem:</strong> Low notification coverage for debt recovery in a base of 5 million subscribers.<br>
+                            <strong>Solution:</strong> Implemented data-driven segmentation strategies based on customer behavior patterns.<br>
+                            <strong>Impact:</strong> Increased notification coverage from <span style="color:white; font-weight:bold;">60% to 99%</span>, directly optimizing revenue recovery strategies.
+                        </p>
+                        <a href="#" class="btn-project">Explore Use Case</a>
+                    </div>
+                    <div class="project-visual">
+                        <img src="https://via.placeholder.com/600x400/1e293b/ffffff?text=Data+Analytics" alt="Analytics Dashboard">
+                    </div>
                 </div>
+
+                <div class="project-card">
+                    <div class="project-content">
+                        <div class="project-tags">
+                            <span class="p-tag">Migration</span>
+                            <span class="p-tag">BigQuery</span>
+                            <span class="p-tag">Architecture</span>
+                        </div>
+                        <h3 class="project-title">Enterprise Data Migration & Modernization</h3>
+                        <p class="project-desc">
+                            <strong>Challenge:</strong> Legacy on-premise systems (Netezza/SAS) were creating bottlenecks and data silos.<br>
+                            <strong>Solution:</strong> Led the migration initiative to Google BigQuery, validating data integrity for <span style="color:white; font-weight:bold;">7 million users</span>.<br>
+                            <strong>Impact:</strong> Modernized the data architecture, ensured zero data loss, and significantly reduced processing times for critical business KPIs.
+                        </p>
+                        <a href="#" class="btn-project">Explore Use Case</a>
+                    </div>
+                    <div class="project-visual">
+                        <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
+                    </div>
+                </div>
+
+            </div>
         </div>
     </section>
 
@@ -598,71 +742,195 @@
             <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
             <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
             <div style="margin-top: 50px; margin-bottom: 30px;">
-                <img src="rocky.jpg" alt="Rocky" style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
+                <img src="rocky.jpg" alt="Rocky" 
+                     style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" 
+                     onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
                 <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">(Rocky is also ready for the flight! 🐾)</p>
             </div>
+            
             <div class="contact-icons">
                 <a href="mailto:javierignacio.moraga@gmail.com" class="c-icon"><i class="fa-solid fa-envelope"></i></a>
                 <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" class="c-icon"><i class="fa-brands fa-linkedin"></i></a>
             </div>
-            <div style="margin-top: 30px;"><a href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download class="btn-fill">Download CV</a></div>
+
+            <div style="margin-top: 30px;">
+                <a href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
+            </div>
+
             <p style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
         </div>
     </section>
 
-    <footer><div class="container"><p>© 2025 Javier Moraga. Built for the Global Market.</p></div></footer>
+    <footer>
+        <div class="container">
+            <p>© 2025 Javier Moraga. Built for the Global Market.</p>
+        </div>
+    </footer>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // (Tu código JS existente para el Path SVG de 'Evolution' y Scroll Animations se mantiene aquí)
-            // ... [He simplificado esta parte para no repetir todo el bloque gigante, ya lo tienes en tu archivo original] ...
-            // ... [Asegúrate de copiar tu lógica de 'recalculatePath' y 'updateScroll' aquí si la necesitas, o usar la de abajo completa] ...
-
-            // --- Lógica SVG (Resumida para integración) ---
             const section = document.getElementById('evolution-section');
             const aboutWrapper = document.querySelector('.about-section-wrapper');
             const evoCards = document.querySelectorAll('.evo-card');
+            
             const desktopSvg = document.querySelector('.desktop-svg-container');
             const trackPath = document.getElementById('trackPath');
             const progressPath = document.getElementById('progressPath');
             const desktopBall = document.getElementById('desktopBall');
             
+            const mobileSystem = document.querySelector('.mobile-system');
+            const mobileProgress = document.getElementById('mobileProgress');
+            const mobileBall = document.getElementById('mobileBall');
+
             let pathLength = 0;
+
+            // --- RECALCULATE PATH DYNAMICALLY (Original Logic) ---
             function recalculatePath() {
-                if (window.innerWidth <= 1199 || !desktopSvg) return;
-                const aboutFrame = document.querySelector('#aboutFrame .content-frame');
-                if(!aboutFrame) return;
-                const sectionRect = document.getElementById('evolution-section').getBoundingClientRect();
-                const endY = aboutFrame.getBoundingClientRect().top - sectionRect.top; 
-                desktopSvg.style.height = `${endY}px`;
-                desktopSvg.setAttribute('viewBox', `0 0 1000 ${endY}`);
+                if (window.innerWidth <= 1199) return; 
+
+                const svgContainer = document.querySelector('.desktop-svg-container');
+                const cards = document.querySelectorAll('.evo-card');
+                const aboutFrame = document.querySelector('#aboutFrame .content-frame'); 
                 
-                // Lógica simple de trazado (puedes pegar tu versión detallada si prefieres)
-                trackPath.setAttribute('d', `M 500 0 L 500 ${endY}`); 
-                progressPath.setAttribute('d', `M 500 0 L 500 ${endY}`);
+                if (!svgContainer || cards.length === 0 || !aboutFrame) return;
+
+                const sectionRect = document.getElementById('evolution-section').getBoundingClientRect();
+                const svgTop = sectionRect.top;
+
+                const aboutRect = aboutFrame.getBoundingClientRect();
+                const endY = aboutRect.top - svgTop; 
+
+                svgContainer.style.height = `${endY}px`;
+                svgContainer.setAttribute('viewBox', `0 0 1000 ${endY}`);
+
+                const centerX = 500;
+                const leftX = 236;  
+                const rightX = 764; 
+                
+                let d = `M ${centerX} 0`;
+                let currentX = centerX;
+                let currentY = 0;
+
+                cards.forEach((card, index) => {
+                    const cardRect = card.getBoundingClientRect();
+                    const cardMiddleY = (cardRect.top - svgTop) + (cardRect.height / 2);
+                    const targetX = (index % 2 === 0) ? leftX : rightX;
+                    const targetY = cardMiddleY;
+
+                    const cp1x = currentX;
+                    const cp1y = currentY + (targetY - currentY) * 0.5;
+                    const cp2x = targetX;
+                    const cp2y = currentY + (targetY - currentY) * 0.5;
+
+                    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
+
+                    currentX = targetX;
+                    currentY = targetY;
+                });
+
+                const finalCp1x = currentX;
+                const finalCp1y = currentY + (endY - currentY) * 0.5;
+                const finalCp2x = centerX;
+                const finalCp2y = currentY + (endY - currentY) * 0.5;
+
+                d += ` C ${finalCp1x} ${finalCp1y}, ${finalCp2x} ${finalCp2y}, ${centerX} ${endY}`;
+
+                trackPath.setAttribute('d', d);
+                progressPath.setAttribute('d', d);
+                
                 pathLength = progressPath.getTotalLength();
                 progressPath.style.strokeDasharray = pathLength;
                 progressPath.style.strokeDashoffset = pathLength;
             }
-            setTimeout(recalculatePath, 100);
+
+            setTimeout(recalculatePath, 100); 
 
             function updateScroll() {
-                if(!section) return;
+                if(!section) return; 
+
                 const rect = section.getBoundingClientRect();
-                const scrolledDistance = (window.innerHeight / 2) - rect.top;
-                let scrollPercent = Math.max(0, Math.min(1, scrolledDistance / rect.height));
+                const windowHeight = window.innerHeight;
+
+                const sectionTop = rect.top;
+                const sectionHeight = rect.height; 
                 
-                if(progressPath && pathLength > 0) {
-                     const drawLength = pathLength * scrollPercent;
-                     progressPath.style.strokeDashoffset = Math.max(0, pathLength - drawLength);
-                     // Ball logic...
+                const scrolledDistance = (windowHeight / 2) - sectionTop;
+                let scrollPercent = scrolledDistance / sectionHeight;
+
+                scrollPercent = Math.max(0, Math.min(1, scrollPercent));
+
+                if (window.innerWidth <= 1199) {
+                    if(mobileProgress && mobileBall) {
+                        const percent = scrollPercent * 100;
+                        mobileProgress.style.height = percent + '%';
+                        mobileBall.style.top = percent + '%';
+                    }
+                } else {
+                    if(progressPath && desktopBall && pathLength > 0) {
+                        if (scrollPercent >= 0.99) {
+                            desktopBall.setAttribute("cx", 500);
+                            const endY = parseFloat(desktopSvg.style.height);
+                            desktopBall.setAttribute("cy", endY);
+                            progressPath.style.strokeDashoffset = 0;
+                        } else {
+                            const drawLength = pathLength * scrollPercent;
+                            const newOffset = Math.max(0, pathLength - drawLength);
+                            progressPath.style.strokeDashoffset = newOffset;
+                            
+                            const safeLength = Math.min(drawLength, pathLength - 0.1);
+                            if (safeLength >= 0) {
+                                const point = progressPath.getPointAtLength(safeLength);
+                                desktopBall.setAttribute("cx", point.x);
+                                desktopBall.setAttribute("cy", point.y);
+                            }
+                        }
+                    }
                 }
+
                 evoCards.forEach(card => {
-                    if (card.getBoundingClientRect().top < window.innerHeight * 0.85) card.classList.add('active');
+                    const cardTop = card.getBoundingClientRect().top;
+                    if (cardTop < windowHeight * 0.85) {
+                        card.classList.add('active');
+                    } 
                 });
+
+                if (scrollPercent >= 0.99) {
+                    if(aboutWrapper) aboutWrapper.classList.add('frame-active');
+                } else {
+                    if(aboutWrapper) aboutWrapper.classList.remove('frame-active');
+                }
             }
+
             window.addEventListener('scroll', updateScroll);
-            window.addEventListener('resize', () => { recalculatePath(); updateScroll(); });
+            window.addEventListener('resize', () => {
+                recalculatePath();
+                updateScroll();
+            });
+            
+            const logoRows = document.querySelectorAll('.logo-row');
+            const rowObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('row-visible');
+                    } 
+                });
+            }, { threshold: 0.2 });
+            logoRows.forEach(row => rowObserver.observe(row));
+
+            let iconsAnimated = false; 
+            window.addEventListener('scroll', () => {
+                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+                    if (!iconsAnimated) {
+                        iconsAnimated = true;
+                        const icons = document.querySelectorAll('.c-icon');
+                        icons.forEach((icon, index) => {
+                            setTimeout(() => {
+                                icon.classList.add('icon-pop');
+                            }, index * 200);
+                        });
+                    }
+                }
+            });
         });
     </script>
 
@@ -674,16 +942,16 @@
                 el: '.swiper-pagination',
                 clickable: true,
             },
-            effect: 'coverflow',  // El efecto 3D clave
-            loop: true,           // Bucle infinito
-            centeredSlides: true, // Tarjeta activa siempre al centro
-            slidesPerView: 'auto',// Ancho automático basado en CSS (300px)
+            effect: 'coverflow',
+            loop: true,           
+            centeredSlides: true, 
+            slidesPerView: 'auto',
             coverflowEffect: {
-                rotate: 0,        // Sin rotación excesiva
-                stretch: 100,     // Separación entre tarjetas
-                depth: 150,       // Profundidad 3D
+                rotate: 0,        
+                stretch: 100,     
+                depth: 150,       
                 modifier: 1.5,
-                slideShadows: false, // Sin sombras negras, para mantener tu estilo limpio
+                slideShadows: false, 
             }
         });
     </script>
