@@ -158,7 +158,7 @@
         .logo-img { max-width: 220px; max-height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); opacity: 0.8; transition: all 0.4s ease; }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS (FIXED & SNAP) --- */
+        /* --- STACK CARDS (INFINITE & SNAP) --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
 
@@ -176,15 +176,17 @@
         .stack-container { 
             display: flex; 
             gap: 30px; 
-            padding: 40px 10px; /* Padding reducido para aprovechar espacio */
+            padding: 40px 10px; 
             width: 100%; 
             
-            /* Lógica Carrusel + SNAP (Imán) */
+            /* Lógica Carrusel */
             flex-wrap: nowrap;       
             overflow-x: auto;        
-            scroll-behavior: smooth; 
             
-            /* Visual Fix: Centra tarjetas al soltar scroll */
+            /* IMPORTANTE: Quitamos smooth behavior del CSS para poder hacer el loop infinito con JS */
+            /* scroll-behavior: smooth;  <-- ELIMINADO */
+            
+            /* Snap (Imán) */
             scroll-snap-type: x mandatory; 
             justify-content: flex-start; 
             
@@ -200,7 +202,7 @@
             position: relative; 
             min-width: 260px;  
             width: 260px;
-            flex-shrink: 0; /* Evita que se aplasten */
+            flex-shrink: 0; 
             min-height: 480px; 
             display: flex; flex-direction: column; padding: 30px;
             background: rgba(17, 25, 40, 0.6); 
@@ -209,7 +211,7 @@
             border-radius: 16px; overflow: hidden; transition: 0.3s;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             
-            /* Alineación del SNAP: Centra la tarjeta */
+            /* Alineación del SNAP */
             scroll-snap-align: center; 
         }
 
@@ -829,51 +831,41 @@
             const mobileProgress = document.getElementById('mobileProgress');
             const mobileBall = document.getElementById('mobileBall');
 
-            // --- LÓGICA DE CARRUSEL CON LOOP INFINITO ---
+            // --- LÓGICA DE CARRUSEL CON LOOP INFINITO (DUPLICACIÓN) ---
             const container = document.getElementById('stackContainer');
             const btnLeft = document.getElementById('slideLeft');
             const btnRight = document.getElementById('slideRight');
             const dots = document.querySelectorAll('.dot');
 
             if (container && btnLeft && btnRight) {
+                // 1. Clonar elementos para crear el efecto infinito
+                const originalCards = Array.from(container.children);
+                // Clonamos y añadimos al final
+                originalCards.forEach(card => {
+                    const clone = card.cloneNode(true);
+                    // Importante: Marcar como clon si necesitas diferenciarlos, pero visualmente son iguales
+                    container.appendChild(clone);
+                });
+
                 // Distancia a mover: Ancho de tarjeta (260) + Gap (30) = 290
                 const scrollAmount = 290; 
+                // Ancho del set original (aprox para cálculo)
+                const originalSetWidth = scrollAmount * originalCards.length;
 
-                btnRight.addEventListener('click', () => {
-                    // Calcular el máximo scroll posible (Ancho total contenido - Ancho visible)
-                    const maxScroll = container.scrollWidth - container.clientWidth;
-                    
-                    // Si estamos muy cerca del final (con un margen de error de 10px), volver al principio
-                    if (container.scrollLeft >= maxScroll - 10) {
-                        container.scrollTo({ left: 0, behavior: 'smooth' });
-                    } else {
-                        // Si no, avanzar normal
-                        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                    }
-                });
-
-                btnLeft.addEventListener('click', () => {
-                    // Si estamos al principio (posición 0), ir al final
-                    if (container.scrollLeft <= 10) {
-                        container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-                    } else {
-                        // Si no, retroceder normal
-                        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                    }
-                });
-
-                // MOBILE DOTS UPDATE
+                // Evento Scroll para "Teletransporte"
                 container.addEventListener('scroll', () => {
+                    // Si llegamos a la mitad (final del set original), volvemos al principio
+                    if (container.scrollLeft >= originalSetWidth) {
+                        container.scrollLeft -= originalSetWidth;
+                    } 
+                    // Si intentamos ir atrás desde el principio, vamos a la mitad
+                    else if (container.scrollLeft <= 0) {
+                        container.scrollLeft += originalSetWidth;
+                    }
+
+                    // Actualizar Dots (Móvil) usando módulo
                     const scrollLeft = container.scrollLeft;
-                    const card = container.querySelector('.mirror-card');
-                    if(!card) return;
-                    
-                    const style = window.getComputedStyle(card);
-                    const marginRight = parseFloat(style.marginRight) || 0;
-                    const fullCardWidth = card.offsetWidth + marginRight; // Aprox width
-                    
-                    // Calculo aproximado para encender los dots
-                    const index = Math.round(scrollLeft / 290);
+                    const index = Math.round(scrollLeft / scrollAmount) % originalCards.length;
                     
                     if(dots.length > 0) {
                         dots.forEach((dot, i) => {
@@ -881,6 +873,15 @@
                             else dot.classList.remove('active');
                         });
                     }
+                });
+
+                // Botones con desplazamiento suave
+                btnRight.addEventListener('click', () => {
+                    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+
+                btnLeft.addEventListener('click', () => {
+                    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
                 });
             }
 
