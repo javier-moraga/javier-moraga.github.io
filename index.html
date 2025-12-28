@@ -179,15 +179,15 @@
         .mirror-card.purple::before { background: #8b5cf6; box-shadow: 0 0 15px #8b5cf6; }
         .mirror-card.cyan::before { background: #06b6d4; box-shadow: 0 0 15px #06b6d4; }
 
-        /* Ajuste de título para que no se corte */
+        /* Ajuste de título para que no se corte y nombre completo */
         .mirror-content h2 { 
-            font-size: 1.15rem; /* Reducido para que quepa todo el texto */
+            font-size: 1.15rem; 
             color: #fff; margin-bottom: 20px; font-weight: 700; 
             text-transform: uppercase; letter-spacing: 0.5px; 
             border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
             background: linear-gradient(90deg, #fff 0%, #cbd5e1 100%); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            min-height: 45px; /* Asegura altura consistente */
+            min-height: 45px; 
             display: flex; align-items: center;
         }
         
@@ -512,7 +512,7 @@
                     
                     <div class="mirror-card blue">
                         <div class="mirror-content">
-                            <h2>Cloud & Eng</h2>
+                            <h2>Cloud & Engineering</h2>
                             <div class="skill-group">
                                 <div class="skill-group-title">Core Skills</div>
                                 <ul class="skill-list">
@@ -896,15 +896,20 @@
             }, { threshold: 0.2 });
             logoRows.forEach(row => rowObserver.observe(row));
 
-            // MOBILE DOTS CALCULATION FIXED
+            // MOBILE DOTS CALCULATION FIXED (LÓGICA MEJORADA)
             container.addEventListener('scroll', () => {
                 const scrollLeft = container.scrollLeft;
-                // Obtenemos el ancho real de la tarjeta más su margen derecho
+                
+                // Obtener primera tarjeta
                 const card = container.querySelector('.mirror-card');
+                if(!card) return;
+
+                // Calcular ancho total real: ancho + margin-right
                 const style = window.getComputedStyle(card);
-                const marginRight = parseFloat(style.marginRight);
+                const marginRight = parseFloat(style.marginRight) || 0;
                 const fullCardWidth = card.offsetWidth + marginRight;
                 
+                // Cálculo simple y directo
                 const index = Math.round(scrollLeft / fullCardWidth);
                 
                 dots.forEach((dot, i) => {
