@@ -162,7 +162,16 @@
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .stack-container { display: flex; gap: 40px; padding: 40px 20px; width: 100%; flex-wrap: nowrap; justify-content: center; }
+        
+        /* MODIFICACIÓN DE LAYOUT PARA STACK 
+           Escritorio: Se adapta al ancho
+           Móvil: Se convierte en carrusel "Peeking"
+        */
+        .stack-container { 
+            display: flex; gap: 40px; padding: 40px 20px; width: 100%; 
+            flex-wrap: nowrap; /* Default para carrusel */
+            justify-content: center; 
+        }
         
         .mirror-card {
             position: relative; width: 300px; height: 480px; display: flex; flex-direction: column; padding: 30px;
@@ -233,8 +242,12 @@
 
         /* --- MEDIA QUERIES (MOBILE OPTIMIZATION) --- */
         @media (min-width: 1200px) {
+            /* Desktop: Permitimos wrap para evitar que se vean estáticas o aplastadas al achicar */
+            .stack-container { 
+                flex-wrap: wrap; 
+                justify-content: center; 
+            }
             .skills-section .container { max-width: 100% !important; padding: 0 50px; }
-            .stack-container { justify-content: center; overflow-x: visible; }
             .pagination-dots { display: none; }
         }
 
@@ -259,8 +272,26 @@
             .container { padding: 0 20px; }
             .content-frame::before { top: 0px; height: 350px; width: 120%; left: -10%; transform: none; }
 
-            .stack-container { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x mandatory; padding-left: 20px; padding-bottom: 30px; }
-            .mirror-card { min-width: 85vw; max-width: 85vw; scroll-snap-align: center; margin-right: 15px; padding: 25px; }
+            /* STACK MOBILE: Configuración "Peeking" (Vistazo) */
+            .stack-container { 
+                justify-content: flex-start; 
+                flex-wrap: nowrap; 
+                overflow-x: auto; 
+                scroll-snap-type: x mandatory; 
+                padding-left: 20px; /* Padding inicial */
+                padding-right: 40px; /* Espacio para que se vea el final */
+                padding-bottom: 30px; 
+            }
+            
+            /* Tarjeta con ancho fijo para controlar el peeking */
+            .mirror-card { 
+                min-width: 280px; 
+                max-width: 280px; 
+                scroll-snap-align: center; 
+                margin-right: 15px; 
+                padding: 25px; 
+            }
+            
             .pagination-dots { display: flex; justify-content: center; }
 
             .about-grid, .project-card { grid-template-columns: 1fr; }
