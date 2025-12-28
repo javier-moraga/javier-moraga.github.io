@@ -163,21 +163,21 @@
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
         .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
         
-        /* MODIFICACIÓN DE LAYOUT PARA STACK 
-           Escritorio: Se adapta al ancho
-           Móvil: Se convierte en carrusel "Peeking"
-        */
+        /* DESKTOP (Default): Flex Wrap para mostrar todas en bloque */
         .stack-container { 
-            display: flex; gap: 40px; padding: 40px 20px; width: 100%; 
-            flex-wrap: nowrap; /* Default para carrusel */
+            display: flex; gap: 30px; 
+            padding: 40px 20px; width: 100%; 
+            flex-wrap: wrap; 
             justify-content: center; 
         }
         
         .mirror-card {
-            position: relative; width: 300px; height: 480px; display: flex; flex-direction: column; padding: 30px;
+            position: relative; width: 220px; /* Tamaño escritorio compacto */
+            min-height: 480px; 
+            display: flex; flex-direction: column; padding: 30px;
             background: rgba(17, 25, 40, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.125); border-radius: 16px; overflow: hidden; transition: 0.3s;
-            flex-shrink: 0; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
         .mirror-card:hover { transform: translateY(-8px); border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); background: rgba(17, 25, 40, 0.75); }
         .mirror-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: transparent; z-index: 2; }
@@ -188,15 +188,14 @@
         .mirror-card.purple::before { background: #8b5cf6; box-shadow: 0 0 15px #8b5cf6; }
         .mirror-card.cyan::before { background: #06b6d4; box-shadow: 0 0 15px #06b6d4; }
 
-        /* Ajuste de título para que no se corte y nombre completo */
         .mirror-content h2 { 
-            font-size: 1.15rem; 
+            font-size: 1.1rem; 
             color: #fff; margin-bottom: 20px; font-weight: 700; 
             text-transform: uppercase; letter-spacing: 0.5px; 
             border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
             background: linear-gradient(90deg, #fff 0%, #cbd5e1 100%); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            min-height: 45px; 
+            min-height: 50px; /* Altura mínima para alineación */
             display: flex; align-items: center;
         }
         
@@ -242,12 +241,8 @@
 
         /* --- MEDIA QUERIES (MOBILE OPTIMIZATION) --- */
         @media (min-width: 1200px) {
-            /* Desktop: Permitimos wrap para evitar que se vean estáticas o aplastadas al achicar */
-            .stack-container { 
-                flex-wrap: wrap; 
-                justify-content: center; 
-            }
             .skills-section .container { max-width: 100% !important; padding: 0 50px; }
+            /* Desktop: No dots */
             .pagination-dots { display: none; }
         }
 
@@ -272,19 +267,20 @@
             .container { padding: 0 20px; }
             .content-frame::before { top: 0px; height: 350px; width: 120%; left: -10%; transform: none; }
 
-            /* STACK MOBILE: Configuración "Peeking" (Vistazo) */
+            /* STACK MOBILE: Configuración Carrusel Horizontal */
             .stack-container { 
                 justify-content: flex-start; 
                 flex-wrap: nowrap; 
                 overflow-x: auto; 
                 scroll-snap-type: x mandatory; 
-                padding-left: 20px; /* Padding inicial */
-                padding-right: 40px; /* Espacio para que se vea el final */
+                padding-left: 20px; 
+                padding-right: 40px; 
                 padding-bottom: 30px; 
             }
             
-            /* Tarjeta con ancho fijo para controlar el peeking */
+            /* Tarjeta móvil: Ancho fijo para peeking */
             .mirror-card { 
+                width: 280px;
                 min-width: 280px; 
                 max-width: 280px; 
                 scroll-snap-align: center; 
@@ -292,6 +288,7 @@
                 padding: 25px; 
             }
             
+            /* Dots visibles en móvil */
             .pagination-dots { display: flex; justify-content: center; }
 
             .about-grid, .project-card { grid-template-columns: 1fr; }
