@@ -168,14 +168,23 @@
             width: 100%;
             padding-top: 50px;
             padding-bottom: 60px;
-            overflow: hidden;
             z-index: 1;
+            /* IMPORTANTE: Permitir que las flechas se vean si sobresalen un poco */
+            overflow: visible; 
+        }
+
+        /* Ocultar contenido desbordado fuera del wrapper principal de la sección si es necesario */
+        .skills-section .content-frame {
+            overflow: visible; 
         }
 
         .swiper-container.two .swiper-slide {
             width: 300px; 
             height: auto;
             position: relative;
+            
+            /* NUEVO: Cursor de mano para indicar clic */
+            cursor: pointer;
         }
 
         .slider-image { width: 100%; height: 100%; }
@@ -187,7 +196,7 @@
             min-height: 480px; 
             display: flex; flex-direction: column; padding: 30px;
             
-            /* CORRECCIÓN: Fondo mucho más sólido para evitar transparencias superpuestas */
+            /* Fondo sólido (95% opacidad) para tapar la tarjeta de atrás */
             background: rgba(11, 17, 32, 0.95); 
             
             backdrop-filter: blur(20px);
@@ -221,7 +230,45 @@
         .skill-item i { width: 20px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Estilos de la paginación Swiper */
+        /* --- ESTILOS DE FLECHAS DE NAVEGACIÓN (AMARILLAS) --- */
+        .swiper-button-next, .swiper-button-prev {
+            background-image: none !important; /* Quitar flecha por defecto de Swiper */
+            color: var(--accent-gold); /* Color Amarillo */
+            width: 50px;
+            height: 50px;
+            background-color: rgba(17, 25, 40, 0.9); /* Fondo oscuro */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            z-index: 50;
+            cursor: pointer;
+        }
+
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            background-color: var(--accent-gold);
+            color: var(--bg-dark);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+        }
+
+        /* Posicionamiento */
+        .swiper-button-prev { left: 10px; }
+        .swiper-button-next { right: 10px; }
+
+        @media (min-width: 1200px) {
+            /* En pantallas grandes, sacar las flechas un poco hacia afuera */
+            .swiper-button-prev { left: -60px; }
+            .swiper-button-next { right: -60px; }
+        }
+
+        @media (max-width: 768px) {
+            /* En móvil, ocultar flechas para no tapar contenido (se usa swipe) */
+            .swiper-button-next, .swiper-button-prev { display: none; }
+        }
+
+        /* Paginación (Puntos) */
         .swiper-pagination { bottom: 0px !important; }
         .swiper-pagination-bullet {
             background: transparent;
@@ -663,7 +710,12 @@
                     </div>
 
                 </div>
+                
                 <div class="swiper-pagination"></div>
+                
+                <div class="swiper-button-prev"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="swiper-button-next"><i class="fa-solid fa-chevron-right"></i></div>
+                
             </div>
             
         </div>
@@ -943,11 +995,20 @@
                 el: '.swiper-pagination',
                 clickable: true,
             },
+            // Activamos navegación por flechas
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
             effect: 'coverflow',
-            loop: false,          // DESACTIVADO PARA EVITAR CLONACIONES
+            loop: false,          
             centeredSlides: true, 
             slidesPerView: 'auto',
-            initialSlide: 2,      // COMENZAR EN EL CENTRO (Tarjeta 3 de 5)
+            initialSlide: 2,      
+            
+            // --- NUEVO: HABILITAR CLIC EN TARJETAS PARA NAVEGAR ---
+            slideToClickedSlide: true,
+            
             coverflowEffect: {
                 rotate: 0,        
                 stretch: 100,     
