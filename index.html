@@ -158,27 +158,54 @@
         .logo-img { max-width: 220px; max-height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); opacity: 0.8; transition: all 0.4s ease; }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* --- STACK CARDS --- */
+        /* --- STACK CARDS (CARRUSEL HORIZONTAL ACTUALIZADO) --- */
         .skills-section { position: relative; padding: 50px 0; z-index: 10; }
         .section-title { font-size: 2rem; margin-bottom: 50px; font-weight: 700; text-align: center; }
-        .stack-scroll-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        
-        /* DESKTOP (Default): Flex Wrap para mostrar todas en bloque */
-        .stack-container { 
-            display: flex; gap: 30px; 
-            padding: 40px 20px; width: 100%; 
-            flex-wrap: wrap; 
-            justify-content: center; 
+
+        .stack-scroll-wrapper { 
+            position: relative; 
+            width: 100%; 
+            max-width: 1400px; 
+            margin: 0 auto;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
         }
-        
+
+        /* Contenedor Carrusel */
+        .stack-container { 
+            display: flex; 
+            gap: 30px; 
+            padding: 40px 10px; 
+            width: 100%; 
+            
+            /* Lógica Carrusel */
+            flex-wrap: nowrap;       
+            overflow-x: auto;        
+            scroll-behavior: smooth; 
+            justify-content: flex-start;
+            
+            /* Ocultar scrollbar */
+            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;  /* IE */
+        }
+
+        /* Ocultar scrollbar Chrome/Safari */
+        .stack-container::-webkit-scrollbar { display: none; }
+
+        /* Tarjeta en Carrusel */
         .mirror-card {
-            position: relative; width: 220px; /* Tamaño escritorio compacto */
+            position: relative; 
+            min-width: 260px;  
+            width: 260px;
+            flex-shrink: 0; 
             min-height: 480px; 
             display: flex; flex-direction: column; padding: 30px;
             background: rgba(17, 25, 40, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.125); border-radius: 16px; overflow: hidden; transition: 0.3s;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
+        
         .mirror-card:hover { transform: translateY(-8px); border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); background: rgba(17, 25, 40, 0.75); }
         .mirror-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: transparent; z-index: 2; }
 
@@ -189,14 +216,12 @@
         .mirror-card.cyan::before { background: #06b6d4; box-shadow: 0 0 15px #06b6d4; }
 
         .mirror-content h2 { 
-            font-size: 1.1rem; 
-            color: #fff; margin-bottom: 20px; font-weight: 700; 
+            font-size: 1.1rem; color: #fff; margin-bottom: 20px; font-weight: 700; 
             text-transform: uppercase; letter-spacing: 0.5px; 
             border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; 
             background: linear-gradient(90deg, #fff 0%, #cbd5e1 100%); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            min-height: 50px; /* Altura mínima para alineación */
-            display: flex; align-items: center;
+            min-height: 50px; display: flex; align-items: center;
         }
         
         .skill-group { margin-bottom: 20px; }
@@ -205,6 +230,37 @@
         .skill-item { font-size: 0.9em; margin-bottom: 8px; display: flex; align-items: center; color: #e2e8f0; }
         .skill-item i { width: 20px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.1); }
+
+        /* --- BOTONES DE FLECHA --- */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(11, 17, 32, 0.9);
+            border: 1px solid var(--accent-gold); /* Borde Gold */
+            color: var(--accent-gold); /* Icono Gold */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            opacity: 0.8;
+        }
+
+        .nav-arrow:hover {
+            background-color: var(--accent-gold); /* Fondo Gold al hover */
+            color: var(--bg-dark); /* Icono oscuro al hover */
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+        }
+
+        .left-arrow { left: -25px; } 
+        .right-arrow { right: -25px; }
 
         .pagination-dots { display: none; gap: 10px; margin-top: 10px; margin-bottom: 20px; }
         .dot { width: 10px; height: 10px; background-color: rgba(255,255,255,0.2); border-radius: 50%; cursor: pointer; transition: 0.3s; }
@@ -287,6 +343,9 @@
                 margin-right: 15px; 
                 padding: 25px; 
             }
+            
+            /* Ocultar flechas en móvil, usar swipe */
+            .nav-arrow { display: none; }
             
             /* Dots visibles en móvil */
             .pagination-dots { display: flex; justify-content: center; }
@@ -535,6 +594,8 @@
             <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
             
             <div class="stack-scroll-wrapper">
+                
+                <button id="slideLeft" class="nav-arrow left-arrow"><i class="fa-solid fa-chevron-left"></i></button>
 
                 <div class="stack-container" id="stackContainer">
                     
@@ -633,6 +694,8 @@
                     </div>
 
                 </div>
+                
+                <button id="slideRight" class="nav-arrow right-arrow"><i class="fa-solid fa-chevron-right"></i></button>
 
                 <div class="pagination-dots">
                     <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -759,81 +822,77 @@
             const mobileProgress = document.getElementById('mobileProgress');
             const mobileBall = document.getElementById('mobileBall');
 
+            // --- BOTONES CARRUSEL ---
+            const btnLeft = document.getElementById('slideLeft');
+            const btnRight = document.getElementById('slideRight');
+
+            if (container && btnLeft && btnRight) {
+                // Cantidad de scroll = Ancho de tarjeta (260) + Gap (30) aprox
+                const scrollAmount = 300; 
+
+                btnRight.addEventListener('click', () => {
+                    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                });
+
+                btnLeft.addEventListener('click', () => {
+                    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                });
+            }
+
             let pathLength = 0;
 
-            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY (NUEVA LÓGICA) ---
+            // --- FUNCTION TO RECALCULATE PATH DYNAMICALLY ---
             function recalculatePath() {
                 if (window.innerWidth <= 1199) return; 
 
-                // Referencias a elementos
                 const svgContainer = document.querySelector('.desktop-svg-container');
                 const cards = document.querySelectorAll('.evo-card');
-                const aboutFrame = document.querySelector('#aboutFrame .content-frame'); // El contenedor objetivo
+                const aboutFrame = document.querySelector('#aboutFrame .content-frame'); 
                 
                 if (!svgContainer || cards.length === 0 || !aboutFrame) return;
 
-                // 1. OBTENER COORDENADAS RELATIVAS AL CONTENEDOR SVG
-                // El SVG empieza en top:0 de .evolution-section.
                 const sectionRect = document.getElementById('evolution-section').getBoundingClientRect();
                 const svgTop = sectionRect.top;
 
-                // 2. CONFIGURAR EL PUNTO FINAL (El borde superior de la tarjeta About)
                 const aboutRect = aboutFrame.getBoundingClientRect();
-                // Queremos que la línea termine EXACTAMENTE en el borde superior del div siguiente
                 const endY = aboutRect.top - svgTop; 
 
-                // Ajustar altura del SVG
                 svgContainer.style.height = `${endY}px`;
                 svgContainer.setAttribute('viewBox', `0 0 1000 ${endY}`);
 
-                // 3. CONSTRUIR LOS PUNTOS DE LA RUTA (PATH)
-                // Coordenadas X fijas
                 const centerX = 500;
-                const leftX = 236;  // Ajustado para tocar el borde de las tarjetas izquierdas
-                const rightX = 764; // Ajustado para tocar el borde de las tarjetas derechas
+                const leftX = 236;  
+                const rightX = 764; 
                 
-                // Iniciar Path en el centro arriba
                 let d = `M ${centerX} 0`;
-                
                 let currentX = centerX;
                 let currentY = 0;
 
-                // Recorrer cada tarjeta para encontrar su centro vertical exacto
                 cards.forEach((card, index) => {
                     const cardRect = card.getBoundingClientRect();
-                    
-                    // Calcular el Y central de la tarjeta relativo al SVG
                     const cardMiddleY = (cardRect.top - svgTop) + (cardRect.height / 2);
                     
-                    // Determinar si vamos a la izquierda o derecha (impares izquierda, pares derecha)
-                    // Index 0 = Izquierda (Clase evo-left), Index 1 = Derecha (Clase evo-right), etc.
                     const targetX = (index % 2 === 0) ? leftX : rightX;
                     const targetY = cardMiddleY;
 
-                    // Crear una curva suave (Cubic Bezier) hacia el punto
                     const cp1x = currentX;
                     const cp1y = currentY + (targetY - currentY) * 0.5;
-                    
                     const cp2x = targetX;
                     const cp2y = currentY + (targetY - currentY) * 0.5;
 
                     d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${targetX} ${targetY}`;
 
-                    // Actualizar coordenadas actuales para la siguiente iteración
                     currentX = targetX;
                     currentY = targetY;
                 });
 
-                // 4. CONECTAR EL ÚLTIMO PUNTO CON EL DESTINO FINAL (About Section)
                 const finalCp1x = currentX;
                 const finalCp1y = currentY + (endY - currentY) * 0.5;
-                
                 const finalCp2x = centerX;
                 const finalCp2y = currentY + (endY - currentY) * 0.5;
 
                 d += ` C ${finalCp1x} ${finalCp1y}, ${finalCp2x} ${finalCp2y}, ${centerX} ${endY}`;
 
-                // 5. APLICAR AL SVG
                 trackPath.setAttribute('d', d);
                 progressPath.setAttribute('d', d);
                 
@@ -851,15 +910,12 @@
                 const rect = section.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
 
-                // --- LÓGICA DE SCROLL (0% A 100% REAL) ---
                 const sectionTop = rect.top;
                 const sectionHeight = rect.height; 
                 
-                // Ajuste para que empiece a dibujar cuando la sección entra en pantalla
                 const scrolledDistance = (windowHeight / 2) - sectionTop;
                 let scrollPercent = scrolledDistance / sectionHeight;
 
-                // Clamp estricto
                 scrollPercent = Math.max(0, Math.min(1, scrollPercent));
 
                 // BALL ANIMATION
@@ -871,7 +927,6 @@
                     }
                 } else {
                     if(progressPath && desktopBall && pathLength > 0) {
-                        // FORZAR FINAL: Si pasamos el 99%, forzar la bola al final exacto
                         if (scrollPercent >= 0.99) {
                             desktopBall.setAttribute("cx", 500);
                             const endY = parseFloat(desktopSvg.style.height);
@@ -900,7 +955,6 @@
                     } 
                 });
 
-                // LIGHT EXPLOSION TRIGGER
                 if (scrollPercent >= 0.99) {
                     if(aboutWrapper) aboutWrapper.classList.add('frame-active');
                 } else {
@@ -924,20 +978,16 @@
             }, { threshold: 0.2 });
             logoRows.forEach(row => rowObserver.observe(row));
 
-            // MOBILE DOTS CALCULATION FIXED (LÓGICA MEJORADA)
+            // MOBILE DOTS CALCULATION
             container.addEventListener('scroll', () => {
                 const scrollLeft = container.scrollLeft;
-                
-                // Obtener primera tarjeta
                 const card = container.querySelector('.mirror-card');
                 if(!card) return;
 
-                // Calcular ancho total real: ancho + margin-right
                 const style = window.getComputedStyle(card);
                 const marginRight = parseFloat(style.marginRight) || 0;
                 const fullCardWidth = card.offsetWidth + marginRight;
                 
-                // Cálculo simple y directo
                 const index = Math.round(scrollLeft / fullCardWidth);
                 
                 dots.forEach((dot, i) => {
