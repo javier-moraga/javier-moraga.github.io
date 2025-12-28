@@ -39,7 +39,6 @@
             background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px; position: relative; z-index: 2;
             box-shadow: 0 0 50px rgba(0,0,0,0.3);
-            /* Importante: Overflow visible para que la luz no se corte si se expande */
             overflow: visible; 
         }
 
@@ -205,27 +204,21 @@
             background-color: #111827; 
         }
 
-        /* LUZ DE EXPLOSIÓN: MOVIDA AL FRAME INTERNO PARA CONTROL DE CAPAS */
+        /* LUZ DE EXPLOSIÓN */
         .content-frame::before {
             content: ''; position: absolute; 
             top: -50px; 
             left: 50%; transform: translateX(-50%) scaleX(1.5); 
             width: 100%; height: 450px; 
-            
-            /* Degradado suave */
             background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.4) 0%, rgba(251, 191, 36, 0.3) 25%, rgba(251, 191, 36, 0.05) 60%, transparent 80%); 
-            
             filter: blur(40px); 
             opacity: 0; 
             transition: opacity 0.5s ease-in-out; 
             pointer-events: none; 
-            
-            /* CLAVE: Z-INDEX 1 PARA ESTAR SOBRE EL FONDO PERO BAJO EL TEXTO/IMAGEN */
             z-index: 1; 
             mix-blend-mode: screen; 
         }
         
-        /* ACTIVACIÓN DE LA LUZ CUANDO SE LLEGA AL FINAL */
         .about-section-wrapper.frame-active .content-frame::before { opacity: 1; }
 
         .about-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 60px; align-items: start; position: relative; z-index: 2; }
@@ -234,13 +227,13 @@
         .profile-img-container { 
             text-align: center; 
             position: relative;
-            z-index: 20; /* Superior a la luz */
+            z-index: 20; 
         }
         .profile-img { width: 280px; height: 280px; object-fit: cover; border-radius: 50%; border: 4px solid var(--accent); box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
         
         .about-text {
             position: relative;
-            z-index: 20; /* Superior a la luz */
+            z-index: 20; 
         }
         .about-text h2 { font-size: 2.5rem; margin-bottom: 20px; line-height: 1.2; }
         .about-text p { font-size: 1.05rem; color: #cbd5e1; margin-bottom: 20px; text-align: justify; }
@@ -333,6 +326,7 @@
         .mirror-card.gold::before { background: #fbbf24; box-shadow: 0 0 15px #fbbf24; }
         .mirror-card.green::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
         .mirror-card.purple::before { background: #8b5cf6; box-shadow: 0 0 15px #8b5cf6; }
+        .mirror-card.cyan::before { background: #06b6d4; box-shadow: 0 0 15px #06b6d4; } /* NUEVA CLASE PARA LA TARJETA EXTRA */
 
         .mirror-content h2 { 
             font-size: 1.3em; color: #fff; margin-bottom: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
@@ -354,7 +348,7 @@
         .dot.active { background-color: var(--accent-gold); transform: scale(1.2); }
 
         /* --- PROJECTS SECTION --- */
-        .projects-section { padding: 50px 0 50px; position: relative; z-index: 10; margin-top: 0; }
+        .projects-section { padding: 50px 0 150px; position: relative; z-index: 10; margin-top: 0; }
         
         .project-card {
             background-color: #111827; border: 1px solid rgba(255, 255, 255, 0.08); 
@@ -737,10 +731,25 @@
                         </div>
                     </div>
 
+                    <div class="mirror-card cyan">
+                        <div class="mirror-content">
+                            <h2>Data Mgmt & Gov</h2>
+                            <div class="skill-group">
+                                <div class="skill-group-title">Governance Scope</div>
+                                <ul class="skill-list">
+                                    <li class="skill-item"><i class="fa-solid fa-table-list"></i> Cataloguing & Documentation</li>
+                                    <li class="skill-item"><i class="fa-solid fa-mask"></i> Anonymisation & Masking</li>
+                                    <li class="skill-item"><i class="fa-solid fa-cubes"></i> Modelling & Standardisation</li>
+                                    <li class="skill-item"><i class="fa-solid fa-broom"></i> Data Cleaning & Quality</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="pagination-dots">
-                    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
 
             </div>
