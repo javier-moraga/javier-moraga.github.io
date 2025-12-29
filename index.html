@@ -70,18 +70,84 @@
         .nav-links a { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
-        /* NAV BTN */
-        .nav-btn {
-            position: relative; padding: 10px 25px; color: white !important; 
-            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
-            font-size: 0.85rem; font-weight: 700; overflow: hidden; transition: 0.3s; 
-            border-radius: 4px; background: rgba(255, 255, 255, 0.02); 
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08); 
+        /* --- ESTILOS DEL BOTÓN MOKN (SERPIENTE + GLOW) --- */
+        .mokn-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03); /* Fondo base muy sutil */
+            padding: 1px; /* El grosor del borde de la serpiente */
+            border-radius: 4px;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
         }
-        .nav-btn:hover { 
-            background: rgba(251, 191, 36, 0.08); color: var(--accent-gold) !important; 
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.15); 
+
+        /* El contenedor interior del texto */
+        .mokn-inner {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0b1120; /* Color de fondo del botón (tapa el centro) */
+            padding: 10px 25px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            overflow: hidden; /* Para contener el glow */
         }
+
+        /* 1. LA SERPIENTE (Snake Border) */
+        .mokn-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            /* El degradado cónico crea la "cabeza" de la serpiente */
+            background: conic-gradient(
+                transparent, 
+                transparent, 
+                transparent, 
+                var(--accent-gold) /* La cola de la serpiente */
+            );
+            /* Animación de rotación infinita */
+            animation: rotateSnake 4s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes rotateSnake {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 2. EL BRILLO DEL MOUSE (Mouse Glow) */
+        /* Este elemento se mueve con JS dentro del .mokn-inner */
+        .mokn-glow {
+            position: absolute;
+            top: var(--y, 50%);
+            left: var(--x, 50%);
+            transform: translate(-50%, -50%);
+            width: 150px; /* Tamaño de la linterna */
+            height: 150px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, transparent 70%);
+            opacity: 0; /* Invisible por defecto */
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* Click traspasa */
+            z-index: 1;
+            mix-blend-mode: screen; /* Mezcla elegante */
+        }
+
+        /* Mostrar el glow al pasar el mouse */
+        .mokn-btn:hover .mokn-glow {
+            opacity: 1;
+        }
+        
+        .mokn-text { position: relative; z-index: 5; } /* Texto encima del glow */
 
         /* --- MOBILE BOTTOM NAV --- */
         .mobile-nav-container {
@@ -138,7 +204,7 @@
             justify-content: center;
             gap: 12px;
             margin: 25px auto 40px; 
-            max-width: 650px; /* En desktop mantiene 4 por fila aprox */
+            max-width: 650px; 
         }
 
         /* Animación de Latido Dorado */
@@ -200,7 +266,6 @@
         .evo-company { font-size: 1.1rem; color: var(--accent); font-weight: 600; margin-bottom: 5px; display: block; }
         .evo-date { font-size: 0.85rem; color: #64748b; font-family: 'Fira Code', monospace; margin-bottom: 5px; display: block; }
         
-        /* ESTILO PARA MODALIDAD DE TRABAJO */
         .evo-mode {
             font-size: 0.75rem; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px;
             display: inline-block; margin-bottom: 15px; font-weight: 600; border: 1px solid rgba(255,255,255,0.05);
@@ -244,10 +309,8 @@
         .contact-section { padding: 50px 0 80px; text-align: center; position: relative; z-index: 10; }
         .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         
-        /* Estilos base de los iconos de contacto */
         .c-icon { font-size: 2.5rem; color: var(--text-muted); transition: 0.3s ease; margin: 0 10px; }
         
-        /* HOVER CON COLORES DE MARCA */
         .c-icon:hover { transform: translateY(-5px); }
         .c-icon.email:hover { color: var(--accent-gold); }
         .c-icon.linkedin:hover { color: #0077b5; }
@@ -426,9 +489,14 @@
                 <a href="#about">About Me</a>
                 <a href="#skills">Stack</a>
                 <a href="#projects">Portfolio</a>
-                <a href="#contact" class="nav-btn">
-                    <span></span><span></span><span></span><span></span>Contact
+                
+                <a href="#contact" class="mokn-btn" id="contactBtn">
+                    <span class="mokn-inner">
+                        <span class="mokn-text">Contact</span>
+                        <span class="mokn-glow"></span>
+                    </span>
                 </a>
+
             </nav>
         </div>
     </header>
@@ -904,6 +972,18 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // --- LÓGICA DE BOTÓN CONTACT (MOUSE GLOW) ---
+            const btn = document.getElementById('contactBtn');
+            if(btn) {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    btn.style.setProperty('--x', x + 'px');
+                    btn.style.setProperty('--y', y + 'px');
+                });
+            }
+
             const section = document.getElementById('evolution-section');
             const aboutWrapper = document.querySelector('.about-section-wrapper');
             const evoCards = document.querySelectorAll('.evo-card');
