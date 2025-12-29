@@ -75,27 +75,27 @@
             left: 50%; 
             transform: translateX(-50%);
             z-index: 2000; 
-            width: 90%; 
-            max-width: 400px;
+            width: 95%; /* Un poco más ancho para asegurar espacio */
+            max-width: 420px;
         }
         
         .mobile-nav {
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            background: rgba(17, 24, 39, 0.95); /* Fondo un poco más sólido */
+            background: rgba(17, 24, 39, 0.95); /* Fondo sólido */
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 50px; 
-            padding: 12px 25px;
+            padding: 12px 15px; /* Menos padding lateral para dar espacio a botones */
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            width: 100%; /* Asegura que llene el contenedor */
-            flex-wrap: nowrap; /* IMPIDE que se rompa en columnas */
+            width: 100%;
+            flex-wrap: nowrap; /* IMPIDE que los botones bajen de línea */
         }
         
         .mn-link {
             color: #94a3b8; 
-            font-size: 1.2rem; 
+            font-size: 1.1rem; /* Ligeramente más pequeño para asegurar fit */
             transition: 0.3s; 
             display: flex; 
             flex-direction: column; 
@@ -103,8 +103,9 @@
             gap: 4px; 
             text-decoration: none;
             flex: 1; /* Distribuye el espacio equitativamente */
+            min-width: 0; /* Permite encogerse si es necesario */
         }
-        .mn-link span { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; }
+        .mn-link span { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
         .mn-link:hover, .mn-link.active { color: var(--accent-gold); transform: translateY(-2px); }
 
         /* --- HERO SECTION --- */
@@ -244,7 +245,9 @@
         .skill-item i { width: 20px; text-align: center; margin-right: 10px; opacity: 0.8; }
         .badge { margin-left: auto; font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: 700; color: white; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* --- ESTILOS DE FLECHAS DE NAVEGACIÓN (AMARILLAS + PULSO) --- */
+        /* --- ESTILOS DE FLECHAS DE NAVEGACIÓN (INTELIGENTES) --- */
+        
+        /* Animación de Pulso Dorado */
         @keyframes pulseGold {
             0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); transform: scale(1); }
             70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); transform: scale(1.1); }
@@ -252,8 +255,8 @@
         }
 
         .swiper-button-next, .swiper-button-prev {
-            background-image: none !important;
-            color: var(--accent-gold);
+            background-image: none !important; /* Quitar icono default */
+            color: var(--accent-gold); 
             width: 50px; height: 50px;
             background-color: rgba(17, 25, 40, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -264,21 +267,32 @@
             cursor: pointer;
         }
 
-        /* Aplica animación SOLO si NO está deshabilitado */
+        /* --- ESTADO ACTIVO (PUEDE AVANZAR) --- */
+        /* Si NO tiene la clase disabled, aplica animación y color */
         .swiper-button-next:not(.swiper-button-disabled),
         .swiper-button-prev:not(.swiper-button-disabled) {
             animation: pulseGold 2s infinite;
             border-color: var(--accent-gold);
-            background-color: rgba(251, 191, 36, 0.1); /* Sutil fondo amarillo */
+            background-color: rgba(251, 191, 36, 0.1); /* Brillo sutil */
         }
 
-        /* Estilo para botón deshabilitado (Fin del camino) */
+        /* --- ESTADO INACTIVO (FIN DEL CAMINO) --- */
         .swiper-button-disabled {
             opacity: 0.3 !important;
             cursor: not-allowed !important;
             animation: none !important;
             box-shadow: none !important;
-            filter: grayscale(100%);
+            filter: grayscale(100%); /* Se vuelve gris */
+            pointer-events: none;
+        }
+
+        .swiper-button-next:not(.swiper-button-disabled):hover, 
+        .swiper-button-prev:not(.swiper-button-disabled):hover {
+            background-color: var(--accent-gold);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
+            animation: none; /* Al hacer hover, paramos el pulso y lo dejamos sólido */
+            transform: scale(1.1);
         }
 
         .swiper-button-prev { left: 10px; }
@@ -366,6 +380,7 @@
             .container { padding: 0 20px; }
             .content-frame::before { top: 0px; height: 350px; width: 120%; left: -10%; transform: none; }
 
+            /* Ajuste Swiper Móvil */
             .swiper-container.two .swiper-slide { width: 280px; }
 
             .about-grid, .project-card { grid-template-columns: 1fr; }
