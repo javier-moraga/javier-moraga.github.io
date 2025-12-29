@@ -70,84 +70,91 @@
         .nav-links a { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
-        /* --- ESTILOS DEL BOTÓN MOKN (SERPIENTE + GLOW) --- */
+        /* --- ESTILOS DEL BOTÓN MOKN (SERPIENTE CONTINUA + GLOW) --- */
         .mokn-btn {
             position: relative;
-            background: rgba(255, 255, 255, 0.03); /* Fondo base muy sutil */
-            padding: 1px; /* El grosor del borde de la serpiente */
+            background: transparent;
+            /* El padding aquí se elimina, el grosor lo da el margen del inner */
+            padding: 0; 
             border-radius: 4px;
-            overflow: hidden;
+            overflow: hidden; /* IMPORTANTE: Corta el gradiente gigante */
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             transition: 0.3s;
         }
 
-        /* El contenedor interior del texto */
+        /* 1. LA SERPIENTE (Snake Border - Corregido para continuidad) */
+        .mokn-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%; /* Muy grande para que cubra las esquinas al girar */
+            height: 300%;
+            transform: translate(-50%, -50%); /* Centrado perfecto */
+            
+            /* Gradiente cónico suave sin cortes bruscos */
+            background: conic-gradient(
+                from 0deg, 
+                transparent 0%, 
+                transparent 70%, 
+                var(--accent-gold) 100%
+            );
+            
+            animation: rotateSnake 3s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes rotateSnake {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* El contenedor interior del texto (Tapa el centro) */
         .mokn-inner {
             position: relative;
             z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #0b1120; /* Color de fondo del botón (tapa el centro) */
+            background-color: #0b1120; 
+            /* Margen de 1.5px crea el efecto de borde */
+            margin: 1.5px; 
+            width: calc(100% - 3px);
+            border-radius: 3px; /* Un poco menos que el padre */
+            
             padding: 10px 25px;
-            border-radius: 4px;
             color: white;
             font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            overflow: hidden; /* Para contener el glow */
-        }
-
-        /* 1. LA SERPIENTE (Snake Border) */
-        .mokn-btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            /* El degradado cónico crea la "cabeza" de la serpiente */
-            background: conic-gradient(
-                transparent, 
-                transparent, 
-                transparent, 
-                var(--accent-gold) /* La cola de la serpiente */
-            );
-            /* Animación de rotación infinita */
-            animation: rotateSnake 4s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes rotateSnake {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            overflow: hidden; /* Contiene el glow */
         }
 
         /* 2. EL BRILLO DEL MOUSE (Mouse Glow) */
-        /* Este elemento se mueve con JS dentro del .mokn-inner */
         .mokn-glow {
             position: absolute;
             top: var(--y, 50%);
             left: var(--x, 50%);
             transform: translate(-50%, -50%);
-            width: 150px; /* Tamaño de la linterna */
+            width: 150px; 
             height: 150px;
             background: radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, transparent 70%);
-            opacity: 0; /* Invisible por defecto */
+            opacity: 0; 
             transition: opacity 0.3s ease;
-            pointer-events: none; /* Click traspasa */
+            pointer-events: none; 
             z-index: 1;
-            mix-blend-mode: screen; /* Mezcla elegante */
+            mix-blend-mode: screen; 
         }
 
-        /* Mostrar el glow al pasar el mouse */
         .mokn-btn:hover .mokn-glow {
             opacity: 1;
         }
         
-        .mokn-text { position: relative; z-index: 5; } /* Texto encima del glow */
+        .mokn-text { position: relative; z-index: 5; } 
 
         /* --- MOBILE BOTTOM NAV --- */
         .mobile-nav-container {
@@ -197,51 +204,43 @@
         .hero-tags { margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 
-        /* ESTILO PARA TECH STACK EN HERO (Latido + Grid Móvil) */
+        /* ESTILO PARA TECH STACK EN HERO (Minimalista Sin Marco) */
         .tech-stack-wrapper {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 12px;
+            gap: 5px; /* Menos espacio horizontal */
+            row-gap: 10px;
             margin: 25px auto 40px; 
             max-width: 650px; 
         }
 
-        /* Animación de Latido Dorado */
-        @keyframes goldenHeartbeat {
-            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3); transform: scale(1); }
-            50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.8); transform: scale(1.02); }
-            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3); transform: scale(1); }
-        }
-
         .tech-pill {
-            background: rgba(17, 24, 39, 0.6);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: transparent; /* Sin fondo */
+            border: none; /* Sin borde */
+            box-shadow: none; /* Sin sombra */
             color: #cbd5e1;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: 5px 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
             display: flex; align-items: center; gap: 8px;
             transition: 0.3s;
-            backdrop-filter: blur(5px);
-            
-            /* Aplicar animación de latido constante */
-            animation: goldenHeartbeat 3s infinite ease-in-out;
+            /* Eliminada animación de latido */
         }
-
-        /* Delay aleatorio para que no latan todos exactamente igual */
-        .tech-pill:nth-child(even) { animation-delay: 1.5s; }
-        .tech-pill:nth-child(3n) { animation-delay: 0.5s; }
 
         .tech-pill:hover {
-            border-color: var(--accent-gold) !important;
             color: #fff;
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
-            animation: none; /* Pausar latido al hover */
+            transform: translateY(-2px);
         }
-        .tech-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: inline-block; }
+
+        .tech-dot { 
+            width: 6px; 
+            height: 6px; 
+            background: var(--accent-gold); /* Amarillo */
+            border-radius: 50%; 
+            display: inline-block; 
+            box-shadow: 0 0 8px var(--accent-gold); /* Pequeño brillo amarillo */
+        }
         
         /* --- EVOLUTION SECTION --- */
         .evolution-section { padding: 50px 0 0 0; position: relative; overflow: visible; display: flex; justify-content: center; }
