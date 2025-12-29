@@ -320,43 +320,75 @@
         
         .logo-rows-container { display: flex; flex-direction: column; gap: 50px; max-width: 1200px; margin: 0 auto; }
         
-        /* Grid para las filas en Desktop */
-        .logo-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; align-items: start; justify-items: center; opacity: 0; transform: translateY(60px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        /* Grid Desktop */
+        .logo-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; align-items: center; justify-items: center; opacity: 0; transform: translateY(60px); transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .logo-row.row-visible { opacity: 1; transform: translateY(0); }
 
-        /* Estilo Individual Wrapper */
+        /* Wrapper Individual */
         .logo-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            text-align: center;
+            justify-content: center;
+            position: relative; /* Clave para el tooltip */
             width: 100%;
         }
 
-        .logo-item { width: 100%; height: 100px; display: flex; justify-content: center; align-items: center; transition: transform 0.4s ease; text-decoration: none; position: relative; margin-bottom: 5px; }
+        .logo-item { width: 100%; height: 100px; display: flex; justify-content: center; align-items: center; transition: transform 0.4s ease; text-decoration: none; position: relative; margin-bottom: 5px; z-index: 2; }
         .logo-item:hover { transform: scale(1.05); }
         .logo-img { max-width: 200px; max-height: 80px; width: auto; object-fit: contain; filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)); opacity: 0.8; transition: all 0.4s ease; }
         .logo-item:hover .logo-img { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,255,255,0.9)); }
 
-        /* Descripción del Logo */
-        .logo-desc {
-            font-size: 0.8rem; 
-            color: #64748b;     
-            margin-top: 5px;
-            font-weight: 500;
-            opacity: 0;         
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            min-height: 20px; /* Evita saltos de linea si no hay texto visible */
+        /* --- DESKTOP TOOLTIP (El Contexto Detallado) --- */
+        .logo-desktop-tooltip {
+            position: absolute;
+            bottom: 90%; /* Aparece encima del logo */
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            width: 280px; /* Ancho cómodo para lectura */
+            background: rgba(15, 23, 42, 0.95); /* Fondo oscuro casi opaco */
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            color: #e2e8f0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            text-align: center;
+            line-height: 1.5;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
         }
 
-        .logo-wrapper:hover .logo-desc {
+        /* La flechita del tooltip */
+        .logo-desktop-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+        }
+
+        /* Mostrar Tooltip al Hover */
+        .logo-wrapper:hover .logo-desktop-tooltip {
             opacity: 1;
-            transform: translateY(0);
-            color: var(--accent-gold); 
+            visibility: visible;
+            transform: translateX(-50%) translateY(0); /* Pequeña animación hacia arriba */
+        }
+
+        /* Highlight del texto en tooltip */
+        .tooltip-highlight { color: var(--accent-gold); font-weight: 600; display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- MOBILE TAGLINE (El texto corto) --- */
+        .logo-mobile-tag {
+            display: none; /* Oculto en Desktop por defecto */
         }
 
         /* --- STACK CARDS (SWIPER 3D) --- */
@@ -490,27 +522,28 @@
             .logo-rows-container { 
                 display: grid; 
                 grid-template-columns: 1fr 1fr; 
-                gap: 30px 15px; 
+                gap: 40px 15px; 
             }
+            .logo-row { display: contents; }
             
-            .logo-row { display: contents; } /* Ignora los div de fila */
-            
-            .logo-wrapper {
-                margin-bottom: 10px;
-            }
-
-            .logo-item { 
-                height: 60px; 
-                margin-bottom: 5px; 
-            }
+            .logo-wrapper { margin-bottom: 15px; }
+            .logo-item { height: 60px; margin-bottom: 8px; }
             .logo-img { max-height: 45px; }
 
-            .logo-desc {
-                opacity: 1; /* SIEMPRE visible en móvil */
-                transform: none;
-                font-size: 0.7rem;
+            /* Ocultar Tooltip complejo en móvil */
+            .logo-desktop-tooltip { display: none !important; }
+
+            /* Mostrar Tagline simple en móvil */
+            .logo-mobile-tag {
                 display: block;
+                font-size: 0.7rem;
+                color: #94a3b8;
+                font-weight: 500;
+                text-align: center;
+                line-height: 1.3;
+                max-width: 90%;
             }
+            .logo-mobile-tag span { color: var(--accent); display: block; font-weight: 700; margin-bottom: 2px;}
         }
     </style>
 </head>
@@ -754,21 +787,45 @@
                         <a href="https://www.clarochile.cl/" target="_blank" class="logo-item" title="Claro Chile">
                             <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
                         </a>
-                        <span class="logo-desc">Global Telco Giant</span>
+                        <div class="logo-desktop-tooltip">
+                            <span class="tooltip-highlight">Global Telco Giant</span>
+                            Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.
+                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: Optus)</em>
+                        </div>
+                        <div class="logo-mobile-tag">
+                            <span>Global Telco Giant</span>
+                            Subsidiary of América Móvil
+                        </div>
                     </div>
 
                     <div class="logo-wrapper">
                         <a href="https://www.wom.cl/" target="_blank" class="logo-item" title="WOM">
                             <img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
                         </a>
-                        <span class="logo-desc">High-Growth Challenger</span>
+                         <div class="logo-desktop-tooltip">
+                            <span class="tooltip-highlight">High-Growth Challenger</span>
+                            Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.
+                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: TPG / Vodafone)</em>
+                        </div>
+                        <div class="logo-mobile-tag">
+                            <span>High-Growth Challenger</span>
+                            Disrupted market (20% share)
+                        </div>
                     </div>
 
                     <div class="logo-wrapper">
                         <a href="https://www.entel.cl/" target="_blank" class="logo-item" title="Entel">
                             <img src="logos/entel_chile.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
                         </a>
-                        <span class="logo-desc">Leader Telco (Sim. to Telstra)</span>
+                         <div class="logo-desktop-tooltip">
+                            <span class="tooltip-highlight">Leader Telco (10M+ Subs)</span>
+                            Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.
+                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: Telstra)</em>
+                        </div>
+                        <div class="logo-mobile-tag">
+                            <span>Leader Telco</span>
+                            Sim. to Telstra (10M+ Users)
+                        </div>
                     </div>
                 </div>
 
@@ -777,21 +834,44 @@
                         <a href="https://www.a3d.cl/" target="_blank" class="logo-item" title="A3D">
                             <img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
                         </a>
-                        <span class="logo-desc">Omnichannel Retail</span>
+                         <div class="logo-desktop-tooltip">
+                            <span class="tooltip-highlight">Omnichannel Retail</span>
+                            Major direct-response retail company with extensive cross-platform sales operations and logistics data.
+                        </div>
+                        <div class="logo-mobile-tag">
+                            <span>Omnichannel Retail</span>
+                            Major Direct-Response Firm
+                        </div>
                     </div>
 
                     <div class="logo-wrapper">
                         <a href="https://www.latamairlines.com/" target="_blank" class="logo-item" title="LATAM Airlines">
                             <img src="logos/latam_airlines_chile.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
                         </a>
-                        <span class="logo-desc">Largest Airline in S. America</span>
+                         <div class="logo-desktop-tooltip">
+                            <span class="tooltip-highlight">Largest Airline in S. America</span>
+                            The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.
+                            <br><em style="color:#64748b; font-size:0.75rem;">(Scale similar to Qantas)</em>
+                        </div>
+                        <div class="logo-mobile-tag">
+                            <span>Airline Leader</span>
+                            Largest in S. America (Sim. Qantas)
+                        </div>
                     </div>
 
                     <div class="logo-wrapper">
                         <a href="https://www.clinicaalemana.cl/" target="_blank" class="logo-item" title="Clínica Alemana">
                             <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
                         </a>
-                        <span class="logo-desc">Top Tier Private Hospital</span>
+                         <div class="logo-desktop-tooltip">
+                            <span class="tooltip-highlight">Top Tier Private Hospital</span>
+                            One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.
+                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: Ramsay Health)</em>
+                        </div>
+                        <div class="logo-mobile-tag">
+                            <span>Top Tier Hospital</span>
+                            JCI Accredited Leader
+                        </div>
                     </div>
                 </div>
             </div>
@@ -993,7 +1073,7 @@
                         <a href="#" class="btn-project">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
+                         <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
                     </div>
                 </div>
 
