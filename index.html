@@ -131,10 +131,22 @@
         .hero-tags { margin-bottom: 30px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
         .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
 
-        /* NUEVO: ESTILO PARA TECH STACK EN HERO */
-        .tech-stack-container {
-            display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin: 25px auto 40px; max-width: 900px;
+        /* ESTILO PARA TECH STACK EN HERO (Filas Ordenadas) */
+        .tech-stack-wrapper {
+            margin: 25px auto 40px; 
+            max-width: 900px;
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            align-items: center;
         }
+        .tech-row {
+            display: flex; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+
         .tech-pill {
             background: rgba(17, 24, 39, 0.6);
             border: 1px solid rgba(59, 130, 246, 0.3);
@@ -179,17 +191,10 @@
         .evo-company { font-size: 1.1rem; color: var(--accent); font-weight: 600; margin-bottom: 5px; display: block; }
         .evo-date { font-size: 0.85rem; color: #64748b; font-family: 'Fira Code', monospace; margin-bottom: 5px; display: block; }
         
-        /* NUEVO: ESTILO PARA MODALIDAD DE TRABAJO */
+        /* ESTILO PARA MODALIDAD DE TRABAJO */
         .evo-mode {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            background: rgba(255,255,255,0.05);
-            padding: 3px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-bottom: 15px;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.75rem; color: #94a3b8; background: rgba(255,255,255,0.05); padding: 3px 8px; border-radius: 4px;
+            display: inline-block; margin-bottom: 15px; font-weight: 600; border: 1px solid rgba(255,255,255,0.05);
         }
         .evo-mode i { margin-right: 5px; color: var(--accent); }
 
@@ -220,39 +225,24 @@
         .industries-box ul { padding-left: 20px; color: #cbd5e1; list-style-type: disc; }
         .industries-box li { margin-bottom: 8px; line-height: 1.6; }
 
-        /* NUEVO: CAJA DE PREFERRED ROLES */
+        /* CAJA DE PREFERRED ROLES */
         .roles-box { border-left-color: var(--accent); }
         .roles-box h4 { color: var(--accent); }
         .role-tag { display: block; margin-bottom: 8px; color: white; font-weight: 600; }
         .role-sub { display: block; font-size: 0.85em; color: #94a3b8; font-weight: 400; margin-top: 2px;}
 
-        /* --- WHATSAPP FLOATING BUTTON --- */
-        .whatsapp-float {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            bottom: 40px;
-            right: 40px;
-            background-color: var(--whatsapp-green);
-            color: #FFF;
-            border-radius: 50px;
-            text-align: center;
-            font-size: 30px;
-            box-shadow: 2px 2px 3px #999;
-            z-index: 3000; /* Por encima de todo */
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
-        }
-        .whatsapp-float:hover { transform: scale(1.1); background-color: #20b858; color: white;}
+        /* --- CONTACT & ICONS --- */
+        .contact-section { padding: 50px 0 80px; text-align: center; position: relative; z-index: 10; }
+        .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
         
-        @keyframes pulse-green {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-        }
-        .whatsapp-float { animation: pulse-green 2s infinite; }
+        /* Estilos base de los iconos de contacto */
+        .c-icon { font-size: 2.5rem; color: var(--text-muted); transition: 0.3s ease; margin: 0 10px; }
+        
+        /* HOVER CON COLORES DE MARCA */
+        .c-icon:hover { transform: translateY(-5px); }
+        .c-icon.email:hover { color: var(--accent-gold); }
+        .c-icon.linkedin:hover { color: #0077b5; }
+        .c-icon.whatsapp:hover { color: #25d366; }
 
         /* --- BOTONES --- */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -349,19 +339,7 @@
         .project-visual img { width: 85%; height: auto; border-radius: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: transform 0.5s ease; }
         .project-card:hover .project-visual img { transform: scale(1.02); }
 
-        /* --- CONTACT --- */
-        .contact-section { padding: 50px 0 80px; text-align: center; position: relative; z-index: 10; }
-        .contact-icons { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
-        .c-icon { font-size: 2rem; color: var(--text-muted); transition: 0.3s; }
-        .c-icon:hover { color: var(--accent-gold); transform: translateY(-5px); }
         footer { padding: 20px 0; text-align: center; font-size: 0.8rem; color: #555; border-top: 1px solid rgba(255,255,255,0.05); position: relative; z-index: 10; background: transparent; padding-bottom: 100px; }
-
-        @keyframes iconPop {
-            0% { transform: translateY(0); color: var(--text-muted); }
-            50% { transform: translateY(-15px); color: var(--accent-gold); }
-            100% { transform: translateY(0); color: var(--text-muted); }
-        }
-        .icon-pop { animation: iconPop 0.5s ease forwards; }
 
         /* --- MEDIA QUERIES (MOBILE OPTIMIZATION) --- */
         @media (min-width: 1200px) {
@@ -376,9 +354,6 @@
             
             /* Mostrar Menú Móvil */
             .mobile-nav-container { display: block; }
-
-            /* Ajustar WhatsApp para que no choque con el menú */
-            .whatsapp-float { bottom: 100px; right: 20px; width: 50px; height: 50px; font-size: 25px; }
 
             .hero { padding: 120px 0 40px; }
             .hero h1 { font-size: 2.2rem; padding: 0 10px; } 
@@ -426,10 +401,6 @@
         </nav>
     </div>
 
-    <a href="https://wa.me/56959021213" class="whatsapp-float" target="_blank">
-        <i class="fa-brands fa-whatsapp"></i>
-    </a>
-
     <header>
         <div class="container nav-flex">
             <div class="logo">Javier <span>Moraga</span></div>
@@ -453,15 +424,19 @@
             </div>
             <h1>Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span></h1>
             
-            <div class="tech-stack-container">
-                <div class="tech-pill"><span class="tech-dot"></span> BigQuery</div>
-                <div class="tech-pill"><span class="tech-dot"></span> SQL</div>
-                <div class="tech-pill"><span class="tech-dot"></span> Python</div>
-                <div class="tech-pill"><span class="tech-dot"></span> Dataform</div>
-                <div class="tech-pill"><span class="tech-dot"></span> GCP</div>
-                <div class="tech-pill"><span class="tech-dot"></span> Airflow</div>
-                <div class="tech-pill"><span class="tech-dot"></span> Looker Studio</div>
-                <div class="tech-pill"><span class="tech-dot"></span> Power BI</div>
+            <div class="tech-stack-wrapper">
+                <div class="tech-row">
+                    <div class="tech-pill"><span class="tech-dot"></span> BigQuery</div>
+                    <div class="tech-pill"><span class="tech-dot"></span> SQL</div>
+                    <div class="tech-pill"><span class="tech-dot"></span> Python</div>
+                    <div class="tech-pill"><span class="tech-dot"></span> GCP</div>
+                </div>
+                <div class="tech-row">
+                    <div class="tech-pill"><span class="tech-dot"></span> Dataform</div>
+                    <div class="tech-pill"><span class="tech-dot"></span> Airflow</div>
+                    <div class="tech-pill"><span class="tech-dot"></span> Looker Studio</div>
+                    <div class="tech-pill"><span class="tech-dot"></span> Power BI</div>
+                </div>
             </div>
 
             <p>
@@ -890,8 +865,9 @@
             </div>
             
             <div class="contact-icons">
-                <a href="mailto:javierignacio.moraga@gmail.com" class="c-icon"><i class="fa-solid fa-envelope"></i></a>
-                <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" class="c-icon"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="mailto:javierignacio.moraga@gmail.com" class="c-icon email"><i class="fa-solid fa-envelope"></i></a>
+                <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" class="c-icon linkedin"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://wa.me/56959021213" target="_blank" class="c-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
 
             <div style="margin-top: 30px;">
@@ -936,7 +912,6 @@
                     }
                 });
 
-                // Si estamos arriba del todo (header), que active el home
                 if (window.scrollY < 200) {
                     mobileLinks.forEach(link => link.classList.remove('active-nav'));
                     mobileLinks[0].classList.add('active-nav');
@@ -1085,21 +1060,6 @@
                 });
             }, { threshold: 0.2 });
             logoRows.forEach(row => rowObserver.observe(row));
-
-            let iconsAnimated = false; 
-            window.addEventListener('scroll', () => {
-                if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
-                    if (!iconsAnimated) {
-                        iconsAnimated = true;
-                        const icons = document.querySelectorAll('.c-icon');
-                        icons.forEach((icon, index) => {
-                            setTimeout(() => {
-                                icon.classList.add('icon-pop');
-                            }, index * 200);
-                        });
-                    }
-                }
-            });
         });
     </script>
 
