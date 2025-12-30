@@ -237,6 +237,7 @@
         .desktop-svg-container { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1000px; z-index: 1; pointer-events: none; overflow: visible; }
         .path-bg { fill: none; stroke: rgba(255, 255, 255, 0.03); stroke-width: 2px; }
         .path-progress { fill: none; stroke: url(#lineGradient); stroke-width: 2px; stroke-linecap: round; stroke-dasharray: 10000; stroke-dashoffset: 10000; transition: stroke-dashoffset 0.1s linear; }
+        /* CAMBIO 1: cx="500" para evitar el salto inicial a la izquierda */
         #desktopBall { filter: drop-shadow(0 0 10px var(--accent-gold)); transition: cx 0.1s linear, cy 0.1s linear; }
 
         .mobile-system { display: none; position: absolute; top: 0; bottom: 0; left: 20px; width: 2px; z-index: 0; }
@@ -626,7 +627,7 @@
             </defs>
             <path id="trackPath" class="path-bg" />
             <path id="progressPath" class="path-progress" />
-            <circle id="desktopBall" cx="0" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
+            <circle id="desktopBall" cx="500" cy="0" r="8" fill="white" style="filter: drop-shadow(0 0 10px var(--accent-gold));" />
         </svg>
 
         <div class="mobile-system">
@@ -892,7 +893,7 @@
                         <div class="slider-image">
                             <div class="mirror-card blue">
                                 <div class="mirror-content">
-                                    <h2>Cloud & Eng</h2>
+                                    <h2>Cloud & Engineering</h2>
                                     <div class="skill-group">
                                         <div class="skill-group-title">Core Skills</div>
                                         <ul class="skill-list">
@@ -987,7 +988,7 @@
                         <div class="slider-image">
                             <div class="mirror-card cyan">
                                 <div class="mirror-content">
-                                    <h2>Data Mgmt & Gov</h2>
+                                    <h2>Data Management & Governance</h2>
                                     <div class="skill-group">
                                         <div class="skill-group-title">Governance Scope</div>
                                         <ul class="skill-list">
@@ -1101,9 +1102,7 @@
                 <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" target="_blank" rel="noopener noreferrer" class="c-icon linkedin">
                     <i class="fa-brands fa-linkedin"></i>
                 </a>
-                
-                <a href="https://wa.me/56959021213" target="_blank" class="c-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></a>
-            </div>
+                </div>
 
             <div style="margin-top: 30px;">
                 <a href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
@@ -1326,7 +1325,7 @@
             loop: false,          
             centeredSlides: true, 
             slidesPerView: 'auto',
-            initialSlide: 2,      
+            initialSlide: 0, /* CAMBIO 2: Iniciar en la primera tarjeta */     
             slideToClickedSlide: true,
             coverflowEffect: {
                 rotate: 0,        
