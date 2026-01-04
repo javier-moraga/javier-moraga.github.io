@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive KPI Report | Case Study</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0b1120;
+            --bg-card: #1e293b;
+            --accent: #3b82f6;
+            --accent-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* NAVIGATION */
+        .nav-bar {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(11, 17, 32, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-sizing: border-box;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: var(--accent); transform: translateX(-5px); }
+
+        /* HERO SECTION */
+        .hero {
+            padding: 140px 20px 80px;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item { text-align: left; }
+        .meta-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .meta-value { font-size: 1rem; font-weight: 600; color: white; }
+
+        /* CONTENT CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
+        }
+
+        .section-block {
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.8s forwards;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { font-size: 1.8rem; margin-bottom: 30px; border-left: 4px solid var(--accent); padding-left: 20px; }
+        p { color: #cbd5e1; font-size: 1.1rem; margin-bottom: 20px; }
+
+        /* COMPLEXITY VISUAL (FILE STACK) */
+        .file-stack {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 30px;
+            position: relative;
+            margin: 40px 0;
+            overflow: hidden;
+        }
+
+        .file-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .file-row:last-child { border-bottom: none; }
+        .file-icon { color: var(--accent-gold); }
+        .file-tag { margin-left: auto; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
+
+        /* ARCHITECTURE DIAGRAM (CSS ONLY) */
+        .arch-diagram {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
+            align-items: center;
+            gap: 10px;
+            margin: 50px 0;
+            background: #111827;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            position: relative;
+        }
+
+        .arch-box {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .arch-box:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15); }
+        
+        .arch-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .arch-title { font-weight: 700; color: white; display: block; margin-bottom: 5px; }
+        .arch-sub { font-size: 0.8rem; color: var(--text-muted); }
+        
+        .arrow { color: var(--text-muted); font-size: 1.5rem; animation: pulseArrow 2s infinite; }
+
+        @keyframes pulseArrow { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+
+        /* CODE SNIPPET STYLE */
+        .code-container {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            position: relative;
+        }
+        .code-header {
+            position: absolute; top: 0; left: 0; width: 100%;
+            background: rgba(255,255,255,0.05); padding: 5px 15px;
+            font-size: 0.75rem; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .code-content { margin-top: 25px; }
+        .kw { color: #c678dd; } /* Keyword */
+        .func { color: #61afef; } /* Function */
+        .str { color: #98c379; } /* String */
+        .com { color: #5c6370; font-style: italic; } /* Comment */
+
+        /* COMPARISON TABLE */
+        .impact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .impact-card {
+            background: rgba(255,255,255,0.03);
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        .impact-val { font-size: 2.5rem; font-weight: 800; display: block; margin-bottom: 10px; }
+        .val-bad { color: #ef4444; }
+        .val-good { color: #10b981; }
+
+        @media (max-width: 768px) {
+            .arch-diagram { grid-template-columns: 1fr; gap: 30px; }
+            .arrow { transform: rotate(90deg); margin: 10px 0; }
+            .impact-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="../index.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+        </a>
+        <div style="font-weight: 700; color: white;">Javier Moraga</div>
+    </nav>
+
+    <header class="hero">
+        <div style="display:inline-block; padding: 5px 15px; background:rgba(59,130,246,0.1); border-radius:20px; color:var(--accent); font-size:0.8rem; font-weight:600; margin-bottom:20px;">
+            BUSINESS INTELLIGENCE & ENGINEERING
+        </div>
+        <h1>Executive KPI Report Consolidation</h1>
+        <p>From fragmented Excel files to a Unified Single Source of Truth for the Board of Directors.</p>
+        
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">Role</span>
+                <span class="meta-value">Lead Analyst / Coordinator</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Domain</span>
+                <span class="meta-value">Telecom (Finance, Network, Sales)</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Stack (Then)</span>
+                <span class="meta-value">Excel Adv, VBA</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Stack (Now)</span>
+                <span class="meta-value">BigQuery, Python, PowerBI</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="section-block">
+            <h2>The Data Challenge (2016)</h2>
+            <p>
+                Every week, the General Manager required a consolidated view of the business to make strategic decisions. 
+                However, the data landscape was fragmented. Information arrived in isolated "silos" via email, often with conflicting metrics.
+            </p>
+            <p>
+                My responsibility was to centralize over 20+ distinct data sources into a master report, ensuring that 
+                <strong>Finance (EBITDA)</strong>, <strong>Network (Availability)</strong>, and <strong>Commercial (Churn)</strong> numbers were consistent.
+            </p>
+
+            <div class="file-stack">
+                <div style="position:absolute; top:10px; right:15px; font-size:0.7rem; color:#64748b;">SOURCE INPUTS (SIMULATION)</div>
+                
+                <div class="file-row">
+                    <i class="fa-solid fa-file-csv file-icon"></i>
+                    <span>...REPORTE_DIRECCIÓN_2016_EdoRes.csv</span>
+                    <span class="file-tag">FINANCE</span>
+                </div>
+                <div class="file-row">
+                    <i class="fa-solid fa-file-csv file-icon"></i>
+                    <span>...REPORTE_DIRECCIÓN_Infraestructura.csv</span>
+                    <span class="file-tag">NETWORK</span>
+                </div>
+                <div class="file-row">
+                    <i class="fa-solid fa-file-csv file-icon"></i>
+                    <span>...REPORTE_DIRECCIÓN_Portabilidad.csv</span>
+                    <span class="file-tag">COMMERCIAL</span>
+                </div>
+                <div class="file-row">
+                    <i class="fa-solid fa-file-csv file-icon"></i>
+                    <span>...REPORTE_DIRECCIÓN_Calidad_Red.csv</span>
+                    <span class="file-tag">ENGINEERING</span>
+                </div>
+                <div class="file-row">
+                    <i class="fa-solid fa-file-excel file-icon" style="color:#10b981;"></i>
+                    <span style="color:white; font-weight:600;">MASTER_CONSOLIDATED_REPORT_V_FINAL_REAL.xlsx</span>
+                    <span class="file-tag" style="background:rgba(16,185,129,0.2); color:#10b981;">OUTPUT</span>
+                </div>
+            </div>
+            
+            <p><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444; margin-right:8px;"></i> <strong>Pain Points:</strong> High risk of human error during copy-paste, version control issues ("Is this the V2 or V3?"), and 6+ hours of manual processing every Monday morning.</p>
+        </div>
+
+        <div class="section-block">
+            <h2>The Modernization Proposal (2026 Vision)</h2>
+            <p>
+                If I were to rebuild this ecosystem today for the Australian market, I would move away from manual file handling 
+                to an <strong>Automated ELT (Extract, Load, Transform) Architecture</strong>.
+            </p>
+            <p>
+                This ensures data lineage, automated quality checks (e.g., alerting if <em>Active Users</em> drops by >10%), 
+                and near real-time availability.
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-box">
+                    <i class="fa-brands fa-python arch-icon" style="color:#3b82f6;"></i>
+                    <span class="arch-title">Ingestion</span>
+                    <span class="arch-sub">Python / Airflow</span>
+                </div>
+                
+                <i class="fa-solid fa-arrow-right arrow"></i>
+
+                <div class="arch-box" style="border-color:var(--accent-gold);">
+                    <i class="fa-brands fa-google arch-icon" style="color:var(--accent-gold);"></i>
+                    <span class="arch-title">Warehouse</span>
+                    <span class="arch-sub">Google BigQuery</span>
+                </div>
+
+                <i class="fa-solid fa-arrow-right arrow"></i>
+
+                <div class="arch-box">
+                    <i class="fa-solid fa-chart-simple arch-icon" style="color:#10b981;"></i>
+                    <span class="arch-title">Visualization</span>
+                    <span class="arch-sub">Power BI</span>
+                </div>
+            </div>
+
+            <h3>Technical Implementation (Code Snippet)</h3>
+            <p>Instead of VLOOKUPs, we use SQL for robust transformations. Here is how I would model the "Customer Churn" logic using BigQuery SQL:</p>
+
+            <div class="code-container">
+                <div class="code-header">process_daily_kpis.sql</div>
+                <div class="code-content">
+<pre>
+<span class="kw">MERGE</span> `claro-data-warehouse.exec_reports.daily_kpis` T
+<span class="kw">USING</span> (
+    <span class="kw">SELECT</span>
+        date_id,
+        region,
+        <span class="kw">SUM</span>(gross_adds) <span class="kw">AS</span> total_activations,
+        <span class="kw">SUM</span>(churn_vol) + <span class="kw">SUM</span>(churn_invol) <span class="kw">AS</span> total_churn,
+        <span class="com">-- Calculated Field: Net Adds</span>
+        (<span class="kw">SUM</span>(gross_adds) - (<span class="kw">SUM</span>(churn_vol) + <span class="kw">SUM</span>(churn_invol))) <span class="kw">AS</span> net_adds
+    <span class="kw">FROM</span> `claro-data-warehouse.staging.commercial_movements`
+    <span class="kw">WHERE</span> date_id = <span class="kw">CURRENT_DATE</span>()
+    <span class="kw">GROUP BY</span> 1, 2
+) S
+<span class="kw">ON</span> T.date_id = S.date_id <span class="kw">AND</span> T.region = S.region
+<span class="kw">WHEN MATCHED THEN</span>
+    <span class="kw">UPDATE SET</span> total_churn = S.total_churn, net_adds = S.net_adds
+<span class="kw">WHEN NOT MATCHED THEN</span>
+    <span class="kw">INSERT</span> (date_id, region, total_activations, total_churn, net_adds)
+    <span class="kw">VALUES</span> (S.date_id, S.region, S.total_activations, S.total_churn, S.net_adds);
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h2>Quantifiable Impact</h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <span class="meta-label">Processing Time</span>
+                    <div class="impact-val val-bad">6 Hours</div>
+                    <span style="color:#64748b;">Manual Process (2016)</span>
+                </div>
+                <div class="impact-card" style="border:1px solid rgba(16,185,129,0.3); background:rgba(16,185,129,0.05);">
+                    <span class="meta-label">Processing Time</span>
+                    <div class="impact-val val-good">15 Mins</div>
+                    <span style="color:#64748b;">Automated Pipeline (Proposed)</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px; padding: 20px; border-left: 4px solid var(--accent-gold); background: rgba(251, 191, 36, 0.05);">
+                <h4 style="color:var(--accent-gold); margin:0 0 10px 0;">Executive Summary</h4>
+                <p style="margin:0; font-size:0.95rem;">
+                    This project demonstrates my ability to understand complex legacy business logic and translate it into modern data engineering workflows. 
+                    I bridge the gap between "Business Requirements" (The Excel sheet) and "Technical Execution" (Cloud Architecture).
+                </p>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:80px;">
+            <a href="../index.html#contact" style="display:inline-block; padding:15px 30px; background:var(--accent); color:white; border-radius:30px; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(59,130,246,0.4);">
+                Hire Me for Your Data Team
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>
