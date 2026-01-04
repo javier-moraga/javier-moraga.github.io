@@ -13,7 +13,7 @@
         :root {
             /* Healthcare / Data Governance Palette */
             --bg-dark: #0f172a;
-            --health-teal: #14b8a6; /* Acento principal (Teal) */
+            --health-teal: #14b8a6; /* Acento principal (Teal/Turquesa) */
             --health-dark-teal: #115e59;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -226,7 +226,7 @@
                 <div class="gov-card">
                     <div class="gov-icon"><i class="fa-solid fa-user-shield"></i></div>
                     <span class="gov-title">PII Protection</span>
-                    <span class="gov-desc">Tables containing Patient ID or personal info are tagged with <code>dg-has-pii: si</code> and <code>dg-data-classification: altamente_sensible</code>.</span>
+                    <span class="gov-desc">Tables containing Patient ID or personal info are tagged with <code>dg-has-pii: true</code> and <code>dg-data-classification: highly_sensitive</code>.</span>
                 </div>
                 <div class="gov-card">
                     <div class="gov-icon"><i class="fa-solid fa-check-double"></i></div>
@@ -238,25 +238,25 @@
             <div class="code-window">
                 <div class="code-header">
                     <span><i class="fa-solid fa-code"></i> bigquery/ddl/create_patient_table.sql</span>
-                    <span style="font-size:0.75rem;">SQL</span>
+                    <span style="font-size:0.75rem;">SQL (BigQuery)</span>
                 </div>
                 <div class="code-body">
-<span class="k-purp">CREATE TABLE</span> `{project-id}.ds_raw_datalake.pacientes`
+<span class="k-purp">CREATE TABLE</span> `{project-id}.ds_raw_datalake.patients`
 (
-  id_paciente   <span class="k-blue">STRING</span>  <span class="k-gray">OPTIONS(description = "Identificador único")</span>,
-  fecha_ingreso <span class="k-blue">DATE</span>    <span class="k-gray">OPTIONS(description = "Fecha registro sistema")</span>,
-  diagnostico   <span class="k-blue">STRING</span>  <span class="k-gray">OPTIONS(description = "Código CIE-10")</span>
+  patient_id    <span class="k-blue">STRING</span>  <span class="k-gray">OPTIONS(description = "Unique Patient Identifier")</span>,
+  admit_date    <span class="k-blue">DATE</span>    <span class="k-gray">OPTIONS(description = "Admission Date")</span>,
+  diagnosis_cd  <span class="k-blue">STRING</span>  <span class="k-gray">OPTIONS(description = "ICD-10 Code")</span>
 )
-<span class="k-purp">PARTITION BY</span> <span class="k-blue">DATE</span>(fecha_ingreso)
-<span class="k-purp">CLUSTER BY</span> id_paciente
+<span class="k-purp">PARTITION BY</span> <span class="k-blue">DATE</span>(admit_date)
+<span class="k-purp">CLUSTER BY</span> patient_id
 <span class="k-purp">OPTIONS</span>(
-  description = <span class="k-green">"Tabla maestra de pacientes con datos sensibles"</span>,
+  description = <span class="k-green">"Master patient table containing sensitive medical records (PII/PHI)"</span>,
   labels = [
     (<span class="k-green">"dg-layer"</span>, <span class="k-green">"raw"</span>),
-    (<span class="k-green">"dg-ingestion-type"</span>, <span class="k-green">"fundacional"</span>),
-    (<span class="k-green">"dg-has-pii"</span>, <span class="k-green">"si"</span>),
-    (<span class="k-green">"dg-data-classification"</span>, <span class="k-green">"altamente_sensible"</span>),
-    (<span class="k-green">"dg-domain"</span>, <span class="k-green">"salud"</span>)
+    (<span class="k-green">"dg-ingestion-type"</span>, <span class="k-green">"foundational"</span>),
+    (<span class="k-green">"dg-has-pii"</span>, <span class="k-green">"true"</span>),
+    (<span class="k-green">"dg-data-classification"</span>, <span class="k-green">"highly_sensitive"</span>),
+    (<span class="k-green">"dg-domain"</span>, <span class="k-green">"healthcare"</span>)
   ]
 );
                 </div>
