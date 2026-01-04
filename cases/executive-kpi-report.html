@@ -12,8 +12,8 @@
     <style>
         :root {
             --bg-dark: #0b1120;
-            --claro-red: #da291c; /* Rojo Corporativo */
-            --claro-dark-red: #7f1d1d;
+            --claro-red: #da291c; /* Rojo Corporativo Claro */
+            --claro-accent: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --card-bg: rgba(255, 255, 255, 0.03);
@@ -41,7 +41,7 @@
         }
         .back-link:hover { color: var(--claro-red); transform: translateX(-5px); }
 
-        /* --- HERO SECTION --- */
+        /* --- HERO SECTION (Corporate Style) --- */
         .hero {
             padding: 140px 20px 60px;
             max-width: 1000px; margin: 0 auto; text-align: center;
@@ -74,92 +74,68 @@
 
         h2 { font-size: 1.8rem; margin-bottom: 30px; border-left: 4px solid var(--claro-red); padding-left: 20px; color: white; }
         p { color: #cbd5e1; font-size: 1.1rem; margin-bottom: 20px; }
-        
-        /* --- TIMELINE (MONDAY MADNESS) --- */
-        .timeline-container {
-            background: #1e1b4b; /* Dark Blue base */
-            background: linear-gradient(to bottom, #171717, #0f0f0f);
-            padding: 30px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+        strong { color: white; }
+
+        /* --- DASHBOARD RECREATION (Corporate Red Theme) --- */
+        .dashboard-mockup {
+            background: #1c1917; /* Darker corporate bg */
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 30px; margin: 40px 0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             position: relative;
         }
-        .timeline-title { text-align: center; color: white; font-weight: 700; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px;}
-        
-        .timeline-steps {
-            display: flex; justify-content: space-between; position: relative;
+        .dash-header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .dash-title { font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px; }
+        .dash-date { color: var(--claro-red); font-family: 'Fira Code', monospace; }
+
+        /* KPI CARDS */
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-mini-card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; text-align: left; border-left: 3px solid #44403c; transition: 0.3s; }
+        .kpi-mini-card:hover { border-left-color: var(--claro-red); background: rgba(255,255,255,0.08); }
+        .kpi-val { font-size: 1.8rem; font-weight: 800; color: white; display: block; margin: 5px 0; }
+        .kpi-lbl { font-size: 0.75rem; color: #a8a29e; text-transform: uppercase; letter-spacing: 0.5px; }
+        .trend-badge { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; float: right; }
+        .bg-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .bg-red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+        /* TIMELINE VISUALIZATION (For the 15:00 Deadline) */
+        .timeline-box {
+            background: rgba(255,255,255,0.02); padding: 30px; border-radius: 12px; margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
+        .timeline-steps { display: flex; justify-content: space-between; position: relative; margin-top: 20px; }
         .timeline-steps::before {
-            content: ''; position: absolute; top: 20px; left: 0; width: 100%; height: 2px;
+            content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 2px;
             background: rgba(255,255,255,0.1); z-index: 0;
         }
         .t-step { position: relative; z-index: 1; text-align: center; width: 25%; }
-        .t-circle {
-            width: 40px; height: 40px; background: #262626; border: 2px solid #525252;
-            border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            color: #a3a3a3; font-weight: bold; transition: 0.3s;
+        .t-dot {
+            width: 32px; height: 32px; background: #262626; border: 2px solid #525252;
+            border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;
+            color: #a3a3a3; font-size: 0.8rem; transition: 0.3s;
         }
-        .t-step:hover .t-circle { border-color: var(--claro-red); color: white; background: var(--claro-red); box-shadow: 0 0 15px var(--claro-red); }
+        .t-step:hover .t-dot { border-color: var(--claro-red); background: var(--claro-red); color: white; box-shadow: 0 0 15px var(--claro-red); }
+        .t-time { color: var(--claro-red); font-family: 'Fira Code', monospace; font-size: 0.8rem; font-weight: bold; }
+        .t-desc { font-size: 0.8rem; color: #cbd5e1; margin-top: 5px; }
+
+        /* --- CODE/PROCESS SECTION --- */
+        .process-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+        .process-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border-left: 3px solid var(--claro-red); }
+        .process-card h4 { margin: 0 0 10px 0; color: white; display: flex; align-items: center; gap: 10px; }
         
-        .t-time { font-family: 'Fira Code', monospace; color: var(--claro-red); font-size: 0.8rem; display: block; margin-bottom: 5px; }
-        .t-desc { color: #cbd5e1; font-size: 0.9rem; font-weight: 600; }
-        .t-detail { font-size: 0.75rem; color: #64748b; margin-top: 5px; line-height: 1.4; }
-
-        /* --- DATA SOURCES GRID --- */
-        .sources-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin: 30px 0;
+        .code-block {
+            background: #0f172a; border-radius: 12px; padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1); font-family: 'Fira Code', monospace;
+            font-size: 0.9rem; color: #e2e8f0; overflow-x: auto; margin-top: 30px;
         }
-        .source-tag {
-            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px;
-            font-size: 0.75rem; color: #94a3b8; border: 1px solid transparent; text-align: center;
-            transition: 0.3s;
-        }
-        .source-tag:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; }
-        .source-tag i { display: block; font-size: 1.2rem; margin-bottom: 5px; color: var(--claro-red); }
-
-        /* --- DASHBOARD MOCKUP (CORPORATE) --- */
-        .corp-dashboard {
-            background: #1c1917; border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .cd-header {
-            background: #292524; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .cd-title { font-weight: 700; color: white; font-size: 0.9rem; text-transform: uppercase; }
-        .cd-confidential { background: #7f1d1d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
-
-        .cd-body { padding: 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-        
-        .cd-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .cd-card { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 6px; border-left: 3px solid #57534e; }
-        .cd-card.finance { border-left-color: #10b981; } /* Profit */
-        .cd-card.red { border-left-color: var(--claro-red); } /* Alert */
-        
-        .cd-label { font-size: 0.7rem; color: #a8a29e; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .cd-value { font-size: 1.4rem; color: white; font-weight: 700; }
-        .cd-sub { font-size: 0.7rem; color: #10b981; } .cd-sub.neg { color: #ef4444; }
-
-        .cd-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; color: #d6d3d1; }
-        .cd-table th { text-align: left; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #78716c; }
-        .cd-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .cd-bar { height: 4px; background: #44403c; border-radius: 2px; width: 100%; position: relative; margin-top: 5px;}
-        .cd-fill { height: 100%; background: var(--claro-red); position: absolute; }
-
-        /* --- MODERN STACK --- */
-        .tech-flow {
-            display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 30px;
-            background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px;
-        }
-        .tf-box { text-align: center; }
-        .tf-icon { font-size: 1.5rem; color: white; margin-bottom: 5px; }
-        .tf-text { font-size: 0.8rem; color: #94a3b8; }
-        .tf-arrow { color: #525252; }
+        .kw { color: #c678dd; } .func { color: #61afef; } .str { color: #98c379; } .com { color: #5c6370; }
 
         @media (max-width: 768px) {
+            .kpi-row, .process-grid { grid-template-columns: 1fr; }
             .timeline-steps { flex-direction: column; gap: 20px; }
-            .timeline-steps::before { left: 20px; width: 2px; height: 100%; top: 0; }
-            .t-step { width: 100%; text-align: left; padding-left: 60px; }
-            .t-circle { position: absolute; left: 0; margin: 0; }
-            .cd-body { grid-template-columns: 1fr; }
+            .timeline-steps::before { width: 2px; height: 100%; left: 15px; top: 0; }
+            .t-step { text-align: left; padding-left: 50px; }
+            .t-dot { position: absolute; left: 0; margin: 0; }
             .hero h1 { font-size: 2rem; }
         }
     </style>
@@ -176,7 +152,7 @@
     <header class="hero">
         <span class="hero-badge">CORPORATE STRATEGY</span>
         <h1>Executive Reporting Orchestration</h1>
-        <p>Providing the "Single Source of Truth" for the General Manager and Board of Directors.</p>
+        <p>The "Single Source of Truth" for the General Manager and Board of Directors.</p>
         
         <div class="meta-grid">
             <div class="meta-item">
@@ -189,7 +165,7 @@
             </div>
             <div class="meta-item">
                 <span class="meta-label">Deadline</span>
-                <span class="meta-value">Every Monday @ 15:00</span>
+                <span class="meta-value">Mondays @ 15:00</span>
             </div>
             <div class="meta-item">
                 <span class="meta-label">Complexity</span>
@@ -201,137 +177,124 @@
     <div class="container">
 
         <div class="section-block">
-            <h2>The Challenge: High-Stakes Coordination</h2>
+            <h2>The Challenge: 21 Sources, 1 Truth</h2>
             <p>
-                In 2016, C-Level decision-making relied on a unified weekly report. 
-                This document wasn't just a spreadsheet; it was the company's compass. 
+                In 2016, C-Level decision-making relied on a unified weekly report. This document was the company's compass. 
                 My role was to centralize information from Finance, Engineering, and Commercial departments 
                 into a coherent narrative, updated weekly with strict deadlines.
             </p>
-            
-            <div class="timeline-container">
-                <div class="timeline-title"><i class="fa-regular fa-clock"></i> The "Monday Sprint" Workflow</div>
+            <p>
+                <strong>The "Monday Sprint":</strong> Every Monday was a race against time to validate and consolidate 21 disparate sources (CSVs, Excel, Emails) before the 15:00 Board Meeting.
+            </p>
+
+            <div class="timeline-box">
+                <div style="color:white; font-weight:700; margin-bottom:10px;"><i class="fa-regular fa-clock"></i> Weekly Workflow</div>
                 <div class="timeline-steps">
                     <div class="t-step">
-                        <div class="t-circle">1</div>
-                        <span class="t-time">09:00 AM</span>
-                        <div class="t-desc">Data Collection</div>
-                        <div class="t-detail">Receiving 21+ files from Managers (Finance, Ops, Sales).</div>
+                        <div class="t-dot">1</div>
+                        <span class="t-time">09:00</span>
+                        <div class="t-desc">Collection (21 Sources)</div>
                     </div>
                     <div class="t-step">
-                        <div class="t-circle">2</div>
-                        <span class="t-time">11:00 AM</span>
-                        <div class="t-desc">Validation</div>
-                        <div class="t-detail">Cross-checking KPIs (e.g., Sales vs. Activations). Detecting anomalies.</div>
+                        <div class="t-dot">2</div>
+                        <span class="t-time">11:00</span>
+                        <div class="t-desc">Cross-Validation</div>
                     </div>
                     <div class="t-step">
-                        <div class="t-circle">3</div>
-                        <span class="t-time">13:00 PM</span>
-                        <div class="t-desc">Consolidation</div>
-                        <div class="t-detail">Updating the Master Model. Integrating qualitative feedback.</div>
+                        <div class="t-dot">3</div>
+                        <span class="t-time">13:00</span>
+                        <div class="t-desc">Master Consolidation</div>
                     </div>
                     <div class="t-step">
-                        <div class="t-circle">4</div>
-                        <span class="t-time">15:00 PM</span>
-                        <div class="t-desc">Delivery</div>
-                        <div class="t-detail">Final submission to the General Manager for the Board Meeting.</div>
+                        <div class="t-dot">4</div>
+                        <span class="t-time">15:00</span>
+                        <div class="t-desc">Delivery to CEO</div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="section-block">
-            <h2>The Ecosystem: 21 Sources of Truth</h2>
+            <h2>The Artifact: Executive Dashboard</h2>
             <p>
-                I acted as the central node for information, harmonizing disparate formats (CSV, Excel, Email) into a standardized model.
+                The output was a high-level summary tracking strategic goals (EBITDA, Market Share, Network Quality). 
+                Below is a CSS recreation of the key metrics managed:
             </p>
-            <div class="sources-grid">
-                <div class="source-tag"><i class="fa-solid fa-money-bill-trend-up"></i>Estatus Objetivos</div>
-                <div class="source-tag"><i class="fa-solid fa-chart-pie"></i>EBITDA & P&L</div>
-                <div class="source-tag"><i class="fa-solid fa-tower-cell"></i>Calidad de Red</div>
-                <div class="source-tag"><i class="fa-solid fa-users"></i>Carátula Móvil</div>
-                <div class="source-tag"><i class="fa-solid fa-right-left"></i>Portabilidad</div>
-                <div class="source-tag"><i class="fa-solid fa-shop"></i>Puntos de Venta</div>
-                <div class="source-tag"><i class="fa-solid fa-boxes-stacked"></i>Inventario</div>
-                <div class="source-tag"><i class="fa-solid fa-headset"></i>Call Center KPIs</div>
+            
+            <div class="dashboard-mockup">
+                <div class="dash-header">
+                    <span class="dash-title">Reporte de Dirección Semanal</span>
+                    <span class="dash-date">WEEK 43 / OCT 2016</span>
+                </div>
+
+                <div class="kpi-row">
+                    <div class="kpi-mini-card">
+                        <span class="kpi-lbl">EBITDA (YTD)</span>
+                        <span class="trend-badge bg-green">+1.2 vs Budget</span>
+                        <span class="kpi-val">4.4 Pts</span>
+                        <span style="font-size:0.75rem; color:#94a3b8;">Solid Profitability</span>
+                    </div>
+                    <div class="kpi-mini-card">
+                        <span class="kpi-lbl">Net Portability</span>
+                        <span class="trend-badge bg-red">-1,405 Subs</span>
+                        <span class="kpi-val">-0.8%</span>
+                        <span style="font-size:0.75rem; color:#94a3b8;">Alert: South Region</span>
+                    </div>
+                    <div class="kpi-mini-card">
+                        <span class="kpi-lbl">Network Availability</span>
+                        <span class="trend-badge bg-green">Stable</span>
+                        <span class="kpi-val">99.3%</span>
+                        <span style="font-size:0.75rem; color:#94a3b8;">2G/3G Access</span>
+                    </div>
+                </div>
+
+                <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:8px;">
+                    <h4 style="color:white; margin:0 0 15px 0; font-size:0.9rem; text-transform:uppercase;">Sales Performance vs Budget</h4>
+                    <table style="width:100%; color:#cbd5e1; font-size:0.85rem; border-collapse:collapse;">
+                        <tr style="border-bottom:1px solid rgba(255,255,255,0.1); text-align:left;">
+                            <th style="padding-bottom:10px;">Unit</th>
+                            <th style="padding-bottom:10px;">Execution</th>
+                            <th style="padding-bottom:10px;">Trend</th>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px 0;">Postpaid Sales</td>
+                            <td>
+                                <div style="width:100%; background:#44403c; height:6px; border-radius:3px; position:relative;">
+                                    <div style="width:92%; background:var(--claro-red); height:100%; border-radius:3px;"></div>
+                                </div>
+                                <span style="font-size:0.7rem; float:right; margin-top:4px;">92%</span>
+                            </td>
+                            <td style="color:#fca5a5;"><i class="fa-solid fa-arrow-down"></i> Under</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px 0;">Collections</td>
+                            <td>
+                                <div style="width:100%; background:#44403c; height:6px; border-radius:3px; position:relative;">
+                                    <div style="width:98%; background:#10b981; height:100%; border-radius:3px;"></div>
+                                </div>
+                                <span style="font-size:0.7rem; float:right; margin-top:4px;">98%</span>
+                            </td>
+                            <td style="color:#34d399;"><i class="fa-solid fa-check"></i> On Target</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="section-block">
-            <h2>The Output: Executive Dashboard</h2>
-            <p>
-                The final product was a high-level executive summary used to track the company's strategic goals.
-                <em>(Recreated below using CSS based on actual project metrics).</em>
-            </p>
-
-            <div class="corp-dashboard">
-                <div class="cd-header">
-                    <span class="cd-title">Reporte Semanal de Dirección</span>
-                    <span class="cd-confidential">CONFIDENTIAL / INTERNAL USE</span>
+            <h2>Integration Methodology</h2>
+            <div class="process-grid">
+                <div class="process-card">
+                    <h4><i class="fa-solid fa-layer-group" style="color:var(--claro-red);"></i> Data Centralization</h4>
+                    <p style="font-size:0.9rem; margin:0;">
+                        Acting as the central node to harmonize data from Finance (P&L), Engineering (Site Uptime), and Commercial (Gross Adds) into a standardized model.
+                    </p>
                 </div>
-                <div class="cd-body">
-                    <div class="cd-left">
-                        <div class="cd-kpi-grid">
-                            <div class="cd-card finance">
-                                <span class="cd-label">EBITDA (YTD)</span>
-                                <span class="cd-value">4.4 Pts</span>
-                                <span class="cd-sub"><i class="fa-solid fa-caret-up"></i> +1.2 vs Budget</span>
-                            </div>
-                            <div class="cd-card">
-                                <span class="cd-label">Suscriptores Totales</span>
-                                <span class="cd-value">6.8M</span>
-                                <span class="cd-sub"><i class="fa-solid fa-caret-up"></i> +0.5% WoW</span>
-                            </div>
-                            <div class="cd-card red">
-                                <span class="cd-label">Portabilidad Neta</span>
-                                <span class="cd-value">-1,405</span>
-                                <span class="cd-sub neg"><i class="fa-solid fa-caret-down"></i> Alerta Zona Sur</span>
-                            </div>
-                            <div class="cd-card">
-                                <span class="cd-label">Disp. de Red (Access)</span>
-                                <span class="cd-value">99.3%</span>
-                                <span class="cd-sub">Estable</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="cd-right">
-                        <table class="cd-table">
-                            <thead>
-                                <tr>
-                                    <th>Unidad</th>
-                                    <th>% Cumplimiento</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Ventas Postpago</td>
-                                    <td>
-                                        92%
-                                        <div class="cd-bar"><div class="cd-fill" style="width: 92%;"></div></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Ventas Prepago</td>
-                                    <td>
-                                        88%
-                                        <div class="cd-bar"><div class="cd-fill" style="width: 88%;"></div></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Recaudación</td>
-                                    <td>
-                                        98%
-                                        <div class="cd-bar"><div class="cd-fill" style="width: 98%; background:#10b981;"></div></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div style="margin-top:20px; padding:10px; background:rgba(255,255,255,0.05); border-radius:4px; font-size:0.7rem; color:#a8a29e;">
-                            <strong>Notas de Gerencia:</strong><br>
-                            Foco en recuperación de Portabilidad en RM. Revisar inventario de equipos gama alta para campaña Navidad.
-                        </div>
-                    </div>
+                <div class="process-card">
+                    <h4><i class="fa-solid fa-shield-halved" style="color:var(--claro-red);"></i> Data Integrity</h4>
+                    <p style="font-size:0.9rem; margin:0;">
+                        Rigorous cross-validation logic (e.g., ensuring "Sales" reported by Commercial matched "Activations" reported by Network) before C-Level presentation.
+                    </p>
                 </div>
             </div>
         </div>
@@ -339,29 +302,36 @@
         <div class="section-block">
             <h2>Modernization Vision (2026)</h2>
             <p>
-                Moving from manual consolidation to automated pipelines. If I were to re-architect this solution today 
-                using modern cloud stacks:
+                If I were to re-architect this legacy solution today using a modern cloud stack, I would move from manual consolidation to an <strong>Automated ELT Pipeline</strong>:
             </p>
-            
-            <div class="tech-flow">
-                <div class="tf-box">
-                    <div class="tf-icon"><i class="fa-brands fa-python"></i></div>
-                    <div class="tf-text"><strong>Ingest</strong><br>Auto-fetch CSVs from SharePoint/FTP</div>
-                </div>
-                <div class="tf-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                <div class="tf-box">
-                    <div class="tf-icon"><i class="fa-solid fa-database"></i></div>
-                    <div class="tf-text"><strong>Warehouse</strong><br>BigQuery for consolidation & history</div>
-                </div>
-                <div class="tf-arrow"><i class="fa-solid fa-arrow-right"></i></div>
-                <div class="tf-box">
-                    <div class="tf-icon"><i class="fa-solid fa-bolt"></i></div>
-                    <div class="tf-text"><strong>Real-Time</strong><br>Power BI Dashboard (No more PDFs)</div>
-                </div>
+            <ul style="list-style:none; padding:0; color:#cbd5e1;">
+                <li style="margin-bottom:10px;"><i class="fa-solid fa-check" style="color:#10b981; margin-right:10px;"></i> <strong>Ingest:</strong> Python scripts to auto-fetch CSVs from SharePoint/FTP.</li>
+                <li style="margin-bottom:10px;"><i class="fa-solid fa-check" style="color:#10b981; margin-right:10px;"></i> <strong>Warehouse:</strong> Centralize 21 sources into Google BigQuery.</li>
+                <li style="margin-bottom:10px;"><i class="fa-solid fa-check" style="color:#10b981; margin-right:10px;"></i> <strong>Viz:</strong> Power BI Dashboard with real-time updates (Eliminating the 15:00 deadline stress).</li>
+            </ul>
+
+            <div class="code-block">
+<pre>
+<span class="com"># Modern Approach: Automated Validation Logic (Python)</span>
+<span class="kw">def</span> <span class="func">validate_kpi_integrity</span>(sales_df, network_df):
+    <span class="str">"""Ensures Sales numbers match Network Activations"""</span>
+    
+    sales_count = sales_df[<span class="str">'gross_adds'</span>].sum()
+    network_activations = network_df[<span class="str">'new_subscribers'</span>].sum()
+    
+    delta = <span class="kw">abs</span>(sales_count - network_activations)
+    threshold = <span class="kw">0.02</span> <span class="com"># 2% Acceptable variance</span>
+    
+    <span class="kw">if</span> delta / sales_count > threshold:
+        <span class="kw">raise</span> <span class="func">DataIntegrityError</span>(<span class="str">f"Mismatch detected! Delta: {delta}"</span>)
+    
+    <span class="kw">return</span> <span class="kw">True</span>
+</pre>
             </div>
         </div>
 
         <div style="text-align:center; margin-top:80px; border-top:1px solid rgba(255,255,255,0.1); padding-top:40px;">
+            <p style="color:#94a3b8; font-size:0.9rem;">Demonstrating the ability to manage complex corporate data environments.</p>
             <a href="../index.html#contact" style="display:inline-block; padding:15px 30px; background:var(--claro-red); color:white; border-radius:30px; font-weight:700; text-decoration:none; box-shadow:0 10px 30px rgba(218, 41, 28, 0.4); transition:0.3s;">
                 Contact Javier
             </a>
