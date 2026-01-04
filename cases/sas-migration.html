@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAS to BigQuery Migration | Data Engineering Portfolio</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Healthcare / Data Governance Palette */
+            --bg-dark: #0f172a;
+            --health-teal: #14b8a6; /* Acento principal (Teal) */
+            --health-dark-teal: #115e59;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(20, 184, 166, 0.03);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* --- NAVIGATION --- */
+        .nav-bar {
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            position: fixed; width: 100%; top: 0; z-index: 100; box-sizing: border-box;
+        }
+        .back-link {
+            text-decoration: none; color: var(--text-muted); font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .back-link:hover { color: var(--health-teal); transform: translateX(-5px); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 140px 20px 60px;
+            max-width: 1000px; margin: 0 auto; text-align: center;
+            background: radial-gradient(circle at center, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+        }
+        .hero h1 {
+            font-size: 3rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #5eead4);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero-badge {
+            display:inline-block; padding: 5px 15px; 
+            background: rgba(20, 184, 166, 0.1); border: 1px solid var(--health-teal);
+            border-radius:20px; color: var(--health-teal); font-size:0.75rem; font-weight:700; margin-bottom:20px; letter-spacing: 1px;
+        }
+
+        .meta-grid {
+            display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap;
+            border-top: 1px solid var(--border-color); padding-top: 30px;
+        }
+        .meta-item { text-align: left; }
+        .meta-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .meta-value { font-size: 1rem; font-weight: 600; color: white; }
+
+        /* --- CONTENT CONTAINER --- */
+        .container { max-width: 950px; margin: 0 auto; padding: 0 20px 100px; }
+        
+        .section-block { margin-bottom: 80px; opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s forwards; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-size: 1.8rem; margin-bottom: 30px; border-left: 4px solid var(--health-teal); padding-left: 20px; color: white; }
+        p { color: #cbd5e1; font-size: 1.1rem; margin-bottom: 20px; }
+        
+        /* --- VISUALS --- */
+        .framework-visual {
+            background: #1e293b; border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 30px; margin-bottom: 40px; position: relative; overflow: hidden;
+        }
+        .framework-visual img { width: 100%; height: auto; border-radius: 8px; filter: grayscale(20%) contrast(1.1); transition:0.3s; }
+        .framework-visual img:hover { filter: grayscale(0%); }
+        .img-caption { text-align:center; font-size:0.8rem; color:#64748b; margin-top:10px; font-style: italic; }
+
+        /* --- GOVERNANCE CARDS --- */
+        .gov-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .gov-card { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; 
+            transition: 0.3s;
+        }
+        .gov-card:hover { border-color: var(--health-teal); background: rgba(20, 184, 166, 0.05); }
+        .gov-icon { font-size: 1.5rem; color: var(--health-teal); margin-bottom: 15px; }
+        .gov-title { font-weight: 700; color: white; margin-bottom: 10px; display: block; }
+        .gov-desc { font-size: 0.9rem; color: #cbd5e1; }
+
+        /* --- CODE BLOCK --- */
+        .code-window {
+            background: #0d1117; border-radius: 8px; border: 1px solid #30363d;
+            margin-top: 30px; font-family: 'Fira Code', monospace; font-size: 0.85rem;
+        }
+        .code-header {
+            background: #161b22; padding: 10px 15px; border-bottom: 1px solid #30363d;
+            color: #8b949e; display: flex; justify-content: space-between; align-items: center;
+        }
+        .code-body { padding: 20px; overflow-x: auto; color: #c9d1d9; line-height: 1.5; }
+        
+        .k-blue { color: #79c0ff; }
+        .k-green { color: #7ee787; }
+        .k-orange { color: #ffa657; }
+        .k-purp { color: #d2a8ff; }
+        .k-gray { color: #8b949e; }
+
+        /* --- PIPELINE FLOW --- */
+        .pipeline-steps { display: flex; justify-content: space-between; margin-top: 40px; flex-wrap: wrap; gap: 20px; }
+        .p-step { 
+            flex: 1; min-width: 150px; background: #1e293b; padding: 20px; border-radius: 10px; text-align: center; 
+            border-top: 3px solid #334155; position: relative;
+        }
+        .p-step.active { border-top-color: var(--health-teal); }
+        .p-step i { font-size: 1.5rem; margin-bottom: 10px; color: white; }
+        .p-step span { display: block; font-size: 0.85rem; color: #cbd5e1; font-weight: 600; }
+        .p-arrow { align-self: center; color: #475569; font-size: 1.2rem; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .gov-grid { grid-template-columns: 1fr; }
+            .p-arrow { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="../index.html#projects" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+        </a>
+        <div style="font-weight: 700; color: white; letter-spacing: 1px; font-size: 0.9rem;">JAVIER MORAGA / DATA ENGINEER</div>
+    </nav>
+
+    <header class="hero">
+        <span class="hero-badge">CLOUD MIGRATION & GOVERNANCE</span>
+        <h1>Legacy to Cloud: SAS/Oracle to BigQuery</h1>
+        <p>Modernizing the data infrastructure of a top-tier healthcare provider (Clínica Alemana) handling tables up to 90M+ records.</p>
+        
+        <div class="meta-grid">
+            <div class="meta-item">
+                <span class="meta-label">Legacy Stack</span>
+                <span class="meta-value">SAS / Oracle / On-Prem</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Modern Stack</span>
+                <span class="meta-value">GCP / BigQuery / Airflow</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Data Volume</span>
+                <span class="meta-value">90M+ Rows / Table</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Key Focus</span>
+                <span class="meta-value">Governance & Security</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="section-block">
+            <h2>The Challenge: Siloed & Slow Analytics</h2>
+            <p>
+                Decision-making processes were reliant on legacy <strong>SAS Enterprise Guide</strong> flows connected to on-premise Oracle databases. 
+                These workflows were becoming difficult to maintain, lacked version control, and struggled to process growing datasets efficiently.
+            </p>
+            
+            <div class="framework-visual">
+                <img src="../image_2d3ac1.jpg" alt="Legacy SAS Flowchart" style="border: 1px solid rgba(255,255,255,0.1);">
+                <div class="img-caption">Original State: Complex, manual SAS flows with limited observability.</div>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h2>The Solution: Automated "Data Ingestor" Framework</h2>
+            <p>
+                We engineered a custom Python framework deployed on **Kubernetes (GKE)** and orchestrated by **Airflow**. 
+                This "Data Ingestor" automates the ELT (Extract, Load, Transform) process, moving data securely from on-premise databases to the Data Lake.
+            </p>
+
+            <div class="pipeline-steps">
+                <div class="p-step active">
+                    <i class="fa-solid fa-server"></i>
+                    <span>Oracle / Postgres</span>
+                    <small style="color:#64748b; display:block; margin-top:5px;">On-Prem Source</small>
+                </div>
+                <div class="p-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="p-step active">
+                    <i class="fa-brands fa-python"></i>
+                    <span>Data Ingestor</span>
+                    <small style="color:#64748b; display:block; margin-top:5px;">Python / Docker / VPN</small>
+                </div>
+                <div class="p-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="p-step active">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>BigQuery RAW</span>
+                    <small style="color:#64748b; display:block; margin-top:5px;">String Ingestion</small>
+                </div>
+                <div class="p-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="p-step active">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>Transformation</span>
+                    <small style="color:#64748b; display:block; margin-top:5px;">SQL Casting & Quality</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-block">
+            <h2>Data Governance & Security by Design</h2>
+            <p>
+                Handling sensitive patient data requires strict governance. The migration didn't just move data; it categorized it. 
+                We implemented a strict <strong>Labeling Standard</strong> directly in the DDL of BigQuery tables.
+            </p>
+
+            <div class="gov-grid">
+                <div class="gov-card">
+                    <div class="gov-icon"><i class="fa-solid fa-user-shield"></i></div>
+                    <span class="gov-title">PII Protection</span>
+                    <span class="gov-desc">Tables containing Patient ID or personal info are tagged with <code>dg-has-pii: si</code> and <code>dg-data-classification: altamente_sensible</code>.</span>
+                </div>
+                <div class="gov-card">
+                    <div class="gov-icon"><i class="fa-solid fa-check-double"></i></div>
+                    <span class="gov-title">Automated Quality</span>
+                    <span class="gov-desc">The framework automatically counts <code>cast_error_count</code> and flags <code>suspicious_dates</code> (e.g., year < 1900) during ingestion.</span>
+                </div>
+            </div>
+
+            <div class="code-window">
+                <div class="code-header">
+                    <span><i class="fa-solid fa-code"></i> bigquery/ddl/create_patient_table.sql</span>
+                    <span style="font-size:0.75rem;">SQL</span>
+                </div>
+                <div class="code-body">
+<span class="k-purp">CREATE TABLE</span> `{project-id}.ds_raw_datalake.pacientes`
+(
+  id_paciente   <span class="k-blue">STRING</span>  <span class="k-gray">OPTIONS(description = "Identificador único")</span>,
+  fecha_ingreso <span class="k-blue">DATE</span>    <span class="k-gray">OPTIONS(description = "Fecha registro sistema")</span>,
+  diagnostico   <span class="k-blue">STRING</span>  <span class="k-gray">OPTIONS(description = "Código CIE-10")</span>
+)
+<span class="k-purp">PARTITION BY</span> <span class="k-blue">DATE</span>(fecha_ingreso)
+<span class="k-purp">CLUSTER BY</span> id_paciente
+<span class="k-purp">OPTIONS</span>(
+  description = <span class="k-green">"Tabla maestra de pacientes con datos sensibles"</span>,
+  labels = [
+    (<span class="k-green">"dg-layer"</span>, <span class="k-green">"raw"</span>),
+    (<span class="k-green">"dg-ingestion-type"</span>, <span class="k-green">"fundacional"</span>),
+    (<span class="k-green">"dg-has-pii"</span>, <span class="k-green">"si"</span>),
+    (<span class="k-green">"dg-data-classification"</span>, <span class="k-green">"altamente_sensible"</span>),
+    (<span class="k-green">"dg-domain"</span>, <span class="k-green">"salud"</span>)
+  ]
+);
+                </div>
+            </div>
+        </div>
+
+        <div class="section-block" style="text-align:center; padding-top:20px;">
+            <div style="background: linear-gradient(145deg, rgba(20, 184, 166, 0.1), transparent); padding: 40px; border-radius: 20px; border: 1px solid rgba(20, 184, 166, 0.2);">
+                <h2 style="border:none; padding:0; margin-bottom:15px; font-size:2.5rem; color: white;">90 Million+</h2>
+                <p style="font-size:1.2rem; color: #5eead4; margin-bottom: 5px;">Records Processed Daily</p>
+                <p style="font-size:0.9rem; max-width:600px; margin:0 auto;">
+                    The migration enabled the clinic to query historical data in seconds rather than hours, 
+                    unlocking real-time decision-making for medical resource allocation.
+                </p>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:80px; border-top:1px solid var(--border-color); padding-top:40px;">
+            <a href="../index.html#contact" style="display:inline-block; padding:15px 30px; background:transparent; border: 2px solid var(--health-teal); color:white; border-radius:30px; font-weight:700; text-decoration:none; transition:0.3s;">
+                Request Technical Walkthrough
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>
