@@ -827,7 +827,7 @@
                         <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight">Global Telco Giant</span>
                             Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.
-                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: Optus)</em>
+                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Optus)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span>Global Telco Giant</span>
@@ -841,7 +841,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight">High-Growth Challenger</span>
                             Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.
-                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: TPG / Vodafone)</em>
+                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to TPG / Vodafone)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span>High-Growth Challenger</span>
@@ -855,7 +855,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight">Leader Telco (10M+ Subs)</span>
                             Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.
-                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: Telstra)</em>
+                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Telstra)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span>Leader Telco</span>
@@ -885,7 +885,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight">Largest Airline in S. America</span>
                             The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.
-                            <br><em style="color:#64748b; font-size:0.75rem;">(Scale similar to Qantas)</em>
+                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Qantas)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span>Airline Leader</span>
@@ -899,7 +899,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight">Top Tier Private Hospital</span>
                             One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.
-                            <br><em style="color:#64748b; font-size:0.75rem;">(Equiv: Ramsay Health)</em>
+                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Ramsay Health)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span>Top Tier Hospital</span>
@@ -1333,6 +1333,12 @@
                     cvBtn.setAttribute('download', globalCVName);
                     cvBtn.innerText = "Download CV (Global)";
                 }
+
+                // --- D. LOGOS (Esconder referencias de Australia) ---
+                const ausRefs = document.querySelectorAll('.aus-ref');
+                ausRefs.forEach(ref => {
+                    ref.style.display = 'none';
+                });
             }
         });
     </script>
