@@ -70,6 +70,19 @@
         .nav-links a { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
+        /* ESTILOS NUEVOS PARA BANDERAS */
+        .lang-options {
+            display: flex; gap: 12px; margin-left: 20px; align-items: center;
+        }
+        .lang-btn {
+            background: none; border: none; font-size: 1.4rem; cursor: pointer;
+            filter: grayscale(100%); opacity: 0.6; transition: 0.3s;
+            padding: 0; line-height: 1;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            filter: grayscale(0%); opacity: 1; transform: scale(1.1);
+        }
+
         /* --- ESTILOS DEL BOTÓN MOKN (SERPIENTE CONTINUA + GLOW) --- */
         .mokn-btn {
             position: relative;
@@ -592,24 +605,30 @@
 
     <div class="mobile-nav-container">
         <nav class="mobile-nav">
-            <a href="#" class="mn-link active-nav"><i class="fa-solid fa-house"></i><span>Home</span></a>
-            <a href="#about" class="mn-link"><i class="fa-solid fa-user"></i><span>About</span></a>
-            <a href="#skills" class="mn-link"><i class="fa-solid fa-layer-group"></i><span>Stack</span></a>
-            <a href="#projects" class="mn-link"><i class="fa-solid fa-briefcase"></i><span>Work</span></a>
-            <a href="#contact" class="mn-link"><i class="fa-solid fa-paper-plane"></i><span>Contact</span></a>
+            <a href="#" class="mn-link active-nav" id="nav-home"><i class="fa-solid fa-house"></i><span>Home</span></a>
+            <a href="#about" class="mn-link" id="nav-about"><i class="fa-solid fa-user"></i><span>About</span></a>
+            <a href="#skills" class="mn-link" id="nav-stack"><i class="fa-solid fa-layer-group"></i><span>Stack</span></a>
+            <a href="#projects" class="mn-link" id="nav-work"><i class="fa-solid fa-briefcase"></i><span>Work</span></a>
+            <a href="#contact" class="mn-link" id="nav-contact"><i class="fa-solid fa-paper-plane"></i><span>Contact</span></a>
         </nav>
     </div>
 
     <header>
         <div class="container nav-flex">
             <div class="logo">Javier <span>Moraga</span></div>
+            
+            <div class="lang-options">
+                <button onclick="changeLang('en')" class="lang-btn active" id="btn-en" title="English">🇬🇧</button>
+                <button onclick="changeLang('es')" class="lang-btn" id="btn-es" title="Español">🇪🇸</button>
+            </div>
+
             <nav class="nav-links">
-                <a href="#about">About Me</a>
-                <a href="#skills">Stack</a>
-                <a href="#projects">Portfolio</a>
+                <a href="#about" id="d-nav-about">About Me</a>
+                <a href="#skills" id="d-nav-stack">Stack</a>
+                <a href="#projects" id="d-nav-work">Portfolio</a>
                 <a href="#contact" class="mokn-btn" id="contactBtn">
                     <span class="mokn-inner">
-                        <span class="mokn-text">Contact</span>
+                        <span class="mokn-text" id="d-nav-contact">Contact</span>
                         <span class="mokn-glow"></span>
                     </span>
                 </a>
@@ -624,7 +643,7 @@
                 <span class="hero-tag">Aviation</span>
                 <span class="hero-tag">Telecom</span>
             </div>
-            <h1>Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span></h1>
+            <h1 id="hero-title">Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span></h1>
             
             <div class="tech-stack-wrapper">
                 <div class="tech-pill"><span class="tech-dot"></span> BigQuery</div>
@@ -1290,57 +1309,138 @@
     </div>
     
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 1. Detectar si existe el parámetro ?v=global en la URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const version = urlParams.get('v');
-    
-            if (version === 'global') {
-                console.log("Modo Global Activado 🌍");
-    
-                // --- A. HERO SECTION ---
-                const heroText = document.getElementById('hero-availability-text');
-                if (heroText) {
-                    heroText.innerHTML = `
-                    Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
+        // Diccionario de textos
+        const translations = {
+            en: {
+                nav: { home: "Home", about: "About Me", stack: "Stack", work: "Portfolio", contact: "Contact" },
+                hero: {
+                    title: `Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span>`,
+                    desc_global: `Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
                     <br>
                     <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
                         Available for Remote Roles Worldwide & Global Relocation
                     </span>
                     <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
                         <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Chilean Citizen (Open to Relocation)
-                    </span>`;
+                    </span>`,
+                    desc_aus: `Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
+                    <br>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Eligible for TSS 482 Visa (Medium and Long-term Strategic Skills List)</span>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                        <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Chilean Citizen (LMT Exempt for Sponsorship)
+                    </span>`,
+                    timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Flexible overlap with US, EU & APAC timezones`,
+                    timezone_aus: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Available for overlap with AEST mornings (Sydney time)`,
+                    cv_btn: "Download CV"
                 }
-    
-                const heroTimezone = document.getElementById('hero-timezone-text');
-                if (heroTimezone) {
-                    heroTimezone.innerHTML = `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Flexible overlap with US, EU & APAC timezones`;
+            },
+            es: {
+                nav: { home: "Inicio", about: "Sobre Mí", stack: "Tecnologías", work: "Portafolio", contact: "Contacto" },
+                hero: {
+                    title: `Analista de Datos Senior / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">+10 Años de Experiencia</span>`,
+                    desc_global: `Ofreciendo soluciones analíticas escalables en <strong style="color:white">BigQuery y GCP</strong>, con sólida capacidad en <strong style="color:white">ingeniería de datos, migraciones y optimización de pipelines</strong>. Ayudo a las organizaciones a estandarizar modelos de datos, mejorar la fiabilidad y convertir datos complejos en insights accionables.
+                    <br>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
+                        Disponible para roles remotos a nivel mundial y reubicación global
+                    </span>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                        <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Ciudadano Chileno (Abierto a reubicación)
+                    </span>`,
+                    desc_aus: `(El modo español está optimizado para la versión global remota). Delivering scalable analytics solutions...`, 
+                    timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Solapamiento flexible con horarios de EE. UU., Europa y APAC`,
+                    timezone_aus: ``, // No aplica, fallback a global si se selecciona ES
+                    cv_btn: "Descargar CV (Global)"
                 }
-    
-                // --- B. ABOUT SECTION ---
-                const whyCountry = document.getElementById('about-why-country');
-                if (whyCountry) {
-                    whyCountry.style.display = 'none';
-                }
-    
-                // --- C. CONTACT / CV ---
-                const cvBtn = document.getElementById('download-cv-btn');
-                if (cvBtn) {
-                    // Cambia el nombre del archivo aquí si es necesario
-                    const globalCVName = "Javier_Moraga_Data_Analyst_Resume_Global.pdf";
-                    
-                    cvBtn.setAttribute('href', globalCVName);
-                    cvBtn.setAttribute('download', globalCVName);
-                    cvBtn.innerText = "Download CV (Global)";
-                }
+            }
+        };
 
-                // --- D. LOGOS (Esconder referencias de Australia) ---
-                const ausRefs = document.querySelectorAll('.aus-ref');
-                ausRefs.forEach(ref => {
-                    ref.style.display = 'none';
-                });
+        let currentMode = 'aus'; // 'aus' or 'global'
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Detectar si es Global
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('v') === 'global') {
+                currentMode = 'global';
+                console.log("Modo Global Detectado");
+                applyGlobalMode();
             }
         });
+
+        function applyGlobalMode() {
+            // Ocultar referencias a empresas australianas
+            const ausRefs = document.querySelectorAll('.aus-ref');
+            ausRefs.forEach(ref => ref.style.display = 'none');
+
+            // Ocultar Why Australia
+            const whyCountry = document.getElementById('about-why-country');
+            if (whyCountry) whyCountry.style.display = 'none';
+
+            // Actualizar textos a versión Global (en Inglés por defecto)
+            updateTextContent('en');
+        }
+
+        function changeLang(lang) {
+            // Update buttons visual state
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            // Update Texts
+            updateTextContent(lang);
+        }
+
+        function updateTextContent(lang) {
+            const t = translations[lang];
+            
+            // --- Navigation ---
+            // Desktop
+            document.getElementById('d-nav-about').textContent = t.nav.about;
+            document.getElementById('d-nav-stack').textContent = t.nav.stack;
+            document.getElementById('d-nav-work').textContent = t.nav.work;
+            document.getElementById('d-nav-contact').textContent = t.nav.contact;
+            
+            // Mobile (icon labels)
+            const mobileLinks = document.querySelectorAll('.mn-link span');
+            if(mobileLinks.length > 0) {
+                mobileLinks[0].textContent = t.nav.home;
+                mobileLinks[1].textContent = t.nav.about;
+                mobileLinks[2].textContent = t.nav.stack; // A veces 'Stack' se queda igual
+                mobileLinks[3].textContent = t.nav.work;
+                mobileLinks[4].textContent = t.nav.contact;
+            }
+
+            // --- Hero ---
+            document.getElementById('hero-title').innerHTML = t.hero.title;
+
+            // Hero Description Logic
+            const heroText = document.getElementById('hero-availability-text');
+            if(currentMode === 'global') {
+                heroText.innerHTML = t.hero.desc_global;
+            } else {
+                // If in AUS mode but user clicked ES, maybe force global desc? 
+                // Or keep English AUS desc? Let's assume ES user wants Global info mostly.
+                if(lang === 'es') heroText.innerHTML = t.hero.desc_global; 
+                else heroText.innerHTML = t.hero.desc_aus;
+            }
+
+            // Timezone
+            const timeText = document.getElementById('hero-timezone-text');
+            if(currentMode === 'global' || lang === 'es') {
+                timeText.innerHTML = t.hero.timezone_global;
+            } else {
+                timeText.innerHTML = t.hero.timezone_aus;
+            }
+
+            // CV Button
+            const cvBtn = document.getElementById('download-cv-btn');
+            if (currentMode === 'global') {
+                const globalCVName = "Javier_Moraga_Data_Analyst_Resume_Global.pdf";
+                cvBtn.setAttribute('href', globalCVName);
+                cvBtn.setAttribute('download', globalCVName);
+                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV (Global)";
+            } else {
+                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
+            }
+        }
     </script>
 
     <script>
