@@ -637,7 +637,7 @@
                 <div class="tech-pill"><span class="tech-dot"></span> Power BI</div>
             </div>
 
-            <p>
+            <p id="hero-availability-text">
                 Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
                 <br>
                 <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Eligible for TSS 482 Visa (Medium and Long-term Strategic Skills List)</span>
@@ -647,7 +647,7 @@
             </p>
             
             <div style="margin-bottom: 40px; font-size: 0.95rem; color: #94a3b8; display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                 <span><i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Available for overlap with AEST mornings (Sydney time)</span>
+                 <span id="hero-timezone-text"><i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Available for overlap with AEST mornings (Sydney time)</span>
                  <span><i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:8px;"></i> Relocation Availability: ~2 Months (Tentative)</span>
             </div>
         </div>
@@ -776,7 +776,9 @@
                     <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
                     <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
                     <p>I specialize in translating complex data into clear, actionable insights through well-designed data models, high-impact dashboards, and scalable cloud data solutions. I have a strong background in GCP, BigQuery, and SQL, with proven success modernizing legacy architectures.</p>
-                    <p><strong>Why Australia?</strong> This is a structured life project. With family already settled in the country, I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.</p>
+                    
+                    <p id="about-why-country"><strong>Why Australia?</strong> This is a structured life project. With family already settled in the country, I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.</p>
+                    
                     <div class="about-info-grid">
                         <div class="industries-box">
                             <h4><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
@@ -1156,7 +1158,7 @@
                 </div>
 
             <div style="margin-top: 30px;">
-                <a href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
+                 <a id="download-cv-btn" href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
             </div>
 
             <p style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
@@ -1286,6 +1288,54 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Detectar si existe el parámetro ?v=global en la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const version = urlParams.get('v');
+    
+            if (version === 'global') {
+                console.log("Modo Global Activado 🌍");
+    
+                // --- A. HERO SECTION ---
+                const heroText = document.getElementById('hero-availability-text');
+                if (heroText) {
+                    heroText.innerHTML = `
+                    Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
+                    <br>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
+                        Available for Remote Roles Worldwide & Global Relocation
+                    </span>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                        <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Chilean Citizen (Open to Relocation)
+                    </span>`;
+                }
+    
+                const heroTimezone = document.getElementById('hero-timezone-text');
+                if (heroTimezone) {
+                    heroTimezone.innerHTML = `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Flexible overlap with US, EU & APAC timezones`;
+                }
+    
+                // --- B. ABOUT SECTION ---
+                const whyCountry = document.getElementById('about-why-country');
+                if (whyCountry) {
+                    whyCountry.style.display = 'none';
+                }
+    
+                // --- C. CONTACT / CV ---
+                const cvBtn = document.getElementById('download-cv-btn');
+                if (cvBtn) {
+                    // Cambia el nombre del archivo aquí si es necesario
+                    const globalCVName = "Javier_Moraga_Data_Analyst_Resume_Global.pdf";
+                    
+                    cvBtn.setAttribute('href', globalCVName);
+                    cvBtn.setAttribute('download', globalCVName);
+                    cvBtn.innerText = "Download CV (Global)";
+                }
+            }
+        });
+    </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
