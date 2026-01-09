@@ -985,8 +985,8 @@
                                         <div class="skill-group-title" id="st-grp-2">Proficient</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer</li>
-                                            <li class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</li>
-                                            <li class="skill-item"><i class="fa-solid fa-eye"></i> Observability</li>
+                                            <li class="skill-item"><i class="fa-solid fa-route"></i> <span id="st-cld-2">Data Pipelines</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-eye"></i> <span id="st-cld-3">Observability</span></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -1008,7 +1008,7 @@
                                      <div class="skill-group">
                                         <div class="skill-group-title" id="stack-sub-1">Modeling & Legacy</div>
                                         <ul class="skill-list">
-                                            <li class="skill-item"><i class="fa-solid fa-sitemap"></i> Dimensional Model</li>
+                                            <li class="skill-item"><i class="fa-solid fa-sitemap"></i> <span id="st-fnd-1">Dimensional Model</span></li>
                                             <li class="skill-item"><i class="fa-solid fa-database"></i> PostgreSQL</li>
                                             <li class="skill-item"><i class="fa-solid fa-terminal"></i> SAS / Oracle</li>
                                         </ul>
@@ -1025,11 +1025,11 @@
                                      <div class="skill-group">
                                         <div class="skill-group-title" id="st-grp-4">Best Practices</div>
                                         <ul class="skill-list">
-                                            <li class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git) <span class="badge">Working knowledge</span></li>
-                                            <li class="skill-item"><i class="fa-solid fa-check-double"></i> Data Quality</li>
-                                            <li class="skill-item"><i class="fa-solid fa-magnifying-glass"></i> Code Reviews</li>
-                                            <li class="skill-item"><i class="fa-brands fa-git-alt"></i> Version Control</li>
-                                            <li class="skill-item"><i class="fa-solid fa-book"></i> Documentation</li>
+                                            <li class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git) <span class="badge" id="badge-cicd">Working knowledge</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-check-double"></i> <span id="st-eng-2">Data Quality</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-magnifying-glass"></i> <span id="st-eng-3">Code Reviews</span></li>
+                                            <li class="skill-item"><i class="fa-brands fa-git-alt"></i> <span id="st-eng-4">Version Control</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-book"></i> <span id="st-eng-5">Documentation</span></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -1309,7 +1309,16 @@
                     title: `Technical <span class="highlight">Stack</span>`,
                     h1: "Cloud & Engineering", h2: "Foundations", sub_1: "Modeling & Legacy", h3: "Engineering", h4: "Analytics & BI", h5: "Data Management & Governance", sub_2: "Governance Scope",
                     grp_1: "Core Skills", grp_2: "Proficient", grp_3: "Advanced", grp_4: "Best Practices", grp_5: "Visualization", grp_6: "Business",
-                    gov_1: "Cataloguing & Documentation", gov_2: "Anonymisation & Masking", gov_3: "Modelling & Standardisation", gov_4: "Data Cleaning & Quality"
+                    gov_1: "Cataloguing & Documentation", gov_2: "Anonymisation & Masking", gov_3: "Modelling & Standardisation", gov_4: "Data Cleaning & Quality",
+                    // --- NUEVOS ITEMS DE STACK ---
+                    item_pipe: "Data Pipelines",
+                    item_obs: "Observability",
+                    item_dim: "Dimensional Model",
+                    badge_cicd: "Working knowledge",
+                    item_qual: "Data Quality",
+                    item_rev: "Code Reviews",
+                    item_ver: "Version Control",
+                    item_doc: "Documentation"
                 },
                 projects: {
                     title: `Featured Projects & <span class="highlight">Impact</span>`,
@@ -1386,7 +1395,16 @@
                     title: `Stack <span class="highlight">Técnico</span>`,
                     h1: "Nube e Ingeniería", h2: "Fundamentos", sub_1: "Modelado y Legacy", h3: "Ingeniería", h4: "Analítica y BI", h5: "Gestión y Gobierno de Datos", sub_2: "Alcance de Gobierno",
                     grp_1: "Habilidades Core", grp_2: "Competente", grp_3: "Avanzado", grp_4: "Mejores Prácticas", grp_5: "Visualización", grp_6: "Negocio",
-                    gov_1: "Catalogación y Documentación", gov_2: "Anonimización y Enmascaramiento", gov_3: "Modelado y Estandarización", gov_4: "Limpieza y Calidad de Datos"
+                    gov_1: "Catalogación y Documentación", gov_2: "Anonimización y Enmascaramiento", gov_3: "Modelado y Estandarización", gov_4: "Limpieza y Calidad de Datos",
+                    // --- NUEVOS ITEMS DE STACK ---
+                    item_pipe: "Pipelines de Datos",
+                    item_obs: "Observabilidad",
+                    item_dim: "Modelo Dimensional",
+                    badge_cicd: "Nociones / Práctico",
+                    item_qual: "Calidad de Datos",
+                    item_rev: "Revisiones de Código",
+                    item_ver: "Control de Versiones",
+                    item_doc: "Documentación"
                 },
                 projects: {
                     title: `Proyectos Destacados e <span class="highlight">Impacto</span>`,
@@ -1589,11 +1607,20 @@
             document.getElementById('st-grp-5').textContent = t.skills.grp_5;
             document.getElementById('st-grp-6').textContent = t.skills.grp_6;
 
-            // Skill Items (NEW - Cyan Card)
+            // Skill Items (NEW - Updated)
             document.getElementById('skill-gov-1').textContent = t.skills.gov_1;
             document.getElementById('skill-gov-2').textContent = t.skills.gov_2;
             document.getElementById('skill-gov-3').textContent = t.skills.gov_3;
             document.getElementById('skill-gov-4').textContent = t.skills.gov_4;
+            // NEW additions
+            document.getElementById('st-cld-2').textContent = t.skills.item_pipe;
+            document.getElementById('st-cld-3').textContent = t.skills.item_obs;
+            document.getElementById('st-fnd-1').textContent = t.skills.item_dim;
+            document.getElementById('badge-cicd').textContent = t.skills.badge_cicd;
+            document.getElementById('st-eng-2').textContent = t.skills.item_qual;
+            document.getElementById('st-eng-3').textContent = t.skills.item_rev;
+            document.getElementById('st-eng-4').textContent = t.skills.item_ver;
+            document.getElementById('st-eng-5').textContent = t.skills.item_doc;
 
             // --- Projects ---
             document.getElementById('projects-title').innerHTML = t.projects.title;
