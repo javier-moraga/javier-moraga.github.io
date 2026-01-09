@@ -70,19 +70,45 @@
         .nav-links a { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
-        /* ESTILOS NUEVOS PARA BANDERAS */
+        /* --- ESTILOS BANDERAS (MODIFICADO) --- */
         .lang-options {
             display: flex; gap: 15px; margin-left: 20px; align-items: center;
         }
+        
         .lang-btn {
-            background: none; border: none; 
-            font-size: 1.8rem; /* AUMENTADO PARA MEJOR VISIBILIDAD */
+            background: none; 
+            border: 2px solid transparent; 
+            border-radius: 50%; 
             cursor: pointer;
-            filter: grayscale(100%); opacity: 0.6; transition: all 0.3s ease;
-            padding: 0; line-height: 1;
+            padding: 0; 
+            line-height: 0; 
+            opacity: 0.5; /* Transparente si no está activo */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 34px; 
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        .lang-btn:hover, .lang-btn.active {
-            filter: grayscale(0%); opacity: 1; transform: scale(1.2);
+
+        .lang-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .lang-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .lang-btn.active {
+            opacity: 1;
+            border-color: var(--accent-gold); 
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); 
+            transform: scale(1.15);
         }
 
         /* --- ESTILOS DEL BOTÓN MOKN (SERPIENTE CONTINUA + GLOW) --- */
@@ -620,8 +646,12 @@
             <div class="logo">Javier <span>Moraga</span></div>
             
             <div class="lang-options">
-                <button onclick="changeLang('en')" class="lang-btn active" id="btn-en" title="English">🇬🇧</button>
-                <button onclick="changeLang('es')" class="lang-btn" id="btn-es" title="Español">🇪🇸</button>
+                <button onclick="changeLang('en')" class="lang-btn active" id="btn-en" title="English">
+                    <img src="https://flagcdn.com/w80/gb.png" alt="English">
+                </button>
+                <button onclick="changeLang('es')" class="lang-btn" id="btn-es" title="Español">
+                    <img src="https://flagcdn.com/w80/es.png" alt="Español">
+                </button>
             </div>
 
             <nav class="nav-links">
