@@ -82,7 +82,7 @@
             cursor: pointer;
             padding: 0; 
             line-height: 0; 
-            opacity: 0.5; /* Transparente si no está activo */
+            opacity: 0.5; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 34px; 
             height: 34px;
@@ -111,7 +111,7 @@
             transform: scale(1.15);
         }
 
-        /* --- ESTILOS DEL BOTÓN MOKN (SERPIENTE CONTINUA + GLOW) --- */
+        /* --- ESTILOS DEL BOTÓN MOKN --- */
         .mokn-btn {
             position: relative;
             background: transparent;
@@ -876,13 +876,13 @@
                             <img src="logos/claro_chile.png" alt="Claro Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=CLARO'">
                         </a>
                         <div class="logo-desktop-tooltip">
-                            <span class="tooltip-highlight">Global Telco Giant</span>
-                            Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.
+                            <span class="tooltip-highlight" id="logo-tt-title-1">Global Telco Giant</span>
+                            <span id="logo-tt-text-1">Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.</span>
                             <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Optus)</em>
                         </div>
                         <div class="logo-mobile-tag">
-                            <span>Global Telco Giant</span>
-                            Subsidiary of América Móvil
+                            <span id="logo-mob-title-1">Global Telco Giant</span>
+                            <span id="logo-mob-text-1">Subsidiary of América Móvil</span>
                         </div>
                     </div>
                     <div class="logo-wrapper">
@@ -890,13 +890,13 @@
                             <img src="logos/wom_chile.png" alt="WOM" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=WOM'">
                         </a>
                          <div class="logo-desktop-tooltip">
-                            <span class="tooltip-highlight">High-Growth Challenger</span>
-                            Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.
+                            <span class="tooltip-highlight" id="logo-tt-title-2">High-Growth Challenger</span>
+                            <span id="logo-tt-text-2">Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.</span>
                             <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to TPG / Vodafone)</em>
                         </div>
                         <div class="logo-mobile-tag">
-                            <span>High-Growth Challenger</span>
-                            Disrupted market (20% share)
+                            <span id="logo-mob-title-2">High-Growth Challenger</span>
+                            <span id="logo-mob-text-2">Disrupted market (20% share)</span>
                         </div>
                     </div>
                     <div class="logo-wrapper">
@@ -904,13 +904,13 @@
                             <img src="logos/entel_chile.png" alt="Entel Chile" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ENTEL'">
                         </a>
                          <div class="logo-desktop-tooltip">
-                            <span class="tooltip-highlight">Leader Telco (10M+ Subs)</span>
-                            Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.
+                            <span class="tooltip-highlight" id="logo-tt-title-3">Leader Telco (10M+ Subs)</span>
+                            <span id="logo-tt-text-3">Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.</span>
                             <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Telstra)</em>
                         </div>
                         <div class="logo-mobile-tag">
-                            <span>Leader Telco</span>
-                            Sim. to Telstra (10M+ Users)
+                            <span id="logo-mob-title-3">Leader Telco</span>
+                            <span id="logo-mob-text-3">Sim. to Telstra (10M+ Users)</span>
                         </div>
                     </div>
                 </div>
@@ -921,12 +921,12 @@
                             <img src="logos/a3d_chile.png" alt="A3D" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=A3D'">
                         </a>
                          <div class="logo-desktop-tooltip">
-                            <span class="tooltip-highlight">Omnichannel Retail</span>
-                            Major direct-response retail company with extensive cross-platform sales operations and logistics data.
+                            <span class="tooltip-highlight" id="logo-tt-title-4">Omnichannel Retail</span>
+                            <span id="logo-tt-text-4">Major direct-response retail company with extensive cross-platform sales operations and logistics data.</span>
                         </div>
                         <div class="logo-mobile-tag">
-                            <span>Omnichannel Retail</span>
-                            Major Direct-Response Firm
+                            <span id="logo-mob-title-4">Omnichannel Retail</span>
+                            <span id="logo-mob-text-4">Major Direct-Response Firm</span>
                         </div>
                     </div>
                     <div class="logo-wrapper">
@@ -934,13 +934,13 @@
                             <img src="logos/latam_airlines_chile.png" alt="LATAM Airlines" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=LATAM'">
                         </a>
                          <div class="logo-desktop-tooltip">
-                            <span class="tooltip-highlight">Largest Airline in S. America</span>
-                            The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.
+                            <span class="tooltip-highlight" id="logo-tt-title-5">Largest Airline in S. America</span>
+                            <span id="logo-tt-text-5">The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.</span>
                             <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Qantas)</em>
                         </div>
                         <div class="logo-mobile-tag">
-                            <span>Airline Leader</span>
-                            Largest in S. America (Sim. Qantas)
+                            <span id="logo-mob-title-5">Airline Leader</span>
+                            <span id="logo-mob-text-5">Largest in S. America (Sim. Qantas)</span>
                         </div>
                     </div>
                     <div class="logo-wrapper">
@@ -948,13 +948,13 @@
                             <img src="logos/clinica_alemana_chile.png" alt="Clínica Alemana" class="logo-img" onerror="this.src='https://via.placeholder.com/200x100/000000/FFFFFF?text=ALEMANA'">
                         </a>
                          <div class="logo-desktop-tooltip">
-                            <span class="tooltip-highlight">Top Tier Private Hospital</span>
-                            One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.
+                            <span class="tooltip-highlight" id="logo-tt-title-6">Top Tier Private Hospital</span>
+                            <span id="logo-tt-text-6">One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.</span>
                             <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Ramsay Health)</em>
                         </div>
                         <div class="logo-mobile-tag">
-                            <span>Top Tier Hospital</span>
-                            JCI Accredited Leader
+                            <span id="logo-mob-title-6">Top Tier Hospital</span>
+                            <span id="logo-mob-text-6">JCI Accredited Leader</span>
                         </div>
                     </div>
                 </div>
@@ -973,7 +973,7 @@
                                 <div class="mirror-content">
                                     <h2 id="stack-h-1">Cloud & Engineering</h2>
                                     <div class="skill-group">
-                                        <div class="skill-group-title">Core Skills</div>
+                                        <div class="skill-group-title" id="st-grp-1">Core Skills</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-brands fa-google"></i> GCP <span class="badge">Core</span></li>
                                             <li class="skill-item"><i class="fa-solid fa-database"></i> BigQuery <span class="badge">Expert</span></li>
@@ -982,7 +982,7 @@
                                         </ul>
                                     </div>
                                     <div class="skill-group">
-                                        <div class="skill-group-title">Proficient</div>
+                                        <div class="skill-group-title" id="st-grp-2">Proficient</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-wind"></i> Cloud Composer</li>
                                             <li class="skill-item"><i class="fa-solid fa-route"></i> Data Pipelines</li>
@@ -999,7 +999,7 @@
                                 <div class="mirror-content">
                                     <h2 id="stack-h-2">Foundations</h2>
                                      <div class="skill-group">
-                                        <div class="skill-group-title">Advanced</div>
+                                        <div class="skill-group-title" id="st-grp-3">Advanced</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-code"></i> SQL <span class="badge">Advanced</span></li>
                                             <li class="skill-item"><i class="fa-brands fa-python"></i> Python / Pandas <span class="badge">Intermediate</span></li>
@@ -1023,7 +1023,7 @@
                                 <div class="mirror-content">
                                     <h2 id="stack-h-3">Engineering</h2>
                                      <div class="skill-group">
-                                        <div class="skill-group-title">Best Practices</div>
+                                        <div class="skill-group-title" id="st-grp-4">Best Practices</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-code-branch"></i> CI/CD (Git) <span class="badge">Working knowledge</span></li>
                                             <li class="skill-item"><i class="fa-solid fa-check-double"></i> Data Quality</li>
@@ -1042,7 +1042,7 @@
                                 <div class="mirror-content">
                                     <h2 id="stack-h-4">Analytics & BI</h2>
                                     <div class="skill-group">
-                                        <div class="skill-group-title">Visualization</div>
+                                        <div class="skill-group-title" id="st-grp-5">Visualization</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-chart-simple"></i> Power BI <span class="badge">Advanced</span></li>
                                             <li class="skill-item"><i class="fa-solid fa-magnifying-glass-chart"></i> Looker Studio <span class="badge">Advanced</span></li>
@@ -1050,7 +1050,7 @@
                                         </ul>
                                     </div>
                                      <div class="skill-group">
-                                        <div class="skill-group-title">Business</div>
+                                        <div class="skill-group-title" id="st-grp-6">Business</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-table"></i> Excel <span class="badge">Advanced</span></li>
                                             <li class="skill-item"><i class="fa-solid fa-file-medical"></i> REDCap (Health)</li>
@@ -1068,10 +1068,10 @@
                                     <div class="skill-group">
                                         <div class="skill-group-title" id="stack-sub-2">Governance Scope</div>
                                         <ul class="skill-list">
-                                            <li class="skill-item"><i class="fa-solid fa-table-list"></i> Cataloguing & Documentation</li>
-                                            <li class="skill-item"><i class="fa-solid fa-mask"></i> Anonymisation & Masking</li>
-                                            <li class="skill-item"><i class="fa-solid fa-cubes"></i> Modelling & Standardisation</li>
-                                            <li class="skill-item"><i class="fa-solid fa-broom"></i> Data Cleaning & Quality</li>
+                                            <li class="skill-item"><i class="fa-solid fa-table-list"></i> <span id="skill-gov-1">Cataloguing & Documentation</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-mask"></i> <span id="skill-gov-2">Anonymisation & Masking</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-cubes"></i> <span id="skill-gov-3">Modelling & Standardisation</span></li>
+                                            <li class="skill-item"><i class="fa-solid fa-broom"></i> <span id="skill-gov-4">Data Cleaning & Quality</span></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -1297,9 +1297,19 @@
                                  <div><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>DataOps / Data Analyst</span><span class="role-sub">Engineering scope & automation.</span></div>`
                 },
                 logo: { title: "Trusted By / Previous Experience" },
+                logos_content: {
+                    tt_title_1: "Global Telco Giant", tt_desc_1: "Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.", mob_title_1: "Global Telco Giant", mob_desc_1: "Subsidiary of América Móvil",
+                    tt_title_2: "High-Growth Challenger", tt_desc_2: "Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.", mob_title_2: "High-Growth Challenger", mob_desc_2: "Disrupted market (20% share)",
+                    tt_title_3: "Leader Telco (10M+ Subs)", tt_desc_3: "Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.", mob_title_3: "Leader Telco", mob_desc_3: "Sim. to Telstra (10M+ Users)",
+                    tt_title_4: "Omnichannel Retail", tt_desc_4: "Major direct-response retail company with extensive cross-platform sales operations and logistics data.", mob_title_4: "Omnichannel Retail", mob_desc_4: "Major Direct-Response Firm",
+                    tt_title_5: "Largest Airline in S. America", tt_desc_5: "The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.", mob_title_5: "Airline Leader", mob_desc_5: "Largest in S. America (Sim. Qantas)",
+                    tt_title_6: "Top Tier Private Hospital", tt_desc_6: "One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.", mob_title_6: "Top Tier Hospital", mob_desc_6: "JCI Accredited Leader"
+                },
                 skills: {
                     title: `Technical <span class="highlight">Stack</span>`,
-                    h1: "Cloud & Engineering", h2: "Foundations", sub_1: "Modeling & Legacy", h3: "Engineering", h4: "Analytics & BI", h5: "Data Management & Governance", sub_2: "Governance Scope"
+                    h1: "Cloud & Engineering", h2: "Foundations", sub_1: "Modeling & Legacy", h3: "Engineering", h4: "Analytics & BI", h5: "Data Management & Governance", sub_2: "Governance Scope",
+                    grp_1: "Core Skills", grp_2: "Proficient", grp_3: "Advanced", grp_4: "Best Practices", grp_5: "Visualization", grp_6: "Business",
+                    gov_1: "Cataloguing & Documentation", gov_2: "Anonymisation & Masking", gov_3: "Modelling & Standardisation", gov_4: "Data Cleaning & Quality"
                 },
                 projects: {
                     title: `Featured Projects & <span class="highlight">Impact</span>`,
@@ -1364,9 +1374,19 @@
                                  <div><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>DataOps / Analista Técnico</span><span class="role-sub">Alcance de ingeniería y automatización.</span></div>`
                 },
                 logo: { title: "Confían en mí / Experiencia Previa" },
+                logos_content: {
+                    tt_title_1: "Gigante Telco Global", tt_desc_1: "Filial de América Móvil (Fortune 500), uno de los grupos de telecomunicaciones más grandes del mundo.", mob_title_1: "Gigante Telco Global", mob_desc_1: "Filial de América Móvil",
+                    tt_title_2: "Challenger de Alto Crecimiento", tt_desc_2: "Operador de telecomunicaciones de rápido crecimiento. Irrumpió en el mercado logrando 20% de participación en tiempo récord.", mob_title_2: "Challenger Alto Crecimiento", mob_desc_2: "Disruptor (20% share)",
+                    tt_title_3: "Telco Líder (10M+ Subs)", tt_desc_3: "La empresa de telecomunicaciones más grande de Chile. Líder en infraestructura 5G y transformación digital.", mob_title_3: "Telco Líder", mob_desc_3: "Sim. a Telstra (10M+ Usuarios)",
+                    tt_title_4: "Retail Omnicanal", tt_desc_4: "Importante empresa de retail de respuesta directa con extensas operaciones de venta multiplataforma y logística.", mob_title_4: "Retail Omnicanal", mob_desc_4: "Firma Líder Respuesta Directa",
+                    tt_title_5: "Aerolínea más grande de LatAm", tt_desc_5: "El grupo de aerolíneas más grande de LatAm. Opera 1,500 vuelos diarios en 26 países.", mob_title_5: "Aerolínea Líder", mob_desc_5: "Mayor de Sudamérica (Sim. Qantas)",
+                    tt_title_6: "Clínica de Primer Nivel", tt_desc_6: "Uno de los principales hospitales privados de América Latina (Acreditado por JCI). Líder en procesamiento de datos clínicos.", mob_title_6: "Hospital Top Tier", mob_desc_6: "Líder Acreditado JCI"
+                },
                 skills: {
                     title: `Stack <span class="highlight">Técnico</span>`,
-                    h1: "Nube e Ingeniería", h2: "Fundamentos", sub_1: "Modelado y Legacy", h3: "Ingeniería", h4: "Analítica y BI", h5: "Gestión y Gobierno de Datos", sub_2: "Alcance de Gobierno"
+                    h1: "Nube e Ingeniería", h2: "Fundamentos", sub_1: "Modelado y Legacy", h3: "Ingeniería", h4: "Analítica y BI", h5: "Gestión y Gobierno de Datos", sub_2: "Alcance de Gobierno",
+                    grp_1: "Habilidades Core", grp_2: "Competente", grp_3: "Avanzado", grp_4: "Mejores Prácticas", grp_5: "Visualización", grp_6: "Negocio",
+                    gov_1: "Catalogación y Documentación", gov_2: "Anonimización y Enmascaramiento", gov_3: "Modelado y Estandarización", gov_4: "Limpieza y Calidad de Datos"
                 },
                 projects: {
                     title: `Proyectos Destacados e <span class="highlight">Impacto</span>`,
@@ -1517,8 +1537,39 @@
             document.getElementById('about-roles-title').innerHTML = t.about.roles_title;
             document.getElementById('about-roles-list').innerHTML = t.about.roles_list;
 
-            // --- Logos ---
+            // --- Logos (NEW) ---
             document.getElementById('logo-section-title').textContent = t.logo.title;
+            
+            // Tooltips
+            document.getElementById('logo-tt-title-1').textContent = t.logos_content.tt_title_1;
+            document.getElementById('logo-tt-text-1').textContent = t.logos_content.tt_desc_1;
+            document.getElementById('logo-mob-title-1').textContent = t.logos_content.mob_title_1;
+            document.getElementById('logo-mob-text-1').textContent = t.logos_content.mob_desc_1;
+
+            document.getElementById('logo-tt-title-2').textContent = t.logos_content.tt_title_2;
+            document.getElementById('logo-tt-text-2').textContent = t.logos_content.tt_desc_2;
+            document.getElementById('logo-mob-title-2').textContent = t.logos_content.mob_title_2;
+            document.getElementById('logo-mob-text-2').textContent = t.logos_content.mob_desc_2;
+
+            document.getElementById('logo-tt-title-3').textContent = t.logos_content.tt_title_3;
+            document.getElementById('logo-tt-text-3').textContent = t.logos_content.tt_desc_3;
+            document.getElementById('logo-mob-title-3').textContent = t.logos_content.mob_title_3;
+            document.getElementById('logo-mob-text-3').textContent = t.logos_content.mob_desc_3;
+
+            document.getElementById('logo-tt-title-4').textContent = t.logos_content.tt_title_4;
+            document.getElementById('logo-tt-text-4').textContent = t.logos_content.tt_desc_4;
+            document.getElementById('logo-mob-title-4').textContent = t.logos_content.mob_title_4;
+            document.getElementById('logo-mob-text-4').textContent = t.logos_content.mob_desc_4;
+
+            document.getElementById('logo-tt-title-5').textContent = t.logos_content.tt_title_5;
+            document.getElementById('logo-tt-text-5').textContent = t.logos_content.tt_desc_5;
+            document.getElementById('logo-mob-title-5').textContent = t.logos_content.mob_title_5;
+            document.getElementById('logo-mob-text-5').textContent = t.logos_content.mob_desc_5;
+
+            document.getElementById('logo-tt-title-6').textContent = t.logos_content.tt_title_6;
+            document.getElementById('logo-tt-text-6').textContent = t.logos_content.tt_desc_6;
+            document.getElementById('logo-mob-title-6').textContent = t.logos_content.mob_title_6;
+            document.getElementById('logo-mob-text-6').textContent = t.logos_content.mob_desc_6;
 
             // --- Skills ---
             document.getElementById('skills-title').innerHTML = t.skills.title;
@@ -1529,6 +1580,20 @@
             document.getElementById('stack-h-5').textContent = t.skills.h5;
             document.getElementById('stack-sub-1').textContent = t.skills.sub_1;
             document.getElementById('stack-sub-2').textContent = t.skills.sub_2;
+            
+            // Skill Groups (NEW)
+            document.getElementById('st-grp-1').textContent = t.skills.grp_1;
+            document.getElementById('st-grp-2').textContent = t.skills.grp_2;
+            document.getElementById('st-grp-3').textContent = t.skills.grp_3;
+            document.getElementById('st-grp-4').textContent = t.skills.grp_4;
+            document.getElementById('st-grp-5').textContent = t.skills.grp_5;
+            document.getElementById('st-grp-6').textContent = t.skills.grp_6;
+
+            // Skill Items (NEW - Cyan Card)
+            document.getElementById('skill-gov-1').textContent = t.skills.gov_1;
+            document.getElementById('skill-gov-2').textContent = t.skills.gov_2;
+            document.getElementById('skill-gov-3').textContent = t.skills.gov_3;
+            document.getElementById('skill-gov-4').textContent = t.skills.gov_4;
 
             // --- Projects ---
             document.getElementById('projects-title').innerHTML = t.projects.title;
