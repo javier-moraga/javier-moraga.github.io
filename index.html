@@ -70,7 +70,7 @@
         .nav-links a { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
         .nav-links a:hover { color: var(--accent); }
 
-        /* --- ESTILOS BANDERAS (MODIFICADO) --- */
+        /* --- ESTILOS BANDERAS --- */
         .lang-options {
             display: flex; gap: 15px; margin-left: 20px; align-items: center;
         }
@@ -671,9 +671,9 @@
     <section class="hero">
         <div class="container">
             <div class="hero-tags">
-                <span class="hero-tag">Healthcare</span>
-                <span class="hero-tag">Aviation</span>
-                <span class="hero-tag">Telecom</span>
+                <span class="hero-tag" id="tag-1">Healthcare</span>
+                <span class="hero-tag" id="tag-2">Aviation</span>
+                <span class="hero-tag" id="tag-3">Telecom</span>
             </div>
             <h1 id="hero-title">Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span></h1>
             
@@ -726,12 +726,12 @@
 
         <div class="evolution-container">
             <div class="evo-card evo-left">
-                <span class="evo-industry">Healthcare</span>
-                <h3 class="evo-header">Data Analyst (Data Engineering scope)</h3>
+                <span class="evo-industry" id="evo-ind-1">Healthcare</span>
+                <h3 class="evo-header" id="evo-role-1">Data Analyst (Data Engineering scope)</h3>
                 <span class="evo-company">Clínica Alemana</span>
                 <span class="evo-date">2025 – Present</span>
-                <span class="evo-mode"><i class="fa-solid fa-wifi"></i> Remote</span>
-                <div class="evo-desc">
+                <span class="evo-mode" id="evo-mode-1"><i class="fa-solid fa-wifi"></i> Remote</span>
+                <div class="evo-desc" id="evo-desc-1">
                     <ul>
                         <li>SAS → BigQuery Migration</li>
                         <li>Clinical Data Pipelines</li>
@@ -741,12 +741,12 @@
             </div>
 
             <div class="evo-card evo-right">
-                <span class="evo-industry">Aviation</span>
-                <h3 class="evo-header">Data Analyst (Data Engineering scope)</h3>
+                <span class="evo-industry" id="evo-ind-2">Aviation</span>
+                <h3 class="evo-header" id="evo-role-2">Data Analyst (Data Engineering scope)</h3>
                 <span class="evo-company">LATAM Airlines</span>
                 <span class="evo-date">2023 – 2025</span>
-                <span class="evo-mode"><i class="fa-solid fa-wifi"></i> Remote</span>
-                <div class="evo-desc">
+                <span class="evo-mode" id="evo-mode-2"><i class="fa-solid fa-wifi"></i> Remote</span>
+                <div class="evo-desc" id="evo-desc-2">
                     <ul>
                         <li>Jira → BigQuery Ingestion</li>
                         <li>Near Real-time Reporting</li>
@@ -756,12 +756,12 @@
             </div>
 
             <div class="evo-card evo-left">
-                <span class="evo-industry">Consulting</span>
-                <h3 class="evo-header">Data Analyst</h3>
+                <span class="evo-industry" id="evo-ind-3">Consulting</span>
+                <h3 class="evo-header" id="evo-role-3">Data Analyst</h3>
                 <span class="evo-company">A3D</span>
                 <span class="evo-date">2023</span>
-                <span class="evo-mode"><i class="fa-solid fa-laptop-house"></i> Hybrid</span>
-                <div class="evo-desc">
+                <span class="evo-mode" id="evo-mode-3"><i class="fa-solid fa-laptop-house"></i> Hybrid</span>
+                <div class="evo-desc" id="evo-desc-3">
                     <ul>
                         <li>Enterprise Data Documentation</li>
                         <li>Source Cataloging</li>
@@ -771,12 +771,12 @@
             </div>
 
             <div class="evo-card evo-right">
-                <span class="evo-industry">Telecom</span>
-                <h3 class="evo-header">Senior Collections Analyst</h3>
+                <span class="evo-industry" id="evo-ind-4">Telecom</span>
+                <h3 class="evo-header" id="evo-role-4">Senior Collections Analyst</h3>
                 <span class="evo-company">ENTEL</span>
                 <span class="evo-date">2022 – 2023</span>
-                <span class="evo-mode"><i class="fa-solid fa-laptop-house"></i> Hybrid</span>
-                <div class="evo-desc">
+                <span class="evo-mode" id="evo-mode-4"><i class="fa-solid fa-laptop-house"></i> Hybrid</span>
+                <div class="evo-desc" id="evo-desc-4">
                     <ul>
                         <li>Behavior-based Segmentation</li>
                         <li>Revenue Recovery Analysis</li>
@@ -785,12 +785,12 @@
             </div>
 
             <div class="evo-card evo-left">
-                <span class="evo-industry">Telecom</span>
-                <h3 class="evo-header">Senior Data Analyst</h3>
+                <span class="evo-industry" id="evo-ind-5">Telecom</span>
+                <h3 class="evo-header" id="evo-role-5">Senior Data Analyst</h3>
                 <span class="evo-company">WOM Chile</span>
                 <span class="evo-date">2018 – 2022</span>
-                <span class="evo-mode"><i class="fa-solid fa-building"></i> On-site</span>
-                <div class="evo-desc">
+                <span class="evo-mode" id="evo-mode-5"><i class="fa-solid fa-building"></i> On-site</span>
+                <div class="evo-desc" id="evo-desc-5">
                     <ul>
                         <li>Churn Analysis</li>
                         <li>Customer Segmentation</li>
@@ -800,12 +800,12 @@
             </div>
 
             <div class="evo-card evo-right">
-                <span class="evo-industry">Telecom</span>
-                <h3 class="evo-header">Operations Control Engineer</h3>
+                <span class="evo-industry" id="evo-ind-6">Telecom</span>
+                <h3 class="evo-header" id="evo-role-6">Operations Control Engineer</h3>
                 <span class="evo-company">Claro Chile</span>
                 <span class="evo-date">2015 – 2018</span>
-                <span class="evo-mode"><i class="fa-solid fa-building"></i> On-site</span>
-                <div class="evo-desc">
+                <span class="evo-mode" id="evo-mode-6"><i class="fa-solid fa-building"></i> On-site</span>
+                <div class="evo-desc" id="evo-desc-6">
                     <ul>
                         <li>KPI Automation</li>
                         <li>ETL Controls</li>
@@ -824,16 +824,16 @@
                     <img src="profile_2.jpg" alt="Javier Moraga" class="profile-img" onerror="this.src='https://via.placeholder.com/300'">
                 </div>
                 <div class="about-text">
-                    <span style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
-                    <h2>Who is <span style="color: var(--accent);">Javier?</span></h2>
-                    <p>I specialize in translating complex data into clear, actionable insights through well-designed data models, high-impact dashboards, and scalable cloud data solutions. I have a strong background in GCP, BigQuery, and SQL, with proven success modernizing legacy architectures.</p>
+                    <span id="about-pretitle" style="color: var(--accent-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">The Professional & The Person</span>
+                    <h2 id="about-title">Who is <span style="color: var(--accent);">Javier?</span></h2>
+                    <p id="about-intro">I specialize in translating complex data into clear, actionable insights through well-designed data models, high-impact dashboards, and scalable cloud data solutions. I have a strong background in GCP, BigQuery, and SQL, with proven success modernizing legacy architectures.</p>
                     
                     <p id="about-why-country"><strong>Why Australia?</strong> This is a structured life project. With family already settled in the country, I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.</p>
                     
                     <div class="about-info-grid">
                         <div class="industries-box">
-                            <h4><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
-                            <ul style="font-size: 0.9rem;">
+                            <h4 id="about-value-title"><i class="fa-solid fa-briefcase"></i> Value Proposition</h4>
+                            <ul id="about-value-list" style="font-size: 0.9rem;">
                                 <li style="margin-bottom: 8px;"><strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Business & Analytics, Operations, Finance, Marketing, Risk & Collections</em>.</li>
                                 <li style="margin-bottom: 8px;"><strong>Resourcefulness:</strong> Driven by curiosity. If a solution doesn't exist, I find a way to learn it and build it from scratch.</li>
                                 <li style="margin-bottom: 8px;"><strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.</li>
@@ -841,8 +841,8 @@
                             </ul>
                         </div>
                         <div class="industries-box roles-box">
-                            <h4><i class="fa-solid fa-user-tag"></i> Preferred Roles</h4>
-                            <div style="font-size: 0.95rem;">
+                            <h4 id="about-roles-title"><i class="fa-solid fa-user-tag"></i> Preferred Roles</h4>
+                            <div id="about-roles-list" style="font-size: 0.95rem;">
                                 <div style="margin-bottom: 15px;">
                                     <span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Senior Data Analyst</span>
                                     <span class="role-sub">Focus on insights & business value.</span>
@@ -866,7 +866,7 @@
     <section class="logo-section-container">
         <div class="content-frame" style="padding: 40px; border-color: rgba(255,255,255,0.02); background: transparent; box-shadow: none;">
             <div class="logo-section-header">
-                <h5>Trusted By / Previous Experience</h5>
+                <h5 id="logo-section-title">Trusted By / Previous Experience</h5>
             </div>
             
             <div class="logo-rows-container">
@@ -964,14 +964,14 @@
 
     <section id="skills" class="skills-section">
         <div class="content-frame">
-            <h2 class="section-title">Technical <span class="highlight">Stack</span></h2>
+            <h2 class="section-title" id="skills-title">Technical <span class="highlight">Stack</span></h2>
             <div class="swiper-container two">
                 <div class="swiper-wrapper">
                     <div class="swiper-slide">
                         <div class="slider-image">
                             <div class="mirror-card blue">
                                 <div class="mirror-content">
-                                    <h2>Cloud & Engineering</h2>
+                                    <h2 id="stack-h-1">Cloud & Engineering</h2>
                                     <div class="skill-group">
                                         <div class="skill-group-title">Core Skills</div>
                                         <ul class="skill-list">
@@ -997,7 +997,7 @@
                         <div class="slider-image">
                             <div class="mirror-card gold">
                                 <div class="mirror-content">
-                                    <h2>Foundations</h2>
+                                    <h2 id="stack-h-2">Foundations</h2>
                                      <div class="skill-group">
                                         <div class="skill-group-title">Advanced</div>
                                         <ul class="skill-list">
@@ -1006,7 +1006,7 @@
                                         </ul>
                                     </div>
                                      <div class="skill-group">
-                                        <div class="skill-group-title">Modeling & Legacy</div>
+                                        <div class="skill-group-title" id="stack-sub-1">Modeling & Legacy</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-sitemap"></i> Dimensional Model</li>
                                             <li class="skill-item"><i class="fa-solid fa-database"></i> PostgreSQL</li>
@@ -1021,7 +1021,7 @@
                         <div class="slider-image">
                             <div class="mirror-card green">
                                 <div class="mirror-content">
-                                    <h2>Engineering</h2>
+                                    <h2 id="stack-h-3">Engineering</h2>
                                      <div class="skill-group">
                                         <div class="skill-group-title">Best Practices</div>
                                         <ul class="skill-list">
@@ -1040,7 +1040,7 @@
                         <div class="slider-image">
                             <div class="mirror-card purple">
                                 <div class="mirror-content">
-                                    <h2>Analytics & BI</h2>
+                                    <h2 id="stack-h-4">Analytics & BI</h2>
                                     <div class="skill-group">
                                         <div class="skill-group-title">Visualization</div>
                                         <ul class="skill-list">
@@ -1064,9 +1064,9 @@
                         <div class="slider-image">
                             <div class="mirror-card cyan">
                                 <div class="mirror-content">
-                                    <h2>Data Management & Governance</h2>
+                                    <h2 id="stack-h-5">Data Management & Governance</h2>
                                     <div class="skill-group">
-                                        <div class="skill-group-title">Governance Scope</div>
+                                        <div class="skill-group-title" id="stack-sub-2">Governance Scope</div>
                                         <ul class="skill-list">
                                             <li class="skill-item"><i class="fa-solid fa-table-list"></i> Cataloguing & Documentation</li>
                                             <li class="skill-item"><i class="fa-solid fa-mask"></i> Anonymisation & Masking</li>
@@ -1088,7 +1088,7 @@
 
     <section id="projects" class="projects-section">
         <div class="content-frame">
-            <h2 class="section-title">Featured Projects & <span class="highlight">Impact</span></h2>
+            <h2 class="section-title" id="projects-title">Featured Projects & <span class="highlight">Impact</span></h2>
             
             <div class="sticky-wrapper">
                 
@@ -1099,13 +1099,13 @@
                             <span class="p-tag">Dataform</span>
                             <span class="p-tag">GenAI Analytics</span>
                         </div>
-                        <h3 class="project-title">GenAI Adoption Pipeline — "Amelia" Assistant</h3>
-                        <p class="project-desc">
+                        <h3 class="project-title" id="p-title-1">GenAI Adoption Pipeline — "Amelia" Assistant</h3>
+                        <p class="project-desc" id="p-desc-1">
                             <strong>Context:</strong> Measuring the impact of "Amelia", an internal GenAI assistant for HR & Operations.<br>
                             <strong>Problem:</strong> Disconnected logs (GA4, Backend, Feedback) made it impossible to track true adoption vs. human fallback.<br>
                             <strong>Outcome:</strong> Automated Dataform (SQLX) pipeline & Executive Dashboard monitoring adoption by VP and CSAT scores.
                         </p>
-                        <a href="cases/latam-ai-adoption-dashboard.html" class="btn-project">Explore Use Case</a>
+                        <a href="cases/latam-ai-adoption-dashboard.html" class="btn-project" id="p-btn-1">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
                         <img src="https://via.placeholder.com/600x400/16203c/ffffff?text=AI+Adoption+Pipeline" alt="Cloud Project">
@@ -1119,13 +1119,13 @@
                             <span class="p-tag">BigQuery</span>
                             <span class="p-tag">Looker</span>
                         </div>
-                        <h3 class="project-title">Enterprise Migration: SAS/Oracle to BigQuery</h3>
-                        <p class="project-desc">
+                        <h3 class="project-title" id="p-title-2">Enterprise Migration: SAS/Oracle to BigQuery</h3>
+                        <p class="project-desc" id="p-desc-2">
                             <strong>Context:</strong> Modernizing data infrastructure for <strong>Clínica Alemana</strong>.<br>
                             <strong>Challenge:</strong> Migrating 90M+ record tables and complex legacy flows (SAS Enterprise Guide) to Cloud with strict PII governance.<br>
                             <strong>Outcome:</strong> Implemented a custom "Data Ingestor" framework on GKE/Airflow, enabling automated quality checks and real-time Looker reporting.
                         </p>
-                        <a href="cases/sas-migration.html" class="btn-project">Explore Use Case</a>
+                        <a href="cases/sas-migration.html" class="btn-project" id="p-btn-2">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
                          <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
@@ -1140,15 +1140,15 @@
                             <span class="p-tag">Executive Strategy</span>
                         </div>
 
-                        <h3 class="project-title">Strategic Retention Dashboard & Churn Analysis</h3>
+                        <h3 class="project-title" id="p-title-3">Strategic Retention Dashboard & Churn Analysis</h3>
 
-                        <p class="project-desc">
+                        <p class="project-desc" id="p-desc-3">
                             <strong>Context:</strong> Weekly high-level diagnostic for the CEO and Marketing Dept. Monitoring the "Portability War" and customer churn.<br>
                             <strong>Challenge:</strong> Consolidating hybrid sources (BigQuery Models + Manual NPS via email) into a coherent narrative of Retention vs. Competition.<br>
                             <strong>Impact:</strong> 360° visibility of Churn (Prepaid/Postpaid) and effectiveness of loyalty campaigns.
                         </p>
 
-                        <a href="cases/wom-retention-dashboard.html" class="btn-project">View Case Study</a>
+                        <a href="cases/wom-retention-dashboard.html" class="btn-project" id="p-btn-3">View Case Study</a>
                     </div>
 
                     <div class="project-visual">
@@ -1165,9 +1165,9 @@
                             <span class="p-tag">Executive Reporting</span>
                         </div>
 
-                        <h3 class="project-title">Executive KPI Report — Consolidation & Modernisation</h3>
+                        <h3 class="project-title" id="p-title-4">Executive KPI Report — Consolidation & Modernisation</h3>
 
-                        <p class="project-desc">
+                        <p class="project-desc" id="p-desc-4">
                             <strong>Context:</strong> Weekly executive report consolidating <strong>21 data sources</strong> (Finance, Network, Sales) for the
                             Corporate Committee (delivered every Monday 15:00).<br>
                             <strong>Problem:</strong> Fragmented Excel/CSV sources, manual consolidation and metric inconsistencies
@@ -1176,7 +1176,7 @@
                             process — plus a modern redesign proposal based on BigQuery + Power BI.
                         </p>
 
-                        <a href="claro-executive-report.html" class="btn-project">Explore Use Case</a>
+                        <a href="claro-executive-report.html" class="btn-project" id="p-btn-4">Explore Use Case</a>
                     </div>
 
                     <div class="project-visual">
@@ -1191,13 +1191,13 @@
 
     <section id="contact" class="contact-section">
         <div class="content-frame" style="padding: 40px; background: transparent; border: none; box-shadow: none;">
-            <span style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
-            <h2 style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
+            <span id="contact-pill" style="border: 1px solid var(--accent-gold); padding: 5px 15px; border-radius: 20px; color: var(--accent-gold);">Get in Touch</span>
+            <h2 id="contact-title" style="margin-top: 20px; font-size: 2.5rem;">Ready to <span class="highlight">collaborate?</span></h2>
             <div style="margin-top: 50px; margin-bottom: 30px;">
                 <img src="rocky.jpg" alt="Rocky" 
                      style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid var(--accent-gold); object-fit: cover; box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);" 
                      onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'">
-                <p style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">(Rocky is also ready for the flight! 🐾)</p>
+                <p id="contact-dog" style="font-size: 1.1rem; color: #cbd5e1; margin-top: 15px; font-weight: 600;">(Rocky is also ready for the flight! 🐾)</p>
             </div>
             
             <div class="contact-icons">
@@ -1212,20 +1212,19 @@
                  <a id="download-cv-btn" href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
             </div>
 
-            <p style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
+            <p id="footer-location" style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
         </div>
     </section>
 
     <footer>
         <div class="container">
-            <p>© 2025 Javier Moraga. Built for the Global Market.</p>
+            <p id="footer-copy">© 2025 Javier Moraga. Built for the Global Market.</p>
         </div>
     </footer>
 
     <div id="modalKPI" class="modal-overlay">
         <div class="modal-box">
             <button class="modal-close" onclick="closeCase_KPI()">×</button>
-
             <div class="modal-header-modern">
                 <div class="header-tags">
                     <span class="m-tag tag-blue">Executive Reporting</span>
@@ -1234,119 +1233,28 @@
                 <h1>Executive KPI Consolidation</h1>
                 <p class="subtitle">From Manual Excel Sheets to a Unified Truth</p>
             </div>
-
-            <div class="modal-body-modern">
-                
+             <div class="modal-body-modern">
                 <div class="bento-grid">
-
                     <div class="bento-card full-width">
-                        <h3 class="bento-title"><i class="fa-solid fa-layer-group"></i> The Context</h3>
-                        <p>
-                            Every Monday at 08:00 AM, the Corporate Committee (CEO + Directors) required a 
-                            <strong>Single View of the Business</strong>. This report consolidated critical KPIs 
-                            from <span class="text-highlight">Finance (EBITDA)</span>, <span class="text-highlight">Network (Uptime)</span>, 
-                            and <span class="text-highlight">Commercial (Gross Adds/Churn)</span>.
-                        </p>
+                        <h3 class="bento-title">The Context</h3>
+                        <p>Consolidated critical KPIs from Finance, Network, and Commercial for the Corporate Committee.</p>
                     </div>
-
-                    <div class="bento-card danger-zone">
-                        <h3 class="bento-title text-danger"><i class="fa-solid fa-triangle-exclamation"></i> The Chaos (2016)</h3>
-                        <div class="chaos-visual">
-                            <div class="chaos-item">📧 Email Chains</div>
-                            <div class="chaos-item">📂 50+ CSVs</div>
-                            <div class="chaos-item">⚡ Data Mismatches</div>
-                        </div>
-                        <p class="small-text">
-                            Information lived in silos. Finance reported one Churn number, Commercial reported another. 
-                            Consolidation was manual, error-prone, and high-stress.
-                        </p>
-                    </div>
-
-                    <div class="bento-card role-focus">
-                        <h3 class="bento-title"><i class="fa-solid fa-user-gear"></i> My Role</h3>
-                        <ul class="clean-list">
-                            <li><strong>Orchestrator:</strong> Defined the "Official" calculation rules across depts.</li>
-                            <li><strong>Gatekeeper:</strong> Validated cross-area consistency (e.g., Sales vs. Activations).</li>
-                            <li><strong>Architect:</strong> Designed the Master Excel Model (The MVP of a Data Warehouse).</li>
-                        </ul>
-                    </div>
-
-                    <div class="bento-card full-width flow-section">
-                        <h3 class="bento-title"><i class="fa-solid fa-arrow-right-arrow-left"></i> The Process I Implemented</h3>
-                        <div class="process-flow">
-                            <div class="step">
-                                <div class="step-icon"><i class="fa-solid fa-file-csv"></i></div>
-                                <span>Standardize Inputs</span>
-                            </div>
-                            <div class="step-line"></div>
-                            <div class="step">
-                                <div class="step-icon"><i class="fa-solid fa-filter"></i></div>
-                                <span>Cross-Validation</span>
-                            </div>
-                            <div class="step-line"></div>
-                            <div class="step">
-                                <div class="step-icon"><i class="fa-solid fa-chart-line"></i></div>
-                                <span>Executive View</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bento-card impact-box">
-                        <h3 class="bento-title">Impact</h3>
-                        <div class="stat-big">100%</div>
-                        <p>KPI Consistency across areas</p>
-                    </div>
-
-                    <div class="bento-card impact-box">
-                        <h3 class="bento-title">Efficiency</h3>
-                        <div class="stat-big">6h <i class="fa-solid fa-arrow-right" style="font-size:0.5em; vertical-align:middle;"></i> 1h</div>
-                        <p>Reduction in processing time</p>
-                    </div>
-
-                    <div class="bento-card full-width modern-vision">
-                        <div class="vision-header">
-                            <h3 class="bento-title" style="color:#fff;"><i class="fa-solid fa-rocket"></i> The 2026 Vision (Modern Stack)</h3>
-                            <span class="vision-badge">Architectural Proposal</span>
-                        </div>
-                        <p>
-                            If I were to rebuild this today, I would eliminate manual files entirely in favor of an 
-                            <strong>Automated ELT Pipeline</strong>.
-                        </p>
-                        
-                        <div class="stack-comparison">
-                            <div class="stack-col">
-                                <span>Ingestion</span>
-                                <strong class="tech-text">Python / Airflow</strong>
-                            </div>
-                            <div class="stack-arrow">→</div>
-                            <div class="stack-col">
-                                <span>Warehousing</span>
-                                <strong class="tech-text">Google BigQuery</strong>
-                            </div>
-                            <div class="stack-arrow">→</div>
-                            <div class="stack-col">
-                                <span>Consumption</span>
-                                <strong class="tech-text">Power BI / Looker</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                </div> <div class="modal-actions-modern">
-                    <a href="cases/executive-kpi-report.html" class="btn-fill">View Full Case Study</a>
+                </div> 
+                <div class="modal-actions-modern">
                     <button class="btn-outline" onclick="closeCase_KPI()">Close</button>
                 </div>
-
             </div>
         </div>
     </div>
     
     <script>
-        // Diccionario de textos
+        // Diccionario COMPLETO de traducciones
         const translations = {
             en: {
                 nav: { home: "Home", about: "About Me", stack: "Stack", work: "Portfolio", contact: "Contact" },
                 hero: {
                     title: `Senior Data Analyst / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">10+ Years Experience</span>`,
+                    tags: ["Healthcare", "Aviation", "Telecom"],
                     desc_global: `Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
                     <br>
                     <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
@@ -1364,12 +1272,56 @@
                     timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Flexible overlap with US, EU & APAC timezones`,
                     timezone_aus: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Available for overlap with AEST mornings (Sydney time)`,
                     cv_btn: "Download CV"
-                }
+                },
+                evolution: {
+                    ind_1: "Healthcare", role_1: "Data Analyst (Data Engineering scope)", mode_1: `<i class="fa-solid fa-wifi"></i> Remote`, desc_1: `<ul><li>SAS → BigQuery Migration</li><li>Clinical Data Pipelines</li><li>Data Quality Automation</li></ul>`,
+                    ind_2: "Aviation", role_2: "Data Analyst (Data Engineering scope)", mode_2: `<i class="fa-solid fa-wifi"></i> Remote`, desc_2: `<ul><li>Jira → BigQuery Ingestion</li><li>Near Real-time Reporting</li><li>CI/CD Delivery</li></ul>`,
+                    ind_3: "Consulting", role_3: "Data Analyst", mode_3: `<i class="fa-solid fa-laptop-house"></i> Hybrid`, desc_3: `<ul><li>Enterprise Data Documentation</li><li>Source Cataloging</li><li>Knowledge Standardization</li></ul>`,
+                    ind_4: "Telecom", role_4: "Senior Collections Analyst", mode_4: `<i class="fa-solid fa-laptop-house"></i> Hybrid`, desc_4: `<ul><li>Behavior-based Segmentation</li><li>Revenue Recovery Analysis</li></ul>`,
+                    ind_5: "Telecom", role_5: "Senior Data Analyst", mode_5: `<i class="fa-solid fa-building"></i> On-site`, desc_5: `<ul><li>Churn Analysis</li><li>Customer Segmentation</li><li>Netezza → BigQuery Migration</li></ul>`,
+                    ind_6: "Telecom", role_6: "Operations Control Engineer", mode_6: `<i class="fa-solid fa-building"></i> On-site`, desc_6: `<ul><li>KPI Automation</li><li>ETL Controls</li><li>Process Monitoring</li></ul>`
+                },
+                about: {
+                    pretitle: "The Professional & The Person",
+                    title: `Who is <span style="color: var(--accent);">Javier?</span>`,
+                    intro: `I specialize in translating complex data into clear, actionable insights through well-designed data models, high-impact dashboards, and scalable cloud data solutions. I have a strong background in GCP, BigQuery, and SQL, with proven success modernizing legacy architectures.`,
+                    why_country: `<strong>Why Australia?</strong> This is a structured life project. With family already settled in the country, I have a clear understanding of the lifestyle and culture, ensuring a smooth and rapid integration.`,
+                    val_title: `<i class="fa-solid fa-briefcase"></i> Value Proposition`,
+                    val_list: `<li style="margin-bottom: 8px;"><strong>Cross-Functional Versatility:</strong> Direct experience driving value across <em>Business & Analytics, Operations, Finance, Marketing, Risk & Collections</em>.</li>
+                               <li style="margin-bottom: 8px;"><strong>Resourcefulness:</strong> Driven by curiosity. If a solution doesn't exist, I find a way to learn it and build it from scratch.</li>
+                               <li style="margin-bottom: 8px;"><strong>Team Multiplier:</strong> I believe in open knowledge sharing. I enjoy mentoring teammates and elevating the group's technical standard.</li>
+                               <li><strong>Stakeholder Management:</strong> Proven ability to translate technical concepts for non-technical stakeholders (Medical staff, C-Level Execs).</li>`,
+                    roles_title: `<i class="fa-solid fa-user-tag"></i> Preferred Roles`,
+                    roles_list: `<div style="margin-bottom: 15px;"><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Senior Data Analyst</span><span class="role-sub">Focus on insights & business value.</span></div>
+                                 <div style="margin-bottom: 15px;"><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Analytics Engineer</span><span class="role-sub">Focus on data modelling & pipelines.</span></div>
+                                 <div><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>DataOps / Data Analyst</span><span class="role-sub">Engineering scope & automation.</span></div>`
+                },
+                logo: { title: "Trusted By / Previous Experience" },
+                skills: {
+                    title: `Technical <span class="highlight">Stack</span>`,
+                    h1: "Cloud & Engineering", h2: "Foundations", sub_1: "Modeling & Legacy", h3: "Engineering", h4: "Analytics & BI", h5: "Data Management & Governance", sub_2: "Governance Scope"
+                },
+                projects: {
+                    title: `Featured Projects & <span class="highlight">Impact</span>`,
+                    btn: "Explore Use Case",
+                    p1: { title: `GenAI Adoption Pipeline — "Amelia" Assistant`, desc: `<strong>Context:</strong> Measuring the impact of "Amelia", an internal GenAI assistant for HR & Operations.<br><strong>Problem:</strong> Disconnected logs (GA4, Backend, Feedback) made it impossible to track true adoption vs. human fallback.<br><strong>Outcome:</strong> Automated Dataform (SQLX) pipeline & Executive Dashboard monitoring adoption by VP and CSAT scores.` },
+                    p2: { title: `Enterprise Migration: SAS/Oracle to BigQuery`, desc: `<strong>Context:</strong> Modernizing data infrastructure for <strong>Clínica Alemana</strong>.<br><strong>Challenge:</strong> Migrating 90M+ record tables and complex legacy flows (SAS Enterprise Guide) to Cloud with strict PII governance.<br><strong>Outcome:</strong> Implemented a custom "Data Ingestor" framework on GKE/Airflow, enabling automated quality checks and real-time Looker reporting.` },
+                    p3: { title: `Strategic Retention Dashboard & Churn Analysis`, desc: `<strong>Context:</strong> Weekly high-level diagnostic for the CEO and Marketing Dept. Monitoring the "Portability War" and customer churn.<br><strong>Challenge:</strong> Consolidating hybrid sources (BigQuery Models + Manual NPS via email) into a coherent narrative of Retention vs. Competition.<br><strong>Impact:</strong> 360° visibility of Churn (Prepaid/Postpaid) and effectiveness of loyalty campaigns.` },
+                    p4: { title: `Executive KPI Report — Consolidation & Modernisation`, desc: `<strong>Context:</strong> Weekly executive report consolidating <strong>21 data sources</strong> (Finance, Network, Sales) for the Corporate Committee (delivered every Monday 15:00).<br><strong>Problem:</strong> Fragmented Excel/CSV sources, manual consolidation and metric inconsistencies across business areas.<br><strong>Outcome:</strong> Standardised KPI definitions, cross-area validation and a reliable reporting process — plus a modern redesign proposal based on BigQuery + Power BI.` }
+                },
+                contact: {
+                    pill: "Get in Touch",
+                    title: `Ready to <span class="highlight">collaborate?</span>`,
+                    dog: "(Rocky is also ready for the flight! 🐾)",
+                    loc: "Santiago, Chile • Open to Remote & Relocation"
+                },
+                footer: { copy: "© 2025 Javier Moraga. Built for the Global Market." }
             },
             es: {
                 nav: { home: "Inicio", about: "Sobre Mí", stack: "Tecnologías", work: "Portafolio", contact: "Contacto" },
                 hero: {
                     title: `Analista de Datos Senior / Analytics Engineer <br> <span style="font-size:0.8em; font-weight:400; color:#fff; opacity:0.9;">+10 Años de Experiencia</span>`,
+                    tags: ["Salud", "Aviación", "Telecomunicaciones"],
                     desc_global: `Ofreciendo soluciones analíticas escalables en <strong style="color:white">BigQuery y GCP</strong>, con sólida capacidad en <strong style="color:white">ingeniería de datos, migraciones y optimización de pipelines</strong>. Ayudo a las organizaciones a estandarizar modelos de datos, mejorar la fiabilidad y convertir datos complejos en insights accionables.
                     <br>
                     <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
@@ -1378,11 +1330,59 @@
                     <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
                         <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Ciudadano Chileno (Abierto a reubicación)
                     </span>`,
-                    desc_aus: `(El modo español está optimizado para la versión global remota). Delivering scalable analytics solutions...`, 
+                    desc_aus: `Ofreciendo soluciones analíticas escalables en <strong style="color:white">BigQuery y GCP</strong>, con sólida capacidad en <strong style="color:white">ingeniería de datos, migraciones y optimización de pipelines</strong>. Ayudo a las organizaciones a estandarizar modelos de datos, mejorar la fiabilidad y convertir datos complejos en insights accionables.
+                    <br>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Disponible para Reubicación y Remoto (Australia)</span>
+                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                        <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Ciudadano Chileno (Exento de LMT para Patrocinio)
+                    </span>`, // Adaptado al español para modo AUS
                     timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Solapamiento flexible con horarios de EE. UU., Europa y APAC`,
-                    timezone_aus: ``, // No aplica, fallback a global si se selecciona ES
+                    timezone_aus: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Disponible para solapamiento con mañanas de AEST (Sídney)`,
                     cv_btn: "Descargar CV (Global)"
-                }
+                },
+                evolution: {
+                    ind_1: "Salud", role_1: "Analista de Datos (Alcance Ing. de Datos)", mode_1: `<i class="fa-solid fa-wifi"></i> Remoto`, desc_1: `<ul><li>Migración SAS → BigQuery</li><li>Pipelines de Datos Clínicos</li><li>Automatización de Calidad de Datos</li></ul>`,
+                    ind_2: "Aviación", role_2: "Analista de Datos (Alcance Ing. de Datos)", mode_2: `<i class="fa-solid fa-wifi"></i> Remoto`, desc_2: `<ul><li>Ingesta Jira → BigQuery</li><li>Reportes en Tiempo Casi Real</li><li>Entrega CI/CD</li></ul>`,
+                    ind_3: "Consultoría", role_3: "Analista de Datos", mode_3: `<i class="fa-solid fa-laptop-house"></i> Híbrido`, desc_3: `<ul><li>Documentación de Datos Empresariales</li><li>Catalogación de Fuentes</li><li>Estandarización de Conocimiento</li></ul>`,
+                    ind_4: "Telecom", role_4: "Analista Senior de Cobranza", mode_4: `<i class="fa-solid fa-laptop-house"></i> Híbrido`, desc_4: `<ul><li>Segmentación Basada en Comportamiento</li><li>Análisis de Recuperación de Ingresos</li></ul>`,
+                    ind_5: "Telecom", role_5: "Analista de Datos Senior", mode_5: `<i class="fa-solid fa-building"></i> Presencial`, desc_5: `<ul><li>Análisis de Fuga (Churn)</li><li>Segmentación de Clientes</li><li>Migración Netezza → BigQuery</li></ul>`,
+                    ind_6: "Telecom", role_6: "Ingeniero de Control de Operaciones", mode_6: `<i class="fa-solid fa-building"></i> Presencial`, desc_6: `<ul><li>Automatización de KPIs</li><li>Controles ETL</li><li>Monitoreo de Procesos</li></ul>`
+                },
+                about: {
+                    pretitle: "El Profesional y La Persona",
+                    title: `¿Quién es <span style="color: var(--accent);">Javier?</span>`,
+                    intro: `Me especializo en traducir datos complejos en insights claros y accionables a través de modelos de datos bien diseñados, dashboards de alto impacto y soluciones de datos escalables en la nube. Tengo una sólida formación en GCP, BigQuery y SQL, con éxito comprobado modernizando arquitecturas heredadas.`,
+                    why_country: `<strong>¿Por qué Australia?</strong> Este es un proyecto de vida estructurado. Con familia ya establecida en el país, tengo un entendimiento claro del estilo de vida y la cultura, asegurando una integración fluida y rápida.`,
+                    val_title: `<i class="fa-solid fa-briefcase"></i> Propuesta de Valor`,
+                    val_list: `<li style="margin-bottom: 8px;"><strong>Versatilidad Multifuncional:</strong> Experiencia directa impulsando valor en <em>Negocios y Analítica, Operaciones, Finanzas, Marketing, Riesgo y Cobranzas</em>.</li>
+                               <li style="margin-bottom: 8px;"><strong>Ingenio:</strong> Impulsado por la curiosidad. Si no existe una solución, encuentro la manera de aprenderla y construirla desde cero.</li>
+                               <li style="margin-bottom: 8px;"><strong>Multiplicador de Equipo:</strong> Creo en compartir conocimientos abiertamente. Disfruto mentoreando a compañeros y elevando el estándar técnico del grupo.</li>
+                               <li><strong>Gestión de Stakeholders:</strong> Capacidad comprobada para traducir conceptos técnicos para interesados no técnicos (Personal médico, Ejecutivos C-Level).</li>`,
+                    roles_title: `<i class="fa-solid fa-user-tag"></i> Roles Preferidos`,
+                    roles_list: `<div style="margin-bottom: 15px;"><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Analista de Datos Senior</span><span class="role-sub">Enfoque en insights y valor de negocio.</span></div>
+                                 <div style="margin-bottom: 15px;"><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>Analytics Engineer</span><span class="role-sub">Enfoque en modelado de datos y pipelines.</span></div>
+                                 <div><span class="role-tag"><i class="fa-solid fa-check" style="color:var(--accent); margin-right:8px;"></i>DataOps / Analista Técnico</span><span class="role-sub">Alcance de ingeniería y automatización.</span></div>`
+                },
+                logo: { title: "Confían en mí / Experiencia Previa" },
+                skills: {
+                    title: `Stack <span class="highlight">Técnico</span>`,
+                    h1: "Nube e Ingeniería", h2: "Fundamentos", sub_1: "Modelado y Legacy", h3: "Ingeniería", h4: "Analítica y BI", h5: "Gestión y Gobierno de Datos", sub_2: "Alcance de Gobierno"
+                },
+                projects: {
+                    title: `Proyectos Destacados e <span class="highlight">Impacto</span>`,
+                    btn: "Explorar Caso de Uso",
+                    p1: { title: `Pipeline Adopción GenAI — Asistente "Amelia"`, desc: `<strong>Contexto:</strong> Medir el impacto de "Amelia", asistente GenAI interno para RRHH y Operaciones.<br><strong>Problema:</strong> Logs desconectados (GA4, Backend, Feedback) hacían imposible rastrear la adopción real vs. fallback humano.<br><strong>Resultado:</strong> Pipeline automatizado en Dataform (SQLX) y Dashboard Ejecutivo monitoreando adopción por VP y puntajes CSAT.` },
+                    p2: { title: `Migración Empresarial: SAS/Oracle a BigQuery`, desc: `<strong>Contexto:</strong> Modernización de infraestructura de datos para <strong>Clínica Alemana</strong>.<br><strong>Desafío:</strong> Migrar tablas de +90M registros y flujos legacy complejos (SAS Enterprise Guide) a la Nube con estricta gobernanza PII.<br><strong>Resultado:</strong> Implementación de framework "Data Ingestor" personalizado en GKE/Airflow, habilitando controles de calidad automatizados y reportes en tiempo real en Looker.` },
+                    p3: { title: `Dashboard Estratégico de Retención y Análisis de Fuga`, desc: `<strong>Contexto:</strong> Diagnóstico semanal de alto nivel para CEO y Depto. de Marketing. Monitoreo de "Guerra de Portabilidad" y fuga de clientes.<br><strong>Desafío:</strong> Consolidar fuentes híbridas (Modelos BigQuery + NPS Manual vía email) en una narrativa coherente de Retención vs. Competencia.<br><strong>Impacto:</strong> Visibilidad 360° de Fuga (Prepago/Postpago) y efectividad de campañas de fidelización.` },
+                    p4: { title: `Reporte KPI Ejecutivo — Consolidación y Modernización`, desc: `<strong>Contexto:</strong> Reporte ejecutivo semanal consolidando <strong>21 fuentes de datos</strong> (Finanzas, Red, Ventas) para el Comité Corporativo (entregado cada lunes 15:00).<br><strong>Problema:</strong> Fuentes fragmentadas Excel/CSV, consolidación manual e inconsistencias métricas entre áreas.<br><strong>Resultado:</strong> Estandarización de definiciones de KPI, validación entre áreas y un proceso de reporte confiable — más una propuesta de rediseño moderno basada en BigQuery + Power BI.` }
+                },
+                contact: {
+                    pill: "Hablemos",
+                    title: `¿Listo para <span class="highlight">colaborar?</span>`,
+                    dog: "(¡Rocky también está listo para el viaje! 🐾)",
+                    loc: "Santiago, Chile • Abierto a Remoto y Reubicación"
+                },
+                footer: { copy: "© 2025 Javier Moraga. Construido para el Mercado Global." }
             }
         };
 
@@ -1424,33 +1424,32 @@
             const t = translations[lang];
             
             // --- Navigation ---
-            // Desktop
             document.getElementById('d-nav-about').textContent = t.nav.about;
             document.getElementById('d-nav-stack').textContent = t.nav.stack;
             document.getElementById('d-nav-work').textContent = t.nav.work;
             document.getElementById('d-nav-contact').textContent = t.nav.contact;
             
-            // Mobile (icon labels)
             const mobileLinks = document.querySelectorAll('.mn-link span');
             if(mobileLinks.length > 0) {
                 mobileLinks[0].textContent = t.nav.home;
                 mobileLinks[1].textContent = t.nav.about;
-                mobileLinks[2].textContent = t.nav.stack; // A veces 'Stack' se queda igual
+                mobileLinks[2].textContent = t.nav.stack;
                 mobileLinks[3].textContent = t.nav.work;
                 mobileLinks[4].textContent = t.nav.contact;
             }
 
             // --- Hero ---
             document.getElementById('hero-title').innerHTML = t.hero.title;
+            document.getElementById('tag-1').textContent = t.hero.tags[0];
+            document.getElementById('tag-2').textContent = t.hero.tags[1];
+            document.getElementById('tag-3').textContent = t.hero.tags[2];
 
             // Hero Description Logic
             const heroText = document.getElementById('hero-availability-text');
             if(currentMode === 'global') {
                 heroText.innerHTML = t.hero.desc_global;
             } else {
-                // If in AUS mode but user clicked ES, maybe force global desc? 
-                // Or keep English AUS desc? Let's assume ES user wants Global info mostly.
-                if(lang === 'es') heroText.innerHTML = t.hero.desc_global; 
+                if(lang === 'es') heroText.innerHTML = t.hero.desc_aus; 
                 else heroText.innerHTML = t.hero.desc_aus;
             }
 
@@ -1472,6 +1471,93 @@
             } else {
                 cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
             }
+
+            // --- Evolution ---
+            document.getElementById('evo-ind-1').textContent = t.evolution.ind_1;
+            document.getElementById('evo-role-1').textContent = t.evolution.role_1;
+            document.getElementById('evo-mode-1').innerHTML = t.evolution.mode_1;
+            document.getElementById('evo-desc-1').innerHTML = t.evolution.desc_1;
+
+            document.getElementById('evo-ind-2').textContent = t.evolution.ind_2;
+            document.getElementById('evo-role-2').textContent = t.evolution.role_2;
+            document.getElementById('evo-mode-2').innerHTML = t.evolution.mode_2;
+            document.getElementById('evo-desc-2').innerHTML = t.evolution.desc_2;
+
+            document.getElementById('evo-ind-3').textContent = t.evolution.ind_3;
+            document.getElementById('evo-role-3').textContent = t.evolution.role_3;
+            document.getElementById('evo-mode-3').innerHTML = t.evolution.mode_3;
+            document.getElementById('evo-desc-3').innerHTML = t.evolution.desc_3;
+
+            document.getElementById('evo-ind-4').textContent = t.evolution.ind_4;
+            document.getElementById('evo-role-4').textContent = t.evolution.role_4;
+            document.getElementById('evo-mode-4').innerHTML = t.evolution.mode_4;
+            document.getElementById('evo-desc-4').innerHTML = t.evolution.desc_4;
+
+            document.getElementById('evo-ind-5').textContent = t.evolution.ind_5;
+            document.getElementById('evo-role-5').textContent = t.evolution.role_5;
+            document.getElementById('evo-mode-5').innerHTML = t.evolution.mode_5;
+            document.getElementById('evo-desc-5').innerHTML = t.evolution.desc_5;
+
+            document.getElementById('evo-ind-6').textContent = t.evolution.ind_6;
+            document.getElementById('evo-role-6').textContent = t.evolution.role_6;
+            document.getElementById('evo-mode-6').innerHTML = t.evolution.mode_6;
+            document.getElementById('evo-desc-6').innerHTML = t.evolution.desc_6;
+
+            // --- About ---
+            document.getElementById('about-pretitle').textContent = t.about.pretitle;
+            document.getElementById('about-title').innerHTML = t.about.title;
+            document.getElementById('about-intro').textContent = t.about.intro;
+            
+            // "Why Australia" solo se actualiza si está visible (o se actualiza y CSS lo oculta en modo global)
+            const whyAus = document.getElementById('about-why-country');
+            if(whyAus) whyAus.innerHTML = t.about.why_country;
+
+            document.getElementById('about-value-title').innerHTML = t.about.val_title;
+            document.getElementById('about-value-list').innerHTML = t.about.val_list;
+            document.getElementById('about-roles-title').innerHTML = t.about.roles_title;
+            document.getElementById('about-roles-list').innerHTML = t.about.roles_list;
+
+            // --- Logos ---
+            document.getElementById('logo-section-title').textContent = t.logo.title;
+
+            // --- Skills ---
+            document.getElementById('skills-title').innerHTML = t.skills.title;
+            document.getElementById('stack-h-1').textContent = t.skills.h1;
+            document.getElementById('stack-h-2').textContent = t.skills.h2;
+            document.getElementById('stack-h-3').textContent = t.skills.h3;
+            document.getElementById('stack-h-4').textContent = t.skills.h4;
+            document.getElementById('stack-h-5').textContent = t.skills.h5;
+            document.getElementById('stack-sub-1').textContent = t.skills.sub_1;
+            document.getElementById('stack-sub-2').textContent = t.skills.sub_2;
+
+            // --- Projects ---
+            document.getElementById('projects-title').innerHTML = t.projects.title;
+            
+            // Update individual projects
+            const p = t.projects;
+            
+            document.getElementById('p-title-1').innerHTML = p.p1.title;
+            document.getElementById('p-desc-1').innerHTML = p.p1.desc;
+            document.getElementById('p-btn-1').textContent = p.btn;
+
+            document.getElementById('p-title-2').innerHTML = p.p2.title;
+            document.getElementById('p-desc-2').innerHTML = p.p2.desc;
+            document.getElementById('p-btn-2').textContent = p.btn;
+
+            document.getElementById('p-title-3').innerHTML = p.p3.title;
+            document.getElementById('p-desc-3').innerHTML = p.p3.desc;
+            document.getElementById('p-btn-3').textContent = p.btn;
+
+            document.getElementById('p-title-4').innerHTML = p.p4.title;
+            document.getElementById('p-desc-4').innerHTML = p.p4.desc;
+            document.getElementById('p-btn-4').textContent = p.btn;
+
+            // --- Contact & Footer ---
+            document.getElementById('contact-pill').textContent = t.contact.pill;
+            document.getElementById('contact-title').innerHTML = t.contact.title;
+            document.getElementById('contact-dog').textContent = t.contact.dog;
+            document.getElementById('footer-location').textContent = t.contact.loc;
+            document.getElementById('footer-copy').textContent = t.footer.copy;
         }
     </script>
 
