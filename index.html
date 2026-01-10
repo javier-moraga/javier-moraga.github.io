@@ -1456,7 +1456,7 @@
         }
 
        // --- NUEVA FUNCIÓN: MODO CHILE (checkCountryMode) ACTUALIZADA ---
-               function checkCountryMode() {
+                  function checkCountryMode() {
             const urlParams = new URLSearchParams(window.location.search);
             const pais = urlParams.get('pais');
         
@@ -1476,11 +1476,11 @@
                 const timezoneText = document.getElementById('hero-timezone-text');
                 if (timezoneText) timezoneText.style.display = 'none';
         
-                // B. OCULTAR BLOQUE "POR QUÉ AUSTRALIA" (Corrección aquí)
+                // B. OCULTAR BLOQUE "POR QUÉ AUSTRALIA"
                 const whyAustraliaText = document.getElementById('about-why-country');
                 if (whyAustraliaText) {
                     whyAustraliaText.style.display = 'none';
-                    whyAustraliaText.innerHTML = ''; // Doble seguridad: borramos el contenido
+                    whyAustraliaText.innerHTML = ''; 
                 }
         
                 // 3. SACAR TOOLTIPS DE EMPRESAS
@@ -1508,6 +1508,13 @@
                 // 5. OCULTAR INFORMACIÓN DE VISAS/REUBICACIÓN
                 const relocationElements = document.querySelectorAll('.relocation-info');
                 relocationElements.forEach(el => el.style.display = 'none');
+        
+                // 6. SIMPLIFICAR PIE DE PÁGINA (Corrección Solicitada)
+                const footerLocation = document.getElementById('footer-location');
+                if (footerLocation) {
+                    // Reemplazamos todo el texto por solo la ciudad y país
+                    footerLocation.innerHTML = "Santiago, Chile"; 
+                }
             }
         }
 
