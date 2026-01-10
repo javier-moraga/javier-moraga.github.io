@@ -1455,47 +1455,60 @@
             updateTextContent('en');
         }
 
-        // --- NUEVA FUNCIÓN: MODO CHILE (checkCountryMode) ---
+       // --- NUEVA FUNCIÓN: MODO CHILE (checkCountryMode) ACTUALIZADA ---
         function checkCountryMode() {
             const urlParams = new URLSearchParams(window.location.search);
             const pais = urlParams.get('pais');
-
+        
             if (pais === 'cl') {
-                console.log("🇨🇱 Modo Chile detectado: Ajustando interfaz...");
-
-                // ACCIÓN 1: Forzar Idioma a Español
+                console.log("🇨🇱 Modo Chile detectado: Simplificando interfaz...");
+        
+                // 1. FORZAR IDIOMA Y OCULTAR ICONOS
                 if (typeof changeLang === 'function') {
-                    changeLang('es');
+                    changeLang('es'); // Forzar español
                 }
-
-                // ACCIÓN 2: Ocultar Información de Reubicación/Visas
-                const relocationElements = document.querySelectorAll('.relocation-info');
-                relocationElements.forEach(el => {
-                    el.style.display = 'none';
+                // Ocultar el selector de banderas (.lang-options)
+                const langSwitcher = document.querySelector('.lang-options');
+                if (langSwitcher) langSwitcher.style.display = 'none';
+        
+                // 2. RETIRAR ZONA HORARIA / DISPONIBILIDAD
+                // Seleccionamos el elemento por ID y lo ocultamos
+                const timezoneText = document.getElementById('hero-timezone-text');
+                if (timezoneText) timezoneText.style.display = 'none';
+        
+                // 3. SACAR TOOLTIPS DE EMPRESAS
+                // Seleccionamos todos los globos emergentes (.logo-desktop-tooltip) y los ocultamos
+                const allTooltips = document.querySelectorAll('.logo-desktop-tooltip');
+                allTooltips.forEach(tt => {
+                    tt.style.display = 'none'; // Esto evita que aparezcan al pasar el mouse
                 });
-
-                // ACCIÓN 3: Ocultar Comparaciones (Tooltips y Referencias Australianas)
-                const comparisonElements = document.querySelectorAll('.company-tooltip, .aus-ref');
-                comparisonElements.forEach(el => {
-                    el.style.display = 'none';
-                });
-
-                // ACCIÓN 4: Cambiar el CV
-                const btnCvMain = document.getElementById('btn-download-cv'); // Botón principal
-                const btnCvEnglish = document.getElementById('btn-download-cv-en'); // Botón EN secundario
-
-                // A. Modificar botón principal para descargar versión CL
+                
+                // También ocultamos cualquier etiqueta móvil si es necesario
+                const mobileTags = document.querySelectorAll('.logo-mobile-tag');
+                mobileTags.forEach(mt => mt.style.display = 'none');
+        
+                // 4. CAMBIAR CV A VERSIÓN CHILE
+                const btnCvMain = document.getElementById('download-cv-btn'); 
+                const btnCvEnglish = document.getElementById('btn-download-cv-en');
+        
+                // A. Modificar botón principal
                 if (btnCvMain) {
                     const newPdfPath = 'files/Javier_Moraga_Data_Analyst_Resume_CL.pdf';
                     btnCvMain.setAttribute('href', newPdfPath);
                     btnCvMain.setAttribute('download', 'Javier_Moraga_Data_Analyst_Resume_CL.pdf');
-                    // Nota: changeLang('es') ya se encargó de poner el texto en español ("Descargar CV")
+                    btnCvMain.textContent = "Descargar CV"; // Texto simple en español
                 }
-
+        
                 // B. Ocultar botón secundario (Inglés) si existe
                 if (btnCvEnglish) {
                     btnCvEnglish.style.display = 'none';
                 }
+        
+                // EXTRA: Ocultar información de visas/reubicación (Limpieza general)
+                const relocationElements = document.querySelectorAll('.relocation-info');
+                relocationElements.forEach(el => {
+                    el.style.display = 'none';
+                });
             }
         }
 
