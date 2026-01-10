@@ -691,15 +691,15 @@
             <p id="hero-availability-text">
                 Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
                 <br>
-                <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Eligible for TSS 482 Visa (Medium and Long-term Strategic Skills List)</span>
-                <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Eligible for TSS 482 Visa (Medium and Long-term Strategic Skills List)</span>
+                <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:5px;">
                     <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Chilean Citizen (LMT Exempt for Sponsorship)
                 </span>
             </p>
             
             <div style="margin-bottom: 40px; font-size: 0.95rem; color: #94a3b8; display: flex; flex-direction: column; gap: 8px; align-items: center;">
                  <span id="hero-timezone-text"><i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Available for overlap with AEST mornings (Sydney time)</span>
-                 <span><i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:8px;"></i> Relocation Availability: ~2 Months (Tentative)</span>
+                 <span class="relocation-info"><i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:8px;"></i> Relocation Availability: ~2 Months (Tentative)</span>
             </div>
         </div>
     </section> 
@@ -878,7 +878,7 @@
                         <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight" id="logo-tt-title-1">Global Telco Giant</span>
                             <span id="logo-tt-text-1">Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.</span>
-                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Optus)</em>
+                            <br><em class="aus-ref company-tooltip" style="color:#64748b; font-size:0.75rem;">(Comparable to Optus)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span id="logo-mob-title-1">Global Telco Giant</span>
@@ -892,7 +892,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight" id="logo-tt-title-2">High-Growth Challenger</span>
                             <span id="logo-tt-text-2">Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.</span>
-                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to TPG / Vodafone)</em>
+                            <br><em class="aus-ref company-tooltip" style="color:#64748b; font-size:0.75rem;">(Comparable to TPG / Vodafone)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span id="logo-mob-title-2">High-Growth Challenger</span>
@@ -906,7 +906,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight" id="logo-tt-title-3">Leader Telco (10M+ Subs)</span>
                             <span id="logo-tt-text-3">Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.</span>
-                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Telstra)</em>
+                            <br><em class="aus-ref company-tooltip" style="color:#64748b; font-size:0.75rem;">(Comparable to Telstra)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span id="logo-mob-title-3">Leader Telco</span>
@@ -936,7 +936,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight" id="logo-tt-title-5">Largest Airline in S. America</span>
                             <span id="logo-tt-text-5">The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.</span>
-                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Qantas)</em>
+                            <br><em class="aus-ref company-tooltip" style="color:#64748b; font-size:0.75rem;">(Comparable to Qantas)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span id="logo-mob-title-5">Airline Leader</span>
@@ -950,7 +950,7 @@
                          <div class="logo-desktop-tooltip">
                             <span class="tooltip-highlight" id="logo-tt-title-6">Top Tier Private Hospital</span>
                             <span id="logo-tt-text-6">One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.</span>
-                            <br><em class="aus-ref" style="color:#64748b; font-size:0.75rem;">(Comparable to Ramsay Health)</em>
+                            <br><em class="aus-ref company-tooltip" style="color:#64748b; font-size:0.75rem;">(Comparable to Ramsay Health)</em>
                         </div>
                         <div class="logo-mobile-tag">
                             <span id="logo-mob-title-6">Top Tier Hospital</span>
@@ -1216,6 +1216,7 @@
 
             <div style="margin-top: 30px;">
                  <a id="download-cv-btn" href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
+                 <a id="btn-download-cv-en" href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-outline" style="display:none; margin-left: 10px;">EN</a> 
             </div>
 
             <p id="footer-location" style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
@@ -1252,9 +1253,8 @@
             </div>
         </div>
     </div>
-    
     <script>
-        // Diccionario COMPLETO de traducciones
+        // --- DICCIONARIO DE TRADUCCIONES ---
         const translations = {
             en: {
                 nav: { home: "Home", about: "About Me", stack: "Stack", work: "Portfolio", contact: "Contact" },
@@ -1263,16 +1263,16 @@
                     tags: ["Healthcare", "Aviation", "Telecom"],
                     desc_global: `Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
                     <br>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:20px;">
                         Available for Remote Roles Worldwide & Global Relocation
                     </span>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:5px;">
                         <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Chilean Citizen (Open to Relocation)
                     </span>`,
                     desc_aus: `Delivering scalable analytics solutions in <strong style="color:white">BigQuery & GCP</strong>, with strong capability in <strong style="color:white">data engineering, migrations and pipeline optimization</strong>. I help organisations standardise data models, improve data reliability, and turn complex datasets into actionable insights.
                     <br>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Eligible for TSS 482 Visa (Medium and Long-term Strategic Skills List)</span>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:20px;">Open to Relocation & Remote (Australia) — Eligible for TSS 482 Visa (Medium and Long-term Strategic Skills List)</span>
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:5px;">
                         <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Chilean Citizen (LMT Exempt for Sponsorship)
                     </span>`,
                     timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Flexible overlap with US, EU & APAC timezones`,
@@ -1306,7 +1306,7 @@
                 logos_content: {
                     tt_title_1: "Global Telco Giant", tt_desc_1: "Subsidiary of América Móvil (Fortune 500), one of the largest telecom groups in the world with vast data ecosystems.", mob_title_1: "Global Telco Giant", mob_desc_1: "Subsidiary of América Móvil",
                     tt_title_2: "High-Growth Challenger", tt_desc_2: "Fast-growing challenger telecom operator. Disrupted the market attaining 20% market share in record time.", mob_title_2: "High-Growth Challenger", mob_desc_2: "Disrupted market (20% share)",
-                    tt_title_3: "Leader Telco (10M+ Subs)", tt_desc_3: "Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.", mob_title_3: "Leader Telco", mob_desc_3: "Sim. to Telstra (10M+ Users)",
+                    tt_title_3: "Leader Telco (10M+ Subs)", tt_desc_3: "Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.", mob_title_3: "Leader Telco", mob_desc_3: "Sim. to Telstra (10M+ Usuarios)",
                     tt_title_4: "Omnichannel Retail", tt_desc_4: "Major direct-response retail company with extensive cross-platform sales operations and logistics data.", mob_title_4: "Omnichannel Retail", mob_desc_4: "Major Direct-Response Firm",
                     tt_title_5: "Largest Airline in S. America", tt_desc_5: "The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.", mob_title_5: "Airline Leader", mob_desc_5: "Largest in S. America (Sim. Qantas)",
                     tt_title_6: "Top Tier Private Hospital", tt_desc_6: "One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.", mob_title_6: "Top Tier Hospital", mob_desc_6: "JCI Accredited Leader"
@@ -1316,7 +1316,6 @@
                     h1: "Cloud & Engineering", h2: "Foundations", sub_1: "Modeling & Legacy", h3: "Engineering", h4: "Analytics & BI", h5: "Data Management & Governance", sub_2: "Governance Scope",
                     grp_1: "Core Skills", grp_2: "Proficient", grp_3: "Advanced", grp_4: "Best Practices", grp_5: "Visualization", grp_6: "Business",
                     gov_1: "Cataloguing & Documentation", gov_2: "Anonymisation & Masking", gov_3: "Modelling & Standardisation", gov_4: "Data Cleaning & Quality",
-                    // --- NUEVOS ITEMS DE STACK ---
                     item_pipe: "Data Pipelines",
                     item_obs: "Observability",
                     item_dim: "Dimensional Model",
@@ -1349,18 +1348,18 @@
                     tags: ["Salud", "Aviación", "Telecomunicaciones"],
                     desc_global: `Ofreciendo soluciones analíticas escalables en <strong style="color:white">BigQuery y GCP</strong>, con sólida capacidad en <strong style="color:white">ingeniería de datos, migraciones y optimización de pipelines</strong>. Ayudo a las organizaciones a estandarizar modelos de datos, mejorar la fiabilidad y convertir datos complejos en insights accionables.
                     <br>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:20px;">
                         Disponible para roles remotos a nivel mundial y reubicación global
                     </span>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:5px;">
                         <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Ciudadano Chileno (Abierto a reubicación)
                     </span>`,
                     desc_aus: `Ofreciendo soluciones analíticas escalables en <strong style="color:white">BigQuery y GCP</strong>, con sólida capacidad en <strong style="color:white">ingeniería de datos, migraciones y optimización de pipelines</strong>. Ayudo a las organizaciones a estandarizar modelos de datos, mejorar la fiabilidad y convertir datos complejos en insights accionables.
                     <br>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:20px;">Disponible para Reubicación y Remoto (Australia)</span>
-                    <span class="text-accent" style="font-weight: 600; display:block; margin-top:5px;">
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:20px;">Disponible para Reubicación y Remoto (Australia)</span>
+                    <span class="text-accent relocation-info" style="font-weight: 600; display:block; margin-top:5px;">
                         <i class="fa-solid fa-passport" style="margin-right:6px;"></i>Ciudadano Chileno (Exento de LMT para Patrocinio)
-                    </span>`, // Adaptado al español para modo AUS
+                    </span>`, 
                     timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Solapamiento flexible con horarios de EE. UU., Europa y APAC`,
                     timezone_aus: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Disponible para solapamiento con mañanas de AEST (Sídney)`,
                     cv_btn: "Descargar CV (Global)"
@@ -1402,7 +1401,6 @@
                     h1: "Nube e Ingeniería", h2: "Fundamentos", sub_1: "Modelado y Legacy", h3: "Ingeniería", h4: "Analítica y BI", h5: "Gestión y Gobierno de Datos", sub_2: "Alcance de Gobierno",
                     grp_1: "Habilidades Core", grp_2: "Competente", grp_3: "Avanzado", grp_4: "Mejores Prácticas", grp_5: "Visualización", grp_6: "Negocio",
                     gov_1: "Catalogación y Documentación", gov_2: "Anonimización y Enmascaramiento", gov_3: "Modelado y Estandarización", gov_4: "Limpieza y Calidad de Datos",
-                    // --- NUEVOS ITEMS DE STACK ---
                     item_pipe: "Pipelines de Datos",
                     item_obs: "Observabilidad",
                     item_dim: "Modelo Dimensional",
@@ -1430,37 +1428,81 @@
             }
         };
 
-        let currentMode = 'aus'; // 'aus' or 'global'
+        let currentMode = 'aus'; // Default mode
 
+        // --- INICIALIZACIÓN Y DETECCIÓN DE MODO ---
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. Detectar si es Global
+            // 1. Detección de parámetro 'v=global' (Existente)
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('v') === 'global') {
                 currentMode = 'global';
                 console.log("Modo Global Detectado");
                 applyGlobalMode();
             }
+
+            // 2. Detección de parámetro 'pais=cl' (NUEVO REQUERIMIENTO)
+            checkCountryMode();
         });
 
+        // Función existente para modo Global
         function applyGlobalMode() {
-            // Ocultar referencias a empresas australianas
             const ausRefs = document.querySelectorAll('.aus-ref');
             ausRefs.forEach(ref => ref.style.display = 'none');
 
-            // Ocultar Why Australia
             const whyCountry = document.getElementById('about-why-country');
             if (whyCountry) whyCountry.style.display = 'none';
 
-            // Actualizar textos a versión Global (en Inglés por defecto)
             updateTextContent('en');
         }
 
+        // --- NUEVA FUNCIÓN: MODO CHILE (checkCountryMode) ---
+        function checkCountryMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pais = urlParams.get('pais');
+
+            if (pais === 'cl') {
+                console.log("🇨🇱 Modo Chile detectado: Ajustando interfaz...");
+
+                // ACCIÓN 1: Forzar Idioma a Español
+                if (typeof changeLang === 'function') {
+                    changeLang('es');
+                }
+
+                // ACCIÓN 2: Ocultar Información de Reubicación/Visas
+                const relocationElements = document.querySelectorAll('.relocation-info');
+                relocationElements.forEach(el => {
+                    el.style.display = 'none';
+                });
+
+                // ACCIÓN 3: Ocultar Comparaciones (Tooltips y Referencias Australianas)
+                const comparisonElements = document.querySelectorAll('.company-tooltip, .aus-ref');
+                comparisonElements.forEach(el => {
+                    el.style.display = 'none';
+                });
+
+                // ACCIÓN 4: Cambiar el CV
+                const btnCvMain = document.getElementById('btn-download-cv'); // Botón principal
+                const btnCvEnglish = document.getElementById('btn-download-cv-en'); // Botón EN secundario
+
+                // A. Modificar botón principal para descargar versión CL
+                if (btnCvMain) {
+                    const newPdfPath = 'files/Javier_Moraga_Data_Analyst_Resume_CL.pdf';
+                    btnCvMain.setAttribute('href', newPdfPath);
+                    btnCvMain.setAttribute('download', 'Javier_Moraga_Data_Analyst_Resume_CL.pdf');
+                    // Nota: changeLang('es') ya se encargó de poner el texto en español ("Descargar CV")
+                }
+
+                // B. Ocultar botón secundario (Inglés) si existe
+                if (btnCvEnglish) {
+                    btnCvEnglish.style.display = 'none';
+                }
+            }
+        }
+
+        // --- GESTIÓN DE IDIOMAS ---
         function changeLang(lang) {
-            // Update buttons visual state
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + lang).classList.add('active');
-
-            // Update Texts
             updateTextContent(lang);
         }
 
@@ -1493,27 +1535,29 @@
             if(currentMode === 'global') {
                 heroText.innerHTML = t.hero.desc_global;
             } else {
-                if(lang === 'es') heroText.innerHTML = t.hero.desc_aus; 
-                else heroText.innerHTML = t.hero.desc_aus;
+                // Si estamos en modo Chile, el texto base es el de Aus, pero ocultamos partes con CSS (.relocation-info)
+                heroText.innerHTML = t.hero.desc_aus;
             }
 
             // Timezone
             const timeText = document.getElementById('hero-timezone-text');
-            if(currentMode === 'global' || lang === 'es') {
+            if(currentMode === 'global') {
                 timeText.innerHTML = t.hero.timezone_global;
             } else {
                 timeText.innerHTML = t.hero.timezone_aus;
             }
 
-            // CV Button
+            // CV Button Text & Logic updates based on mode
             const cvBtn = document.getElementById('download-cv-btn');
-            if (currentMode === 'global') {
+            // Si NO es modo Global (es decir, es AUS o CL), el texto cambia según idioma
+            if (currentMode !== 'global') {
+                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
+            } else {
+                // Modo Global CV logic
                 const globalCVName = "Javier_Moraga_Data_Analyst_Resume_Global.pdf";
                 cvBtn.setAttribute('href', globalCVName);
                 cvBtn.setAttribute('download', globalCVName);
                 cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV (Global)";
-            } else {
-                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
             }
 
             // --- Evolution ---
@@ -1552,7 +1596,6 @@
             document.getElementById('about-title').innerHTML = t.about.title;
             document.getElementById('about-intro').textContent = t.about.intro;
             
-            // "Why Australia" solo se actualiza si está visible (o se actualiza y CSS lo oculta en modo global)
             const whyAus = document.getElementById('about-why-country');
             if(whyAus) whyAus.innerHTML = t.about.why_country;
 
@@ -1561,39 +1604,30 @@
             document.getElementById('about-roles-title').innerHTML = t.about.roles_title;
             document.getElementById('about-roles-list').innerHTML = t.about.roles_list;
 
-            // --- Logos (NEW) ---
+            // --- Logos ---
             document.getElementById('logo-section-title').textContent = t.logo.title;
             
-            // Tooltips
-            document.getElementById('logo-tt-title-1').textContent = t.logos_content.tt_title_1;
-            document.getElementById('logo-tt-text-1').textContent = t.logos_content.tt_desc_1;
-            document.getElementById('logo-mob-title-1').textContent = t.logos_content.mob_title_1;
-            document.getElementById('logo-mob-text-1').textContent = t.logos_content.mob_desc_1;
+            // Tooltips Mapping
+            const tooltips = [
+                {id: '1', tt_t: t.logos_content.tt_title_1, tt_d: t.logos_content.tt_desc_1, mb_t: t.logos_content.mob_title_1, mb_d: t.logos_content.mob_desc_1},
+                {id: '2', tt_t: t.logos_content.tt_title_2, tt_d: t.logos_content.tt_desc_2, mb_t: t.logos_content.mob_title_2, mb_d: t.logos_content.mob_desc_2},
+                {id: '3', tt_t: t.logos_content.tt_title_3, tt_d: t.logos_content.tt_desc_3, mb_t: t.logos_content.mob_title_3, mb_d: t.logos_content.mob_desc_3},
+                {id: '4', tt_t: t.logos_content.tt_title_4, tt_d: t.logos_content.tt_desc_4, mb_t: t.logos_content.mob_title_4, mb_d: t.logos_content.mob_desc_4},
+                {id: '5', tt_t: t.logos_content.tt_title_5, tt_d: t.logos_content.tt_desc_5, mb_t: t.logos_content.mob_title_5, mb_d: t.logos_content.mob_desc_5},
+                {id: '6', tt_t: t.logos_content.tt_title_6, tt_d: t.logos_content.tt_desc_6, mb_t: t.logos_content.mob_title_6, mb_d: t.logos_content.mob_desc_6},
+            ];
 
-            document.getElementById('logo-tt-title-2').textContent = t.logos_content.tt_title_2;
-            document.getElementById('logo-tt-text-2').textContent = t.logos_content.tt_desc_2;
-            document.getElementById('logo-mob-title-2').textContent = t.logos_content.mob_title_2;
-            document.getElementById('logo-mob-text-2').textContent = t.logos_content.mob_desc_2;
-
-            document.getElementById('logo-tt-title-3').textContent = t.logos_content.tt_title_3;
-            document.getElementById('logo-tt-text-3').textContent = t.logos_content.tt_desc_3;
-            document.getElementById('logo-mob-title-3').textContent = t.logos_content.mob_title_3;
-            document.getElementById('logo-mob-text-3').textContent = t.logos_content.mob_desc_3;
-
-            document.getElementById('logo-tt-title-4').textContent = t.logos_content.tt_title_4;
-            document.getElementById('logo-tt-text-4').textContent = t.logos_content.tt_desc_4;
-            document.getElementById('logo-mob-title-4').textContent = t.logos_content.mob_title_4;
-            document.getElementById('logo-mob-text-4').textContent = t.logos_content.mob_desc_4;
-
-            document.getElementById('logo-tt-title-5').textContent = t.logos_content.tt_title_5;
-            document.getElementById('logo-tt-text-5').textContent = t.logos_content.tt_desc_5;
-            document.getElementById('logo-mob-title-5').textContent = t.logos_content.mob_title_5;
-            document.getElementById('logo-mob-text-5').textContent = t.logos_content.mob_desc_5;
-
-            document.getElementById('logo-tt-title-6').textContent = t.logos_content.tt_title_6;
-            document.getElementById('logo-tt-text-6').textContent = t.logos_content.tt_desc_6;
-            document.getElementById('logo-mob-title-6').textContent = t.logos_content.mob_title_6;
-            document.getElementById('logo-mob-text-6').textContent = t.logos_content.mob_desc_6;
+            tooltips.forEach(item => {
+                const ttTitle = document.getElementById(`logo-tt-title-${item.id}`);
+                const ttText = document.getElementById(`logo-tt-text-${item.id}`);
+                const mobTitle = document.getElementById(`logo-mob-title-${item.id}`);
+                const mobText = document.getElementById(`logo-mob-text-${item.id}`);
+                
+                if(ttTitle) ttTitle.textContent = item.tt_t;
+                if(ttText) ttText.textContent = item.tt_d;
+                if(mobTitle) mobTitle.textContent = item.mb_t;
+                if(mobText) mobText.textContent = item.mb_d;
+            });
 
             // --- Skills ---
             document.getElementById('skills-title').innerHTML = t.skills.title;
@@ -1605,7 +1639,6 @@
             document.getElementById('stack-sub-1').textContent = t.skills.sub_1;
             document.getElementById('stack-sub-2').textContent = t.skills.sub_2;
             
-            // Skill Groups (NEW)
             document.getElementById('st-grp-1').textContent = t.skills.grp_1;
             document.getElementById('st-grp-2').textContent = t.skills.grp_2;
             document.getElementById('st-grp-3').textContent = t.skills.grp_3;
@@ -1613,12 +1646,10 @@
             document.getElementById('st-grp-5').textContent = t.skills.grp_5;
             document.getElementById('st-grp-6').textContent = t.skills.grp_6;
 
-            // Skill Items (NEW - Updated)
             document.getElementById('skill-gov-1').textContent = t.skills.gov_1;
             document.getElementById('skill-gov-2').textContent = t.skills.gov_2;
             document.getElementById('skill-gov-3').textContent = t.skills.gov_3;
             document.getElementById('skill-gov-4').textContent = t.skills.gov_4;
-            // NEW additions
             document.getElementById('st-cld-2').textContent = t.skills.item_pipe;
             document.getElementById('st-cld-3').textContent = t.skills.item_obs;
             document.getElementById('st-fnd-1').textContent = t.skills.item_dim;
@@ -1630,25 +1661,13 @@
 
             // --- Projects ---
             document.getElementById('projects-title').innerHTML = t.projects.title;
-            
-            // Update individual projects
             const p = t.projects;
             
-            document.getElementById('p-title-1').innerHTML = p.p1.title;
-            document.getElementById('p-desc-1').innerHTML = p.p1.desc;
-            document.getElementById('p-btn-1').textContent = p.btn;
-
-            document.getElementById('p-title-2').innerHTML = p.p2.title;
-            document.getElementById('p-desc-2').innerHTML = p.p2.desc;
-            document.getElementById('p-btn-2').textContent = p.btn;
-
-            document.getElementById('p-title-3').innerHTML = p.p3.title;
-            document.getElementById('p-desc-3').innerHTML = p.p3.desc;
-            document.getElementById('p-btn-3').textContent = p.btn;
-
-            document.getElementById('p-title-4').innerHTML = p.p4.title;
-            document.getElementById('p-desc-4').innerHTML = p.p4.desc;
-            document.getElementById('p-btn-4').textContent = p.btn;
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`p-title-${i}`).innerHTML = p[`p${i}`].title;
+                document.getElementById(`p-desc-${i}`).innerHTML = p[`p${i}`].desc;
+                document.getElementById(`p-btn-${i}`).textContent = p.btn;
+            }
 
             // --- Contact & Footer ---
             document.getElementById('contact-pill').textContent = t.contact.pill;
@@ -1661,7 +1680,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // --- LÓGICA DE BOTÓN CONTACT (MOUSE GLOW) ---
+            // --- EFECTOS VISUALES (Mouse Glow, Scroll, SVG Path) ---
             const btn = document.getElementById('contactBtn');
             if(btn) {
                 btn.addEventListener('mousemove', (e) => {
@@ -1686,7 +1705,7 @@
             const mobileProgress = document.getElementById('mobileProgress');
             const mobileBall = document.getElementById('mobileBall');
 
-            // --- LÓGICA DE BARRA DE NAVEGACIÓN ACTIVA ---
+            // Navegación Activa
             const mobileLinks = document.querySelectorAll('.mn-link');
             const sectionsList = document.querySelectorAll('section, header'); 
             
@@ -1712,8 +1731,8 @@
                     }
                 });
             });
-            // ---------------------------------------------
 
+            // SVG Path Animation Logic
             let pathLength = 0;
 
             function recalculatePath() {
@@ -1852,14 +1871,13 @@
         // --- FUNCIONES DEL MODAL KPI ---
         function openCase_KPI(){ 
             document.getElementById('modalKPI').style.display='flex'; 
-            document.body.style.overflow = 'hidden'; // Bloquear scroll fondo
+            document.body.style.overflow = 'hidden'; 
         }
         function closeCase_KPI(){ 
             document.getElementById('modalKPI').style.display='none'; 
-            document.body.style.overflow = 'auto'; // Restaurar scroll
+            document.body.style.overflow = 'auto'; 
         }
 
-        // Cerrar si se da clic fuera de la caja
         window.onclick = function(event) {
             const modal = document.getElementById('modalKPI');
             if (event.target == modal) {
@@ -1884,7 +1902,7 @@
             loop: false,          
             centeredSlides: true, 
             slidesPerView: 'auto',
-            initialSlide: 0, /* CAMBIO: Iniciar en la primera tarjeta */     
+            initialSlide: 0,     
             slideToClickedSlide: true,
             coverflowEffect: {
                 rotate: 0,        
