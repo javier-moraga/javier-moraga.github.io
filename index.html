@@ -1108,7 +1108,9 @@
                         <a href="cases/latam-ai-adoption-dashboard.html" class="btn-project" id="p-btn-1">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/16203c/ffffff?text=AI+Adoption+Pipeline" alt="Cloud Project">
+                        <img src="images/genai-dashboard.jpg" 
+                             alt="GenAI Adoption Dashboard" 
+                             onerror="this.src='https://via.placeholder.com/600x400/16203c/ffffff?text=AI+Adoption+Pipeline'">
                     </div>
                 </div>
 
@@ -1128,7 +1130,9 @@
                         <a href="cases/sas-migration.html" class="btn-project" id="p-btn-2">Explore Use Case</a>
                     </div>
                     <div class="project-visual">
-                         <img src="https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow" alt="Migration Project">
+                         <img src="images/migration-architecture.jpg" 
+                              alt="Migration SAS to BigQuery Architecture"
+                              onerror="this.src='https://via.placeholder.com/600x400/0f172a/ffffff?text=Migration+Workflow'">
                     </div>
                 </div>
 
@@ -1152,8 +1156,9 @@
                     </div>
 
                     <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/1e1b4b/d946ef?text=WOM+Retention+Analytics" 
-                             alt="WOM Retention Dashboard">
+                        <img src="images/retention-map.jpg" 
+                             alt="WOM Retention Dashboard and Maps"
+                             onerror="this.src='https://via.placeholder.com/600x400/1e1b4b/d946ef?text=WOM+Retention+Analytics'">
                     </div>
                 </div>
 
@@ -1180,8 +1185,9 @@
                     </div>
 
                     <div class="project-visual">
-                        <img src="https://via.placeholder.com/600x400/111827/ffffff?text=Executive+KPI+Report"
-                             alt="Executive KPI Report Architecture">
+                        <img src="images/kpi-report.jpg"
+                             alt="Executive KPI Report Architecture"
+                             onerror="this.src='https://via.placeholder.com/600x400/111827/ffffff?text=Executive+KPI+Report'">
                     </div>
                 </div>
 
@@ -1206,13 +1212,10 @@
                 <a href="https://www.linkedin.com/in/javiermoraganarria/?locale=en_US" target="_blank" rel="noopener noreferrer" class="c-icon linkedin">
                     <i class="fa-brands fa-linkedin"></i>
                 </a>
-            </div>
+                </div>
 
-            <div id="cv-container" style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a id="download-cv-aus" href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
-
-                <a id="download-cv-ww" href="Javier_Moraga_Data_Analyst_Resume_WW.pdf" download="Javier_Moraga_Data_Analyst_Resume_WW.pdf" class="btn-fill" style="display: none;">Download CV (English)</a>
-                <a id="download-cv-esp" href="Javier_Moraga_Data_Analyst_Resume_ESP.pdf" download="Javier_Moraga_Data_Analyst_Resume_ESP.pdf" class="btn-fill" style="display: none;">Descargar CV (Español)</a>
+            <div style="margin-top: 30px;">
+                 <a id="download-cv-btn" href="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" download="Javier_Moraga_Data_Analyst_Resume_AUS.pdf" class="btn-fill">Download CV</a>
             </div>
 
             <p id="footer-location" style="margin-top:20px; color:#666;">Santiago, Chile • Open to Remote & Relocation</p>
@@ -1274,9 +1277,7 @@
                     </span>`,
                     timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Flexible overlap with US, EU & APAC timezones`,
                     timezone_aus: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Local Timezone: GMT-3 | Available for overlap with AEST mornings (Sydney time)`,
-                    cv_btn_aus: "Download CV",
-                    cv_btn_ww: "Download CV (English)",
-                    cv_btn_esp: "Download CV (Spanish)"
+                    cv_btn: "Download CV"
                 },
                 evolution: {
                     ind_1: "Healthcare", role_1: "Data Analyst (Data Engineering scope)", mode_1: `<i class="fa-solid fa-wifi"></i> Remote`, desc_1: `<ul><li>SAS → BigQuery Migration</li><li>Clinical Data Pipelines</li><li>Data Quality Automation</li></ul>`,
@@ -1362,9 +1363,7 @@
                     </span>`, // Adaptado al español para modo AUS
                     timezone_global: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Solapamiento flexible con horarios de EE. UU., Europa y APAC`,
                     timezone_aus: `<i class="fa-regular fa-clock" style="color:var(--accent-gold); margin-right:8px;"></i> Zona Horaria: GMT-3 | Disponible para solapamiento con mañanas de AEST (Sídney)`,
-                    cv_btn_aus: "Descargar CV",
-                    cv_btn_ww: "Descargar CV (Inglés)",
-                    cv_btn_esp: "Descargar CV (Español)"
+                    cv_btn: "Descargar CV (Global)"
                 },
                 evolution: {
                     ind_1: "Salud", role_1: "Analista de Datos (Alcance Ing. de Datos)", mode_1: `<i class="fa-solid fa-wifi"></i> Remoto`, desc_1: `<ul><li>Migración SAS → BigQuery</li><li>Pipelines de Datos Clínicos</li><li>Automatización de Calidad de Datos</li></ul>`,
@@ -1452,13 +1451,6 @@
             const whyCountry = document.getElementById('about-why-country');
             if (whyCountry) whyCountry.style.display = 'none';
 
-            // --- BOTONES CV LOGIC ---
-            // Ocultar el botón AUS
-            document.getElementById('download-cv-aus').style.display = 'none';
-            // Mostrar los botones Globales (WW y ESP)
-            document.getElementById('download-cv-ww').style.display = 'inline-block';
-            document.getElementById('download-cv-esp').style.display = 'inline-block';
-
             // Actualizar textos a versión Global (en Inglés por defecto)
             updateTextContent('en');
         }
@@ -1513,10 +1505,16 @@
                 timeText.innerHTML = t.hero.timezone_aus;
             }
 
-            // --- CV Buttons Labels ---
-            document.getElementById('download-cv-aus').textContent = t.hero.cv_btn_aus;
-            document.getElementById('download-cv-ww').textContent = t.hero.cv_btn_ww;
-            document.getElementById('download-cv-esp').textContent = t.hero.cv_btn_esp;
+            // CV Button
+            const cvBtn = document.getElementById('download-cv-btn');
+            if (currentMode === 'global') {
+                const globalCVName = "Javier_Moraga_Data_Analyst_Resume_Global.pdf";
+                cvBtn.setAttribute('href', globalCVName);
+                cvBtn.setAttribute('download', globalCVName);
+                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV (Global)";
+            } else {
+                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
+            }
 
             // --- Evolution ---
             document.getElementById('evo-ind-1').textContent = t.evolution.ind_1;
