@@ -1456,7 +1456,7 @@
         }
 
        // --- NUEVA FUNCIÓN: MODO CHILE (checkCountryMode) ACTUALIZADA ---
-                  function checkCountryMode() {
+        function checkCountryMode() {
             const urlParams = new URLSearchParams(window.location.search);
             const pais = urlParams.get('pais');
         
@@ -1495,7 +1495,7 @@
                 const btnCvEnglish = document.getElementById('btn-download-cv-en');
         
                 if (btnCvMain) {
-                    const newPdfPath = 'files/Javier_Moraga_Data_Analyst_Resume_CL.pdf';
+                    const newPdfPath = 'Javier_Moraga_Data_Analyst_Resume_CL.pdf';
                     btnCvMain.setAttribute('href', newPdfPath);
                     btnCvMain.setAttribute('download', 'Javier_Moraga_Data_Analyst_Resume_CL.pdf');
                     btnCvMain.textContent = "Descargar CV"; 
@@ -1509,10 +1509,9 @@
                 const relocationElements = document.querySelectorAll('.relocation-info');
                 relocationElements.forEach(el => el.style.display = 'none');
         
-                // 6. SIMPLIFICAR PIE DE PÁGINA (Corrección Solicitada)
+                // 6. SIMPLIFICAR PIE DE PÁGINA
                 const footerLocation = document.getElementById('footer-location');
                 if (footerLocation) {
-                    // Reemplazamos todo el texto por solo la ciudad y país
                     footerLocation.innerHTML = "Santiago, Chile"; 
                 }
             }
@@ -1554,7 +1553,6 @@
             if(currentMode === 'global') {
                 heroText.innerHTML = t.hero.desc_global;
             } else {
-                // Si estamos en modo Chile, el texto base es el de Aus, pero ocultamos partes con CSS (.relocation-info)
                 heroText.innerHTML = t.hero.desc_aus;
             }
 
@@ -1568,15 +1566,23 @@
 
             // CV Button Text & Logic updates based on mode
             const cvBtn = document.getElementById('download-cv-btn');
-            // Si NO es modo Global (es decir, es AUS o CL), el texto cambia según idioma
-            if (currentMode !== 'global') {
-                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
+            
+            if (currentMode === 'global') {
+                // MODO GLOBAL: Cambia el archivo según el idioma
+                if (lang === 'es') {
+                    const globalNameEsp = "Javier_Moraga_Data_Analyst_Resume_Global_Esp.pdf";
+                    cvBtn.setAttribute('href', globalNameEsp);
+                    cvBtn.setAttribute('download', globalNameEsp);
+                    cvBtn.textContent = "Descargar CV";
+                } else {
+                    const globalNameEn = "Javier_Moraga_Data_Analyst_Resume_GLOBAL.pdf";
+                    cvBtn.setAttribute('href', globalNameEn);
+                    cvBtn.setAttribute('download', globalNameEn);
+                    cvBtn.textContent = "Download CV (Global)";
+                }
             } else {
-                // Modo Global CV logic
-                const globalCVName = "Javier_Moraga_Data_Analyst_Resume_Global.pdf";
-                cvBtn.setAttribute('href', globalCVName);
-                cvBtn.setAttribute('download', globalCVName);
-                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV (Global)";
+                // MODOS AUS / CL: Solo cambiamos el texto
+                cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
             }
 
             // --- Evolution ---
