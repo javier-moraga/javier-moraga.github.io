@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Open+Sans:wght@300;400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
@@ -26,6 +27,7 @@
             --code-bg: #282a36;
             --success: #00e676;
             --border-light: rgba(255, 255, 255, 0.1);
+            --wom-pink: #d946ef; /* Color traído del sitio antiguo */
         }
 
         * { box-sizing: border-box; }
@@ -39,6 +41,7 @@
             padding: 0;
             line-height: 1.6;
             overflow-x: hidden;
+            padding-top: 60px; /* Espacio para la navbar fija */
         }
 
         h1, h2, h3, h4 {
@@ -52,21 +55,60 @@
             padding: 0 20px;
         }
 
+        /* --- 1. & 2. NAV BAR (Estilo del sitio antiguo) --- */
+        .nav-bar {
+            padding: 15px 40px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(11, 17, 32, 0.95); 
+            backdrop-filter: blur(10px);
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            left: 0;
+            z-index: 1000; 
+            box-sizing: border-box;
+        }
+        
+        .back-link {
+            text-decoration: none; 
+            color: var(--text-muted); 
+            font-size: 0.9rem;
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .back-link:hover { 
+            color: var(--wom-pink); 
+            transform: translateX(-5px); 
+        }
+
+        .nav-name {
+            font-weight: 700; 
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+
         /* --- HEADER & FLAGS --- */
         header {
-            padding: 40px 0 60px;
+            padding: 60px 0 60px;
             text-align: center;
             border-bottom: 1px solid rgba(230, 0, 126, 0.15);
             background: radial-gradient(circle at center, rgba(230, 0, 126, 0.1), transparent 70%);
         }
 
-        /* ESTILO NUEVO PARA EL LOGO DE MARCA */
+        /* 5. CORRECCIÓN LOGO */
         .brand-logo-header {
             max-width: 140px;
             height: auto;
-            margin: 0 auto 25px auto; /* Centrado y con margen inferior */
+            margin: 0 auto 25px auto;
             display: block;
-            filter: brightness(0) invert(1); /* Vuelve el logo blanco para el fondo oscuro */
+            filter: brightness(0) invert(1);
             opacity: 0.9;
             transition: transform 0.3s ease;
         }
@@ -94,14 +136,22 @@
         }
 
         .lang-btn img { width: 100%; height: 100%; object-fit: cover; }
-
         .lang-btn:hover { opacity: 1; transform: scale(1.1); }
+        .lang-btn.active { opacity: 1; border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); transform: scale(1.15); }
 
-        .lang-btn.active {
-            opacity: 1; 
-            border-color: var(--accent-gold); 
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); 
-            transform: scale(1.15);
+        /* 3. BADGE DE MARKETING (Estilo antiguo) */
+        .hero-badge {
+            display: inline-block; 
+            padding: 5px 15px; 
+            background: rgba(217, 70, 239, 0.1); 
+            border: 1px solid var(--wom-pink);
+            border-radius: 20px; 
+            color: var(--wom-pink); 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+            margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 1px;
         }
 
         .kpi-badge {
@@ -292,12 +342,38 @@
         .accordion-item.active .icon { transform: rotate(45deg); color: var(--primary-magenta); }
         .icon { font-size: 1.5rem; transition: transform 0.3s; color: var(--secondary-cyan); }
 
+        /* 4. BOTÓN DE CONTACTO (Estilo antiguo) */
+        .contact-section {
+            text-align: center; 
+            margin-top: 80px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            padding-top: 40px;
+        }
+
+        .contact-btn {
+            display: inline-block; 
+            padding: 15px 30px; 
+            background: var(--wom-pink); 
+            color: white; 
+            border-radius: 30px; 
+            font-weight: 700; 
+            text-decoration: none; 
+            box-shadow: 0 10px 30px rgba(217, 70, 239, 0.3); 
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(217, 70, 239, 0.5);
+            color: white;
+        }
+
         footer {
             text-align: center;
             padding: 50px 20px;
             font-size: 0.9rem;
             color: #666;
-            border-top: 1px solid rgba(255,255,255,0.05);
             margin-top: 40px;
         }
         
@@ -313,9 +389,16 @@
 </head>
 <body>
 
+    <nav class="nav-bar">
+        <a href="../index.html#projects" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+        </a>
+        <div class="nav-name">Javier Moraga</div>
+    </nav>
+
     <header>
         <div class="container">
-            <img src="logos/wom_chile.png" alt="WOM Chile" class="brand-logo-header">
+            <img src="../logos/wom_chile.png" alt="WOM Chile" class="brand-logo-header">
 
             <div class="lang-options">
                 <button onclick="changeLang('en')" class="lang-btn" id="btn-en" title="English">
@@ -325,6 +408,8 @@
                     <img src="https://flagcdn.com/w80/es.png" alt="Español">
                 </button>
             </div>
+
+            <span class="hero-badge">MARKETING INTELLIGENCE</span>
 
             <div class="kpi-badge" id="header-badge">Impacto: Contención de Fuga (Share Out salvado en 20.8% vs 23.8% proyectado)</div>
             <h1 id="header-title">Mitigación de Crisis &<br><span class="text-gradient">Análisis de Datos</span></h1>
@@ -467,6 +552,15 @@
             </div>
         </section>
 
+        <div class="contact-section">
+            <p id="contact-text" style="color:#94a3b8; font-size:0.9rem; margin-bottom: 30px;">
+                Este caso demuestra la capacidad de manejar métricas sensibles de negocio y presentarlas a Ejecutivos C-Level.
+            </p>
+            <a href="../index.html#contact" class="contact-btn" id="contact-btn-text">
+                Contactar a Javier
+            </a>
+        </div>
+
     </div>
 
     <footer>
@@ -504,7 +598,11 @@
                 acc3: { t: "03. Dashboarding: SQL para Looker Studio", d: "Queries para conectar BigQuery a Looker Studio y automatizar indicadores de crisis.", h3a: "BQ SQL | Looker: Share Out", h3b: "BQ SQL | Looker: Red vs Lag Time", h3c: "BQ SQL | Looker: ROI Retención" },
 
                 label4: "04. Visualización de Resultados",
-                footer: "Caso de estudio con datos anonimizados para portafolio técnico."
+                footer: "Caso de estudio con datos anonimizados para portafolio técnico.",
+
+                // Traducciones nuevas para contacto
+                contactText: "Este caso demuestra la capacidad de manejar métricas sensibles de negocio y presentarlas a Ejecutivos C-Level.",
+                contactBtn: "Contactar a Javier"
             },
             en: {
                 badge: "Impact: Churn Containment (Share Out saved at 20.8% vs 23.8% forecast)",
@@ -529,7 +627,11 @@
                 acc3: { t: "03. Dashboarding: SQL for Looker Studio", d: "Queries connecting BigQuery to Looker Studio to automate crisis indicators.", h3a: "BQ SQL | Looker: Share Out", h3b: "BQ SQL | Looker: Network vs Lag Time", h3c: "BQ SQL | Looker: Retention ROI" },
 
                 label4: "04. Results Visualization",
-                footer: "Case study with anonymized data for technical portfolio."
+                footer: "Case study with anonymized data for technical portfolio.",
+
+                // English for contact
+                contactText: "This case demonstrates the ability to handle sensitive business metrics and present them to C-Level executives.",
+                contactBtn: "Contact Javier"
             }
         };
 
@@ -597,6 +699,10 @@
             // Section 4
             document.getElementById('label-4').textContent = t.label4;
             document.getElementById('footer-text').textContent = t.footer;
+
+            // Contact
+            document.getElementById('contact-text').textContent = t.contactText;
+            document.getElementById('contact-btn-text').textContent = t.contactBtn;
         }
 
         // --- CHARTS CONFIG ---
