@@ -27,7 +27,7 @@
             --code-bg: #282a36;
             --success: #00e676;
             --border-light: rgba(255, 255, 255, 0.1);
-            --wom-pink: #d946ef; /* Color traído del sitio antiguo */
+            --wom-pink: #d946ef; /* Color neón principal */
         }
 
         * { box-sizing: border-box; }
@@ -41,7 +41,8 @@
             padding: 0;
             line-height: 1.6;
             overflow-x: hidden;
-            padding-top: 60px; /* Espacio para la navbar fija */
+            padding-top: 60px;
+            padding-bottom: 60px;
         }
 
         h1, h2, h3, h4 {
@@ -55,11 +56,11 @@
             padding: 0 20px;
         }
 
-        /* --- 1. & 2. NAV BAR (Estilo del sitio antiguo) --- */
+        /* --- NAV BAR MODIFICADA --- */
         .nav-bar {
-            padding: 15px 40px;
+            padding: 10px 40px; /* Reduje un poco el padding vertical para que las banderas encajen mejor */
             display: flex; 
-            justify-content: space-between; 
+            justify-content: space-between; /* Distribuye los 3 elementos: izq, centro, der */
             align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             background: rgba(11, 17, 32, 0.95); 
@@ -94,41 +95,51 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* --- HEADER & FLAGS --- */
+        /* Estilos para las banderas dentro del NAV */
+        .nav-lang-container .lang-options {
+            margin-bottom: 0; /* Eliminamos el margen que tenían en el header */
+            display: flex;
+            gap: 10px;
+        }
+
+        /* --- HEADER & LOGO NEÓN --- */
         header {
-            padding: 60px 0 60px;
+            padding: 40px 0 60px; /* Reduje un poco el padding superior */
             text-align: center;
             border-bottom: 1px solid rgba(230, 0, 126, 0.15);
             background: radial-gradient(circle at center, rgba(230, 0, 126, 0.1), transparent 70%);
         }
 
-        /* 5. CORRECCIÓN LOGO */
         .brand-logo-header {
-            max-width: 140px;
+            max-width: 150px; /* Un poco más grande para que se aprecie el neón */
             height: auto;
-            margin: 0 auto 25px auto;
+            margin: 0 auto 30px auto;
             display: block;
-            filter: brightness(0) invert(1);
-            opacity: 0.9;
-            transition: transform 0.3s ease;
+            /* CAMBIO: Efecto Neón Morado en lugar de blanco plano */
+            filter: drop-shadow(0 0 2px var(--wom-pink)) 
+                    drop-shadow(0 0 8px var(--wom-pink)) 
+                    drop-shadow(0 0 15px rgba(217, 70, 239, 0.5));
+            opacity: 1;
+            transition: transform 0.3s ease, filter 0.3s ease;
         }
         
         .brand-logo-header:hover {
             transform: scale(1.05);
-            opacity: 1;
+            /* Intensifica el neón al pasar el mouse */
+            filter: drop-shadow(0 0 2px var(--wom-pink)) 
+                    drop-shadow(0 0 12px var(--wom-pink)) 
+                    drop-shadow(0 0 25px var(--wom-pink));
         }
 
-        .lang-options {
-            display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;
-        }
-        
+
+        /* Estilos de botones de idioma (reutilizados en el nav) */
         .lang-btn {
             background: none; 
             border: 2px solid transparent; 
             border-radius: 50%; 
             cursor: pointer;
             padding: 0; 
-            width: 34px; height: 34px;
+            width: 30px; height: 30px; /* Ligeramente más pequeños para el nav */
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
             opacity: 0.5; 
@@ -137,9 +148,10 @@
 
         .lang-btn img { width: 100%; height: 100%; object-fit: cover; }
         .lang-btn:hover { opacity: 1; transform: scale(1.1); }
-        .lang-btn.active { opacity: 1; border-color: var(--accent-gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); transform: scale(1.15); }
+        .lang-btn.active { opacity: 1; border-color: var(--wom-pink); box-shadow: 0 0 10px rgba(217, 70, 239, 0.4); transform: scale(1.15); }
 
-        /* 3. BADGE DE MARKETING (Estilo antiguo) */
+
+        /* --- RESTO DE ESTILOS --- */
         .hero-badge {
             display: inline-block; 
             padding: 5px 15px; 
@@ -342,7 +354,7 @@
         .accordion-item.active .icon { transform: rotate(45deg); color: var(--primary-magenta); }
         .icon { font-size: 1.5rem; transition: transform 0.3s; color: var(--secondary-cyan); }
 
-        /* 4. BOTÓN DE CONTACTO (Estilo antiguo) */
+        /* CONTACT SECTION */
         .contact-section {
             text-align: center; 
             margin-top: 80px; 
@@ -369,21 +381,13 @@
             color: white;
         }
 
-        footer {
-            text-align: center;
-            padding: 50px 20px;
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 40px;
-        }
-        
-        footer a { color: var(--primary-magenta); text-decoration: none; margin: 0 10px; font-weight: bold; }
-
         @media (max-width: 768px) {
             header h1 { font-size: 2.2rem; }
             .card { padding: 20px; }
             .pipeline-container { flex-direction: column; }
             .arrow { transform: rotate(90deg); }
+            /* Ajuste para el nav en móviles */
+            .nav-name { display: none; } /* Ocultar nombre en móvil si falta espacio */
         }
     </style>
 </head>
@@ -393,13 +397,8 @@
         <a href="../index.html#projects" class="back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
         </a>
-        <div class="nav-name">Javier Moraga</div>
-    </nav>
 
-    <header>
-        <div class="container">
-            <img src="../logos/wom_chile.png" alt="WOM Chile" class="brand-logo-header">
-
+        <div class="nav-lang-container">
             <div class="lang-options">
                 <button onclick="changeLang('en')" class="lang-btn" id="btn-en" title="English">
                     <img src="https://flagcdn.com/w80/gb.png" alt="English">
@@ -408,6 +407,14 @@
                     <img src="https://flagcdn.com/w80/es.png" alt="Español">
                 </button>
             </div>
+        </div>
+        
+        <div class="nav-name">Javier Moraga</div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <img src="../logos/wom_chile.png" alt="WOM Chile" class="brand-logo-header">
 
             <span class="hero-badge">MARKETING INTELLIGENCE</span>
 
@@ -563,11 +570,6 @@
 
     </div>
 
-    <footer>
-        <p id="footer-text">Caso de estudio con datos anonimizados para portafolio técnico.</p>
-        <p><a href="#">LinkedIn</a> | <a href="#">GitHub</a></p>
-    </footer>
-
     <script>
         function toggleAccordion(element) {
             element.parentElement.classList.toggle('active');
@@ -598,9 +600,6 @@
                 acc3: { t: "03. Dashboarding: SQL para Looker Studio", d: "Queries para conectar BigQuery a Looker Studio y automatizar indicadores de crisis.", h3a: "BQ SQL | Looker: Share Out", h3b: "BQ SQL | Looker: Red vs Lag Time", h3c: "BQ SQL | Looker: ROI Retención" },
 
                 label4: "04. Visualización de Resultados",
-                footer: "Caso de estudio con datos anonimizados para portafolio técnico.",
-
-                // Traducciones nuevas para contacto
                 contactText: "Este caso demuestra la capacidad de manejar métricas sensibles de negocio y presentarlas a Ejecutivos C-Level.",
                 contactBtn: "Contactar a Javier"
             },
@@ -627,9 +626,6 @@
                 acc3: { t: "03. Dashboarding: SQL for Looker Studio", d: "Queries connecting BigQuery to Looker Studio to automate crisis indicators.", h3a: "BQ SQL | Looker: Share Out", h3b: "BQ SQL | Looker: Network vs Lag Time", h3c: "BQ SQL | Looker: Retention ROI" },
 
                 label4: "04. Results Visualization",
-                footer: "Case study with anonymized data for technical portfolio.",
-
-                // English for contact
                 contactText: "This case demonstrates the ability to handle sensitive business metrics and present them to C-Level executives.",
                 contactBtn: "Contact Javier"
             }
@@ -698,7 +694,6 @@
 
             // Section 4
             document.getElementById('label-4').textContent = t.label4;
-            document.getElementById('footer-text').textContent = t.footer;
 
             // Contact
             document.getElementById('contact-text').textContent = t.contactText;
