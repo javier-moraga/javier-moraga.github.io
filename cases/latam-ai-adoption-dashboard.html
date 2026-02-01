@@ -22,7 +22,7 @@
             /* Fondos y Superficies */
             --bg-deep: #050510;
             --bg-gradient: linear-gradient(135deg, #0f0f1a 0%, #050510 100%);
-            --card-bg: rgba(27, 0, 136, 0.05); /* Indigo muy sutil */
+            --card-bg: rgba(27, 0, 136, 0.05);
             --border-glass: rgba(255, 255, 255, 0.1);
             
             --text-white: #ffffff;
@@ -39,7 +39,7 @@
             color: var(--text-white);
             margin: 0;
             padding: 0;
-            padding-top: 60px; /* Espacio para el navbar fijo */
+            padding-top: 60px;
             padding-bottom: 60px;
         }
 
@@ -180,11 +180,10 @@
         .arch-val { font-weight: 600; color: var(--latam-cyan); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;}
         .arrow { color: var(--latam-red); font-size: 1.5rem; font-weight: bold; }
 
-        /* --- MAIN CHARTS --- */
+        /* --- CHARTS --- */
         .chart-wrapper { margin-bottom: 40px; border-bottom: 1px solid var(--border-glass); padding-bottom: 40px; }
         .chart-wrapper:last-child { border-bottom: none; }
 
-        /* --- MICRO CHARTS GRID --- */
         .micro-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -205,7 +204,7 @@
             height: 40px; display: flex; align-items: center;
         }
 
-        /* --- CODE ACCORDION --- */
+        /* --- ACCORDION --- */
         .accordion-btn {
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-glass);
@@ -295,17 +294,17 @@
                 <h3 class="narrative-title" id="title-2">Estructura del Pipeline (Dataform)</h3>
                 <div class="arch-grid">
                     <div class="arch-step">
-                        <div class="arch-label">Raw Layer</div>
+                        <div class="arch-label" id="arch-raw-label">Raw Layer</div>
                         <div class="arch-val">sources/logging_topic</div>
                     </div>
                     <div class="arrow">&#10132;</div>
                     <div class="arch-step">
-                        <div class="arch-label">Silver Layer</div>
+                        <div class="arch-label" id="arch-silver-label">Silver Layer</div>
                         <div class="arch-val">staging/interaction_logs</div>
                     </div>
                     <div class="arrow">&#10132;</div>
                     <div class="arch-step">
-                        <div class="arch-label">Gold Layer</div>
+                        <div class="arch-label" id="arch-gold-label">Gold Layer</div>
                         <div class="arch-val">reporting/interactions_full</div>
                     </div>
                 </div>
@@ -319,7 +318,10 @@
                 <div class="chart-wrapper">
                     <h3 id="chart-title-1">Distribución de Interacciones por Producto</h3>
                     <div id="chart-products" style="height: 300px;"></div>
-                    <button class="accordion-btn" onclick="toggleCode(this)"><span><i class="fas fa-code"></i> Query: interactions_ratios.sqlx</span><i class="fas fa-chevron-down"></i></button>
+                    <button class="accordion-btn" onclick="toggleCode(this)">
+                        <span><i class="fas fa-code"></i> <span class="query-label">Query</span>: interactions_ratios.sqlx</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
                     <div class="code-panel"><pre><code><span class="sql-comm">-- reporting/interactions_ratios.sqlx</span>
 <span class="sql-kw">SELECT</span> product_name, <span class="sql-func">COUNT</span>(id) <span class="sql-kw">AS</span> interactions
 <span class="sql-kw">FROM</span> `${ref("interactions_full")}`
@@ -329,7 +331,10 @@
                 <div class="chart-wrapper">
                     <h3 id="chart-title-2">Penetración por Vicepresidencia (Top 5)</h3>
                     <div id="chart-vp" style="height: 300px;"></div>
-                    <button class="accordion-btn" onclick="toggleCode(this)"><span><i class="fas fa-code"></i> Query: interaction_employees.sqlx</span><i class="fas fa-chevron-down"></i></button>
+                    <button class="accordion-btn" onclick="toggleCode(this)">
+                        <span><i class="fas fa-code"></i> <span class="query-label">Query</span>: interaction_employees.sqlx</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
                     <div class="code-panel"><pre><code><span class="sql-comm">-- reporting/interaction_employees.sqlx</span>
 <span class="sql-kw">SELECT</span> vp_level_2, adoption_rate
 <span class="sql-kw">FROM</span> `${ref("current_staffing_rrhh")}`
@@ -339,7 +344,10 @@
                 <div class="chart-wrapper">
                     <h3 id="chart-title-3">Retención de Usuarios (Cohortes)</h3>
                     <div id="chart-cohorts" style="height: 300px;"></div>
-                    <button class="accordion-btn" onclick="toggleCode(this)"><span><i class="fas fa-code"></i> Query: cohort_statistics.sqlx</span><i class="fas fa-chevron-down"></i></button>
+                    <button class="accordion-btn" onclick="toggleCode(this)">
+                        <span><i class="fas fa-code"></i> <span class="query-label">Query</span>: cohort_statistics.sqlx</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
                     <div class="code-panel"><pre><code><span class="sql-comm">-- reporting/cohort_statistics.sqlx</span>
 <span class="sql-kw">SELECT</span> cohort_month, month_number, active_users
 <span class="sql-kw">FROM</span> `${ref("retention_unique_users_cohort")}`;</code></pre></div>
@@ -356,52 +364,64 @@
                 <div class="micro-grid">
                     
                     <div class="micro-card">
-                        <div class="micro-title">Usuarios Únicos por Producto</div>
+                        <div class="micro-title" id="micro-title-1">Usuarios Únicos por Producto</div>
                         <div id="chart-users" style="height: 200px;"></div>
-                        <button class="accordion-btn" onclick="toggleCode(this)">Query: ga4_general_daily_use.sqlx</button>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                             <span class="query-label">Query</span>: ga4_general_daily_use.sqlx
+                        </button>
                         <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> product, <span class="sql-func">COUNT</span>(DISTINCT user_id) 
 <span class="sql-kw">FROM</span> `${ref("interaction_logs")}` 
 <span class="sql-kw">GROUP BY</span> 1;</code></pre></div>
                     </div>
 
                     <div class="micro-card">
-                        <div class="micro-title">Interacciones Promedio / Usuario</div>
+                        <div class="micro-title" id="micro-title-2">Interacciones Promedio / Usuario</div>
                         <div id="chart-intensity" style="height: 200px;"></div>
-                        <button class="accordion-btn" onclick="toggleCode(this)">Query: products_user_avg.sqlx</button>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                             <span class="query-label">Query</span>: products_user_avg.sqlx
+                        </button>
                         <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> product, <span class="sql-func">AVG</span>(interactions_per_user) 
 <span class="sql-kw">FROM</span> `${ref("products_user_avg")}`;</code></pre></div>
                     </div>
 
                     <div class="micro-card">
-                        <div class="micro-title">Ecosistema de Asistentes</div>
+                        <div class="micro-title" id="micro-title-3">Ecosistema de Asistentes</div>
                         <div id="chart-assistants" style="height: 200px;"></div>
-                        <button class="accordion-btn" onclick="toggleCode(this)">Query: user_activity.sqlx</button>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                             <span class="query-label">Query</span>: user_activity.sqlx
+                        </button>
                         <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> type, <span class="sql-func">COUNT</span>(assistant_id) 
 <span class="sql-kw">FROM</span> `${ref("amelia_hub_activity")}` 
 <span class="sql-kw">GROUP BY</span> 1;</code></pre></div>
                     </div>
 
                     <div class="micro-card">
-                        <div class="micro-title">Tasa de Errores (Mensual)</div>
+                        <div class="micro-title" id="micro-title-4">Tasa de Errores (Mensual)</div>
                         <div id="chart-errors" style="height: 200px;"></div>
-                        <button class="accordion-btn" onclick="toggleCode(this)">Query: products_error_rate.sqlx</button>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                             <span class="query-label">Query</span>: products_error_rate.sqlx
+                        </button>
                         <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> month, error_rate 
 <span class="sql-kw">FROM</span> `${ref("products_error_rate")}` 
 <span class="sql-kw">ORDER BY</span> 1;</code></pre></div>
                     </div>
 
                     <div class="micro-card">
-                        <div class="micro-title">Latencia de Respuesta (seg)</div>
+                        <div class="micro-title" id="micro-title-5">Latencia de Respuesta (seg)</div>
                         <div id="chart-latency" style="height: 200px;"></div>
-                        <button class="accordion-btn" onclick="toggleCode(this)">Query: ga4_session_times.sqlx</button>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                             <span class="query-label">Query</span>: ga4_session_times.sqlx
+                        </button>
                         <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> product, <span class="sql-func">AVG</span>(response_time_sec) 
 <span class="sql-kw">FROM</span> `${ref("ga4_session_times")}`;</code></pre></div>
                     </div>
 
                     <div class="micro-card">
-                        <div class="micro-title">Top Categorías de Contenido</div>
+                        <div class="micro-title" id="micro-title-6">Top Categorías de Contenido</div>
                         <div id="chart-content" style="height: 200px;"></div>
-                        <button class="accordion-btn" onclick="toggleCode(this)">Query: interaction_content_sections.sqlx</button>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                             <span class="query-label">Query</span>: interaction_content_sections.sqlx
+                        </button>
                         <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> category, hits 
 <span class="sql-kw">FROM</span> `${ref("ranking_words")}` 
 <span class="sql-kw">LIMIT</span> 5;</code></pre></div>
@@ -436,39 +456,181 @@
                 badge: "PROYECTO AMELIA",
                 title: "Inteligencia Artificial <br><span class='text-gradient'>Corporativa</span>",
                 desc: "Dashboard de adopción y rendimiento del modelo RAG (Retrieval-Augmented Generation) para LATAM Airlines. Análisis desde logs crudos hasta insights de RRHH.",
+                
+                label1: "01. El Caso de Negocio",
+                title1: "Más que un Chatbot: Conocimiento Contextual",
+                text1: "<p>A diferencia de los asistentes genéricos, <strong>Amelia</strong> fue entrenada con la estructura organizacional de LATAM (Capa Gold de Dataform). Cuando un tripulante pregunta <em>'¿Qué es una COBUS?'</em>, el sistema no alucina; consulta la normativa oficial indexada y responde con precisión. Este dashboard monitorea la efectividad de esa recuperación de información.</p>",
+
+                label2: "02. Arquitectura de Datos",
+                title2: "Estructura del Pipeline (Dataform)",
+                rawLayer: "Capa Raw",
+                silverLayer: "Capa Silver",
+                goldLayer: "Capa Gold",
+
+                label3: "03. Métricas Principales",
+                chart1: "Distribución de Interacciones por Producto",
+                chart2: "Penetración por Vicepresidencia (Top 5)",
+                chart3: "Retención de Usuarios (Cohortes)",
+                
                 label4: "04. Métricas Operativas y Calidad",
                 title4: "Detalle Operacional del Ecosistema",
+                
+                micro1: "Usuarios Únicos por Producto",
+                micro2: "Interacciones Promedio / Usuario",
+                micro3: "Ecosistema de Asistentes",
+                micro4: "Tasa de Errores (Mensual)",
+                micro5: "Latencia de Respuesta (seg)",
+                micro6: "Top Categorías de Contenido",
+
+                queryLabel: "Consulta",
+                
                 contactText: "Este proyecto demuestra la capacidad de integrar Ingeniería de Datos (Dataform) con Inteligencia Artificial aplicada.",
-                contactBtn: "Contactar a Javier"
+                contactBtn: "Contactar a Javier",
+
+                // Textos internos de gráficos (Ejes, Series, Tooltips)
+                chartsData: {
+                    products: { name: "Interacciones", im: "Imágenes" },
+                    vp: { name: "Adopción" },
+                    cohorts: { nameSep: "Sep", nameOct: "Oct", x: ["M0", "M1", "M2", "M3", "M4"] },
+                    users: { name: "Usuarios", x: ['RH+', 'Chat Libre', 'Imágenes'] },
+                    intensity: { name: "Int/Usuario", x: ['Chat Libre', 'RH+', 'Imágenes'] },
+                    assistants: { name: "Asistentes", int: "Internos", ext: "Externos" },
+                    errors: { name: "% Error", x: ['Ene', 'Feb', 'Mar', 'Abr', 'May'] },
+                    latency: { name: "Segundos", x: ['RH+ (RAG)', 'Chat Libre', 'Imágenes'] },
+                    content: { name: "Consultas", x: ['COBUS', 'Beneficios', 'MyDuty', 'IT', 'Vacaciones'] }
+                }
             },
             en: {
                 navBack: "Back to Portfolio",
                 badge: "AMELIA PROJECT",
                 title: "Corporate <br><span class='text-gradient'>Artificial Intelligence</span>",
                 desc: "Adoption and performance dashboard for the RAG (Retrieval-Augmented Generation) model at LATAM Airlines. Analysis from raw logs to HR insights.",
+                
+                label1: "01. Business Case",
+                title1: "More than a Chatbot: Contextual Knowledge",
+                text1: "<p>Unlike generic assistants, <strong>Amelia</strong> was trained with LATAM's organizational structure (Dataform Gold Layer). When a crew member asks <em>'What is a COBUS?'</em>, the system doesn't hallucinate; it queries indexed official regulations and responds precisely. This dashboard monitors the effectiveness of that information retrieval.</p>",
+
+                label2: "02. Data Architecture",
+                title2: "Pipeline Structure (Dataform)",
+                rawLayer: "Raw Layer",
+                silverLayer: "Silver Layer",
+                goldLayer: "Gold Layer",
+
+                label3: "03. Key Metrics",
+                chart1: "Interactions Distribution by Product",
+                chart2: "Penetration by VP (Top 5)",
+                chart3: "User Retention (Cohorts)",
+                
                 label4: "04. Operational & Quality Metrics",
                 title4: "Ecosystem Operational Detail",
+                
+                micro1: "Unique Users by Product",
+                micro2: "Avg Interactions / User",
+                micro3: "Assistant Ecosystem",
+                micro4: "Error Rate (Monthly)",
+                micro5: "Response Latency (sec)",
+                micro6: "Top Content Categories",
+
+                queryLabel: "Query",
+
                 contactText: "This project demonstrates the ability to integrate Data Engineering (Dataform) with Applied AI.",
-                contactBtn: "Contact Javier"
+                contactBtn: "Contact Javier",
+
+                // Charts Internal Data
+                chartsData: {
+                    products: { name: "Interactions", im: "Images" },
+                    vp: { name: "Adoption" },
+                    cohorts: { nameSep: "Sep", nameOct: "Oct", x: ["M0", "M1", "M2", "M3", "M4"] },
+                    users: { name: "Users", x: ['RH+', 'Free Chat', 'Images'] },
+                    intensity: { name: "Int/User", x: ['Free Chat', 'RH+', 'Images'] },
+                    assistants: { name: "Assistants", int: "Internal", ext: "External" },
+                    errors: { name: "% Error", x: ['Jan', 'Feb', 'Mar', 'Apr', 'May'] },
+                    latency: { name: "Seconds", x: ['RH+ (RAG)', 'Free Chat', 'Images'] },
+                    content: { name: "Queries", x: ['COBUS', 'Benefits', 'MyDuty', 'IT', 'Vacations'] }
+                }
             }
         };
+
+        // --- VARIABLES GLOBALES PARA GRÁFICOS ---
+        let cProducts, cVP, cCohorts, cUsers, cIntensity, cAssistants, cErrors, cLatency, cContent;
 
         function changeLang(lang) {
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + lang).classList.add('active');
             const t = translations[lang];
             
+            // DOM Elements Update
             document.getElementById('nav-back').textContent = t.navBack;
             document.getElementById('hero-badge').textContent = t.badge;
             document.getElementById('main-title').innerHTML = t.title;
             document.getElementById('main-desc').textContent = t.desc;
+            
+            document.getElementById('label-1').textContent = t.label1;
+            document.getElementById('title-1').textContent = t.title1;
+            document.getElementById('text-1').innerHTML = t.text1;
+
+            document.getElementById('label-2').textContent = t.label2;
+            document.getElementById('title-2').textContent = t.title2;
+            document.getElementById('arch-raw-label').textContent = t.rawLayer;
+            document.getElementById('arch-silver-label').textContent = t.silverLayer;
+            document.getElementById('arch-gold-label').textContent = t.goldLayer;
+
+            document.getElementById('label-3').textContent = t.label3;
+            document.getElementById('chart-title-1').textContent = t.chart1;
+            document.getElementById('chart-title-2').textContent = t.chart2;
+            document.getElementById('chart-title-3').textContent = t.chart3;
+
             document.getElementById('label-4').textContent = t.label4;
             document.getElementById('title-4').textContent = t.title4;
+            document.getElementById('micro-title-1').textContent = t.micro1;
+            document.getElementById('micro-title-2').textContent = t.micro2;
+            document.getElementById('micro-title-3').textContent = t.micro3;
+            document.getElementById('micro-title-4').textContent = t.micro4;
+            document.getElementById('micro-title-5').textContent = t.micro5;
+            document.getElementById('micro-title-6').textContent = t.micro6;
+
             document.getElementById('contact-text').textContent = t.contactText;
             document.getElementById('contact-btn-text').textContent = t.contactBtn;
+
+            // Actualizar botones de Query
+            document.querySelectorAll('.query-label').forEach(el => el.textContent = t.queryLabel);
+
+            // --- ACTUALIZACIÓN DINÁMICA DE GRÁFICOS ---
+            if(cProducts) {
+                cProducts.series[0].update({ name: t.chartsData.products.name, data: [ {name: 'Chat Libre', y:553000, color:'#1B0088'}, {name: 'RH+', y:179800, color:'#00B5E2'}, {name: t.chartsData.products.im, y:44500, color:'#E30032'} ] });
+            }
+            if(cVP) cVP.series[0].update({ name: t.chartsData.vp.name });
+            if(cCohorts) {
+                cCohorts.series[0].update({ name: t.chartsData.cohorts.nameSep });
+                cCohorts.series[1].update({ name: t.chartsData.cohorts.nameOct });
+                cCohorts.xAxis[0].setCategories(t.chartsData.cohorts.x);
+            }
+            if(cUsers) {
+                cUsers.series[0].update({ name: t.chartsData.users.name });
+                cUsers.xAxis[0].setCategories(t.chartsData.users.x);
+            }
+            if(cIntensity) {
+                cIntensity.series[0].update({ name: t.chartsData.intensity.name });
+                cIntensity.xAxis[0].setCategories(t.chartsData.intensity.x);
+            }
+            if(cAssistants) {
+                cAssistants.series[0].update({ name: t.chartsData.assistants.name, data: [{name: t.chartsData.assistants.int, y:644}, {name: t.chartsData.assistants.ext, y:165}] });
+            }
+            if(cErrors) {
+                cErrors.series[0].update({ name: t.chartsData.errors.name });
+                cErrors.xAxis[0].setCategories(t.chartsData.errors.x);
+            }
+            if(cLatency) {
+                cLatency.series[0].update({ name: t.chartsData.latency.name });
+                cLatency.xAxis[0].setCategories(t.chartsData.latency.x);
+            }
+            if(cContent) {
+                cContent.series[0].update({ name: t.chartsData.content.name });
+                cContent.xAxis[0].setCategories(t.chartsData.content.x);
+            }
         }
 
-        // --- HIGHCHARTS GLOBAL ---
+        // --- HIGHCHARTS INIT ---
         Highcharts.setOptions({
             chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter' } },
             title: { text: null },
@@ -486,65 +648,57 @@
             plotOptions: { series: { animation: false } }
         });
 
-        // --- GRAFICOS PRINCIPALES ---
-        Highcharts.chart('chart-products', {
+        // Almacenar gráficos en variables
+        cProducts = Highcharts.chart('chart-products', {
             chart: { type: 'pie' },
             plotOptions: { pie: { innerSize: '60%', borderWidth: 0, showInLegend: true } },
             series: [{ name: 'Interacciones', data: [ {name: 'Chat Libre', y:553000, color:'#1B0088'}, {name: 'RH+', y:179800, color:'#00B5E2'}, {name: 'Imágenes', y:44500, color:'#E30032'} ] }]
         });
         
-        Highcharts.chart('chart-vp', {
+        cVP = Highcharts.chart('chart-vp', {
             chart: { type: 'bar' },
             xAxis: { categories: ['VP Personas', 'VP Legal', 'VP IT', 'VP Clientes', 'VP Comercial'] },
             series: [{ name: 'Adopción', data: [88.7, 85.7, 83.3, 65.7, 60.9], color: '#1B0088' }]
         });
 
-        Highcharts.chart('chart-cohorts', {
+        cCohorts = Highcharts.chart('chart-cohorts', {
             chart: { type: 'areaspline' },
             xAxis: { categories: ['M0', 'M1', 'M2', 'M3', 'M4'] },
             series: [{ name: 'Sep', data: [100, 45, 38, 35, 32], color: '#00B5E2' }, { name: 'Oct', data: [100, 52, 41, 39, null], color: '#E30032' }]
         });
 
-        // --- MICRO GRAFICOS ---
-        
-        // 1. Usuarios Únicos
-        Highcharts.chart('chart-users', {
+        cUsers = Highcharts.chart('chart-users', {
             chart: { type: 'column' },
             xAxis: { categories: ['RH+', 'Chat Libre', 'Imágenes'] },
             series: [{ name: 'Usuarios', data: [19146, 8914, 4637], color: '#00B5E2' }]
         });
 
-        // 2. Intensidad (Avg Interactions)
-        Highcharts.chart('chart-intensity', {
+        cIntensity = Highcharts.chart('chart-intensity', {
             chart: { type: 'bar' },
             xAxis: { categories: ['Chat Libre', 'RH+', 'Imágenes'] },
             series: [{ name: 'Int/Usuario', data: [62.0, 9.4, 9.6], color: '#1B0088' }]
         });
 
-        // 3. Asistentes (Pie)
-        Highcharts.chart('chart-assistants', {
+        cAssistants = Highcharts.chart('chart-assistants', {
             chart: { type: 'pie' },
             plotOptions: { pie: { innerSize: '0%', borderWidth: 0 } },
             series: [{ name: 'Asistentes', data: [{name: 'Internos', y:644}, {name: 'Externos', y:165}], colors: ['#E30032', '#8d9096'] }]
         });
 
-        // 4. Errores (Line)
-        Highcharts.chart('chart-errors', {
+        cErrors = Highcharts.chart('chart-errors', {
             chart: { type: 'line' },
             xAxis: { categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May'] },
             yAxis: { max: 5 },
             series: [{ name: '% Error', data: [2.1, 1.8, 1.5, 1.2, 0.9], color: '#E30032' }]
         });
 
-        // 5. Latencia (Bar/Gauge sim)
-        Highcharts.chart('chart-latency', {
+        cLatency = Highcharts.chart('chart-latency', {
             chart: { type: 'bar' },
             xAxis: { categories: ['RH+ (RAG)', 'Chat Libre', 'Imágenes'] },
             series: [{ name: 'Segundos', data: [1.2, 2.5, 4.1], color: '#8d9096' }]
         });
 
-        // 6. Contenidos (Bar)
-        Highcharts.chart('chart-content', {
+        cContent = Highcharts.chart('chart-content', {
             chart: { type: 'column' },
             xAxis: { categories: ['COBUS', 'Beneficios', 'MyDuty', 'IT', 'Vacaciones'] },
             series: [{ name: 'Consultas', data: [1540, 1200, 980, 850, 600], color: '#00B5E2' }]
