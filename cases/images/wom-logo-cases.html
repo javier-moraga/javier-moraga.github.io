@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOM Portfolio Hero - Data Graffiti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Permanent+Marker&family=Rock+Salt&family=Rubik+Glitch&display=swap" rel="stylesheet">
+    
+    <style>
+        /* RESET & BASE */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #000; overflow-x: hidden; font-family: 'Helvetica', sans-serif; }
+
+        /* HERO CONTAINER - La Pared de Concreto */
+        .hero-banner {
+            position: relative;
+            width: 100%;
+            height: 100vh; /* Pantalla completa */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0a0a0a;
+            /* Simulamos textura de concreto sucio con gradientes y ruido */
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(20, 20, 20, 0.8), rgba(0,0,0,1)),
+                url("https://www.transparenttextures.com/patterns/concrete-wall.png"),
+                linear-gradient(135deg, #120a1f 0%, #000 100%);
+            background-blend-mode: overlay, multiply, normal;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        /* CAPA DE AMBIENTE (Vapor/Steam y Luces) */
+        .atmosphere {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .fog {
+            position: absolute;
+            bottom: 0;
+            width: 200%;
+            height: 60%;
+            background: linear-gradient(0deg, rgba(230, 0, 126, 0.1) 0%, transparent 100%);
+            filter: blur(20px);
+            animation: drift 20s linear infinite;
+        }
+
+        /* TEXTOS PRINCIPALES - CONTENEDOR */
+        .graffiti-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            width: 90%;
+            max-width: 1400px;
+            /* Transformación 3D sutil para dar profundidad */
+            transform: rotateX(5deg); 
+        }
+
+        /* TÍTULO SUPERIOR - STENCIL */
+        .top-stencil {
+            font-family: 'Black Ops One', cursive;
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: -20px;
+            text-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.8),
+                2px 2px 0px rgba(0,0,0,0.8);
+            opacity: 0.9;
+            position: relative;
+            z-index: 20;
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            /* Efecto de pintura corrida stencil */
+            mask-image: linear-gradient(black 80%, transparent 100%);
+        }
+
+        /* NÚMEROS GIGANTES (El Graffiti) */
+        .numbers-chaos {
+            position: relative;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            mix-blend-mode: screen; /* Para que parezca luz sobre la pared */
+        }
+
+        .spray-text {
+            position: absolute;
+            font-family: 'Rubik Glitch', cursive; /* Fuente Glitch/Spray */
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* NÚMERO 1: 2.8M (Cyan/Red) */
+        .num-affected {
+            font-size: clamp(6rem, 15vw, 12rem);
+            color: #00f3ff;
+            top: 20px;
+            left: 5%;
+            transform: rotate(-5deg);
+            text-shadow: 
+                4px 0px red, 
+                -2px 0px blue,
+                0 0 20px #00f3ff,
+                0 0 50px #00f3ff;
+            animation: glitch-anim 2s infinite;
+            z-index: 5;
+            opacity: 0.8;
+        }
+
+        /* NÚMERO 2: -$48MM (Violeta) */
+        .num-money {
+            font-family: 'Rock Salt', cursive; /* Estilo más manuscrito sucio */
+            font-size: clamp(3rem, 8vw, 6rem);
+            color: #bd00ff;
+            bottom: 40px;
+            left: 20%;
+            transform: rotate(3deg);
+            text-shadow: 
+                0 0 10px #bd00ff,
+                0 0 30px #4b0082;
+            z-index: 6;
+        }
+        /* Efecto de chorreo de pintura (Drip) */
+        .num-money::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: 30px;
+            width: 5px;
+            height: 60px;
+            background: #bd00ff;
+            box-shadow: 0 0 10px #bd00ff;
+            border-radius: 5px;
+            opacity: 0.8;
+        }
+
+        /* NÚMERO 3: 20.8% (MAGENTA - EL HÉROE) */
+        .num-hero {
+            font-family: 'Permanent Marker', cursive;
+            font-size: clamp(8rem, 20vw, 18rem);
+            color: #E6007E; /* WOM MAGENTA */
+            top: 10%;
+            right: 5%;
+            transform: rotate(-2deg) scale(1.1);
+            z-index: 10;
+            text-shadow: 
+                0 0 10px #fff,
+                0 0 30px #E6007E,
+                0 0 80px #E6007E,
+                0 0 120px #E6007E;
+            animation: flicker 0.15s infinite alternate;
+        }
+        
+        /* Chispas eléctricas sobre el magenta */
+        .sparks {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.5;
+            mix-blend-mode: overlay;
+        }
+
+        /* TEXTO INFERIOR - TAG */
+        .bottom-tag {
+            font-family: 'Courier New', monospace;
+            color: #aaa;
+            background: #000;
+            display: inline-block;
+            padding: 5px 15px;
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+            border-left: 5px solid #E6007E;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 20;
+            box-shadow: 0 0 15px rgba(230, 0, 126, 0.3);
+        }
+
+        /* ANIMACIONES */
+        @keyframes glitch-anim {
+            0% { transform: translate(0) rotate(-5deg); }
+            20% { transform: translate(-2px, 2px) rotate(-5deg); }
+            40% { transform: translate(-2px, -2px) rotate(-5deg); }
+            60% { transform: translate(2px, 2px) rotate(-5deg); }
+            80% { transform: translate(2px, -2px) rotate(-5deg); }
+            100% { transform: translate(0) rotate(-5deg); }
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.95; text-shadow: 0 0 30px #E6007E; }
+            100% { opacity: 1; text-shadow: 0 0 50px #E6007E, 0 0 20px white; }
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* EFECTO DE LUZ DE NEON GENERAL */
+        .overlay-light {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, rgba(0, 243, 255, 0.1), rgba(230, 0, 126, 0.1));
+            mix-blend-mode: color-dodge;
+            z-index: 2;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="hero-banner">
+        <div class="atmosphere">
+            <div class="fog"></div>
+        </div>
+        <div class="overlay-light"></div>
+
+        <div class="graffiti-container">
+            <div class="top-stencil">
+                NO FUE MAGIA. FUE FUERZA BRUTA DE DATOS.
+            </div>
+
+            <div class="numbers-chaos">
+                <div class="spray-text num-affected" title="2.8 Millones Afectados">
+                    2.8M
+                </div>
+                <div class="spray-text num-money" title="Desvío Presupuesto">
+                    -$48MM
+                </div>
+                <div class="spray-text num-hero" title="Share Out Salvado">
+                    20.8%
+                    <div class="sparks"></div>
+                </div>
+            </div>
+
+            <div class="bottom-tag">
+                Caso de Estudio: Romper el presupuesto para salvar el market share.
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
