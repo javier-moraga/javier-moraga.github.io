@@ -2,90 +2,231 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alemana | Synced Stabilization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
     <style>
-        /* Ajuste de colores basado en tu index.html */
-        :root { 
-            --wom-magenta: #E6007E; 
-            --wom-cyan: #3b82f6; /* Accent blue de tu index */
-            --bg-deep: #0b1120; /* Color exacto del fondo de tu index */
+        :root {
+            --ale-blue: #004B87;
+            --ale-green: #009A44;
+            --ale-light: #4FC3F7;
+            --bg-dark: #020b14;
+            --legacy-red: #ef4444;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; overflow: hidden; }
-
-        body { 
-            background: var(--bg-deep);
-            height: 100vh; 
-            display: flex; 
-            justify-content: center; 
+        body {
+            background-color: var(--bg-dark);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
             align-items: center;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            user-select: none;
         }
 
-        .radar-screen {
+        /* Contenedor Principal estilo Monitor */
+        .monitor-frame {
             position: relative;
-            /* Tamaño adaptativo para el contenedor del portafolio */
-            width: 85vh; 
-            height: 85vh;
-            max-width: 320px;
-            max-height: 320px;
-            border: 1px solid rgba(230, 0, 126, 0.3);
-            border-radius: 50%;
-            /* Rejilla técnica sutil */
-            background: 
-                repeating-radial-gradient(circle, transparent 0, transparent 40px, rgba(230, 0, 126, 0.05) 40px, rgba(230, 0, 126, 0.05) 41px),
-                linear-gradient(to top, transparent 49.5%, rgba(230, 0, 126, 0.1) 50%, transparent 50.5%),
-                linear-gradient(to right, transparent 49.5%, rgba(230, 0, 126, 0.1) 50%, transparent 50.5%);
+            width: 800px;
+            height: 300px;
+            background: rgba(2, 11, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
         }
 
-        .radar-sweep {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: conic-gradient(from 0deg, rgba(230, 0, 126, 0.35) 0deg, transparent 90deg);
-            border-radius: 50%;
-            animation: sweep 4s linear infinite;
+        /* Grid de fondo */
+        .grid-bg {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
         }
 
-        .target {
-            position: absolute; width: 8px; height: 8px;
-            background: var(--wom-cyan);
-            box-shadow: 0 0 15px var(--wom-cyan);
-            border-radius: 50%;
-            animation: blink 0.8s infinite alternate;
-        }
-
-        .central-text {
+        /* Línea Divisoria Central */
+        .divider {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            left: 50%; top: 20px; bottom: 20px;
+            width: 1px;
+            border-left: 1px dashed rgba(255, 255, 255, 0.15);
+            z-index: 1;
+        }
+
+        /* Textos */
+        .label {
+            position: absolute; top: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+        .label-legacy { left: 40px; color: var(--legacy-red); text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        .label-cloud { right: 40px; color: var(--ale-green); text-shadow: 0 0 10px rgba(0, 154, 68, 0.4); }
+
+        /* SVG Container */
+        .svg-container {
+            position: absolute;
+            inset: 0;
             z-index: 10;
-            text-align: center;
-            background: rgba(11, 17, 32, 0.8);
-            padding: 10px;
-            border-radius: 4px;
-            width: 80%;
+        }
+
+        .pulse-path {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            /* El stroke-dasharray se setea en JS */
+        }
+
+        /* --- ELEMENTOS MÓVILES (Controlados por JS) --- */
+        
+        /* 1. La Barra de Escaneo */
+        .scan-bar {
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            z-index: 20;
+            will-change: transform; /* Optimización de rendimiento */
             pointer-events: none;
         }
 
-        h1 { font-family: 'Black Ops One', cursive; color: #fff; font-size: 1.1rem; letter-spacing: 1px; margin: 2px 0; }
-        .alert { font-family: 'Roboto Mono', monospace; color: var(--wom-magenta); font-size: 0.6rem; font-weight: 800; letter-spacing: 1px; animation: flash 1s infinite; }
-        .sub { font-family: 'Roboto Mono', monospace; color: #64748b; font-size: 0.5rem; text-transform: uppercase; }
+        /* Efecto de "cortina" semitransparente detrás de la barra */
+        .scan-bar::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            right: 0; /* Se extiende hacia la izquierda del movimiento */
+            width: 40px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05));
+        }
 
-        @keyframes sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes blink { 50% { opacity: 0.2; transform: scale(0.8); } }
-        @keyframes flash { 50% { opacity: 0.4; } }
+        /* 2. El Punto Guía (La punta del lápiz) */
+        .guide-dot {
+            position: absolute;
+            width: 8px; height: 8px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%); /* Centrado exacto */
+            box-shadow: 0 0 15px 2px white;
+            z-index: 21;
+            will-change: transform;
+        }
+
+        /* Gradiente SVG */
+        stop.red { stop-color: var(--legacy-red); }
+        stop.mid { stop-color: #fbbf24; } /* Transición ámbar */
+        stop.green { stop-color: var(--ale-green); }
+        stop.blue { stop-color: var(--ale-light); }
+
     </style>
 </head>
 <body>
-    <div class="radar-screen">
-        <div class="radar-sweep"></div>
-        <div class="target" style="top: 25%; left: 30%;"></div>
-        <div class="target" style="top: 60%; left: 75%;"></div>
-        <div class="target" style="top: 15%; left: 65%;"></div>
-        
-        <div class="central-text">
-            <div class="alert">⚠️ CHURN THREAT</div>
-            <h1>DATA DEFENSE</h1>
-            <div class="sub">Mitigating Impact • May 2022</div>
-        </div>
+
+    <div class="monitor-frame">
+        <div class="grid-bg"></div>
+        <div class="divider"></div>
+
+        <div class="label label-legacy">Legacy SAS (Arritmia)</div>
+        <div class="label label-cloud">BigQuery (Sinusal)</div>
+
+        <svg class="svg-container" viewBox="0 0 800 300" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" class="red" />
+                    <stop offset="45%" class="red" />
+                    <stop offset="50%" class="mid" />
+                    <stop offset="55%" class="green" />
+                    <stop offset="100%" class="blue" />
+                </linearGradient>
+                
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+
+            <path id="mainPath" class="pulse-path" stroke="url(#pulseGradient)" filter="url(#glow)"
+                  d="M0,150 
+                     L30,140 L40,180 L50,120 L65,160 L80,100 L95,190 L110,150
+                     L140,150 L150,145 L160,155 L180,150
+                     L210,150 L220,100 L230,200 L240,150
+                     L300,150 L320,150 L330,120 L340,180 L350,150
+                     L400,150
+                     C450,150 460,80 480,80 S510,150 540,150
+                     S570,220 600,220 S630,150 660,150
+                     S690,80 720,80 S750,150 780,150 L800,150" />
+        </svg>
+
+        <div id="scanBar" class="scan-bar"></div>
+        <div id="guideDot" class="guide-dot"></div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const path = document.getElementById('mainPath');
+            const bar = document.getElementById('scanBar');
+            const dot = document.getElementById('guideDot');
+            
+            // 1. Calcular longitud total del trazo SVG
+            const length = path.getTotalLength();
+
+            // 2. Configurar el SVG para que se pueda "dibujar" (stroke-dasharray)
+            // Inicialmente ocultamos todo el trazo
+            path.style.strokeDasharray = length;
+            path.style.strokeDashoffset = length;
+
+            // Variables de animación
+            let start = null;
+            const duration = 5000; // 5 segundos por ciclo (ajustable)
+
+            function animate(timestamp) {
+                if (!start) start = timestamp;
+                
+                // Progreso de 0 a 1
+                let progress = (timestamp - start) / duration;
+
+                // Reiniciar loop
+                if (progress > 1) {
+                    start = timestamp;
+                    progress = 0;
+                }
+
+                // --- MAGIA MATEMÁTICA ---
+                
+                // A. Calcular cuánto trazo dibujar
+                const drawLength = length * progress;
+                path.style.strokeDashoffset = length - drawLength;
+
+                // B. Obtener las coordenadas EXACTAS (x, y) de la punta actual
+                const point = path.getPointAtLength(drawLength);
+
+                // C. Mover la barra (Solo en eje X)
+                // Usamos translate3d para aceleración por hardware
+                bar.style.transform = `translate3d(${point.x}px, 0, 0)`;
+
+                // D. Mover el punto guía (Ejes X e Y) para que siga el pico
+                dot.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`;
+
+                requestAnimationFrame(animate);
+            }
+
+            // Iniciar
+            requestAnimationFrame(animate);
+        });
+    </script>
 </body>
 </html>
