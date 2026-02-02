@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-blue: #00B5E2;
+            --danger-red: #E30032;
+            --radar-lines: rgba(0, 181, 226, 0.15);
+        }
+
+        body { 
+            background: #020205; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; 
+            font-family: 'Consolas', monospace; overflow: hidden; 
+        }
+
+        .radar-screen {
+            width: 600px; height: 450px;
+            background: #030308;
+            position: relative; overflow: hidden;
+            border: 2px solid #1a1a1a;
+            box-shadow: inset 0 0 80px #000;
+        }
+
+        /* --- CUADRÍCULA TÉCNICA --- */
+        .grid-overlay {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* --- ARCOS DE RADAR (RANGE RINGS) --- */
+        .radar-arcs {
+            position: absolute;
+            bottom: -20px; /* Origen desde la base */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px; height: 400px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .arc {
+            fill: none;
+            stroke: var(--radar-lines);
+            stroke-width: 1.5;
+            stroke-dasharray: 4 4; /* Estilo punteado aeronáutico */
+        }
+
+        /* LÍNEA DE INTERCEPCIÓN */
+        .intercept-line {
+            position: absolute; top: 75%; left: 0; width: 100%; height: 1px;
+            border-top: 2px dashed var(--primary-blue);
+            z-index: 5; box-shadow: 0 0 10px var(--primary-blue);
+        }
+
+        /* HUD & AMELIA SYSTEM */
+        .hud { position: absolute; color: #555; font-size: 10px; z-index: 15; letter-spacing: 1px; }
+        .top-right { top: 20px; right: 20px; text-align: right; }
+        .btm-left { bottom: 20px; left: 20px; }
+        .system-status { color: var(--primary-blue); font-weight: bold; }
+
+        /* AGENTE IA (EL AVIÓN) */
+        .ai-plane {
+            position: absolute; top: 75%; left: 50%; 
+            transform: translate(-50%, -10px);
+            width: 0; height: 0;
+            border-left: 15px solid transparent; border-right: 15px solid transparent;
+            border-bottom: 25px solid #fff;
+            filter: drop-shadow(0 0 10px var(--primary-blue));
+            z-index: 20;
+        }
+
+        /* PAQUETES DE DATOS */
+        .packet-wrapper {
+            position: absolute; left: 50%; width: 20px; height: 20px;
+            top: -100px; z-index: 10;
+            animation: fallLinear 7s infinite linear;
+        }
+
+        .state-question, .state-resolved {
+            position: absolute; width: 150px;
+            display: flex; align-items: center;
+        }
+        .state-resolved { opacity: 0; }
+
+        .diamond { width: 10px; height: 10px; transform: rotate(45deg); border: 2px solid; transition: all 0.3s; }
+        .d-red { background: var(--danger-red); border-color: var(--danger-red); box-shadow: 0 0 10px var(--danger-red); }
+        .d-blue { background: var(--primary-blue); border-color: #fff; box-shadow: 0 0 15px var(--primary-blue); }
+
+        .text { margin-left: 15px; white-space: nowrap; font-size: 10px; font-weight: bold; }
+        .t-red { color: var(--danger-red); }
+        .t-blue { color: var(--primary-blue); }
+
+        @keyframes fallLinear { 0% { top: -50px; } 100% { top: 110%; } }
+
+        .p1 { margin-left: -180px; animation-delay: 0s; }
+        .p2 { margin-left: -80px;  animation-delay: 1.8s; }
+        .p3 { margin-left: 90px;   animation-delay: 3.5s; }
+        .p4 { margin-left: 160px;  animation-delay: 5.2s; }
+
+    </style>
+</head>
+<body>
+
+    <div class="radar-screen" id="radar">
+        <div class="grid-overlay"></div>
+        
+        <svg class="radar-arcs" viewBox="0 0 800 400">
+            <circle class="arc" cx="400" cy="400" r="150" />
+            <circle class="arc" cx="400" cy="400" r="280" />
+            <circle class="arc" cx="400" cy="400" r="410" />
+        </svg>
+
+        <div class="intercept-line" id="interceptLine"></div>
+
+        <div class="hud top-right">
+            <span class="system-status">AMELIA SYSTEM V2.0</span><br>
+            AUTO-SYNC: ACTIVE<br>
+            XPNDR: 7000 / ALT
+        </div>
+
+        <div class="hud btm-left">
+            LATAM AIRLINES<br>
+            TAS: 460 KTS | HDG: 320°<br>
+            FMS LOADED... OK
+        </div>
+
+        <div class="packet-wrapper p1">
+            <div class="state-question"><div class="diamond d-red"></div><div class="text t-red">? SALARY DATE</div></div>
+            <div class="state-resolved"><div class="diamond d-blue"></div><div class="text t-blue">✓ PAYSLIP SENT</div></div>
+        </div>
+        <div class="packet-wrapper p2">
+            <div class="state-question"><div class="diamond d-red"></div><div class="text t-red">? VISA INFO</div></div>
+            <div class="state-resolved"><div class="diamond d-blue"></div><div class="text t-blue">✓ DOCS READY</div></div>
+        </div>
+        <div class="packet-wrapper p3">
+            <div class="state-question"><div class="diamond d-red"></div><div class="text t-red">? SHIFT SWAP</div></div>
+            <div class="state-resolved"><div class="diamond d-blue"></div><div class="text t-blue">✓ APPROVED</div></div>
+        </div>
+        <div class="packet-wrapper p4">
+            <div class="state-question"><div class="diamond d-red"></div><div class="text t-red">? HOTEL CODE</div></div>
+            <div class="state-resolved"><div class="diamond d-blue"></div><div class="text t-blue">✓ CONFIRMED</div></div>
+        </div>
+
+        <div class="ai-plane"></div>
+    </div>
+
+    <script>
+        const packets = document.querySelectorAll('.packet-wrapper');
+        const interceptLine = document.getElementById('interceptLine');
+
+        function checkLogic() {
+            const triggerY = interceptLine.getBoundingClientRect().top;
+
+            packets.forEach(packet => {
+                const packetRect = packet.getBoundingClientRect();
+                const question = packet.querySelector('.state-question');
+                const resolved = packet.querySelector('.state-resolved');
+
+                // Detección exacta: cuando el rombo toca la línea
+                if (packetRect.bottom >= triggerY) {
+                    question.style.opacity = '0';
+                    resolved.style.opacity = '1';
+                } else {
+                    question.style.opacity = '1';
+                    resolved.style.opacity = '0';
+                }
+            });
+            requestAnimationFrame(checkLogic);
+        }
+        checkLogic();
+    </script>
+</body>
+</html>
