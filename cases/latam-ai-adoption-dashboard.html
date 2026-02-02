@@ -7,8 +7,11 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/heatmap.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -41,6 +44,7 @@
             padding: 0;
             padding-top: 60px;
             padding-bottom: 60px;
+            overflow-x: hidden; /* Prevenir scroll horizontal global */
         }
 
         /* --- NAV BAR --- */
@@ -140,6 +144,7 @@
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
         section { padding: 20px 0; }
 
+        /* CORRECCIÓN 2: Overflow hidden en cards */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-glass);
@@ -148,6 +153,7 @@
             padding: 40px;
             margin-bottom: 24px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden; /* Mantiene el contenido dentro de los bordes redondeados */
         }
 
         .section-label {
@@ -181,13 +187,20 @@
         .arrow { color: var(--latam-red); font-size: 1.5rem; font-weight: bold; }
 
         /* --- CHARTS --- */
-        .chart-wrapper { margin-bottom: 40px; border-bottom: 1px solid var(--border-glass); padding-bottom: 40px; }
+        .chart-wrapper { 
+            margin-bottom: 40px; 
+            border-bottom: 1px solid var(--border-glass); 
+            padding-bottom: 40px; 
+            width: 100%; /* Asegura que no se expanda más allá del padre */
+        }
         .chart-wrapper:last-child { border-bottom: none; }
 
+        /* CORRECCIÓN 2: Grid Layout robusto */
         .micro-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            width: 100%;
         }
         @media (max-width: 900px) { .micro-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .micro-grid { grid-template-columns: 1fr; } }
@@ -197,6 +210,8 @@
             border: 1px solid var(--border-glass);
             border-radius: 12px;
             padding: 20px;
+            min-width: 0; /* CRÍTICO: Permite que el grid encoja los hijos si es necesario */
+            overflow: hidden; /* Corta cualquier excedente del gráfico */
         }
         .micro-title {
             font-size: 0.9rem; font-weight: 600; color: var(--latam-cyan);
@@ -343,7 +358,7 @@
 
                 <div class="chart-wrapper">
                     <h3 id="chart-title-3">Retención de Usuarios (Cohortes)</h3>
-                    <div id="chart-cohorts" style="height: 300px;"></div>
+                    <div id="chart-cohorts" style="height: 400px;"></div>
                     <button class="accordion-btn" onclick="toggleCode(this)">
                         <span><i class="fas fa-code"></i> <span class="query-label">Query</span>: cohort_statistics.sqlx</span>
                         <i class="fas fa-chevron-down"></i>
@@ -483,15 +498,19 @@
                 micro6: "Top Categorías de Contenido",
 
                 queryLabel: "Consulta",
-                
                 contactText: "Este proyecto demuestra la capacidad de integrar Ingeniería de Datos (Dataform) con Inteligencia Artificial aplicada.",
                 contactBtn: "Contactar a Javier",
 
-                // Textos internos de gráficos (Ejes, Series, Tooltips)
+                // Datos de gráficos (Strings en Español)
                 chartsData: {
-                    products: { name: "Interacciones", im: "Imágenes" },
+                    products: { name: "Interacciones", im: "Imágenes", libre: "Chat Libre" },
                     vp: { name: "Adopción" },
-                    cohorts: { nameSep: "Sep", nameOct: "Oct", x: ["M0", "M1", "M2", "M3", "M4"] },
+                    cohorts: { 
+                        name: "Tasa de Retención", 
+                        y: ['Sep 24', 'Oct 24', 'Nov 24', 'Dic 24', 'Ene 25', 'Feb 25', 'Mar 25', 'Abr 25', 'May 25'], 
+                        x: ['Mes 0', 'Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5', 'Mes 6', 'Mes 7', 'Mes 8'],
+                        tooltip: { join: "ingresó y en", ret: "retuvo al" }
+                    },
                     users: { name: "Usuarios", x: ['RH+', 'Chat Libre', 'Imágenes'] },
                     intensity: { name: "Int/Usuario", x: ['Chat Libre', 'RH+', 'Imágenes'] },
                     assistants: { name: "Asistentes", int: "Internos", ext: "Externos" },
@@ -532,15 +551,19 @@
                 micro6: "Top Content Categories",
 
                 queryLabel: "Query",
-
                 contactText: "This project demonstrates the ability to integrate Data Engineering (Dataform) with Applied AI.",
                 contactBtn: "Contact Javier",
 
-                // Charts Internal Data
+                // Charts Internal Data (Strings en Inglés)
                 chartsData: {
-                    products: { name: "Interactions", im: "Images" },
+                    products: { name: "Interactions", im: "Images", libre: "Free Chat" },
                     vp: { name: "Adoption" },
-                    cohorts: { nameSep: "Sep", nameOct: "Oct", x: ["M0", "M1", "M2", "M3", "M4"] },
+                    cohorts: { 
+                        name: "Retention Rate", 
+                        y: ['Sep 24', 'Oct 24', 'Nov 24', 'Dec 24', 'Jan 25', 'Feb 25', 'Mar 25', 'Apr 25', 'May 25'], 
+                        x: ['Month 0', 'Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8'],
+                        tooltip: { join: "joined and in", ret: "retained" }
+                    },
                     users: { name: "Users", x: ['RH+', 'Free Chat', 'Images'] },
                     intensity: { name: "Int/User", x: ['Free Chat', 'RH+', 'Images'] },
                     assistants: { name: "Assistants", int: "Internal", ext: "External" },
@@ -592,19 +615,39 @@
             document.getElementById('contact-text').textContent = t.contactText;
             document.getElementById('contact-btn-text').textContent = t.contactBtn;
 
-            // Actualizar botones de Query
             document.querySelectorAll('.query-label').forEach(el => el.textContent = t.queryLabel);
 
-            // --- ACTUALIZACIÓN DINÁMICA DE GRÁFICOS ---
+            // --- CORRECCIÓN 1: ACTUALIZACIÓN DINÁMICA DE GRÁFICOS (INTERNA) ---
+            
             if(cProducts) {
-                cProducts.series[0].update({ name: t.chartsData.products.name, data: [ {name: 'Chat Libre', y:553000, color:'#1B0088'}, {name: 'RH+', y:179800, color:'#00B5E2'}, {name: t.chartsData.products.im, y:44500, color:'#E30032'} ] });
+                // Actualiza nombre de serie y nombres de datos (ej: Chat Libre -> Free Chat)
+                cProducts.series[0].update({ 
+                    name: t.chartsData.products.name, 
+                    data: [ 
+                        {name: t.chartsData.products.libre, y:553000, color:'#1B0088'}, 
+                        {name: 'RH+', y:179800, color:'#00B5E2'}, 
+                        {name: t.chartsData.products.im, y:44500, color:'#E30032'} 
+                    ] 
+                });
             }
+            
             if(cVP) cVP.series[0].update({ name: t.chartsData.vp.name });
+            
             if(cCohorts) {
-                cCohorts.series[0].update({ name: t.chartsData.cohorts.nameSep });
-                cCohorts.series[1].update({ name: t.chartsData.cohorts.nameOct });
+                // Actualiza título, Ejes y TOOLTIP
+                cCohorts.update({
+                    tooltip: {
+                        formatter: function () {
+                            return '<b>' + this.series.yAxis.categories[this.point.y] + '</b> ' + t.chartsData.cohorts.tooltip.join + ' <br><b>' +
+                                this.series.xAxis.categories[this.point.x] + '</b> ' + t.chartsData.cohorts.tooltip.ret + ' <br><b>' + this.point.value + '%</b>';
+                        }
+                    }
+                });
+                cCohorts.series[0].update({ name: t.chartsData.cohorts.name });
                 cCohorts.xAxis[0].setCategories(t.chartsData.cohorts.x);
+                cCohorts.yAxis[0].setCategories(t.chartsData.cohorts.y);
             }
+
             if(cUsers) {
                 cUsers.series[0].update({ name: t.chartsData.users.name });
                 cUsers.xAxis[0].setCategories(t.chartsData.users.x);
@@ -614,7 +657,10 @@
                 cIntensity.xAxis[0].setCategories(t.chartsData.intensity.x);
             }
             if(cAssistants) {
-                cAssistants.series[0].update({ name: t.chartsData.assistants.name, data: [{name: t.chartsData.assistants.int, y:644}, {name: t.chartsData.assistants.ext, y:165}] });
+                cAssistants.series[0].update({ 
+                    name: t.chartsData.assistants.name, 
+                    data: [{name: t.chartsData.assistants.int, y:644}, {name: t.chartsData.assistants.ext, y:165}] 
+                });
             }
             if(cErrors) {
                 cErrors.series[0].update({ name: t.chartsData.errors.name });
@@ -644,29 +690,76 @@
                 gridLineColor: '#1f1f2e', title: { text: null },
                 labels: { style: { color: '#8d9096' } } 
             },
-            legend: { enabled: false },
+            legend: { enabled: false, itemStyle: { color: '#b0b0b0' } },
             plotOptions: { series: { animation: false } }
         });
 
-        // Almacenar gráficos en variables
+        // 1. PRODUCTS
         cProducts = Highcharts.chart('chart-products', {
             chart: { type: 'pie' },
             plotOptions: { pie: { innerSize: '60%', borderWidth: 0, showInLegend: true } },
             series: [{ name: 'Interacciones', data: [ {name: 'Chat Libre', y:553000, color:'#1B0088'}, {name: 'RH+', y:179800, color:'#00B5E2'}, {name: 'Imágenes', y:44500, color:'#E30032'} ] }]
         });
         
+        // 2. VP ADOPTION
         cVP = Highcharts.chart('chart-vp', {
             chart: { type: 'bar' },
             xAxis: { categories: ['VP Personas', 'VP Legal', 'VP IT', 'VP Clientes', 'VP Comercial'] },
             series: [{ name: 'Adopción', data: [88.7, 85.7, 83.3, 65.7, 60.9], color: '#1B0088' }]
         });
 
+        // 3. COHORT HEATMAP (Actualizado: Sep 24 - May 25)
         cCohorts = Highcharts.chart('chart-cohorts', {
-            chart: { type: 'areaspline' },
-            xAxis: { categories: ['M0', 'M1', 'M2', 'M3', 'M4'] },
-            series: [{ name: 'Sep', data: [100, 45, 38, 35, 32], color: '#00B5E2' }, { name: 'Oct', data: [100, 52, 41, 39, null], color: '#E30032' }]
+            chart: { type: 'heatmap', marginTop: 40, marginBottom: 80, plotBorderWidth: 1 },
+            xAxis: { categories: ['Mes 0', 'Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5', 'Mes 6', 'Mes 7', 'Mes 8'] },
+            yAxis: { 
+                categories: ['Sep 24', 'Oct 24', 'Nov 24', 'Dic 24', 'Ene 25', 'Feb 25', 'Mar 25', 'Abr 25', 'May 25'], 
+                title: null, 
+                reversed: true 
+            },
+            colorAxis: {
+                min: 0,
+                max: 100,
+                minColor: '#050510',
+                maxColor: '#00B5E2'
+            },
+            legend: { enabled: true, align: 'right', layout: 'vertical', margin: 0, verticalAlign: 'top', y: 25, symbolHeight: 280 },
+            tooltip: {
+                formatter: function () {
+                    // Texto por defecto (Español)
+                    return '<b>' + this.series.yAxis.categories[this.point.y] + '</b> ingresó y en <br><b>' +
+                        this.series.xAxis.categories[this.point.x] + '</b> retuvo al <br><b>' + this.point.value + '%</b> de usuarios';
+                }
+            },
+            series: [{
+                name: 'Tasa de Retención',
+                borderWidth: 1,
+                borderColor: '#1f1f2e',
+                data: [
+                    // Sep 24 Cohort (9 meses)
+                    [0,0,100],[1,0,60],[2,0,50],[3,0,45],[4,0,42],[5,0,40],[6,0,39],[7,0,38],[8,0,38],
+                    // Oct 24 Cohort (8 meses)
+                    [0,1,100],[1,1,58],[2,1,48],[3,1,44],[4,1,41],[5,1,39],[6,1,38],[7,1,37],
+                    // Nov 24 Cohort (7 meses)
+                    [0,2,100],[1,2,55],[2,2,45],[3,2,42],[4,2,40],[5,2,38],[6,2,37],
+                    // Dic 24 Cohort (6 meses)
+                    [0,3,100],[1,3,50],[2,3,40],[3,3,38],[4,3,36],[5,3,35],
+                    // Ene 25 Cohort (5 meses)
+                    [0,4,100],[1,4,52],[2,4,42],[3,4,39],[4,4,37],
+                    // Feb 25 Cohort (4 meses)
+                    [0,5,100],[1,5,53],[2,5,43],[3,5,40],
+                    // Mar 25 Cohort (3 meses)
+                    [0,6,100],[1,6,54],[2,6,44],
+                    // Abr 25 Cohort (2 meses)
+                    [0,7,100],[1,7,55],
+                    // May 25 Cohort (1 mes)
+                    [0,8,100]
+                ],
+                dataLabels: { enabled: true, color: '#ffffff', style: { textOutline: 'none', fontSize: '9px' } }
+            }]
         });
 
+        // MICRO CHARTS
         cUsers = Highcharts.chart('chart-users', {
             chart: { type: 'column' },
             xAxis: { categories: ['RH+', 'Chat Libre', 'Imágenes'] },
