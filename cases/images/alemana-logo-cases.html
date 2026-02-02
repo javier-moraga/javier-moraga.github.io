@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alemana | Synced Stabilization</title>
+    <title>Alemana | Synced Stabilization Fixed</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
@@ -20,27 +20,19 @@
             background-color: var(--bg-dark);
             height: 100vh;
             margin: 0;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            user-select: none;
         }
 
-        /* Contenedor Principal estilo Monitor */
-        .monitor-frame {
+        .container-full {
             position: relative;
-            width: 800px;
-            height: 300px;
-            background: rgba(2, 11, 20, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
-            overflow: hidden;
+            width: 100%;
+            height: 100%;
         }
 
-        /* Grid de fondo */
+        /* Grid de fondo sutil */
         .grid-bg {
             position: absolute; inset: 0;
             background-image: 
@@ -50,104 +42,74 @@
             z-index: 0;
         }
 
-        /* Línea Divisoria Central */
-        .divider {
-            position: absolute;
-            left: 50%; top: 20px; bottom: 20px;
-            width: 1px;
-            border-left: 1px dashed rgba(255, 255, 255, 0.15);
-            z-index: 1;
+        /* SVG ocupa todo el espacio y ignora el aspect ratio para llenar la tarjeta */
+        svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
-        /* Textos */
+        /* Textos superpuestos (HTML es mejor para fuentes nítidas) */
+        .labels-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 20;
+        }
+
         .label {
-            position: absolute; top: 30px;
+            position: absolute; top: 15%; /* Porcentaje para mantener posición relativa */
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
+            font-size: 0.75rem; /* Pequeño para que no rompa en móviles */
             letter-spacing: 2px;
             font-weight: bold;
             text-transform: uppercase;
-            z-index: 2;
         }
-        .label-legacy { left: 40px; color: var(--legacy-red); text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
-        .label-cloud { right: 40px; color: var(--ale-green); text-shadow: 0 0 10px rgba(0, 154, 68, 0.4); }
-
-        /* SVG Container */
-        .svg-container {
-            position: absolute;
-            inset: 0;
-            z-index: 10;
-        }
-
-        .pulse-path {
-            fill: none;
-            stroke-width: 4;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            /* El stroke-dasharray se setea en JS */
-        }
-
-        /* --- ELEMENTOS MÓVILES (Controlados por JS) --- */
         
-        /* 1. La Barra de Escaneo */
-        .scan-bar {
-            position: absolute;
-            top: 0; bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-            z-index: 20;
-            will-change: transform; /* Optimización de rendimiento */
-            pointer-events: none;
+        .label-legacy { left: 5%; color: var(--legacy-red); text-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+        .label-cloud { right: 5%; color: var(--ale-green); text-shadow: 0 0 10px rgba(0, 154, 68, 0.4); text-align: right; }
+
+        /* Línea divisoria central */
+        .divider {
+            position: absolute; left: 50%; top: 10%; bottom: 10%;
+            width: 1px; border-left: 1px dashed rgba(255,255,255,0.1);
+            z-index: 1;
         }
 
-        /* Efecto de "cortina" semitransparente detrás de la barra */
-        .scan-bar::after {
-            content: '';
-            position: absolute;
-            top: 0; bottom: 0;
-            right: 0; /* Se extiende hacia la izquierda del movimiento */
-            width: 40px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05));
+        /* Estilos internos del SVG */
+        .scan-line {
+            stroke: white;
+            stroke-width: 2;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 5px white);
         }
-
-        /* 2. El Punto Guía (La punta del lápiz) */
+        
         .guide-dot {
-            position: absolute;
-            width: 8px; height: 8px;
-            background: white;
-            border-radius: 50%;
-            transform: translate(-50%, -50%); /* Centrado exacto */
-            box-shadow: 0 0 15px 2px white;
-            z-index: 21;
-            will-change: transform;
+            fill: white;
+            filter: drop-shadow(0 0 8px white);
         }
-
-        /* Gradiente SVG */
-        stop.red { stop-color: var(--legacy-red); }
-        stop.mid { stop-color: #fbbf24; } /* Transición ámbar */
-        stop.green { stop-color: var(--ale-green); }
-        stop.blue { stop-color: var(--ale-light); }
 
     </style>
 </head>
 <body>
 
-    <div class="monitor-frame">
+    <div class="container-full">
         <div class="grid-bg"></div>
         <div class="divider"></div>
 
-        <div class="label label-legacy">Legacy SAS (Arritmia)</div>
-        <div class="label label-cloud">BigQuery (Sinusal)</div>
+        <div class="labels-layer">
+            <div class="label label-legacy">Legacy SAS <br><span style="font-size:0.6em; opacity:0.7">(Arritmia)</span></div>
+            <div class="label label-cloud">BigQuery <br><span style="font-size:0.6em; opacity:0.7">(Sinusal)</span></div>
+        </div>
 
-        <svg class="svg-container" viewBox="0 0 800 300" preserveAspectRatio="none">
+        <svg viewBox="0 0 800 300" preserveAspectRatio="none">
             <defs>
                 <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" class="red" />
-                    <stop offset="45%" class="red" />
-                    <stop offset="50%" class="mid" />
-                    <stop offset="55%" class="green" />
-                    <stop offset="100%" class="blue" />
+                    <stop offset="0%" style="stop-color: var(--legacy-red)" />
+                    <stop offset="45%" style="stop-color: var(--legacy-red)" />
+                    <stop offset="50%" style="stop-color: #fbbf24" />
+                    <stop offset="55%" style="stop-color: var(--ale-green)" />
+                    <stop offset="100%" style="stop-color: var(--ale-light)" />
                 </linearGradient>
                 
                 <filter id="glow">
@@ -159,7 +121,13 @@
                 </filter>
             </defs>
 
-            <path id="mainPath" class="pulse-path" stroke="url(#pulseGradient)" filter="url(#glow)"
+            <path id="mainPath" 
+                  stroke="url(#pulseGradient)" 
+                  fill="none"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  filter="url(#glow)"
                   d="M0,150 
                      L30,140 L40,180 L50,120 L65,160 L80,100 L95,190 L110,150
                      L140,150 L150,145 L160,155 L180,150
@@ -169,62 +137,60 @@
                      C450,150 460,80 480,80 S510,150 540,150
                      S570,220 600,220 S630,150 660,150
                      S690,80 720,80 S750,150 780,150 L800,150" />
-        </svg>
 
-        <div id="scanBar" class="scan-bar"></div>
-        <div id="guideDot" class="guide-dot"></div>
+            <line id="scanLine" x1="0" y1="0" x2="0" y2="300" class="scan-line" />
+            
+            <circle id="guideDot" cx="0" cy="150" r="5" class="guide-dot" />
+            
+        </svg>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const path = document.getElementById('mainPath');
-            const bar = document.getElementById('scanBar');
-            const dot = document.getElementById('guideDot');
             
-            // 1. Calcular longitud total del trazo SVG
+            // Obtenemos referencias a los elementos SVG
+            const scanLine = document.getElementById('scanLine');
+            const guideDot = document.getElementById('guideDot');
+            
             const length = path.getTotalLength();
 
-            // 2. Configurar el SVG para que se pueda "dibujar" (stroke-dasharray)
-            // Inicialmente ocultamos todo el trazo
+            // Configuración inicial del trazo
             path.style.strokeDasharray = length;
             path.style.strokeDashoffset = length;
 
-            // Variables de animación
             let start = null;
-            const duration = 5000; // 5 segundos por ciclo (ajustable)
+            const duration = 5000; // Duración del loop
 
             function animate(timestamp) {
                 if (!start) start = timestamp;
-                
-                // Progreso de 0 a 1
                 let progress = (timestamp - start) / duration;
 
-                // Reiniciar loop
                 if (progress > 1) {
                     start = timestamp;
                     progress = 0;
                 }
 
-                // --- MAGIA MATEMÁTICA ---
-                
-                // A. Calcular cuánto trazo dibujar
+                // 1. Dibujamos la línea
                 const drawLength = length * progress;
                 path.style.strokeDashoffset = length - drawLength;
 
-                // B. Obtener las coordenadas EXACTAS (x, y) de la punta actual
+                // 2. Obtenemos la coordenada EXACTA dentro del sistema de coordenadas del SVG (0-800)
+                // No importa si el iframe mide 300px o 1000px, getPointAtLength devuelve valores relativos al viewBox
                 const point = path.getPointAtLength(drawLength);
 
-                // C. Mover la barra (Solo en eje X)
-                // Usamos translate3d para aceleración por hardware
-                bar.style.transform = `translate3d(${point.x}px, 0, 0)`;
+                // 3. Movemos la barra vertical (SVG Line)
+                // Modificamos sus atributos x1 y x2. Y1 e Y2 se mantienen fijos (0 a 300)
+                scanLine.setAttribute("x1", point.x);
+                scanLine.setAttribute("x2", point.x);
 
-                // D. Mover el punto guía (Ejes X e Y) para que siga el pico
-                dot.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`;
+                // 4. Movemos el punto (SVG Circle)
+                guideDot.setAttribute("cx", point.x);
+                guideDot.setAttribute("cy", point.y);
 
                 requestAnimationFrame(animate);
             }
 
-            // Iniciar
             requestAnimationFrame(animate);
         });
     </script>
