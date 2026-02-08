@@ -683,45 +683,45 @@
             });
         });
     </script>
-    <script>
+<script>
     document.addEventListener("DOMContentLoaded", function() {
-        // 1. Capturar los parámetros con los que llegamos a esta página
+        // 1. LEER PARÁMETROS DE LA URL
         const params = new URLSearchParams(window.location.search);
         
-        const mode = params.get('v');       // ej: global
-        const country = params.get('pais'); // ej: cl
-        const lang = params.get('lang');    // ej: es, en
+        const mode = params.get('v');       // global
+        const country = params.get('pais'); // cl
+        const lang = params.get('lang') || 'en'; // es / en
 
-        // 2. Referencia al botón de volver (asegúrate que tu <a> tenga id="btn-back")
-        const backBtn = document.getElementById('btn-back');
-        
-        // Si no usaste ID, intentamos buscar cualquier link que vaya al index
-        const fallbackBtn = document.querySelector('a[href*="index.html"]');
-        const targetBtn = backBtn || fallbackBtn;
-
-        if (targetBtn) {
-            // 3. Construir la URL de regreso preservando el estado
-            let returnUrl = "../index.html?";
-            
-            // Solo agregamos los parámetros si existen
-            if (mode) returnUrl += `v=${mode}&`;
-            if (country) returnUrl += `pais=${country}&`;
-            
-            // Para el idioma, usamos 'initialLang' para que el index lo fuerce al cargar
-            if (lang) returnUrl += `initialLang=${lang}`;
-
-            // 4. Asignar la nueva URL al botón
-            targetBtn.href = returnUrl;
-            
-            console.log("Link de retorno configurado a:", returnUrl);
+        // 2. APLICAR TRADUCCIÓN INMEDIATA
+        // Si la URL dice ?lang=es, cambiamos los textos ahora mismo
+        if (typeof changeLang === 'function') {
+            changeLang(lang);
         }
 
-        // OPCIONAL: Si quieres ocultar contenido en inglés/español dentro del caso
-        // Puedes usar clases CSS como .lang-es o .lang-en
-        if (lang === 'es') {
-            document.body.classList.add('is-spanish');
-        } else {
-            document.body.classList.add('is-english');
+        // 3. CONFIGURAR EL BOTÓN VOLVER
+        // Buscamos por clase .back-link (ya que no tienes id="btn-back")
+        const backBtn = document.querySelector('.back-link');
+
+        if (backBtn) {
+            let returnUrl = "../index.html";
+            let returnParams = [];
+
+            // Reconstruimos los parámetros para no perder el modo (Chile/Global)
+            if (mode) returnParams.push(`v=${mode}`);
+            if (country) returnParams.push(`pais=${country}`);
+            
+            // Pasamos el idioma de vuelta al index
+            if (lang) returnParams.push(`lang=${lang}`);
+
+            // Si hay parámetros, los agregamos
+            if (returnParams.length > 0) {
+                returnUrl += "?" + returnParams.join("&");
+            }
+            
+            // Agregamos el ancla para volver directo a la sección de proyectos
+            returnUrl += "#projects";
+
+            backBtn.href = returnUrl;
         }
     });
 </script>
