@@ -798,5 +798,47 @@
         });
 
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Capturar los parámetros con los que llegamos a esta página
+        const params = new URLSearchParams(window.location.search);
+        
+        const mode = params.get('v');       // ej: global
+        const country = params.get('pais'); // ej: cl
+        const lang = params.get('lang');    // ej: es, en
+
+        // 2. Referencia al botón de volver (asegúrate que tu <a> tenga id="btn-back")
+        const backBtn = document.getElementById('btn-back');
+        
+        // Si no usaste ID, intentamos buscar cualquier link que vaya al index
+        const fallbackBtn = document.querySelector('a[href*="index.html"]');
+        const targetBtn = backBtn || fallbackBtn;
+
+        if (targetBtn) {
+            // 3. Construir la URL de regreso preservando el estado
+            let returnUrl = "../index.html?";
+            
+            // Solo agregamos los parámetros si existen
+            if (mode) returnUrl += `v=${mode}&`;
+            if (country) returnUrl += `pais=${country}&`;
+            
+            // Para el idioma, usamos 'initialLang' para que el index lo fuerce al cargar
+            if (lang) returnUrl += `initialLang=${lang}`;
+
+            // 4. Asignar la nueva URL al botón
+            targetBtn.href = returnUrl;
+            
+            console.log("Link de retorno configurado a:", returnUrl);
+        }
+
+        // OPCIONAL: Si quieres ocultar contenido en inglés/español dentro del caso
+        // Puedes usar clases CSS como .lang-es o .lang-en
+        if (lang === 'es') {
+            document.body.classList.add('is-spanish');
+        } else {
+            document.body.classList.add('is-english');
+        }
+    });
+</script>
 </body>
 </html>
