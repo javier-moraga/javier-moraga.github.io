@@ -1316,7 +1316,7 @@
                     tt_title_3: "Leader Telco (10M+ Subs)", tt_desc_3: "Chile’s largest telecommunications company. Leader in 5G infrastructure and digital transformation.", mob_title_3: "Leader Telco", mob_desc_3: "Sim. to Telstra (10M+ Usuarios)",
                     tt_title_4: "Omnichannel Retail", tt_desc_4: "Major direct-response retail company with extensive cross-platform sales operations and logistics data.", mob_title_4: "Omnichannel Retail", mob_desc_4: "Major Direct-Response Firm",
                     tt_title_5: "Largest Airline in S. America", tt_desc_5: "The largest airline group in LatAm. Operates 1,500 daily flights across 26 countries.", mob_title_5: "Airline Leader", mob_desc_5: "Largest in S. America (Sim. Qantas)",
-                    tt_title_6: "Top Tier Private Hospital", tt_desc_6: "One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.", mob_title_6: "Top Tier Hospital", mob_desc_6: "JCI Accredited Leader"
+                    tt_title_6: "Top Tier Private Hospital", tt_desc_6: "One of Latin America's top private hospitals (JCI Accredited). Leader in clinical data processing.", mob_title_6: "Top Tier Hospital", mob_desc_6: "Líder Acreditado JCI"
                 },
                 skills: {
                     title: `Technical <span class="highlight">Stack</span>`,
@@ -1338,7 +1338,7 @@
                     p1: { title: `GenAI Adoption Pipeline — "Amelia" Assistant`, desc: `<strong>Context:</strong> Measuring the impact of "Amelia", an internal GenAI assistant for HR & Operations.<br><strong>Problem:</strong> Disconnected logs (GA4, Backend, Feedback) made it impossible to track true adoption vs. human fallback.<br><strong>Outcome:</strong> Automated Dataform (SQLX) pipeline & Executive Dashboard monitoring adoption by VP and CSAT scores.` },
                     p2: { title: `Enterprise Migration: SAS/Oracle to BigQuery`, desc: `<strong>Context:</strong> Modernizing data infrastructure for <strong>Clínica Alemana</strong>.<br><strong>Challenge:</strong> Migrating 90M+ record tables and complex legacy flows (SAS Enterprise Guide) to Cloud with strict PII governance.<br><strong>Outcome:</strong> Implemented a custom "Data Ingestor" framework on GKE/Airflow, enabling automated quality checks and real-time Looker reporting.` },
                     p3: { title: `Strategic Retention Dashboard & Churn Analysis`, desc: `<strong>Context:</strong> Weekly high-level diagnostic for the CEO and Marketing Dept. Monitoring the "Portability War" and customer churn.<br><strong>Challenge:</strong> Consolidating hybrid sources (BigQuery Models + Manual NPS via email) into a coherent narrative of Retention vs. Competition.<br><strong>Impact:</strong> 360° visibility of Churn (Prepaid/Postpaid) and effectiveness of loyalty campaigns.` },
-                    p4: { title: `Executive KPI Report — Consolidation & Modernisation`, desc: `<strong>Context:</strong> Weekly executive report consolidating <strong>21 data sources</strong> (Finance, Network, Sales) for the Corporate Committee (delivered every Monday 15:00).<br><strong>Problem:</strong> Fragmented Excel/CSV sources, manual consolidation and metric inconsistencies across business areas.<br><strong>Outcome:</strong> Standardised KPI definitions, cross-area validation and a reliable reporting process — plus a modern redesign proposal based on BigQuery + Power BI.` }
+                    p4: { title: `Executive KPI Report — Consolidation & Modernisation`, desc: `<strong>Context:</strong> Weekly executive report consolidating <strong>21 data sources</strong> (Finance, Network, Sales) for the Corporate Committee (delivered every Monday 15:00).<br><strong>Problem:</strong> Fragmented Excel/CSV sources, manual consolidation and metric inconsistencies across business areas.<br><strong>Resultado:</strong> Standardised KPI definitions, cross-area validation and a reliable reporting process — plus a modern redesign proposal based on BigQuery + Power BI.` }
                 },
                 contact: {
                     pill: "Get in Touch",
@@ -1439,8 +1439,9 @@
 
         // --- INICIALIZACIÓN Y DETECCIÓN DE MODO ---
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. Detección de parámetro 'v=global' (Existente)
             const urlParams = new URLSearchParams(window.location.search);
+
+            // 1. Detección de parámetro 'v=global' (Existente)
             if (urlParams.get('v') === 'global') {
                 currentMode = 'global';
                 console.log("Modo Global Detectado");
@@ -1449,7 +1450,49 @@
 
             // 2. Detección de parámetro 'pais=cl' (NUEVO REQUERIMIENTO)
             checkCountryMode();
+
+            // 3. NUEVA LÓGICA: Recuperar idioma al volver
+            // Si la URL trae ?lang=es o ?initialLang=es, forzamos el idioma
+            const returnLang = urlParams.get('lang') || urlParams.get('initialLang');
+            if (returnLang === 'es') {
+                changeLang('es');
+            } else if (urlParams.get('pais') !== 'cl') {
+                // Si NO es Chile, y no hay idioma en URL, aseguramos default (generalmente EN)
+                // Nota: changeLang('en') es default visual, pero asegura que active state links
+                 if (!returnLang) updateProjectLinks(); 
+            }
+            
+            // Si no se llamó a changeLang arriba, necesitamos asegurar que los links se actualicen inicialmente
+            if (!returnLang && urlParams.get('pais') !== 'cl') {
+                 updateProjectLinks();
+            }
         });
+
+        // --- NUEVA FUNCIÓN: ACTUALIZAR LINKS DE PROYECTOS (STATE PERSISTENCE) ---
+        function updateProjectLinks() {
+            // 1. Capturar parámetros actuales de la URL principal (v=global, pais=cl)
+            const currentParams = new URLSearchParams(window.location.search);
+            
+            // 2. Capturar el idioma activo actual del botón
+            const activeLangBtn = document.querySelector('.lang-btn.active');
+            const activeLang = activeLangBtn ? activeLangBtn.id.replace('btn-', '') : 'en';
+            
+            // 3. Asegurar que el idioma viaje en los parámetros
+            currentParams.set('lang', activeLang);
+
+            // 4. Generar el string de consulta (ej: ?v=global&lang=es)
+            const queryString = currentParams.toString();
+
+            // 5. Inyectar estos parámetros en TODOS los botones de proyectos
+            const projectButtons = document.querySelectorAll('.btn-project');
+            
+            projectButtons.forEach(btn => {
+                // Obtenemos la URL base limpia (sin parámetros anteriores si los hubiera)
+                const rawUrl = btn.getAttribute('href').split('?')[0];
+                // Asignamos la nueva URL con estado
+                btn.setAttribute('href', `${rawUrl}?${queryString}`);
+            });
+        }
 
         // Función existente para modo Global
         function applyGlobalMode() {
@@ -1460,6 +1503,7 @@
             if (whyCountry) whyCountry.style.display = 'none';
 
             updateTextContent('en');
+            updateProjectLinks(); // <--- CRITICO: Actualiza links al activar modo global
         }
 
        // --- NUEVA FUNCIÓN: MODO CHILE (checkCountryMode) ACTUALIZADA ---
@@ -1469,7 +1513,8 @@
         
             if (pais === 'cl') {
                 console.log("🇨🇱 Modo Chile detectado: Simplificando interfaz...");
-        
+                currentMode = 'cl'; // Set local tracking var
+
                 // 1. FORZAR IDIOMA Y OCULTAR SELECTOR
                 if (typeof changeLang === 'function') {
                     changeLang('es'); 
@@ -1521,6 +1566,8 @@
                 if (footerLocation) {
                     footerLocation.innerHTML = "Santiago, Chile"; 
                 }
+                
+                updateProjectLinks(); // <--- CRITICO: Actualiza links al activar modo Chile
             }
         }
 
@@ -1529,6 +1576,8 @@
             document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('btn-' + lang).classList.add('active');
             updateTextContent(lang);
+            
+            updateProjectLinks(); // <--- CRITICO: Actualiza links al cambiar idioma manual
         }
 
         function updateTextContent(lang) {
@@ -1559,6 +1608,9 @@
             const heroText = document.getElementById('hero-availability-text');
             if(currentMode === 'global') {
                 heroText.innerHTML = t.hero.desc_global;
+            } else if (currentMode === 'cl') {
+                 // Chile usa la descripción global en español pero ya manejamos el idioma
+                 heroText.innerHTML = t.hero.desc_global; 
             } else {
                 heroText.innerHTML = t.hero.desc_aus;
             }
@@ -1567,7 +1619,7 @@
             const timeText = document.getElementById('hero-timezone-text');
             if(currentMode === 'global') {
                 timeText.innerHTML = t.hero.timezone_global;
-            } else {
+            } else if (currentMode !== 'cl') {
                 timeText.innerHTML = t.hero.timezone_aus;
             }
 
@@ -1587,8 +1639,11 @@
                     cvBtn.setAttribute('download', globalNameEn);
                     cvBtn.textContent = "Download CV (Global)";
                 }
+            } else if (currentMode === 'cl') {
+                 // MODO CHILE ya lo maneja checkCountryMode, solo aseguramos texto
+                 cvBtn.textContent = "Descargar CV";
             } else {
-                // MODOS AUS / CL: Solo cambiamos el texto
+                // MODO AUS
                 cvBtn.textContent = lang === 'es' ? "Descargar CV" : "Download CV";
             }
 
@@ -1629,7 +1684,7 @@
             document.getElementById('about-intro').textContent = t.about.intro;
             
             const whyAus = document.getElementById('about-why-country');
-            if(whyAus) whyAus.innerHTML = t.about.why_country;
+            if(whyAus && currentMode !== 'cl') whyAus.innerHTML = t.about.why_country;
 
             document.getElementById('about-value-title').innerHTML = t.about.val_title;
             document.getElementById('about-value-list').innerHTML = t.about.val_list;
