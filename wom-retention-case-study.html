@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOM Chile · Retention Analytics — Javier Moraga</title>
+    <meta name="description" content="Case study: Churn & Retention analytics platform for WOM Chile 2022. BAM mobile + Fiber home. A/B campaign test: 8.9% → 4.1% churn. Cohort heatmaps, traffic-to-churn correlation, geographic breakdown.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+
+    <style>
+:root {
+    --bg:           #050505;
+    --bg2:          #08080c;
+    --surface:      rgba(12,12,16,0.65);
+    --border:       rgba(255,255,255,0.05);
+    --border-hi:    rgba(255,255,255,0.12);
+    --border-glass: rgba(255,255,255,0.08);
+    --text:         rgba(255,255,255,0.92);
+    --muted:        #94a3b8;
+    --dim:          rgba(255,255,255,0.22);
+    --c-eng:        #00e5ff;
+    --c-viz:        #d500f9;
+    --c-biz:        #fbbf24;
+    --c-ok:         #22d3a6;
+    --c-red:        #f43f5e;
+    --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body:    'Inter', sans-serif;
+    --font-disp:    'Jost', sans-serif;
+    --font-mono:    'Fira Code', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+body {
+    background: var(--bg);
+    background-image: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(34,211,166,0.04), transparent 55%);
+    color: var(--text); font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased; line-height: 1.6;
+    padding-top: 64px; overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+* { scrollbar-width: thin; scrollbar-color: rgba(34,211,166,0.2) transparent; }
+*::-webkit-scrollbar { width: 5px; height: 5px; }
+*::-webkit-scrollbar-thumb { background: rgba(34,211,166,0.2); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(34,211,166,0.4); }
+
+/* ── NAV ───────────────────────────────────────────────────── */
+.nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    height: 64px; padding: 0 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(5,5,5,0.88); backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+}
+.back-link { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 7px 14px 7px 12px; border-radius: 100px; display: inline-flex; align-items: center; gap: 8px; transition: color 0.25s, border-color 0.25s; }
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s; }
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-ok); opacity: 1; }
+.nav-name { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--border); padding: 7px 16px; border-radius: 100px; }
+.nav-name b { color: var(--c-ok); margin-left: 10px; font-weight: 500; }
+.lang-switch { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 100px; }
+.lang-opt { background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); padding: 5px 10px; border-radius: 100px; transition: color 0.25s, background 0.25s; }
+.lang-opt.is-active { color: var(--c-ok); background: rgba(34,211,166,0.08); }
+.lang-sep { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); }
+
+/* ── HERO ──────────────────────────────────────────────────── */
+header {
+    padding: 72px 24px 56px; text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(34,211,166,0.05), transparent 60%);
+}
+.hero-badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 18px; background: rgba(34,211,166,0.04); border: 1px solid rgba(34,211,166,0.28); border-radius: 100px; color: var(--c-ok); font-family: var(--font-mono); font-size: 0.65rem; font-weight: 500; margin-bottom: 28px; letter-spacing: 0.18em; text-transform: uppercase; }
+.hero-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--c-ok); box-shadow: 0 0 10px var(--c-ok); animation: dotPulse 2.5s infinite ease-in-out; }
+@keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.5} }
+h1.hero-title { font-family: var(--font-disp); font-weight: 400; font-size: clamp(2rem, 4.8vw, 3.6rem); line-height: 1.05; letter-spacing: -0.03em; text-transform: uppercase; background: linear-gradient(135deg, #fff 10%, #d0d5dd 40%, #5c626e 70%, #121417 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 12px 30px rgba(0,0,0,0.6)); margin: 0 0 22px; }
+.text-accent { background: linear-gradient(90deg, #fff 10%, var(--c-ok) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: none; }
+.lead { font-weight: 300; color: rgba(255,255,255,0.52); max-width: 700px; margin: 0 auto 36px; font-size: clamp(0.92rem,1.4vw,1.05rem); line-height: 1.7; }
+
+.hero-kpis { display: grid; grid-template-columns: repeat(4,1fr); max-width: 940px; margin: 0 auto; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(5,5,5,0.5); backdrop-filter: blur(10px); }
+.hero-kpi { padding: 24px 16px; border-right: 1px solid var(--border); text-align: center; position: relative; overflow: hidden; transition: background 0.4s; }
+.hero-kpi:last-child { border-right: none; }
+.hero-kpi::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background: var(--kc,var(--c-ok)); box-shadow: 0 0 12px var(--kc,var(--c-ok)); opacity:0; transition: opacity 0.4s; }
+.hero-kpi:hover::after { opacity: 0.8; }
+.kpi-value { font-family: var(--font-disp); font-weight: 400; font-size: clamp(1.3rem,2.4vw,1.9rem); line-height:1; background: linear-gradient(180deg,#fff,#94a3b8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; display:block; margin-bottom:10px; letter-spacing:-0.01em; }
+.kpi-value b { background: linear-gradient(180deg,#fff,var(--c-ok)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; font-weight:400; }
+.kpi-label { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+.hero-meta { margin: 26px auto 0; padding-top: 20px; border-top: 1px solid var(--border); max-width: 940px; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted); line-height: 1.8; }
+.hero-meta b { color: var(--c-ok); font-weight: 500; }
+.stack-strip { max-width: 940px; margin: 22px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.stack-pill { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text); background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; transition: all 0.3s; }
+.stack-pill.hi { border-color: rgba(34,211,166,0.3); color: var(--c-ok); background: rgba(34,211,166,0.04); }
+.stack-pill:hover { border-color: rgba(34,211,166,0.4); color: var(--c-ok); background: rgba(34,211,166,0.04); }
+
+/* ── LAYOUT ────────────────────────────────────────────────── */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+section { padding: 60px 0; }
+.card { background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 6px; padding: 44px; margin-bottom: 28px; position: relative; box-shadow: 0 24px 60px rgba(0,0,0,0.35); }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg,transparent,var(--c-ok),transparent); opacity:0.4; border-radius:6px 6px 0 0; }
+.eyebrow { display:inline-flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:0.65rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--c-ok); margin-bottom:16px; }
+.eyebrow::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--c-ok); box-shadow: 0 0 10px var(--c-ok); flex-shrink:0; }
+.section-title { font-family:var(--font-disp); font-size:clamp(1.5rem,2.7vw,2.1rem); font-weight:300; line-height:1.18; letter-spacing:-0.022em; color:var(--text); margin-bottom:22px; }
+.section-title b { color:var(--c-ok); font-weight:400; }
+.narrative { font-size:0.95rem; color:var(--muted); line-height:1.75; font-weight:300; max-width:780px; }
+.narrative p + p { margin-top:14px; }
+.narrative strong { color:var(--text); font-weight:500; }
+.narrative em { color:var(--c-ok); font-style:normal; font-weight:400; }
+.narrative code { font-family:var(--font-mono); font-size:0.78em; color:var(--c-eng); background:rgba(0,229,255,0.06); padding:1px 6px; border-radius:3px; }
+
+/* ── PRODUCT TABS ──────────────────────────────────────────── */
+.tab-strip { display:flex; gap:4px; margin-bottom:32px; border-bottom:1px solid var(--border); }
+.tab-btn { background:none; border:none; cursor:pointer; font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); padding:10px 18px; border-bottom:2px solid transparent; transition:color 0.25s,border-color 0.25s; position:relative; top:1px; }
+.tab-btn.is-active { color:var(--c-ok); border-bottom-color:var(--c-ok); }
+.tab-btn:hover:not(.is-active) { color:var(--text); }
+.tab-pane { display:none; }
+.tab-pane.is-active { display:block; }
+
+/* ── CHART WRAPPER ─────────────────────────────────────────── */
+.chart-wrap { margin-bottom:36px; padding-bottom:36px; border-bottom:1px solid var(--border); }
+.chart-wrap:last-child { border-bottom:none; padding-bottom:0; margin-bottom:0; }
+.chart-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; flex-wrap:wrap; gap:12px; }
+.chart-title { font-family:var(--font-disp); font-size:1.05rem; color:var(--text); font-weight:400; }
+.chart-sub { font-family:var(--font-mono); font-size:0.65rem; color:var(--dim); letter-spacing:0.06em; }
+
+/* ── A/B TEST CALLOUT ──────────────────────────────────────── */
+.ab-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:center; margin:24px 0 8px; }
+.ab-card { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:6px; padding:22px; text-align:center; }
+.ab-card.is-control { border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.03); }
+.ab-card.is-winner { border-color:rgba(34,211,166,0.3); background:rgba(34,211,166,0.03); }
+.ab-tag { font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:8px; }
+.ab-card.is-control .ab-tag { color:var(--c-red); }
+.ab-card.is-winner .ab-tag { color:var(--c-ok); }
+.ab-rate { font-family:var(--font-disp); font-size:2.4rem; font-weight:300; letter-spacing:-0.02em; color:var(--text); line-height:1; margin-bottom:8px; }
+.ab-card.is-control .ab-rate { color:var(--c-red); }
+.ab-card.is-winner .ab-rate { color:var(--c-ok); }
+.ab-desc { font-size:0.78rem; color:var(--muted); line-height:1.5; font-weight:300; }
+.ab-arrow { font-size:1.4rem; color:var(--c-ok); text-align:center; font-weight:bold; opacity:0.7; }
+.ab-variants { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px; }
+.ab-var { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:4px; padding:12px; text-align:center; }
+.ab-var-size { font-family:var(--font-mono); font-size:0.68rem; color:var(--c-ok); margin-bottom:4px; }
+.ab-var-rate { font-family:var(--font-disp); font-size:1.3rem; font-weight:300; color:var(--text); }
+
+/* ── COHORT HEATMAP (CSS) ──────────────────────────────────── */
+.cohort-grid { display:grid; grid-template-columns: 70px repeat(6,1fr); gap:2px; margin:18px 0 8px; font-family:var(--font-mono); font-size:0.6rem; }
+.cohort-cell { padding:8px 4px; text-align:center; border-radius:3px; }
+.cohort-label { color:var(--muted); display:flex; align-items:center; font-size:0.58rem; }
+.cohort-header { color:var(--dim); text-transform:uppercase; letter-spacing:0.12em; padding:6px 4px; display:flex; align-items:center; justify-content:center; }
+.h-ok   { background:rgba(34,211,166,0.08);  color:var(--c-ok); }
+.h-low  { background:rgba(34,211,166,0.15);  color:var(--c-ok); }
+.h-mid  { background:rgba(251,191,36,0.12);  color:var(--c-biz); }
+.h-high { background:rgba(244,63,94,0.12);   color:var(--c-red); }
+.h-v-high { background:rgba(244,63,94,0.22); color:var(--c-red); font-weight:500; }
+
+/* ── BAR CHARTS (CSS) ──────────────────────────────────────── */
+.bar-chart { display:flex; flex-direction:column; gap:10px; }
+.bar-row { display:flex; align-items:center; gap:12px; }
+.bar-label { font-family:var(--font-mono); font-size:0.66rem; color:var(--muted); width:140px; flex-shrink:0; text-align:right; }
+.bar-track { flex:1; background:rgba(255,255,255,0.04); border-radius:100px; height:24px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:100px; display:flex; align-items:center; padding:0 10px; font-family:var(--font-mono); font-size:0.64rem; color:#fff; font-weight:500; animation: barGrow 1.1s var(--ease) both; }
+.bar-fill.c-ok  { background:linear-gradient(90deg,rgba(34,211,166,0.85),rgba(34,211,166,0.5)); }
+.bar-fill.c-red { background:linear-gradient(90deg,rgba(244,63,94,0.85),rgba(244,63,94,0.5)); }
+.bar-fill.c-biz { background:linear-gradient(90deg,rgba(251,191,36,0.85),rgba(251,191,36,0.5)); }
+.bar-fill.c-eng { background:linear-gradient(90deg,rgba(0,229,255,0.85),rgba(0,229,255,0.5)); }
+.bar-fill.c-viz { background:linear-gradient(90deg,rgba(213,0,249,0.85),rgba(213,0,249,0.5)); }
+@keyframes barGrow { from{width:0!important;opacity:0} to{opacity:1} }
+
+/* ── MICRO METRIC CARDS ────────────────────────────────────── */
+.micro-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0 8px; }
+.micro-card { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:6px; padding:20px; }
+.micro-label { font-family:var(--font-mono); font-size:0.6rem; font-weight:500; color:var(--c-ok); text-transform:uppercase; letter-spacing:0.16em; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+.micro-num { font-family:var(--font-disp); font-size:1.65rem; font-weight:300; letter-spacing:-0.015em; margin-bottom:4px; }
+.micro-sub { font-size:0.76rem; color:var(--muted); font-weight:300; line-height:1.5; }
+
+/* ── COMPARE BLOCK ─────────────────────────────────────────── */
+.compare-block { display:grid; grid-template-columns:1fr auto 1fr; gap:18px; align-items:stretch; margin:24px 0 4px; }
+.compare-side { background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:6px; padding:18px 20px; }
+.compare-side.is-after { border-color:rgba(34,211,166,0.25); background:rgba(34,211,166,0.03); }
+.compare-tag { font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim); margin-bottom:10px; display:block; }
+.compare-side.is-after .compare-tag { color:var(--c-ok); }
+.compare-text { font-size:0.9rem; color:var(--muted); line-height:1.6; font-weight:300; }
+.compare-arrow { color:var(--c-ok); font-size:1.1rem; display:flex; align-items:center; justify-content:center; opacity:0.7; }
+
+/* ── INSIGHT ───────────────────────────────────────────────── */
+.insight { display:flex; gap:12px; margin-top:16px; padding:14px 16px; background:rgba(34,211,166,0.03); border:1px solid rgba(34,211,166,0.14); border-radius:4px; }
+.insight-icon { color:var(--c-ok); font-size:0.85rem; flex-shrink:0; padding-top:2px; }
+.insight-text { font-size:0.84rem; color:var(--text); line-height:1.6; font-weight:300; }
+.insight-text b { color:var(--c-ok); font-weight:500; }
+.insight.is-warn { background:rgba(244,63,94,0.03); border-color:rgba(244,63,94,0.14); }
+.insight.is-warn .insight-icon { color:var(--c-red); }
+.insight.is-warn .insight-text b { color:var(--c-red); }
+
+/* ── DECISIONS ─────────────────────────────────────────────── */
+.twocol { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:22px; }
+.twocol-block h4 { font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--c-eng); margin-bottom:18px; display:flex; align-items:center; gap:10px; font-weight:500; }
+.twocol-block.is-fail h4 { color:var(--c-ok); }
+.twocol-list { display:flex; flex-direction:column; gap:14px; }
+.twocol-list li { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-left:2px solid var(--c-eng); border-radius:4px; padding:16px 18px; font-size:0.88rem; color:var(--muted); line-height:1.6; font-weight:300; }
+.twocol-block.is-fail .twocol-list li { border-left-color:var(--c-ok); }
+.twocol-list li b { display:block; font-family:var(--font-disp); font-size:0.98rem; color:var(--text); font-weight:500; margin-bottom:5px; }
+
+
+/* ── FUNNEL ─────────────────────────────────────────────────── */
+.funnel-steps { display:flex; gap:0; margin:24px 0 8px; align-items:flex-start; }
+.funnel-step { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; padding:0 6px; }
+.funnel-step:not(:last-child)::after { content:'→'; position:absolute; right:-10px; top:16px; color:var(--dim); font-size:0.9rem; }
+.funnel-num { font-family:var(--font-disp); font-size:clamp(1.1rem,1.8vw,1.5rem); font-weight:300; letter-spacing:-0.02em; color:var(--text); white-space:nowrap; }
+.funnel-num b { color:var(--c-ok); font-weight:400; }
+.funnel-num.warn { color:var(--c-red); }
+.funnel-pct { font-family:var(--font-mono); font-size:0.6rem; color:var(--dim); letter-spacing:0.06em; margin-top:3px; }
+.funnel-label { font-family:var(--font-mono); font-size:0.56rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-top:7px; text-align:center; line-height:1.4; }
+
+/* ── MODEL FAIL/WIN ────────────────────────────────────────── */
+.model-fail { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0 8px; }
+.model-card { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:6px; padding:20px; }
+.model-card.is-fail { border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.03); }
+.model-card.is-ok   { border-color:rgba(34,211,166,0.3); background:rgba(34,211,166,0.03); }
+.model-card-tag { font-family:var(--font-mono); font-size:0.6rem; letter-spacing:0.16em; text-transform:uppercase; margin-bottom:10px; display:block; color:var(--muted); }
+.model-card.is-fail .model-card-tag { color:var(--c-red); }
+.model-card.is-ok   .model-card-tag { color:var(--c-ok); }
+.model-big { font-family:var(--font-disp); font-size:2rem; font-weight:300; letter-spacing:-0.02em; margin-bottom:6px; }
+.model-card.is-fail .model-big { color:var(--c-red); }
+.model-card.is-ok   .model-big { color:var(--c-ok); }
+.model-sub { font-size:0.78rem; color:var(--muted); font-weight:300; line-height:1.55; }
+
+/* ── COMPETITIVE PORTOUT ───────────────────────────────────── */
+.competitive-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:20px 0 8px; }
+.comp-card { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:6px; padding:16px 18px; }
+.comp-name { font-family:var(--font-mono); font-size:0.72rem; color:var(--c-eng); margin-bottom:12px; letter-spacing:0.04em; }
+.comp-stat { margin-bottom:8px; }
+.comp-stat-label { font-size:0.72rem; color:var(--muted); font-weight:300; }
+.comp-stat-val { font-family:var(--font-disp); font-size:1.25rem; font-weight:300; letter-spacing:-0.01em; }
+.comp-stat-val.bad  { color:var(--c-red); }
+.comp-stat-val.good { color:var(--c-ok); }
+
+/* ── SHAREOUT CALLOUT ──────────────────────────────────────── */
+.shareout-row { display:flex; align-items:center; gap:20px; padding:20px 22px; background:rgba(34,211,166,0.03); border:1px solid rgba(34,211,166,0.2); border-radius:6px; margin:20px 0 8px; }
+.shareout-num { font-family:var(--font-disp); font-size:2.4rem; font-weight:300; color:var(--c-ok); letter-spacing:-0.02em; flex-shrink:0; }
+.shareout-desc { font-size:0.88rem; color:var(--muted); font-weight:300; line-height:1.6; }
+.shareout-desc b { color:var(--text); font-weight:500; }
+
+/* ── CLOSING ───────────────────────────────────────────────── */
+.closing-take { max-width:820px; margin:56px auto 36px; padding:36px 38px; text-align:center; border-top:1px solid var(--border); border-bottom:1px solid var(--border); font-family:var(--font-disp); font-size:clamp(1.1rem,1.9vw,1.5rem); font-weight:300; line-height:1.45; color:rgba(255,255,255,0.82); letter-spacing:-0.005em; }
+.closing-take b { color:var(--c-ok); font-weight:400; }
+.closing-author { display:block; margin-top:14px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim); }
+.contact-section { text-align:center; margin:30px 0 80px; padding-top:36px; border-top:1px solid var(--border); }
+.contact-text { color:var(--muted); font-size:0.92rem; margin:0 auto 28px; max-width:580px; line-height:1.65; font-weight:300; }
+.contact-btn { display:inline-flex; align-items:center; gap:10px; padding:13px 28px; border:1px solid rgba(34,211,166,0.4); background:rgba(34,211,166,0.04); color:var(--c-ok); border-radius:3px; font-family:var(--font-mono); font-size:0.7rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; transition:all 0.3s; }
+.contact-btn:hover { background:rgba(34,211,166,0.08); border-color:var(--c-ok); transform:translateY(-2px); box-shadow:0 12px 30px -10px rgba(34,211,166,0.4); }
+
+@media (max-width:768px) {
+    .nav-bar { padding:0 18px; }
+    .nav-name { display:none; }
+    .container { padding:0 18px; }
+    section { padding:40px 0; }
+    .card { padding:26px 20px; }
+    .hero-kpis { grid-template-columns:repeat(2,1fr); }
+    .hero-kpi { border-bottom:1px solid var(--border); padding:18px 12px; }
+    .hero-kpi:nth-child(2) { border-right:none; }
+    .ab-grid,.ab-variants,.compare-block,.twocol,.micro-grid { grid-template-columns:1fr; }
+    .ab-arrow { transform:rotate(90deg); }
+    .bar-label { width:100px; font-size:0.6rem; }
+    .cohort-grid { grid-template-columns:55px repeat(6,1fr); font-size:0.52rem; }
+    .closing-take { padding:28px 20px; }
+}
+    </style>
+</head>
+<body>
+
+<nav class="nav-bar">
+    <a href="../index.html#projects" class="back-link">
+        <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+    </a>
+    <div class="nav-name">Javier Moraga <b>WOM · Retention Analytics</b></div>
+    <div class="lang-switch">
+        <button class="lang-opt is-active" onclick="changeLang('en')" id="btn-en">EN</button>
+        <span class="lang-sep">·</span>
+        <button class="lang-opt" onclick="changeLang('es')" id="btn-es">ES</button>
+    </div>
+</nav>
+
+<header>
+    <div class="container">
+        <span class="hero-badge" id="hero-badge">Case Study · WOM Chile · 2022 · Customer Engagement</span>
+        <h1 class="hero-title" id="hero-title">Churn &amp; Retention<br><span class="text-accent">Analytics</span></h1>
+        <p class="lead" id="hero-lead">
+            A two-year churn intelligence system — from the Dec 2021 CEO executive report through the 2022 weekly dashboards — covering BAM mobile, Fiber home, postpaid, prepaid and business. Cohort analysis, competitive portout intelligence, retention funnel, A/B campaigns, and a churn prediction model that generated zero retentions and taught the team exactly why behavioral signals beat propensity scores.
+        </p>
+        <div class="hero-kpis">
+            <div class="hero-kpi" style="--kc:var(--c-red)">
+                <span class="kpi-value"><b>8.9%</b> → <b style="background:linear-gradient(180deg,#fff,var(--c-ok));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">4.1%</b></span>
+                <span class="kpi-label" id="kpi-1">Churn · A/B campaign result</span>
+            </div>
+            <div class="hero-kpi" style="--kc:var(--c-ok)">
+                <span class="kpi-value">23<b>K+</b></span>
+                <span class="kpi-label" id="kpi-2">Retentions in 4 weeks (W44–47)</span>
+            </div>
+            <div class="hero-kpi" style="--kc:var(--c-biz)">
+                <span class="kpi-value">+2.4<b>pp</b></span>
+                <span class="kpi-label" id="kpi-3">Share out improvement · Nov 2021</span>
+            </div>
+            <div class="hero-kpi" style="--kc:var(--c-eng)">
+                <span class="kpi-value"><b>3</b></span>
+                <span class="kpi-label" id="kpi-4">Segments · Postpaid · Prepaid · Business</span>
+            </div>
+        </div>
+        <p class="hero-meta" id="hero-meta">
+            <span>May – Jul 2022 · Weekly · <b>Customer Engagement</b></span> ·
+            <span>BAM Mobile + WOM Hogar (Fiber)</span> · <span>Role: Analytics Engineer</span>
+        </p>
+        <div class="stack-strip">
+            <span class="stack-pill hi">Netezza SQL</span>
+            <span class="stack-pill hi">DWH Datamart</span>
+            <span class="stack-pill hi">Cohort analysis</span>
+            <span class="stack-pill hi">A/B testing</span>
+            <span class="stack-pill">Churn modelling</span>
+            <span class="stack-pill">CAP traffic correlation</span>
+            <span class="stack-pill">Geographic breakdown</span>
+            <span class="stack-pill">Highcharts</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════
+     00 · PRIOR STATE — Dec 2021 GG Report
+════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-0">00 · Prior State · Dec 2021</span>
+    <h2 class="section-title" id="title-0">WOM was <b>outperforming the industry</b> on portout — but the prediction model had zero effectiveness.</h2>
+    <div class="narrative" id="text-0">
+        <p>The December 2021 executive report to the CEO established the baseline from which the 2022 weekly dashboard system was built. Three findings shaped the analytical priorities for the year ahead: a competitive advantage in portout that was being eroded, a retention funnel that exceeded contact effectiveness targets but revealed a critical model failure, and a growing volume of deactivation intents that the team was only partially converting.</p>
+    </div>
+
+    <div style="margin:24px 0 8px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="competitive-label">Portout · WOM vs industry vs competitors · Dec 9, 2021</div>
+    <div class="competitive-grid">
+        <div class="comp-card">
+            <div class="comp-name" id="comp-industry">Industry</div>
+            <div class="comp-stat">
+                <div class="comp-stat-label" id="csl-portout">Portout growth</div>
+                <div class="comp-stat-val bad">+14.4%</div>
+            </div>
+            <div class="comp-stat">
+                <div class="comp-stat-label" id="csl-context">Context</div>
+                <div class="comp-stat-val" style="font-size:0.9rem; color:var(--muted);" id="cv-industry">Market baseline. WOM outperforming.</div>
+            </div>
+        </div>
+        <div class="comp-card">
+            <div class="comp-name" id="comp-wom">WOM total</div>
+            <div class="comp-stat">
+                <div class="comp-stat-label">Portout growth</div>
+                <div class="comp-stat-val good">+8.8%</div>
+            </div>
+            <div class="comp-stat">
+                <div class="comp-stat-label">Prepaid</div>
+                <div class="comp-stat-val good">−10.5%</div>
+            </div>
+        </div>
+        <div class="comp-card">
+            <div class="comp-name" id="comp-entel">Entel (biggest threat)</div>
+            <div class="comp-stat">
+                <div class="comp-stat-label" id="csl-consumer">Consumer portout to Entel</div>
+                <div class="comp-stat-val bad">+38.7%</div>
+            </div>
+            <div class="comp-stat">
+                <div class="comp-stat-label" id="csl-plans">Top plans at risk</div>
+                <div class="comp-stat-val" style="font-size:0.88rem;color:var(--muted);" id="cv-plans">CLP $11K and $13K</div>
+            </div>
+        </div>
+    </div>
+    <div class="insight" style="margin-top:4px;">
+        <i class="fas fa-lightbulb insight-icon"></i>
+        <p class="insight-text" id="insight-0a"><b>WOM's portout was +8.8% vs the industry's +14.4%</b> — already a competitive advantage. But Entel's consumer portout from WOM was growing at +38.7%, disproportionate to its share. This identified Entel as the priority competitor for plan-level retention intelligence, and $11K–$13K as the price band to defend.</p>
+    </div>
+
+    <div style="margin:32px 0 8px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="shareout-label">Retention initiatives impact · Nov 2021</div>
+    <div class="shareout-row">
+        <div class="shareout-num">+2.4pp</div>
+        <div class="shareout-desc" id="shareout-desc"><b>Share out improvement</b> from NPG + blindaje retention initiatives in November 2021. Real share out: 20.6% vs 23.0% baseline without interventions. The initiatives were working — the question was how to scale them and fix what wasn't.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     00b · RETENTION FUNNEL + MODEL FAILURE
+════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-0b">00b · Retention Funnel · Dec 2021</span>
+    <h2 class="section-title" id="title-0b">The NPG funnel converted 74% of contacts — but the <b>churn prediction model generated zero retentions.</b></h2>
+    <div class="narrative" id="text-0b">
+        <p>The retention operation ran across four initiative types in W44–47: NPG (negotiation before portout), bajas (deactivation intents from stores and call center), handset renewals, and a <strong>churn prediction model</strong>. The funnel performance was healthy — until the model results came in. 14,292 clients scored, 2,185 contacted, 0 retentions. Not a targeting problem: the model was surfacing the wrong clients for the retention offer.</p>
+    </div>
+
+    <div style="margin:24px 0 4px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="funnel-label">NPG Consumer funnel · W44–47 2021</div>
+    <div class="funnel-steps">
+        <div class="funnel-step">
+            <div class="funnel-num">92<b>K</b></div>
+            <div class="funnel-pct">trigger base</div>
+            <div class="funnel-label" id="fl-trigger">NPG<br>trigger</div>
+        </div>
+        <div class="funnel-step">
+            <div class="funnel-num">57<b>K</b></div>
+            <div class="funnel-pct">61.8%</div>
+            <div class="funnel-label" id="fl-base">Worked<br>base</div>
+        </div>
+        <div class="funnel-step">
+            <div class="funnel-num">35<b>K</b></div>
+            <div class="funnel-pct">61.7%</div>
+            <div class="funnel-label" id="fl-contacted">Contacted</div>
+        </div>
+        <div class="funnel-step">
+            <div class="funnel-num">26<b>K</b></div>
+            <div class="funnel-pct">74.3%</div>
+            <div class="funnel-label" id="fl-valid">Valid<br>contact</div>
+        </div>
+        <div class="funnel-step">
+            <div class="funnel-num">5<b>.9K</b></div>
+            <div class="funnel-pct" id="fp-effectiveness">17.5% effectiveness</div>
+            <div class="funnel-label" id="fl-ret">Retentions<br>NPG Real</div>
+        </div>
+    </div>
+    <div class="insight" style="margin-bottom:24px;">
+        <i class="fas fa-lightbulb insight-icon"></i>
+        <p class="insight-text" id="funnel-insight"><b>The 74.3% valid contact rate and 17.5% effectiveness both exceeded targets</b> (10% target). But N2+ (second-inquiry) subscribers had 34.8% effectiveness — 2× higher than first-inquiry. This suggested that clients who called twice were more committed to leaving and thus more receptive to an offer. The funnel wasn't the problem. The model was.</p>
+    </div>
+
+    <div style="margin:8px 0 10px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="model-label">Churn prediction model vs manual NPG · same period</div>
+    <div class="model-fail">
+        <div class="model-card is-fail">
+            <span class="model-card-tag" id="mct-model">Churn prediction model</span>
+            <div class="model-big">0</div>
+            <div class="model-sub" id="msub-model">retentions out of 14,292 scored clients. 2,185 contacted. 0 accepted offer. The model identified the correct propensity to leave — but for clients who would not respond to the standard retention offer.</div>
+        </div>
+        <div class="model-card is-ok">
+            <span class="model-card-tag" id="mct-npg">Manual NPG (same weeks)</span>
+            <div class="model-big">5,944</div>
+            <div class="model-sub" id="msub-npg">retentions from 92K-trigger NPG process. 17.5% effectiveness — exceeding the 10% target. The manual process outperformed the model because it targeted clients in the act of porting, not clients predicted to port.</div>
+        </div>
+    </div>
+    <div class="insight is-warn">
+        <i class="fas fa-exclamation-triangle insight-icon"></i>
+        <p class="insight-text" id="model-insight"><b>This is the most important finding in the Dec 2021 report.</b> A churn prediction model with 0% retention rate doesn't mean the model scored wrong — it means the intervention was wrong for that population. Clients predicted to churn in 30–60 days are in a different decision stage than clients who have already called to port. The right intervention for each stage is different. This insight directly shaped how the 2022 weekly dashboards prioritised behavioral signals over modelled propensity scores.</p>
+    </div>
+
+    <div style="margin:28px 0 8px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="segments-label">W44–47 retentions · full cross-segment picture</div>
+    <div class="bar-chart">
+        <div class="bar-row">
+            <div class="bar-label" id="seg-consumer">Consumer (total)</div>
+            <div class="bar-track"><div class="bar-fill c-ok" style="width:100%">20,098</div></div>
+        </div>
+        <div class="bar-row">
+            <div class="bar-label" id="seg-business">Business</div>
+            <div class="bar-track"><div class="bar-fill c-eng" style="width:10%">1,997</div></div>
+        </div>
+        <div class="bar-row">
+            <div class="bar-label" id="seg-prepaid">Prepaid</div>
+            <div class="bar-track"><div class="bar-fill c-biz" style="width:5%">1,004</div></div>
+        </div>
+    </div>
+    <div style="margin:20px 0 8px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="business-label">Business 5–29 lines A/B · Nov 2021</div>
+    <div class="compare-block">
+        <div class="compare-side">
+            <span class="compare-tag" id="b-ctrl-tag">Control group</span>
+            <p class="compare-text" id="b-ctrl-text">−7.57 lines per account (main line). No retention intervention. Business accounts losing lines naturally.</p>
+        </div>
+        <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="compare-side is-after">
+            <span class="compare-tag" id="b-camp-tag">Campaign group</span>
+            <p class="compare-text" id="b-camp-text">−2.65 lines per account. 434 lines retained in November. 65% reduction in line losses vs control — same pattern as the 2022 BAM data campaign but for the Business segment.</p>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     01 · CONTEXT
+════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-1">01 · Context</span>
+    <h2 class="section-title" id="title-1">Churn is <b>measured monthly</b> everywhere. It has to be understood <b>weekly</b> to act.</h2>
+    <div class="narrative" id="text-1">
+        <p>WOM Chile's Customer Engagement team needed more than a monthly churn number. They needed to know <strong>which customers were about to leave, why, and which intervention would stop them</strong> — segmented by product line, plan, tenure cohort, billing cycle and geography. A single monthly rate is a post-mortem. A weekly intelligence system is a prevention tool.</p>
+        <p>This case study covers the analytics infrastructure built in 2022 for two product lines: <em>BAM mobile broadband</em> and <em>WOM Hogar fiber</em>. Each had its own churn drivers, its own early-warning signals, and its own retention levers. The dashboards unified them into a single weekly cadence while preserving the product-specific granularity that made the insights actionable.</p>
+    </div>
+    <div class="compare-block" style="margin-top:26px;">
+        <div class="compare-side">
+            <span class="compare-tag" id="before-tag">Before</span>
+            <p class="compare-text" id="before-text">Monthly churn rate by product. No cohort view, no traffic correlation, no geographic segmentation. Retention decisions made reactively after subscribers had already left.</p>
+        </div>
+        <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="compare-side is-after">
+            <span class="compare-tag" id="after-tag">After</span>
+            <p class="compare-text" id="after-text">Weekly dashboards with daily churn tracking, cohort heatmaps, CAP-exhaustion-to-churn correlation, geographic breakdown, live A/B campaign performance, and actionable retention proposals with estimated impact in pp.</p>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     02 · THE DASHBOARDS
+════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-2">02 · The Two Product Lines</span>
+    <h2 class="section-title" id="title-2">BAM mobile and Fiber home. <b>Same methodology, different churn drivers.</b></h2>
+
+    <div class="tab-strip">
+        <button class="tab-btn is-active" onclick="switchTab('bam')" id="tab-bam-btn">📡 BAM Mobile</button>
+        <button class="tab-btn" onclick="switchTab('fiber')" id="tab-fiber-btn">🏠 WOM Hogar · Fiber</button>
+    </div>
+
+    <!-- BAM PANE -->
+    <div class="tab-pane is-active" id="pane-bam">
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="bam-chart-1-title">Monthly churn evolution · BAM consumer</div>
+                <span class="chart-sub" id="bam-chart-1-sub">Jul20 – May22 · % monthly churn</span>
+            </div>
+            <div id="chart-churn-evo" style="height:280px;"></div>
+            <div class="insight">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="bam-insight-1"><b>The pandemic effect is visible in the cohort data.</b> High churn in 2020 (peak 7.2% Jun-Oct 2020) reflected subscriber activations during lockdown that lapsed as mobility returned. By May 2022 the pattern had stabilised — but the mix had shifted: 54% of churn was now concentrated in subscribers with 0–9 months tenure, a signal that early-life retention was the priority lever.</p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="bam-chart-2-title">Churn by type composition · May 2022</div>
+                <span class="chart-sub" id="bam-chart-2-sub">voluntary · portout · arrears · fraud</span>
+            </div>
+            <div class="bar-chart">
+                <div class="bar-row">
+                    <div class="bar-label" id="bl-vol">Voluntary</div>
+                    <div class="bar-track"><div class="bar-fill c-red" style="width:52%">~52%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="bl-portout">Portout</div>
+                    <div class="bar-track"><div class="bar-fill c-biz" style="width:28%">~28%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="bl-mora">Arrears (mora)</div>
+                    <div class="bar-track"><div class="bar-fill c-viz" style="width:15%">~15%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="bl-fraud">Fraud / NA</div>
+                    <div class="bar-track"><div class="bar-fill c-ok" style="width:5%">~5%</div></div>
+                </div>
+            </div>
+            <div class="insight">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="bam-insight-2"><b>Portout and voluntary together represent 80%+ of churn — both are preventable.</b> Arrears churn is a different problem (credit risk, not product fit). Separating these in the dashboard meant the retention and collections teams worked off different queues with different logic.</p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="bam-chart-3-title">CAP exhaustion rate over time · % subscribers hitting 100% of data cap</div>
+                <span class="chart-sub" id="bam-chart-3-sub">Mar21 – Mar22 · avg ~18%</span>
+            </div>
+            <div id="chart-cap" style="height:260px;"></div>
+            <div class="insight">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="bam-insight-3"><b>18% of the subscriber base hits their data cap every month.</b> Of those, 70% are on the three highest-cap plans (100 GB, 150 GB, 200 GB) — which are also the three most deviated plans in churn rate. The subscribers most likely to churn voluntarily were also the ones running out of data. That's the retention lever: give them more data before they decide to leave.</p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="bam-chart-4-title">Traffic → churn correlation · subscribers with 100% CAP use before churn</div>
+                <span class="chart-sub" id="bam-chart-4-sub">~2,400–3,300 churn events/month · CAP distribution at churn moment</span>
+            </div>
+            <div class="micro-grid">
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-1-label">CAP exhausters who churn</div>
+                    <div class="micro-num" style="color:var(--c-red)">~18%</div>
+                    <div class="micro-sub" id="mc-1-sub">of voluntary churn came from subscribers who had used 100% of their data cap in the prior period</div>
+                </div>
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-2-label">Repeat exhausters</div>
+                    <div class="micro-num" style="color:var(--c-biz)">35%</div>
+                    <div class="micro-sub" id="mc-2-sub">of churned CAP exhausters had hit 100% in more than one of their last 5 billing cycles — systematic, not accidental</div>
+                </div>
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-3-label">Zero-traffic churn signal</div>
+                    <div class="micro-num" style="color:var(--c-ok)">14%</div>
+                    <div class="micro-sub" id="mc-3-sub">of subscribers with zero data traffic in one month churned in the next month — disengagement as early warning</div>
+                </div>
+            </div>
+            <div class="insight is-warn">
+                <i class="fas fa-exclamation-triangle insight-icon"></i>
+                <p class="insight-text" id="bam-insight-4"><b>Two opposing churn signals, both actionable:</b> subscribers who use ALL their data (frustrated, need more) and subscribers who use NONE (disengaged, need reactivation). A single retention campaign can't address both — the dashboard surfaced both queues separately.</p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="bam-chart-5-title">Tenure cohort · churn concentration</div>
+                <span class="chart-sub" id="bam-chart-5-sub">months since activation vs churn rate</span>
+            </div>
+            <div class="cohort-grid">
+                <div class="cohort-header"></div>
+                <div class="cohort-header" id="ch-vol">Vol.</div>
+                <div class="cohort-header" id="ch-port">Port.</div>
+                <div class="cohort-header" id="ch-n3">N3</div>
+                <div class="cohort-header" id="ch-n6">N6</div>
+                <div class="cohort-header" id="ch-n12">N12</div>
+                <div class="cohort-header" id="ch-trend">Trend</div>
+
+                <div class="cohort-label" id="cl-0-3">[0–3 mo]</div>
+                <div class="cohort-cell h-v-high">17%</div>
+                <div class="cohort-cell h-high">10%</div>
+                <div class="cohort-cell h-v-high">25%</div>
+                <div class="cohort-cell h-high">15%</div>
+                <div class="cohort-cell h-mid">8%</div>
+                <div class="cohort-cell h-v-high" title="">↑↑</div>
+
+                <div class="cohort-label" id="cl-4-6">[4–6 mo]</div>
+                <div class="cohort-cell h-high">13%</div>
+                <div class="cohort-cell h-mid">8%</div>
+                <div class="cohort-cell h-high">18%</div>
+                <div class="cohort-cell h-mid">11%</div>
+                <div class="cohort-cell h-low">6%</div>
+                <div class="cohort-cell h-high">↑</div>
+
+                <div class="cohort-label" id="cl-7-12">[7–12 mo]</div>
+                <div class="cohort-cell h-mid">9%</div>
+                <div class="cohort-cell h-mid">7%</div>
+                <div class="cohort-cell h-mid">12%</div>
+                <div class="cohort-cell h-low">7%</div>
+                <div class="cohort-cell h-low">4%</div>
+                <div class="cohort-cell h-mid">→</div>
+
+                <div class="cohort-label" id="cl-25p">[25+ mo]</div>
+                <div class="cohort-cell h-high">14%</div>
+                <div class="cohort-cell h-mid">9%</div>
+                <div class="cohort-cell h-high">19%</div>
+                <div class="cohort-cell h-mid">12%</div>
+                <div class="cohort-cell h-low">5%</div>
+                <div class="cohort-cell h-high">↑</div>
+            </div>
+            <div class="insight">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="bam-insight-5"><b>Early-life churn (0–3 months) and long-tenure churn (25+ months) peak simultaneously</b> — two different problems. New subscribers who didn't find product-market fit, and long-tenured subscribers who stopped finding value. The middle cohort (7–12 months) is the most stable. Any retention program should prioritise the extremes, not the average.</p>
+            </div>
+        </div>
+
+    </div><!-- /pane-bam -->
+
+    <!-- FIBER PANE -->
+    <div class="tab-pane" id="pane-fiber">
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="fiber-chart-1-title">Churn evolution · Naked vs Bundle · Oct 2021 – Jul 2022</div>
+                <span class="chart-sub" id="fiber-chart-1-sub">Naked = Fiber only · Bundle = Fiber + TV</span>
+            </div>
+            <div id="chart-fiber-evo" style="height:260px;"></div>
+            <div class="insight">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="fiber-insight-1"><b>Bundle customers (Fiber + TV) churn at 2× the rate of Naked customers.</b> At first glance this seems counterintuitive — more services should mean more stickiness. The data suggests the opposite: Bundle customers have higher expectations, more points of failure, and are more likely to compare total cost against competitors. Naked churn (1.33–1.69%) was remarkably stable; Bundle churn (1.73–2.77%) showed much more variance.</p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="fiber-chart-2-title">Voluntary churn Jul22 vs Jun22 · daily tracking</div>
+                <span class="chart-sub" id="fiber-chart-2-sub">−10.60pp at day 24</span>
+            </div>
+            <div class="micro-grid">
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-f1-label">Voluntary churn Δ</div>
+                    <div class="micro-num" style="color:var(--c-ok)">−0.10pp</div>
+                    <div class="micro-sub" id="mc-f1-sub">Jul vs Jun monthly voluntary churn. Improvement driven by early-life retention focus.</div>
+                </div>
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-f2-label">Involuntary churn Δ</div>
+                    <div class="micro-num" style="color:var(--c-red)">+0.14pp</div>
+                    <div class="micro-sub" id="mc-f2-sub">Involuntary churn increased — arrears and non-payment. Different problem, different team.</div>
+                </div>
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-f3-label">Budget deviation</div>
+                    <div class="micro-num" style="color:var(--c-biz)">+0.60pp</div>
+                    <div class="micro-sub" id="mc-f3-sub">Total churn above budget — surfaced weekly so the team could act before month-close.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="fiber-chart-3-title">Early-life churn · "don't need / don't use" reason</div>
+                <span class="chart-sub" id="fiber-chart-3-sub">% declaring 'no lo necesita' by tenure band</span>
+            </div>
+            <div class="bar-chart">
+                <div class="bar-row">
+                    <div class="bar-label" id="fbl-0-1">Month 0–1</div>
+                    <div class="bar-track"><div class="bar-fill c-red" style="width:22%">~22%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="fbl-1-2">Month 1–2</div>
+                    <div class="bar-track"><div class="bar-fill c-red" style="width:18%">~18%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="fbl-2-3">Month 2–3</div>
+                    <div class="bar-track"><div class="bar-fill c-biz" style="width:40%" id="bar-3mo">40% of "don't need" → first 3 months</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="fbl-3-6">Month 3–6</div>
+                    <div class="bar-track"><div class="bar-fill c-ok" style="width:12%">~12%</div></div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label" id="fbl-6p">6+ months</div>
+                    <div class="bar-track"><div class="bar-fill c-eng" style="width:8%">~8%</div></div>
+                </div>
+            </div>
+            <div class="insight is-warn">
+                <i class="fas fa-exclamation-triangle insight-icon"></i>
+                <p class="insight-text" id="fiber-insight-3"><b>40% of "I don't need it" fiber churn happens in the first 3 months.</b> This isn't a pricing problem or a service quality problem — it's an onboarding problem. Subscribers who declare this reason made the wrong purchase decision, often during an aggressive commercial push. The data makes the case for better qualification at point of sale.</p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="fiber-chart-4-title">Geographic churn leaders · voluntary Jul 2022</div>
+                <span class="chart-sub" id="fiber-chart-4-sub">% incidencia técnica vs churn voluntario por comuna</span>
+            </div>
+            <div class="bar-chart">
+                <div class="bar-row"><div class="bar-label">San Ramón</div><div class="bar-track"><div class="bar-fill c-red" style="width:98%">98.25% incidencia</div></div></div>
+                <div class="bar-row"><div class="bar-label">Cerro Navia</div><div class="bar-track"><div class="bar-fill c-red" style="width:84%">84.06%</div></div></div>
+                <div class="bar-row"><div class="bar-label">San Bernardo</div><div class="bar-track"><div class="bar-fill c-biz" style="width:74%">70.59%</div></div></div>
+                <div class="bar-row"><div class="bar-label">Renca</div><div class="bar-track"><div class="bar-fill c-biz" style="width:74%">74.29%</div></div></div>
+                <div class="bar-row"><div class="bar-label">Quilicura</div><div class="bar-track"><div class="bar-fill c-biz" style="width:67%">67.44%</div></div></div>
+                <div class="bar-row"><div class="bar-label">Santiago</div><div class="bar-track"><div class="bar-fill c-ok" style="width:49%">49.19%</div></div></div>
+            </div>
+            <div class="insight">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="fiber-insight-4"><b>San Ramón (98%) and Cerro Navia (84%) show near-total incidence overlap with voluntary churn.</b> When a network incident's incidence rate approaches 100% of the churning population in a zone, the churn is not "voluntary" in the commercial sense — it's a service quality failure. This allowed the infrastructure team to prioritise remediation zones by their predicted churn impact, not just by ticket volume.</p>
+            </div>
+        </div>
+
+    </div><!-- /pane-fiber -->
+
+  </div><!-- /card -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     03 · A/B CAMPAIGN TEST
+════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-3">03 · A/B Campaign · Real Result</span>
+    <h2 class="section-title" id="title-3">Give CAP exhausters more data before they leave. <b>Churn dropped from 8.9% to 4.1%.</b></h2>
+    <div class="narrative" id="text-3">
+        <p>The traffic analysis led to a direct retention proposal: <strong>proactively double the data allowance for subscribers who regularly exhaust their monthly cap.</strong> The target population was ~16,500 lines. Instead of rolling it out immediately, a three-variant A/B test was run across different bag sizes to find the most cost-effective dose.</p>
+    </div>
+
+    <div class="ab-grid" style="margin-top:28px;">
+        <div class="ab-card is-control">
+            <span class="ab-tag" id="ab-control-tag">Control group (no intervention)</span>
+            <div class="ab-rate">8.9%</div>
+            <div class="ab-desc" id="ab-control-desc">CAP exhausters with no additional data bag. Measured over the same period as campaign groups.</div>
+        </div>
+        <div class="ab-arrow">→</div>
+        <div class="ab-card is-winner">
+            <span class="ab-tag" id="ab-winner-tag">Campaign average (3 variants)</span>
+            <div class="ab-rate">4.1%</div>
+            <div class="ab-desc" id="ab-winner-desc">Average churn across all three bag-size variants. Halved churn vs control with a data gift — not a price discount.</div>
+        </div>
+    </div>
+
+    <div style="margin: 20px 0 8px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="ab-variants-label">Campaign variants · bag size vs churn</div>
+    <div class="ab-variants">
+        <div class="ab-var">
+            <div class="ab-var-size">35 GB bag</div>
+            <div class="ab-var-rate">4.4%</div>
+        </div>
+        <div class="ab-var">
+            <div class="ab-var-size">50 GB bag</div>
+            <div class="ab-var-rate">4.5%</div>
+        </div>
+        <div class="ab-var">
+            <div class="ab-var-size">70 GB bag</div>
+            <div class="ab-var-rate" style="color:var(--c-ok)">3.5%</div>
+        </div>
+    </div>
+    <div class="insight" style="margin-top:20px;">
+        <i class="fas fa-lightbulb insight-icon"></i>
+        <p class="insight-text" id="ab-insight"><b>The 70 GB bag was the most effective at 3.5% churn — but the delta from 35 GB (4.4%) to 70 GB (3.5%) is 0.9pp for double the data cost.</b> The retention decision isn't "which bag works?" — it's "what's the cost per prevented churn at each tier?" The A/B result gave the Finance team the elasticity curve they needed to set policy. Estimated impact: <strong>−0.50pp overall monthly churn · ~14,850 subscribers retained out of 16,500 at risk.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     04 · WHAT I OWNED
+════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-4">04 · What I Owned</span>
+    <h2 class="section-title" id="title-4">Building the intelligence layer that <b>turned churn data into retention decisions.</b></h2>
+
+    <div class="twocol">
+        <div class="twocol-block">
+            <h4><i class="fas fa-compass"></i> <span id="dec-head">Decisions I owned</span></h4>
+            <ul class="twocol-list">
+                <li>
+                    <b id="d1-t">Two churn signals, not one.</b>
+                    <span id="d1-d">Surfacing both CAP exhausters (overuse) and zero-traffic subscribers (disengagement) in the same dashboard, as separate queues. They require opposite interventions — give more vs re-engage — and combining them in a single campaign would have reduced effectiveness of both.</span>
+                </li>
+                <li>
+                    <b id="d2-t">Incidence as a churn cause, not a churn correlate.</b>
+                    <span id="d2-d">Joining network incident data to voluntary churn by commune revealed that in zones like San Ramón (98% overlap), "voluntary" churn was actually service-driven. This reclassification changed which team owned the remediation — not retention, but infrastructure.</span>
+                </li>
+                <li>
+                    <b id="d3-t">Daily churn tracking vs monthly reporting.</b>
+                    <span id="d3-d">Comparing the same day-of-month across consecutive months (e.g. "at day 24 of Jul22 vs Jun22") gave the team an early read on monthly outcome 6 days before close. The −4.8pp reading at day 24 meant corrective action could still be taken within the same month.</span>
+                </li>
+                <li>
+                    <b id="d4-t">Cohort heatmap as the primary analytical surface.</b>
+                    <span id="d4-d">A cohort × cause matrix (vintage cohort vs churn type vs n3/n6/n12 rate) made the 2020 pandemic distortion visible as a structural artifact — not a benchmark. Without it, 2020-era cohorts would have contaminated trend analysis with a non-representative base period.</span>
+                </li>
+            </ul>
+        </div>
+        <div class="twocol-block is-fail">
+            <h4><i class="fas fa-bug"></i> <span id="fail-head">Constraints + what I'd change</span></h4>
+            <ul class="twocol-list">
+                <li>
+                    <b id="f1-t">A/B attribution was manual.</b>
+                    <span id="f1-d">Campaign group assignment and outcome measurement required manual SQL joins between the campaign list and the churn events table. An automated holdout framework would have made re-running the test for new target populations a configuration change, not a data engineering task.</span>
+                </li>
+                <li>
+                    <b id="f2-t">Geographic incidence was lag-matched, not real-time.</b>
+                    <span id="f2-d">Network incident data was joined to the prior month's churn, not to concurrent events. Matching incidents to churn events within the same 48-hour window would have increased the signal precision significantly.</span>
+                </li>
+                <li>
+                    <b id="f3-t">No churn probability score — only observed churn.</b>
+                    <span id="f3-d">The dashboard identified subscribers who had already churned and modelled risk from behavioral signals. A propensity model scoring the full active base before churn events would have shifted the intervention from reactive to truly predictive.</span>
+                </li>
+                <li>
+                    <b id="f4-t">Delivery still by PowerPoint.</b>
+                    <span id="f4-d">The weekly output was a PPTX sent to stakeholders. A live dashboard (Looker, Tableau, or even a simple web view) would have allowed self-service drill-down and removed the analyst from the critical path for ad hoc questions.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+  </div>
+</section>
+
+<blockquote class="closing-take">
+    <span id="closing-quote">"A churn rate is a fact. A churn rate with a tenure cohort, a traffic signal, a geographic breakdown and a tested intervention is a decision."</span>
+    <span class="closing-author" id="closing-author">— Working principle from this project</span>
+</blockquote>
+
+<div class="contact-section">
+    <p class="contact-text" id="contact-text">
+        From revenue assurance and fraud detection to A/B campaign analytics and churn intelligence — consistent discipline: instrument before you need it, and make the output actionable.
+    </p>
+    <a href="../index.html#convergence-section" class="contact-btn" id="contact-btn">
+        <i class="fas fa-arrow-right"></i> Contact Javier
+    </a>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('is-active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('is-active'));
+    document.getElementById('pane-'+tab).classList.add('is-active');
+    document.getElementById('tab-'+tab+'-btn').classList.add('is-active');
+    // reflow charts if they are now visible
+    if (tab === 'bam') {
+        if (window.cChurnEvo) cChurnEvo.reflow();
+        if (window.cCap) cCap.reflow();
+    } else if (tab === 'fiber') {
+        if (window.cFiberEvo) cFiberEvo.reflow();
+    }
+}
+
+const T = {
+    en: {
+        navBack:"Back to Portfolio", badge:"Case Study · WOM Chile · 2022 · Customer Engagement",
+        title:"Churn & Retention<br><span class='text-accent'>Analytics</span>",
+        lead:"A two-year churn intelligence system — from the Dec 2021 CEO executive report through the 2022 weekly dashboards — covering BAM mobile, Fiber home, postpaid, prepaid and business. Cohort analysis, competitive portout intelligence, retention funnel, A/B campaigns, and a churn prediction model that generated zero retentions and taught the team exactly why behavioral signals beat propensity scores.",
+        kpi1:"Churn · A/B campaign result", kpi2:"Jul vs Jun churn reduction",
+        kpi3:"Lines at risk (CAP exhausters)", kpi4:"Product lines · weekly cadence",
+        heroMeta:"May – Jul 2022 · Weekly · Customer Engagement · BAM Mobile + WOM Hogar (Fiber) · Role: Analytics Engineer",
+        label1:"01 · Context",
+        title1:"Churn is <b>measured monthly</b> everywhere. It has to be understood <b>weekly</b> to act.",
+        text1:"<p>WOM Chile's Customer Engagement team needed more than a monthly churn number. They needed to know <strong>which customers were about to leave, why, and which intervention would stop them</strong> — segmented by product line, plan, tenure cohort, billing cycle and geography.</p><p>This case study covers the analytics infrastructure built in 2022 for two product lines: <em>BAM mobile broadband</em> and <em>WOM Hogar fiber</em>. Each had its own churn drivers, its own early-warning signals, and its own retention levers.</p>",
+        beforeTag:"Before", afterTag:"After",
+        beforeText:"Monthly churn rate by product. No cohort view, no traffic correlation, no geographic segmentation. Retention decisions made reactively after subscribers had already left.",
+        afterText:"Weekly dashboards with daily churn tracking, cohort heatmaps, CAP-exhaustion-to-churn correlation, geographic breakdown, live A/B campaign performance, and actionable retention proposals with estimated impact in pp.",
+        label2:"02 · The Two Product Lines",
+        title2:"BAM mobile and Fiber home. <b>Same methodology, different churn drivers.</b>",
+        tabBam:"📡 BAM Mobile", tabFiber:"🏠 WOM Hogar · Fiber",
+        bamChart1Title:"Monthly churn evolution · BAM consumer", bamChart1Sub:"Jul20 – May22 · % monthly churn",
+        bamInsight1:"<b>The pandemic effect is visible in the cohort data.</b> High churn in 2020 (peak 7.2%) reflected lockdown activations that lapsed as mobility returned. By May 2022: 54% of churn concentrated in subscribers with 0–9 months tenure — early-life retention was the priority lever.",
+        bamChart2Title:"Churn by type composition · May 2022", bamChart2Sub:"voluntary · portout · arrears · fraud",
+        blVol:"Voluntary", blPortout:"Portout", blMora:"Arrears (mora)", blFraud:"Fraud / NA",
+        bamInsight2:"<b>Portout and voluntary together represent 80%+ of churn — both are preventable.</b> Arrears churn is a credit risk problem, not a product fit problem. Separating them meant retention and collections worked off different queues.",
+        bamChart3Title:"CAP exhaustion rate · % subscribers hitting 100% of data cap", bamChart3Sub:"Mar21 – Mar22 · avg ~18%",
+        bamInsight3:"<b>18% of subscribers hit their data cap monthly.</b> Of those, 70% are on the three highest-cap plans (100 / 150 / 200 GB) — also the three most deviated plans in churn rate. The subscribers most likely to churn were running out of data. Retention lever: give them more data before they decide to leave.",
+        bamChart4Title:"Traffic → churn correlation · subscribers with 100% CAP use before churn", bamChart4Sub:"~2,400–3,300 churn events/month",
+        mc1Label:"CAP exhausters who churn", mc1Sub:"of voluntary churn from subscribers who used 100% of their data cap in the prior period",
+        mc2Label:"Repeat exhausters", mc2Sub:"of churned CAP exhausters hit 100% in more than one of their last 5 billing cycles — systematic, not accidental",
+        mc3Label:"Zero-traffic churn signal", mc3Sub:"of subscribers with zero data traffic in one month churned the next month — disengagement as early warning",
+        bamInsight4:"<b>Two opposing churn signals, both actionable:</b> subscribers who use ALL their data (frustrated, need more) and subscribers who use NONE (disengaged, need reactivation). A single campaign can't address both — the dashboard surfaced them as separate queues.",
+        bamChart5Title:"Tenure cohort · churn concentration", bamChart5Sub:"months since activation vs churn rate",
+        chVol:"Vol.", chPort:"Port.", chN3:"N3", chN6:"N6", chN12:"N12", chTrend:"Trend",
+        cl03:"[0–3 mo]", cl46:"[4–6 mo]", cl712:"[7–12 mo]", cl25p:"[25+ mo]",
+        bamInsight5:"<b>Early-life (0–3 months) and long-tenure (25+ months) churn peak simultaneously</b> — two different problems. New subscribers who didn't find fit, and long-tenured subscribers who stopped finding value. Retention programs should prioritise the extremes, not the average.",
+        fiberChart1Title:"Churn evolution · Naked vs Bundle · Oct 2021 – Jul 2022", fiberChart1Sub:"Naked = Fiber only · Bundle = Fiber + TV",
+        fiberInsight1:"<b>Bundle customers (Fiber + TV) churn at 2× the rate of Naked customers.</b> More services ≠ more stickiness. Bundle churn (1.73–2.77%) showed much more variance than Naked (1.33–1.69%) — higher expectations, more failure points, easier competitor comparison.",
+        fiberChart2Title:"Voluntary churn Jul22 vs Jun22 · daily tracking", fiberChart2Sub:"−10.60pp at day 24",
+        mcF1Label:"Voluntary churn Δ", mcF1Sub:"Jul vs Jun monthly voluntary churn. Improvement from early-life retention focus.",
+        mcF2Label:"Involuntary churn Δ", mcF2Sub:"Involuntary churn increased — arrears and non-payment. Different problem, different team.",
+        mcF3Label:"Budget deviation", mcF3Sub:"Total churn above budget — surfaced weekly so the team could act before month-close.",
+        fiberChart3Title:"Early-life churn · \"don't need / don't use\" reason", fiberChart3Sub:"% declaring 'no lo necesita' by tenure band",
+        fblM01:"Month 0–1", fblM12:"Month 1–2", fblM23:"Month 2–3", fblM36:"Month 3–6", fblM6p:"6+ months",
+        bar3mo:"40% of \"don't need\" → first 3 months",
+        fiberInsight3:"<b>40% of \"I don't need it\" fiber churn happens in the first 3 months.</b> This isn't a pricing or service quality problem — it's an onboarding problem. The data makes the case for better qualification at point of sale.",
+        fiberChart4Title:"Geographic churn leaders · voluntary Jul 2022", fiberChart4Sub:"% technical incidence vs voluntary churn per commune",
+        fiberInsight4:"<b>San Ramón (98%) and Cerro Navia (84%) show near-total incidence overlap with voluntary churn.</b> When incidence approaches 100% of churning population in a zone, the churn is service-quality driven, not commercial. This allowed infrastructure teams to prioritise remediation zones by predicted churn impact.",
+        label0:"00 · Prior State · Dec 2021",
+        title0:"WOM was <b>outperforming the industry</b> on portout — but the prediction model had zero effectiveness.",
+        text0:"<p>The December 2021 executive report to the CEO established the baseline from which the 2022 weekly dashboard system was built. Three findings shaped the analytical priorities for the year ahead: a competitive advantage in portout that was being eroded, a retention funnel that exceeded contact effectiveness targets but revealed a critical model failure, and a growing volume of deactivation intents that the team was only partially converting.</p>",
+        competitiveLabel:"Portout · WOM vs industry vs competitors · Dec 9, 2021",
+        cslPortout:"Portout growth", cslContext:"Context", cvIndustry:"Market baseline. WOM outperforming.",
+        cslConsumer:"Consumer portout to Entel", cslPlans:"Top plans at risk", cvPlans:"CLP $11K and $13K",
+        insight0a:"<b>WOM's portout was +8.8% vs the industry's +14.4%</b> — already a competitive advantage. But Entel's consumer portout from WOM was growing at +38.7%, disproportionate to its share. This identified Entel as the priority competitor for plan-level retention intelligence, and $11K–$13K as the price band to defend.",
+        shareoutLabel:"Retention initiatives impact · Nov 2021",
+        shareoutDesc:"<b>Share out improvement</b> from NPG + blindaje retention initiatives in November 2021. Real share out: 20.6% vs 23.0% baseline without interventions. The initiatives were working — the question was how to scale them and fix what wasn't.",
+        label0b:"00b · Retention Funnel · Dec 2021",
+        title0b:"The NPG funnel converted 74% of contacts — but the <b>churn prediction model generated zero retentions.</b>",
+        text0b:"<p>The retention operation ran across four initiative types in W44–47: NPG (negotiation before portout), bajas (deactivation intents from stores and call center), handset renewals, and a <strong>churn prediction model</strong>. The funnel performance was healthy — until the model results came in. 14,292 clients scored, 2,185 contacted, 0 retentions. Not a targeting problem: the model was surfacing the wrong clients for the retention offer.</p>",
+        funnelLabel:"NPG Consumer funnel · W44–47 2021",
+        flTrigger:"NPG trigger", flBase:"Worked base", flContacted:"Contacted", flValid:"Valid contact", flRet:"Retentions NPG Real",
+        fpEffectiveness:"17.5% effectiveness",
+        funnelInsight:"<b>The 74.3% valid contact rate and 17.5% effectiveness both exceeded targets</b> (10% target). But N2+ (second-inquiry) subscribers had 34.8% effectiveness — 2× higher than first-inquiry. This suggested that clients who called twice were more committed to leaving and thus more receptive to an offer. The funnel wasn't the problem. The model was.",
+        modelLabel:"Churn prediction model vs manual NPG · same period",
+        mctModel:"Churn prediction model", msubModel:"retentions out of 14,292 scored clients. 2,185 contacted. 0 accepted offer. The model identified the correct propensity to leave — but for clients who would not respond to the standard retention offer.",
+        mctNpg:"Manual NPG (same weeks)", msubNpg:"retentions from 92K-trigger NPG process. 17.5% effectiveness — exceeding the 10% target. The manual process outperformed the model because it targeted clients in the act of porting, not clients predicted to port.",
+        modelInsight:"<b>This is the most important finding in the Dec 2021 report.</b> A churn prediction model with 0% retention rate doesn't mean the model scored wrong — it means the intervention was wrong for that population. Clients predicted to churn in 30–60 days are in a different decision stage than clients who have already called to port. The right intervention for each stage is different. This insight directly shaped how the 2022 weekly dashboards prioritised behavioral signals over modelled propensity scores.",
+        segmentsLabel:"W44–47 retentions · full cross-segment picture",
+        segConsumer:"Consumer (total)", segBusiness:"Business", segPrepaid:"Prepaid",
+        businessLabel:"Business 5–29 lines A/B · Nov 2021",
+        bCtrlTag:"Control group", bCtrlText:"−7.57 lines per account (main line). No retention intervention. Business accounts losing lines naturally.",
+        bCampTag:"Campaign group", bCampText:"−2.65 lines per account. 434 lines retained in November. 65% reduction in line losses vs control — same pattern as the 2022 BAM data campaign but for the Business segment.",
+        kpi2:"Retentions in 4 weeks (W44–47)", kpi3:"Share out improvement · Nov 2021", kpi4:"Segments · Postpaid · Prepaid · Business",
+        label3:"03 · A/B Campaign · Real Result",
+        title3:"Give CAP exhausters more data before they leave. <b>Churn dropped from 8.9% to 4.1%.</b>",
+        text3:"<p>The traffic analysis led to a direct retention proposal: <strong>proactively double the data allowance for subscribers who regularly exhaust their monthly cap.</strong> The target population was ~16,500 lines. A three-variant A/B test was run to find the most cost-effective bag size.</p>",
+        abControlTag:"Control group (no intervention)", abControlDesc:"CAP exhausters with no additional data bag. Measured over the same period as campaign groups.",
+        abWinnerTag:"Campaign average (3 variants)", abWinnerDesc:"Average churn across all three bag-size variants. Halved churn vs control with a data gift — not a price discount.",
+        abVariantsLabel:"Campaign variants · bag size vs churn",
+        abInsight:"<b>The 70 GB bag won at 3.5% churn — but the delta from 35 GB (4.4%) to 70 GB (3.5%) is only 0.9pp for double the data cost.</b> The A/B result gave Finance the elasticity curve to set policy. Estimated impact: <strong>−0.50pp overall monthly churn · ~14,850 subscribers retained out of 16,500 at risk.</strong>",
+        label4:"04 · What I Owned",
+        title4:"Building the intelligence layer that <b>turned churn data into retention decisions.</b>",
+        decHead:"Decisions I owned",
+        d1t:"Two churn signals, not one.", d1d:"Surfacing both CAP exhausters (overuse) and zero-traffic subscribers (disengagement) as separate queues. They require opposite interventions — give more vs re-engage — combining them would reduce effectiveness of both.",
+        d2t:"Incidence as a churn cause, not a correlate.", d2d:"Joining network incident data to voluntary churn by commune revealed that in zones like San Ramón (98% overlap), 'voluntary' churn was actually service-driven. This changed which team owned the remediation — not retention, but infrastructure.",
+        d3t:"Daily churn tracking vs monthly reporting.", d3d:"Comparing the same day-of-month across consecutive months gave the team an early read on monthly outcome 6 days before close. The −4.8pp reading at day 24 meant corrective action could still be taken within the same month.",
+        d4t:"Cohort heatmap as the primary analytical surface.", d4d:"A cohort × cause matrix made the 2020 pandemic distortion visible as a structural artifact — not a benchmark. Without it, 2020-era cohorts would have contaminated trend analysis with a non-representative base period.",
+        failHead:"Constraints + what I'd change",
+        f1t:"A/B attribution was manual.", f1d:"Campaign group assignment required manual SQL joins between the campaign list and churn events. An automated holdout framework would have made re-running for new target populations a configuration change, not an engineering task.",
+        f2t:"Geographic incidence was lag-matched, not real-time.", f2d:"Network incident data was joined to the prior month's churn. Matching incidents to churn events within 48 hours would have increased signal precision significantly.",
+        f3t:"No churn probability score — only observed churn.", f3d:"The dashboard identified who had already churned and modelled risk from behavioral signals. A propensity model scoring the full active base before churn events would have shifted intervention from reactive to truly predictive.",
+        f4t:"Delivery by PowerPoint.", f4d:"The weekly output was a PPTX sent to stakeholders. A live dashboard would have allowed self-service drill-down and removed the analyst from the critical path for ad hoc questions.",
+        closingQuote:'"A churn rate is a fact. A churn rate with a tenure cohort, a traffic signal, a geographic breakdown and a tested intervention is a decision."',
+        closingAuthor:"— Working principle from this project",
+        contactText:"From revenue assurance and fraud detection to A/B campaign analytics and churn intelligence — consistent discipline: instrument before you need it, and make the output actionable.",
+        contactBtn:"Contact Javier", queryLabel:"Source"
+    },
+    es: {
+        navBack:"Volver al Portafolio", badge:"Caso de Estudio · WOM Chile · 2022 · Customer Engagement",
+        title:"Analytics de Churn<br><span class='text-accent'>y Retención</span>",
+        lead:"Un sistema de inteligencia de churn de dos años — desde el reporte ejecutivo al GG de diciembre 2021 hasta los dashboards semanales de 2022 — cubriendo BAM móvil, Fibra hogar, postpago, prepago y empresa. Análisis de cohortes, inteligencia competitiva de portabilidad, funnel de retención, campañas A/B, y un modelo predictivo de churn que generó cero retenciones y le enseñó al equipo exactamente por qué las señales de comportamiento superan a los scores de propensión.",
+        kpi1:"Churn · resultado campaña A/B", kpi2:"Reducción churn Jul vs Jun",
+        kpi3:"Líneas en riesgo (agotadores de CAP)", kpi4:"Líneas de producto · cadencia semanal",
+        heroMeta:"May – Jul 2022 · Semanal · Customer Engagement · BAM Móvil + WOM Hogar (Fibra) · Rol: Analytics Engineer",
+        label1:"01 · Contexto",
+        title1:"El churn se <b>mide mensualmente</b> en todas partes. Hay que entenderlo <b>semanalmente</b> para actuar.",
+        text1:"<p>El equipo de Customer Engagement de WOM Chile necesitaba más que un número mensual de churn. Necesitaba saber <strong>qué clientes estaban a punto de irse, por qué, y qué intervención los retendría</strong> — segmentado por producto, plan, cohorte de antigüedad, ciclo de facturación y geografía.</p><p>Este caso cubre la infraestructura analítica construida en 2022 para dos líneas de producto: <em>BAM banda ancha móvil</em> y <em>WOM Hogar fibra</em>. Cada una tenía sus propios drivers de churn, sus propias señales de alerta temprana y sus propias palancas de retención.</p>",
+        beforeTag:"Antes", afterTag:"Después",
+        beforeText:"Tasa de churn mensual por producto. Sin vista de cohortes, sin correlación de tráfico, sin segmentación geográfica. Decisiones de retención tomadas reactivamente después de que los abonados ya se habían ido.",
+        afterText:"Dashboards semanales con tracking diario de churn, heatmaps de cohortes, correlación agotamiento-de-CAP-con-churn, desglose geográfico, performance de campaña A/B en vivo y propuestas de retención accionables con impacto estimado en pp.",
+        label2:"02 · Las Dos Líneas de Producto",
+        title2:"BAM móvil y Fibra hogar. <b>Misma metodología, distintos drivers de churn.</b>",
+        tabBam:"📡 BAM Móvil", tabFiber:"🏠 WOM Hogar · Fibra",
+        bamChart1Title:"Evolución churn mensual · BAM consumidor", bamChart1Sub:"Jul20 – May22 · % churn mensual",
+        bamInsight1:"<b>El efecto pandemia es visible en los datos de cohorte.</b> El alto churn de 2020 (peak 7.2%) reflejaba activaciones durante el lockdown que caducaron cuando se normalizó la movilidad. A mayo 2022: el 54% del churn se concentraba en abonados con 0–9 meses de antigüedad — la retención en etapa temprana era la palanca prioritaria.",
+        bamChart2Title:"Composición del churn por tipo · Mayo 2022", bamChart2Sub:"voluntario · portout · mora · fraude",
+        blVol:"Voluntario", blPortout:"Portout", blMora:"Mora", blFraud:"Fraude / NA",
+        bamInsight2:"<b>Portout y voluntario juntos representan +80% del churn — ambos son prevenibles.</b> El churn por mora es un problema de riesgo crediticio, no de ajuste al producto. Separarlos significó que retención y cobranzas trabajaran con colas distintas.",
+        bamChart3Title:"Tasa de agotamiento de CAP · % abonados usando el 100% de su cuota", bamChart3Sub:"Mar21 – Mar22 · promedio ~18%",
+        bamInsight3:"<b>El 18% de los abonados agota su CAP de datos mensualmente.</b> De ellos, el 70% está en los tres planes de mayor CAP (100 / 150 / 200 GB) — también los tres planes más desviados en tasa de churn. Los abonados con más probabilidad de churnar eran los que se quedaban sin datos. La palanca de retención: darles más datos antes de que decidan irse.",
+        bamChart4Title:"Correlación tráfico → churn · abonados con 100% de uso de CAP previo al churn", bamChart4Sub:"~2.400–3.300 eventos de churn/mes",
+        mc1Label:"Agotadores de CAP que hacen churn", mc1Sub:"del churn voluntario provino de abonados que usaron el 100% de su CAP en el período anterior",
+        mc2Label:"Agotadores reiterados", mc2Sub:"de los agotadores que churnearon habían usado el 100% en más de uno de sus últimos 5 ciclos — sistemático, no accidental",
+        mc3Label:"Señal de churn por cero tráfico", mc3Sub:"de los abonados con cero tráfico de datos un mes churnearon el mes siguiente — desenganche como alerta temprana",
+        bamInsight4:"<b>Dos señales opuestas de churn, ambas accionables:</b> abonados que usan TODO sus datos (frustrados, necesitan más) y abonados que no usan NADA (desenganchados, necesitan reactivación). Una sola campaña no puede atender ambas — el dashboard las expuso como colas separadas.",
+        bamChart5Title:"Cohorte de antigüedad · concentración del churn", bamChart5Sub:"meses desde activación vs tasa de churn",
+        chVol:"Vol.", chPort:"Port.", chN3:"N3", chN6:"N6", chN12:"N12", chTrend:"Tendencia",
+        cl03:"[0–3 m]", cl46:"[4–6 m]", cl712:"[7–12 m]", cl25p:"[25+ m]",
+        bamInsight5:"<b>El churn de etapa temprana (0–3 meses) y el de antigüedad larga (25+ meses) tienen picos simultáneos</b> — dos problemas distintos. Nuevos abonados que no encontraron fit y abonados de larga data que dejaron de encontrar valor. Los programas de retención deben priorizar los extremos, no el promedio.",
+        fiberChart1Title:"Evolución churn · Naked vs Bundle · Oct 2021 – Jul 2022", fiberChart1Sub:"Naked = Solo Fibra · Bundle = Fibra + TV",
+        fiberInsight1:"<b>Los clientes Bundle (Fibra + TV) churnan al doble de la tasa de los Naked.</b> Más servicios ≠ más retención. El churn Bundle (1.73–2.77%) mostró mucha más varianza que Naked (1.33–1.69%) — mayores expectativas, más puntos de fallo, comparación con competidores más fácil.",
+        fiberChart2Title:"Churn voluntario Jul22 vs Jun22 · tracking diario", fiberChart2Sub:"−10.60pp al día 24",
+        mcF1Label:"Δ Churn voluntario", mcF1Sub:"Jul vs Jun churn mensual voluntario. Mejora impulsada por foco en retención temprana.",
+        mcF2Label:"Δ Churn involuntario", mcF2Sub:"El churn involuntario aumentó — mora y no pago. Problema distinto, equipo distinto.",
+        mcF3Label:"Desviación vs Budget", mcF3Sub:"Churn total sobre el presupuesto — expuesto semanalmente para actuar antes del cierre del mes.",
+        fiberChart3Title:"Churn de etapa temprana · razón 'no lo necesita / no lo usa'", fiberChart3Sub:"% que declara 'no lo necesita' por tramo de antigüedad",
+        fblM01:"Mes 0–1", fblM12:"Mes 1–2", fblM23:"Mes 2–3", fblM36:"Mes 3–6", fblM6p:"6+ meses",
+        bar3mo:"40% del 'no lo necesita' → primeros 3 meses",
+        fiberInsight3:"<b>El 40% del churn de fibra por 'no lo necesito' ocurre en los primeros 3 meses.</b> No es un problema de precio ni de calidad de servicio — es un problema de onboarding. Los datos hacen el caso para una mejor calificación en el punto de venta.",
+        fiberChart4Title:"Líderes de churn geográfico · voluntario Jul 2022", fiberChart4Sub:"% incidencia técnica vs churn voluntario por comuna",
+        fiberInsight4:"<b>San Ramón (98%) y Cerro Navia (84%) muestran superposición casi total de incidencia con churn voluntario.</b> Cuando la incidencia se acerca al 100% de la población que churna en una zona, el churn es impulsado por calidad de servicio, no comercial. Esto permitió al equipo de infraestructura priorizar zonas de remediación por impacto de churn previsto.",
+        label0:"00 · Estado Previo · Dic 2021",
+        title0:"WOM <b>superaba a la industria</b> en portabilidad — pero el modelo predictivo generó cero retenciones.",
+        text0:"<p>El reporte ejecutivo de diciembre 2021 para el Gerente General estableció la línea base desde la cual se construyó el sistema semanal de dashboards de 2022. Tres hallazgos definieron las prioridades analíticas del año siguiente: una ventaja competitiva en portout que se estaba erosionando, un funnel de retención que superaba los objetivos de contactabilidad pero revelaba un fallo crítico del modelo, y un volumen creciente de intenciones de baja que el equipo estaba convirtiendo solo parcialmente.</p>",
+        competitiveLabel:"Portabilidad · WOM vs industria vs competidores · 9 Dic 2021",
+        cslPortout:"Crecimiento portout", cslContext:"Contexto", cvIndustry:"Línea base de mercado. WOM supera a la industria.",
+        cslConsumer:"Portout consumidor hacia Entel", cslPlans:"Planes más en riesgo", cvPlans:"Planes CLP $11K y $13K",
+        insight0a:"<b>El portout de WOM fue +8.8% vs el +14.4% de la industria</b> — ya era una ventaja competitiva. Pero el portout de consumidores hacia Entel crecía al +38.7%, desproporcionado a su participación. Esto identificó a Entel como el competidor prioritario para inteligencia de retención por plan, y $11K–$13K como la franja de precio a defender.",
+        shareoutLabel:"Impacto de iniciativas de retención · Nov 2021",
+        shareoutDesc:"<b>Mejora de share out</b> por iniciativas NPG + blindaje en noviembre 2021. Share out real: 20.6% vs 23.0% de línea base sin intervenciones. Las iniciativas funcionaban — la pregunta era cómo escalarlas y corregir lo que no.",
+        label0b:"00b · Funnel de Retención · Dic 2021",
+        title0b:"El funnel NPG convirtió el 74% de los contactos — pero el <b>modelo predictivo de churn generó cero retenciones.</b>",
+        text0b:"<p>La operación de retención se ejecutó sobre cuatro tipos de iniciativas en W44–47: NPG (negociación antes del portout), bajas (intenciones desde tiendas y call center), renovación de handsets y un <strong>modelo predictivo de churn</strong>. El funnel tenía buen desempeño — hasta que llegaron los resultados del modelo. 14.292 clientes puntuados, 2.185 contactados, 0 retenciones. No era un problema de targeting: el modelo estaba identificando a los clientes equivocados para la oferta de retención.</p>",
+        funnelLabel:"Funnel NPG Consumidor · W44–47 2021",
+        flTrigger:"Trigger NPG", flBase:"Base trabajada", flContacted:"Contactados", flValid:"Contacto válido", flRet:"Retenciones NPG Real",
+        fpEffectiveness:"17.5% efectividad",
+        funnelInsight:"<b>El 74.3% de tasa de contacto válido y el 17.5% de efectividad superaron los objetivos</b> (10% target). Pero los abonados N2+ (segunda consulta) tenían 34.8% de efectividad — 2× más alta. Los clientes que llamaban dos veces estaban más comprometidos con irse y más receptivos a una oferta. El funnel no era el problema. El modelo, sí.",
+        modelLabel:"Modelo predictivo vs NPG manual · mismo período",
+        mctModel:"Modelo predictivo de churn", msubModel:"retenciones de 14.292 clientes puntuados. 2.185 contactados. 0 aceptaron oferta. El modelo identificó correctamente la propensión a irse — pero para clientes que no respondían a la oferta estándar de retención.",
+        mctNpg:"NPG manual (mismas semanas)", msubNpg:"retenciones del proceso NPG con trigger 92K. 17.5% de efectividad — superando el objetivo del 10%. El proceso manual superó al modelo porque apuntaba a clientes en el acto de portarse, no a clientes predichos que podrían portarse.",
+        modelInsight:"<b>Este es el hallazgo más importante del reporte de dic 2021.</b> Un modelo predictivo con 0% de retención no significa que el modelo puntuó mal — significa que la intervención era incorrecta para esa población. Los clientes predichos a churnar en 30–60 días están en una etapa de decisión distinta a los que ya llamaron a portarse. La intervención correcta para cada etapa es diferente. Este insight moldeó directamente cómo los dashboards semanales de 2022 priorizaron las señales de comportamiento por sobre los scores de propensión del modelo.",
+        segmentsLabel:"Retenciones W44–47 · visión completa por segmento",
+        segConsumer:"Consumidor (total)", segBusiness:"Empresa", segPrepaid:"Prepago",
+        businessLabel:"A/B Empresa 5–29 Líneas · Nov 2021",
+        bCtrlTag:"Grupo control", bCtrlText:"−7.57 líneas por cuenta (línea principal). Sin intervención de retención. Cuentas empresas perdiendo líneas naturalmente.",
+        bCampTag:"Grupo campaña", bCampText:"−2.65 líneas por cuenta. 434 líneas retenidas en noviembre. 65% menos pérdida de líneas vs control — el mismo patrón que la campaña de datos de BAM 2022 pero para el segmento Empresa.",
+        kpi2:"Retenciones en 4 semanas (W44–47)", kpi3:"Mejora share out · Nov 2021", kpi4:"Segmentos · Postpago · Prepago · Empresa",
+        label3:"03 · Campaña A/B · Resultado Real",
+        title3:"Dale más datos a los agotadores de CAP antes de que se vayan. <b>El churn bajó de 8.9% a 4.1%.</b>",
+        text3:"<p>El análisis de tráfico llevó a una propuesta directa de retención: <strong>duplicar proactivamente la cuota de datos para abonados que regularmente agotan su CAP mensual.</strong> La población objetivo eran ~16.500 líneas. Se ejecutó un A/B test de tres variantes para encontrar el tamaño de bolsa más costo-efectivo.</p>",
+        abControlTag:"Grupo control (sin intervención)", abControlDesc:"Agotadores de CAP sin bolsa adicional. Medido en el mismo período que los grupos de campaña.",
+        abWinnerTag:"Promedio campaña (3 variantes)", abWinnerDesc:"Churn promedio entre las tres variantes de tamaño de bolsa. La mitad del churn vs control con un regalo de datos — no un descuento de precio.",
+        abVariantsLabel:"Variantes de campaña · tamaño de bolsa vs churn",
+        abInsight:"<b>La bolsa de 70 GB ganó con 3.5% de churn — pero el delta de 35 GB (4.4%) a 70 GB (3.5%) es solo 0.9pp por el doble del costo de datos.</b> El resultado del A/B le dio a Finanzas la curva de elasticidad para fijar política. Impacto estimado: <strong>−0.50pp churn mensual total · ~14.850 abonados retenidos de 16.500 en riesgo.</strong>",
+        label4:"04 · Lo que Tuve a Cargo",
+        title4:"Construir la capa de inteligencia que <b>convirtió datos de churn en decisiones de retención.</b>",
+        decHead:"Decisiones que tomé",
+        d1t:"Dos señales de churn, no una.", d1d:"Exponer tanto agotadores de CAP (sobreuso) como abonados con cero tráfico (desenganche) como colas separadas. Requieren intervenciones opuestas — dar más vs reactivar — combinarlas habría reducido la efectividad de ambas.",
+        d2t:"Incidencia como causa de churn, no como correlato.", d2d:"Cruzar datos de incidencias de red con churn voluntario por comuna reveló que en zonas como San Ramón (98% de superposición), el churn 'voluntario' era impulsado por calidad de servicio. Esto cambió el equipo dueño de la remediación — no retención, sino infraestructura.",
+        d3t:"Tracking diario vs reporte mensual.", d3d:"Comparar el mismo día-del-mes en meses consecutivos le daba al equipo una lectura anticipada del resultado mensual 6 días antes del cierre. La lectura de −4.8pp al día 24 significaba que todavía se podía tomar acción correctiva dentro del mismo mes.",
+        d4t:"Heatmap de cohortes como superficie analítica principal.", d4d:"Una matriz cohorte × causa hizo visible la distorsión pandémica de 2020 como un artefacto estructural — no como un benchmark. Sin ello, las cohortes de 2020 habrían contaminado el análisis de tendencias con un período base no representativo.",
+        failHead:"Limitaciones + qué cambiaría",
+        f1t:"Atribución del A/B manual.", f1d:"La asignación de grupos de campaña requería joins SQL manuales entre la lista de campaña y la tabla de eventos de churn. Un framework de holdout automatizado habría hecho re-ejecutar el test para nuevas poblaciones objetivo un cambio de configuración, no de ingeniería.",
+        f2t:"Incidencia geográfica con lag, no en tiempo real.", f2d:"Los datos de incidencias de red se cruzaban con el churn del mes anterior. Hacer match de incidencias con eventos de churn dentro de las mismas 48 horas habría aumentado significativamente la precisión de la señal.",
+        f3t:"Sin puntaje de probabilidad de churn — solo churn observado.", f3d:"El dashboard identificaba quién ya había churneado y modelaba riesgo desde señales de comportamiento. Un modelo de propensión que puntúe la base activa completa antes de los eventos de churn habría desplazado la intervención de reactiva a verdaderamente predictiva.",
+        f4t:"Entrega por PowerPoint.", f4d:"El output semanal era un PPTX enviado a stakeholders. Un dashboard en vivo habría permitido drill-down de autoservicio y habría sacado al analista del camino crítico para preguntas ad hoc.",
+        closingQuote:'"Una tasa de churn es un hecho. Una tasa de churn con cohorte de antigüedad, señal de tráfico, desglose geográfico e intervención testeada es una decisión."',
+        closingAuthor:"— Principio de trabajo de este proyecto",
+        contactText:"Desde revenue assurance y detección de fraude hasta analytics de campañas A/B e inteligencia de churn — disciplina constante: instrumentar antes de necesitarlo y hacer el output accionable.",
+        contactBtn:"Contactar a Javier", queryLabel:"Consulta"
+    }
+};
+
+function changeLang(lang) {
+    document.querySelectorAll('.lang-opt').forEach(b=>b.classList.remove('is-active'));
+    document.getElementById('btn-'+lang).classList.add('is-active');
+    const t = T[lang];
+    const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    const h=(id,v)=>{const e=document.getElementById(id);if(e)e.innerHTML=v;};
+
+    s('nav-back',t.navBack); s('hero-badge',t.badge); h('hero-title',t.title); s('hero-lead',t.lead);
+    s('kpi-1',t.kpi1); s('kpi-2',t.kpi2); s('kpi-3',t.kpi3); s('kpi-4',t.kpi4);
+    s('hero-meta',t.heroMeta);
+    // Section 00
+    s('label-0',t.label0); h('title-0',t.title0); h('text-0',t.text0);
+    s('competitive-label',t.competitiveLabel);
+    s('csl-portout',t.cslPortout); s('csl-context',t.cslContext); s('cv-industry',t.cvIndustry);
+    s('csl-consumer',t.cslConsumer); s('csl-plans',t.cslPlans); s('cv-plans',t.cvPlans);
+    h('insight-0a',t.insight0a);
+    s('shareout-label',t.shareoutLabel); h('shareout-desc',t.shareoutDesc);
+    // Section 00b
+    s('label-0b',t.label0b); h('title-0b',t.title0b); h('text-0b',t.text0b);
+    s('funnel-label',t.funnelLabel);
+    s('fl-trigger',t.flTrigger); s('fl-base',t.flBase); s('fl-contacted',t.flContacted);
+    s('fl-valid',t.flValid); s('fl-ret',t.flRet); s('fp-effectiveness',t.fpEffectiveness);
+    h('funnel-insight',t.funnelInsight);
+    s('model-label',t.modelLabel);
+    s('mct-model',t.mctModel); s('msub-model',t.msubModel);
+    s('mct-npg',t.mctNpg); s('msub-npg',t.msubNpg);
+    h('model-insight',t.modelInsight);
+    s('segments-label',t.segmentsLabel);
+    s('seg-consumer',t.segConsumer); s('seg-business',t.segBusiness); s('seg-prepaid',t.segPrepaid);
+    s('business-label',t.businessLabel);
+    s('b-ctrl-tag',t.bCtrlTag); s('b-ctrl-text',t.bCtrlText);
+    s('b-camp-tag',t.bCampTag); s('b-camp-text',t.bCampText);
+    s('label-1',t.label1); h('title-1',t.title1); h('text-1',t.text1);
+    s('before-tag',t.beforeTag); s('after-tag',t.afterTag);
+    s('before-text',t.beforeText); s('after-text',t.afterText);
+    s('label-2',t.label2); h('title-2',t.title2);
+    s('tab-bam-btn',t.tabBam); s('tab-fiber-btn',t.tabFiber);
+    s('bam-chart-1-title',t.bamChart1Title); s('bam-chart-1-sub',t.bamChart1Sub);
+    h('bam-insight-1',t.bamInsight1);
+    s('bam-chart-2-title',t.bamChart2Title); s('bam-chart-2-sub',t.bamChart2Sub);
+    s('bl-vol',t.blVol); s('bl-portout',t.blPortout); s('bl-mora',t.blMora); s('bl-fraud',t.blFraud);
+    h('bam-insight-2',t.bamInsight2);
+    s('bam-chart-3-title',t.bamChart3Title); s('bam-chart-3-sub',t.bamChart3Sub);
+    h('bam-insight-3',t.bamInsight3);
+    s('bam-chart-4-title',t.bamChart4Title); s('bam-chart-4-sub',t.bamChart4Sub);
+    s('mc-1-label',t.mc1Label); s('mc-1-sub',t.mc1Sub);
+    s('mc-2-label',t.mc2Label); s('mc-2-sub',t.mc2Sub);
+    s('mc-3-label',t.mc3Label); s('mc-3-sub',t.mc3Sub);
+    h('bam-insight-4',t.bamInsight4);
+    s('bam-chart-5-title',t.bamChart5Title); s('bam-chart-5-sub',t.bamChart5Sub);
+    s('ch-vol',t.chVol); s('ch-port',t.chPort); s('ch-n3',t.chN3); s('ch-n6',t.chN6); s('ch-n12',t.chN12); s('ch-trend',t.chTrend);
+    s('cl-0-3',t.cl03); s('cl-4-6',t.cl46); s('cl-7-12',t.cl712); s('cl-25p',t.cl25p);
+    h('bam-insight-5',t.bamInsight5);
+    s('fiber-chart-1-title',t.fiberChart1Title); s('fiber-chart-1-sub',t.fiberChart1Sub);
+    h('fiber-insight-1',t.fiberInsight1);
+    s('fiber-chart-2-title',t.fiberChart2Title); s('fiber-chart-2-sub',t.fiberChart2Sub);
+    s('mc-f1-label',t.mcF1Label); s('mc-f1-sub',t.mcF1Sub);
+    s('mc-f2-label',t.mcF2Label); s('mc-f2-sub',t.mcF2Sub);
+    s('mc-f3-label',t.mcF3Label); s('mc-f3-sub',t.mcF3Sub);
+    s('fiber-chart-3-title',t.fiberChart3Title); s('fiber-chart-3-sub',t.fiberChart3Sub);
+    s('fbl-0-1',t.fblM01); s('fbl-1-2',t.fblM12); s('fbl-2-3',t.fblM23); s('fbl-3-6',t.fblM36); s('fbl-6p',t.fblM6p);
+    s('bar-3mo',t.bar3mo);
+    h('fiber-insight-3',t.fiberInsight3);
+    s('fiber-chart-4-title',t.fiberChart4Title); s('fiber-chart-4-sub',t.fiberChart4Sub);
+    h('fiber-insight-4',t.fiberInsight4);
+    s('label-3',t.label3); h('title-3',t.title3); h('text-3',t.text3);
+    s('ab-control-tag',t.abControlTag); s('ab-control-desc',t.abControlDesc);
+    s('ab-winner-tag',t.abWinnerTag); s('ab-winner-desc',t.abWinnerDesc);
+    s('ab-variants-label',t.abVariantsLabel);
+    h('ab-insight',t.abInsight);
+    s('label-4',t.label4); h('title-4',t.title4);
+    s('dec-head',t.decHead);
+    s('d1-t',t.d1t); h('d1-d',t.d1d);
+    s('d2-t',t.d2t); h('d2-d',t.d2d);
+    s('d3-t',t.d3t); h('d3-d',t.d3d);
+    s('d4-t',t.d4t); h('d4-d',t.d4d);
+    s('fail-head',t.failHead);
+    s('f1-t',t.f1t); h('f1-d',t.f1d);
+    s('f2-t',t.f2t); h('f2-d',t.f2d);
+    s('f3-t',t.f3t); h('f3-d',t.f3d);
+    s('f4-t',t.f4t); h('f4-d',t.f4d);
+    s('closing-quote',t.closingQuote); s('closing-author',t.closingAuthor);
+    s('contact-text',t.contactText);
+    h('contact-btn','<i class="fas fa-arrow-right"></i> '+t.contactBtn);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    Highcharts.setOptions({
+        chart: { backgroundColor:'transparent', style:{fontFamily:'Inter'}, spacingTop:10 },
+        title: { text:null }, credits:{ enabled:false },
+        xAxis: { gridLineColor:'rgba(255,255,255,0.04)', lineColor:'rgba(255,255,255,0.08)', tickColor:'rgba(255,255,255,0.08)', labels:{style:{color:'#94a3b8',fontSize:'10px',fontFamily:'Fira Code'}} },
+        yAxis: { gridLineColor:'rgba(255,255,255,0.04)', title:{text:null}, labels:{style:{color:'#94a3b8',fontSize:'10px',fontFamily:'Fira Code'}} },
+        legend: { itemStyle:{color:'rgba(255,255,255,0.7)',fontWeight:'400',fontSize:'11px',fontFamily:'Fira Code'}, itemHoverStyle:{color:'#fff'} },
+        tooltip: { backgroundColor:'rgba(5,5,5,0.95)', borderColor:'rgba(34,211,166,0.3)', borderRadius:4, style:{color:'#fff',fontSize:'12px'}, useHTML:true },
+        plotOptions: { series:{ animation:{duration:800} } }
+    });
+
+    // Chart 1: Churn evolution line
+    window.cChurnEvo = Highcharts.chart('chart-churn-evo', {
+        chart: { type:'areaspline' },
+        xAxis: { categories:['Jul20','Oct20','Jan21','Apr21','Jul21','Oct21','Jan22','May22'], tickmarkPlacement:'on' },
+        yAxis: { labels:{ format:'{value}%' }, gridLineDashStyle:'Dash' },
+        tooltip: { pointFormat:'<b>{point.y}%</b> churn' },
+        plotOptions: { areaspline:{ lineWidth:2, marker:{enabled:true,radius:3,fillColor:'#22d3a6',lineColor:'#fff',lineWidth:1}, fillColor:{ linearGradient:{x1:0,y1:0,x2:0,y2:1}, stops:[[0,'rgba(34,211,166,0.3)'],[1,'rgba(34,211,166,0.02)']] } } },
+        series: [
+            { name:'Churn %', color:'#22d3a6', data:[7.2,6.4,5.5,4.7,4.2,3.9,3.8,3.9] },
+            { name:'Budget', color:'rgba(251,191,36,0.6)', data:[4.6,4.6,4.4,4.4,4.3,4.0,4.0,4.0], dashStyle:'Dash', lineWidth:1, marker:{enabled:false} }
+        ]
+    });
+
+    // Chart 2: CAP exhaustion
+    window.cCap = Highcharts.chart('chart-cap', {
+        chart: { type:'column' },
+        xAxis: { categories:['Mar21','Jun21','Sep21','Dec21','Mar22'], tickmarkPlacement:'on' },
+        yAxis: { labels:{format:'{value}%'}, max:25, gridLineDashStyle:'Dash' },
+        tooltip: { pointFormat:'<b>{point.y}%</b> hit 100% CAP' },
+        plotOptions: { column:{ borderWidth:0, borderRadius:3, pointPadding:0.08 } },
+        series: [
+            { name:'CAP exhausters', color:'#f43f5e', data:[17.1,18.4,18.3,16.5,16.8] },
+            { name:'Zero traffic', color:'rgba(34,211,166,0.7)', data:[13.8,13.3,13.0,15.1,16.6] }
+        ]
+    });
+
+    // Chart 3: Fiber Naked vs Bundle
+    window.cFiberEvo = Highcharts.chart('chart-fiber-evo', {
+        chart: { type:'spline' },
+        xAxis: { categories:['Oct21','Nov21','Dec21','Jan22','Feb22','Mar22','Apr22','May22','Jun22','Jul22'], tickmarkPlacement:'on' },
+        yAxis: { labels:{format:'{value}%'}, min:0, max:4, gridLineDashStyle:'Dash' },
+        tooltip: { shared:true, headerFormat:'<b>{point.key}</b><br>', pointFormat:'<span style="color:{series.color}">●</span> {series.name}: <b>{point.y}%</b><br>' },
+        plotOptions: { spline:{ lineWidth:2, marker:{radius:3, lineColor:'#fff', lineWidth:1} } },
+        series: [
+            { name:'Naked (Fiber only)', color:'#22d3a6', data:[1.48,1.51,1.67,1.49,1.52,1.33,1.50,1.51,1.36,1.69], marker:{fillColor:'#22d3a6'} },
+            { name:'Bundle (Fiber + TV)', color:'#f43f5e', data:[null,null,2.77,2.40,null,1.92,2.32,2.04,1.99,1.73], marker:{fillColor:'#f43f5e'} }
+        ]
+    });
+
+    // Reflow safety
+    const allCharts = [window.cChurnEvo, window.cCap, window.cFiberEvo];
+    const forceReflow = () => allCharts.forEach(c => { if(c && typeof c.reflow==='function') c.reflow(); });
+    setTimeout(forceReflow, 100);
+    window.addEventListener('resize', forceReflow, {passive:true});
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const hit = allCharts.find(c => c && c.renderTo && c.renderTo.id === entry.target.id);
+            if (hit) hit.reflow();
+        });
+    }, {threshold:0.1});
+    ['chart-churn-evo','chart-cap','chart-fiber-evo'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) observer.observe(el);
+    });
+
+    const p = new URLSearchParams(window.location.search);
+    const lang = p.get('lang') || 'en';
+    changeLang(lang);
+    const backBtn = document.querySelector('.back-link');
+    if (backBtn) {
+        let url = "../index.html";
+        const ps = [];
+        if (p.get('v')) ps.push('v='+p.get('v'));
+        if (lang) ps.push('lang='+lang);
+        if (ps.length) url += '?' + ps.join('&');
+        url += '#projects';
+        backBtn.href = url;
+    }
+});
+</script>
+</body>
+</html>

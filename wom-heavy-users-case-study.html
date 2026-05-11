@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOM Chile · Heavy User Detection — Javier Moraga</title>
+    <meta name="description" content="Case study: Monthly anomalous-use detection across data, voice and SMS at WOM Chile. Real cost modelling against 3 operators. 50GB+ and 300+ destinations thresholds. 2019.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+:root {
+    --bg:           #050505;
+    --bg2:          #08080c;
+    --surface:      rgba(12,12,16,0.65);
+    --border:       rgba(255,255,255,0.05);
+    --border-hi:    rgba(255,255,255,0.12);
+    --border-glass: rgba(255,255,255,0.08);
+    --text:         rgba(255,255,255,0.92);
+    --muted:        #94a3b8;
+    --dim:          rgba(255,255,255,0.22);
+    --c-eng:        #00e5ff;
+    --c-viz:        #d500f9;
+    --c-biz:        #fbbf24;
+    --c-ok:         #22d3a6;
+    --c-warn:       #f97316;
+    --ease:         cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body:    'Inter', sans-serif;
+    --font-disp:    'Jost', sans-serif;
+    --font-mono:    'Fira Code', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(249,115,22,0.04), transparent 55%);
+    color: var(--text); font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased; line-height: 1.6;
+    padding-top: 64px; overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+* { scrollbar-width: thin; scrollbar-color: rgba(249,115,22,0.2) transparent; }
+*::-webkit-scrollbar { width: 5px; height: 5px; }
+*::-webkit-scrollbar-thumb { background: rgba(249,115,22,0.2); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.45); }
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+.nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    height: 64px; padding: 0 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(5,5,5,0.88);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+}
+.back-link {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--border); padding: 7px 14px 7px 12px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: color 0.25s, border-color 0.25s, transform 0.25s;
+}
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s; }
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-warn); opacity: 1; }
+.nav-name {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--border); padding: 7px 16px; border-radius: 100px;
+}
+.nav-name b { color: var(--c-warn); margin-left: 10px; font-weight: 500; }
+.lang-switch { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 100px; background: rgba(255,255,255,0.015); }
+.lang-opt { background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); padding: 5px 10px; border-radius: 100px; transition: color 0.25s, background 0.25s; }
+.lang-opt.is-active { color: var(--c-warn); background: rgba(249,115,22,0.08); }
+.lang-sep { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); }
+
+/* ── HERO ─────────────────────────────────────────────────────── */
+header {
+    padding: 72px 24px 56px; text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(249,115,22,0.05), transparent 60%);
+}
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 14px 6px 18px;
+    background: rgba(249,115,22,0.04);
+    border: 1px solid rgba(249,115,22,0.28); border-radius: 100px;
+    color: var(--c-warn); font-family: var(--font-mono);
+    font-size: 0.65rem; font-weight: 500;
+    margin-bottom: 28px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.hero-badge::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--c-warn); box-shadow: 0 0 10px var(--c-warn);
+    animation: dotPulse 2.5s infinite ease-in-out;
+}
+@keyframes dotPulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.5} }
+h1.hero-title {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: clamp(2rem, 4.8vw, 3.6rem);
+    line-height: 1.05; letter-spacing: -0.03em; text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 10%, #d0d5dd 40%, #5c626e 70%, #121417 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 12px 30px rgba(0,0,0,0.6)); margin: 0 0 22px;
+}
+.text-accent {
+    background: linear-gradient(90deg, #fff 10%, var(--c-warn) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent; filter: none;
+}
+.lead { font-weight: 300; color: rgba(255,255,255,0.52); max-width: 680px; margin: 0 auto 36px; font-size: clamp(0.92rem, 1.4vw, 1.05rem); line-height: 1.7; }
+.hero-kpis { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 920px; margin: 0 auto; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: rgba(5,5,5,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.hero-kpi { padding: 24px 16px; border-right: 1px solid var(--border); text-align: center; position: relative; overflow: hidden; transition: background 0.4s; }
+.hero-kpi:last-child { border-right: none; }
+.hero-kpi::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--kc, var(--c-warn)); box-shadow: 0 0 12px var(--kc, var(--c-warn)); opacity: 0; transition: opacity 0.4s; }
+.hero-kpi:hover::after { opacity: 0.8; }
+.kpi-value { font-family: var(--font-disp); font-weight: 400; font-size: clamp(1.3rem,2.4vw,1.9rem); line-height: 1; background: linear-gradient(180deg, #fff, #94a3b8); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; display: block; margin-bottom: 10px; letter-spacing: -0.01em; }
+.kpi-value b { background: linear-gradient(180deg, #fff, var(--c-warn)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-weight: 400; }
+.kpi-label { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+.hero-meta { margin: 26px auto 0; padding-top: 20px; border-top: 1px solid var(--border); max-width: 920px; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted); line-height: 1.8; }
+.hero-meta b { color: var(--c-warn); font-weight: 500; }
+.stack-strip { max-width: 920px; margin: 22px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.stack-pill { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text); background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; transition: all 0.3s; }
+.stack-pill.hi { border-color: rgba(249,115,22,0.3); color: var(--c-warn); background: rgba(249,115,22,0.04); }
+.stack-pill:hover { border-color: rgba(249,115,22,0.4); color: var(--c-warn); background: rgba(249,115,22,0.04); }
+
+/* ── LAYOUT ──────────────────────────────────────────────────── */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+section { padding: 60px 0; }
+.card { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 6px; padding: 44px; margin-bottom: 28px; position: relative; box-shadow: 0 24px 60px rgba(0,0,0,0.35); transition: border-color 0.4s; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--c-warn), transparent); opacity: 0.4; border-radius: 6px 6px 0 0; }
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-warn); margin-bottom: 16px; }
+.eyebrow::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--c-warn); box-shadow: 0 0 10px var(--c-warn); flex-shrink: 0; }
+.section-title { font-family: var(--font-disp); font-size: clamp(1.5rem, 2.7vw, 2.1rem); font-weight: 300; line-height: 1.18; letter-spacing: -0.022em; color: var(--text); margin-bottom: 22px; }
+.section-title b { color: var(--c-warn); font-weight: 400; }
+.narrative { font-size: 0.95rem; color: var(--muted); line-height: 1.75; font-weight: 300; max-width: 780px; }
+.narrative p + p { margin-top: 14px; }
+.narrative strong { color: var(--text); font-weight: 500; }
+.narrative em { color: var(--c-warn); font-style: normal; font-weight: 400; }
+.narrative code, .twocol-list li code, .insight-text code, .plat-desc code { font-family: var(--font-mono); font-size: 0.78em; color: var(--c-eng); background: rgba(0,229,255,0.06); padding: 1px 6px; border-radius: 3px; }
+
+/* ── 3-CONTROL TABS ──────────────────────────────────────────── */
+.tab-strip {
+    display: flex; gap: 4px; margin-bottom: 32px;
+    border-bottom: 1px solid var(--border); padding-bottom: 0;
+}
+.tab-btn {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.72rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding: 10px 18px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.25s, border-color 0.25s;
+    position: relative; top: 1px;
+}
+.tab-btn.is-active { color: var(--c-warn); border-bottom-color: var(--c-warn); }
+.tab-btn:hover:not(.is-active) { color: var(--text); }
+.tab-pane { display: none; }
+.tab-pane.is-active { display: block; }
+
+/* ── PIPELINE DIAGRAM ────────────────────────────────────────── */
+.pipeline-grid { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 18px; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 22px 0 8px; flex-wrap: wrap; }
+.pipe-step { flex: 1; min-width: 90px; text-align: center; background: rgba(255,255,255,0.025); border: 1px solid var(--border); border-radius: 6px; padding: 14px 10px; transition: border-color 0.4s; }
+.pipe-step:hover { border-color: rgba(249,115,22,0.3); }
+.pipe-label { font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; letter-spacing: 0.1em; }
+.pipe-val { font-family: var(--font-mono); font-size: 0.74rem; color: var(--c-warn); line-height: 1.45; }
+.pipe-arrow { color: var(--dim); font-size: 0.85rem; align-self: center; flex-shrink: 0; }
+
+/* ── BAR CHARTS (CSS) ────────────────────────────────────────── */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 14px; }
+.bar-label { font-family: var(--font-mono); font-size: 0.66rem; color: var(--muted); width: 160px; flex-shrink: 0; text-align: right; letter-spacing: 0.02em; }
+.bar-track { flex: 1; background: rgba(255,255,255,0.04); border-radius: 100px; height: 26px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 100px; display: flex; align-items: center; padding: 0 10px; font-family: var(--font-mono); font-size: 0.65rem; color: #fff; font-weight: 500; animation: barGrow 1.1s var(--ease) both; }
+.bar-fill.c-warn    { background: linear-gradient(90deg, rgba(249,115,22,0.85), rgba(249,115,22,0.5)); }
+.bar-fill.c-eng     { background: linear-gradient(90deg, rgba(0,229,255,0.85), rgba(0,229,255,0.5)); }
+.bar-fill.c-ok      { background: linear-gradient(90deg, rgba(34,211,166,0.85), rgba(34,211,166,0.5)); }
+.bar-fill.c-viz     { background: linear-gradient(90deg, rgba(213,0,249,0.85), rgba(213,0,249,0.5)); }
+.bar-fill.c-biz     { background: linear-gradient(90deg, rgba(251,191,36,0.85), rgba(251,191,36,0.5)); }
+@keyframes barGrow { from{width:0 !important;opacity:0} to{opacity:1} }
+
+/* Classification legend */
+.class-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 22px 0 8px; }
+.class-card { background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+.class-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-warn); margin-bottom: 7px; display: block; }
+.class-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+/* Cost breakdown */
+.cost-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 22px 0 8px; }
+.cost-card { background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; }
+.cost-label { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.cost-num { font-family: var(--font-disp); font-size: 1.5rem; font-weight: 300; letter-spacing: -0.015em; margin-bottom: 4px; }
+.cost-num.hi { color: var(--c-warn); }
+.cost-num.ok { color: var(--c-ok); }
+.cost-sub { font-size: 0.76rem; color: var(--muted); font-weight: 300; line-height: 1.5; }
+.rate-table { width: 100%; border-collapse: collapse; margin: 18px 0 6px; font-size: 0.82rem; }
+.rate-table th { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 6px 12px; border-bottom: 1px solid var(--border); text-align: left; font-weight: 500; }
+.rate-table td { padding: 8px 12px; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.03); font-weight: 300; }
+.rate-table td:last-child { font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-warn); }
+.rate-table tr:hover td { background: rgba(255,255,255,0.01); }
+
+/* Insight callout */
+.insight { display: flex; gap: 12px; margin-top: 16px; padding: 14px 16px; background: rgba(249,115,22,0.03); border: 1px solid rgba(249,115,22,0.14); border-radius: 4px; }
+.insight-icon { color: var(--c-warn); font-size: 0.85rem; flex-shrink: 0; padding-top: 2px; }
+.insight-text { font-size: 0.84rem; color: var(--text); line-height: 1.6; font-weight: 300; }
+.insight-text b { color: var(--c-warn); font-weight: 500; }
+.insight.is-ok { background: rgba(34,211,166,0.03); border-color: rgba(34,211,166,0.14); }
+.insight.is-ok .insight-icon { color: var(--c-ok); }
+.insight.is-ok .insight-text b { color: var(--c-ok); }
+
+/* SQL accordion */
+.accordion-btn { background: rgba(255,255,255,0.018); border: 1px solid var(--border); width: 100%; padding: 10px 14px; text-align: left; color: var(--muted); cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.04em; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; margin-top: 14px; transition: all 0.3s; }
+.accordion-btn:hover { background: rgba(249,115,22,0.04); color: var(--c-warn); border-color: rgba(249,115,22,0.22); }
+.accordion-btn .fa-chevron-down { transition: transform 0.3s; font-size: 0.7rem; }
+.accordion-btn.is-open .fa-chevron-down { transform: rotate(180deg); }
+.code-panel { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: var(--bg2); border-radius: 0 0 4px 4px; margin-top: -2px; }
+.code-panel.active { max-height: 600px; overflow: auto; border: 1px solid var(--border); border-top: none; padding: 12px; }
+pre { margin: 0; overflow-x: auto; }
+code { font-family: var(--font-mono); color: rgba(255,255,255,0.78); font-size: 0.71rem; line-height: 1.65; }
+.sql-kw   { color: var(--c-warn); font-weight: 500; }
+.sql-str  { color: var(--c-biz); }
+.sql-func { color: #fbbf24; }
+.sql-comm { color: rgba(255,255,255,0.28); font-style: italic; }
+.sql-tbl  { color: var(--c-eng); }
+.sql-op   { color: var(--c-ok); }
+
+/* Decisions / failures */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 22px; }
+.twocol-block h4 { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-eng); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.twocol-block.is-fail h4 { color: var(--c-warn); }
+.twocol-list { display: flex; flex-direction: column; gap: 14px; }
+.twocol-list li { background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-left: 2px solid var(--c-eng); border-radius: 4px; padding: 16px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; font-weight: 300; transition: border-color 0.4s; }
+.twocol-block.is-fail .twocol-list li { border-left-color: var(--c-warn); }
+.twocol-list li:hover { border-color: var(--border-hi); }
+.twocol-list li b { display: block; font-family: var(--font-disp); font-size: 0.98rem; color: var(--text); font-weight: 500; margin-bottom: 5px; }
+
+/* Closing */
+.closing-take { max-width: 820px; margin: 56px auto 36px; padding: 36px 38px; text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-family: var(--font-disp); font-size: clamp(1.1rem,1.9vw,1.5rem); font-weight: 300; line-height: 1.45; color: rgba(255,255,255,0.82); letter-spacing: -0.005em; }
+.closing-take b { color: var(--c-warn); font-weight: 400; }
+.closing-author { display: block; margin-top: 14px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+.contact-section { text-align: center; margin: 30px 0 80px; padding-top: 36px; border-top: 1px solid var(--border); }
+.contact-text { color: var(--muted); font-size: 0.92rem; margin: 0 auto 28px; max-width: 580px; line-height: 1.65; font-weight: 300; }
+.contact-btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 28px; border: 1px solid rgba(249,115,22,0.4); background: rgba(249,115,22,0.04); color: var(--c-warn); border-radius: 3px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s; }
+.contact-btn:hover { background: rgba(249,115,22,0.08); border-color: var(--c-warn); transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(249,115,22,0.4); }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .nav-bar { padding: 0 18px; }
+    .nav-name { display: none; }
+    .container { padding: 0 18px; }
+    section { padding: 40px 0; }
+    .card { padding: 26px 20px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .hero-kpi { border-bottom: 1px solid var(--border); padding: 18px 12px; }
+    .hero-kpi:nth-child(2) { border-right: none; }
+    .pipeline-grid { padding: 12px 8px; }
+    .pipe-arrow { display: none; }
+    .class-grid, .cost-grid, .twocol { grid-template-columns: 1fr; }
+    .bar-label { width: 110px; font-size: 0.6rem; }
+    .closing-take { padding: 28px 20px; }
+    .tab-strip { overflow-x: auto; }
+}
+    </style>
+</head>
+<body>
+
+<nav class="nav-bar">
+    <a href="../index.html#projects" class="back-link">
+        <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+    </a>
+    <div class="nav-name">Javier Moraga <b>WOM · Heavy Users</b></div>
+    <div class="lang-switch">
+        <button class="lang-opt is-active" onclick="changeLang('en')" id="btn-en">EN</button>
+        <span class="lang-sep">·</span>
+        <button class="lang-opt" onclick="changeLang('es')" id="btn-es">ES</button>
+    </div>
+</nav>
+
+<header>
+    <div class="container">
+        <span class="hero-badge" id="hero-badge">Case Study · WOM Chile · 2019</span>
+        <h1 class="hero-title" id="hero-title">Heavy User<br><span class="text-accent">Detection</span></h1>
+        <p class="lead" id="hero-lead">
+            Three monthly controls — data, voice and SMS — to surface subscribers consuming far beyond their plan, detect roaming cost exposure, and separate irregular use from legitimate promotions. Built in Netezza SQL, loaded to SQL Server, reported to Marketing, Finance and Customer Experience.
+        </p>
+        <div class="hero-kpis">
+            <div class="hero-kpi" style="--kc:var(--c-warn)">
+                <span class="kpi-value">50<b>GB</b></span>
+                <span class="kpi-label" id="kpi-1">Data detection threshold</span>
+            </div>
+            <div class="hero-kpi" style="--kc:var(--c-warn)">
+                <span class="kpi-value"><b>300+</b></span>
+                <span class="kpi-label" id="kpi-2">Voice / SMS destination threshold</span>
+            </div>
+            <div class="hero-kpi" style="--kc:var(--c-biz)">
+                <span class="kpi-value">CLP<b>549M</b></span>
+                <span class="kpi-label" id="kpi-3">Network cost flagged (data)</span>
+            </div>
+            <div class="hero-kpi" style="--kc:var(--c-eng)">
+                <span class="kpi-value"><b>3</b></span>
+                <span class="kpi-label" id="kpi-4">Controls per cycle</span>
+            </div>
+        </div>
+        <p class="hero-meta">
+            <span id="meta-period">Monthly · per billing cycle</span> · <b>Revenue Assurance · Network Cost · Fraud Prevention</b> ·
+            <span id="meta-role">Data Analyst</span>
+        </p>
+        <div class="stack-strip">
+            <span class="stack-pill hi">Netezza SQL</span>
+            <span class="stack-pill hi">SQL Server</span>
+            <span class="stack-pill hi">Oracle BSCS</span>
+            <span class="stack-pill">PCRF services</span>
+            <span class="stack-pill">Rating groups</span>
+            <span class="stack-pill">RTX billing tables</span>
+            <span class="stack-pill">SYMSOFT SMSC</span>
+            <span class="stack-pill">Excel export</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════════════════
+     01 · CONTEXT
+════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-1">01 · Context</span>
+    <h2 class="section-title" id="title-1">A subscriber using <b>800 GB</b> on a 10 GB plan doesn't appear in any alert. Until someone writes the query.</h2>
+    <div class="narrative" id="text-1">
+        <p>WOM Chile's commercial strategy — unlimited 4G promotions, double and triple data bags, social network zero-rating — was designed for growth. But it created a monitoring gap: a subscriber with enough promotional services stacked could consume <strong>hundreds of gigabytes</strong> without triggering any automated limit, while generating real interconnection costs to other operators at fixed per-GB or per-minute rates.</p>
+        <p>The same problem appeared in voice and SMS. A postpaid line calling <strong>more than 300 distinct destinations</strong> in one cycle is not normal consumer use — it's either a fraud pattern or a business line incorrectly tariffed on a consumer plan. Without a monthly detection process, both scenarios were invisible.</p>
+        <p><em>The three controls in this case study were the detection layer that didn't exist yet. Each produced a cost-modelled report delivered to Marketing, Customer Experience, Finance and Interconnections.</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     02 · THREE CONTROLS
+════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-2">02 · The Three Controls</span>
+    <h2 class="section-title" id="title-2">Data. Voice. SMS. Each a different <b>abuse pattern,</b> each a different detection logic.</h2>
+
+    <div class="tab-strip">
+        <button class="tab-btn is-active" onclick="switchTab('data')" id="tab-data-btn">📊 Data · 50 GB</button>
+        <button class="tab-btn" onclick="switchTab('voice')" id="tab-voice-btn">📞 Voice · 300+ dest.</button>
+        <button class="tab-btn" onclick="switchTab('sms')" id="tab-sms-btn">💬 SMS · 300+ dest.</button>
+    </div>
+
+    <!-- DATA PANE -->
+    <div class="tab-pane is-active" id="pane-data">
+        <div class="narrative" id="data-narrative">
+            <p>The data heavy user control runs <strong>once per month per billing cycle</strong> (up to 7 cycles). Any subscriber consuming <strong>≥ 50 GB</strong> in their cycle window is extracted, classified and cost-modelled against interconnection rates by operator (Claro, Movistar, Entel) and WOM's own network at CLP 150/GB. The result separates legitimate cases (unlimited plans, promotional bags) from <em>irregular</em> — subscribers whose normal-traffic GB exceeds their theoretical cap.</p>
+        </div>
+
+        <div style="margin: 24px 0 6px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="data-pipe-label">3-stage detection pipeline</div>
+        <div class="pipeline-grid">
+            <div class="pipe-step">
+                <div class="pipe-label" id="dp1">Stage 1</div>
+                <div class="pipe-val">Traffic agg<br>≥ 50 GB<br>→ HU_50</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="dp2">Stage 2</div>
+                <div class="pipe-val">PCRF service<br>cross-join<br>→ HU_50_PASO</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="dp3">Stage 3</div>
+                <div class="pipe-val">Classification<br>+ cost model<br>→ Excel report</div>
+            </div>
+        </div>
+
+        <div style="margin: 24px 0 10px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="data-class-label">Classification logic</div>
+        <div class="class-grid">
+            <div class="class-card">
+                <span class="class-label">IRREGULAR</span>
+                <p class="class-desc" id="dc-irreg"><code>NORMAL_GB > GB_TEORICO</code> — actual traffic exceeds theoretical cap (plan base × 1.2 + extra bags + double/triple bags).</p>
+            </div>
+            <div class="class-card">
+                <span class="class-label">CORRECT</span>
+                <p class="class-desc" id="dc-ok"><code>NORMAL_GB ≤ GB_TEORICO</code> — consumption within theoretical cap. No action required.</p>
+            </div>
+            <div class="class-card">
+                <span class="class-label">4G FREE · speed limit / hourly</span>
+                <p class="class-desc" id="dc-4g">Subscriber has an unlimited 4G promotional bag with speed throttling or hourly restrictions. Exempt from cap comparison.</p>
+            </div>
+            <div class="class-card">
+                <span class="class-label">UNLIMITED PLAN / PPG</span>
+                <p class="class-desc" id="dc-unl">Plan is unlimited or subscriber purchased an unlimited prepaid bag. Exempt. Reported for volume visibility only.</p>
+            </div>
+        </div>
+
+        <div style="margin: 24px 0 10px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="data-cost-label">Network cost breakdown (example period)</div>
+        <div class="cost-grid">
+            <div class="cost-card">
+                <div class="cost-label" id="dcc-rn">Interconnection cost · other operators</div>
+                <div class="cost-num hi">CLP 84.3M</div>
+                <div class="cost-sub" id="dcc-rn-sub">Claro @706/GB · Movistar @1,157/GB · Entel @7,987/GB. Entel's rate is 11× Claro — roaming distribution matters.</div>
+            </div>
+            <div class="cost-card">
+                <div class="cost-label" id="dcc-wom">WOM own-network cost</div>
+                <div class="cost-num ok">CLP 549.7M</div>
+                <div class="cost-sub" id="dcc-wom-sub">@CLP 150/GB internal transfer price. Majority of heavy-user traffic flows through WOM's own 4G — so the internal cost dominates.</div>
+            </div>
+        </div>
+        <table class="rate-table">
+            <thead>
+                <tr>
+                    <th id="rt-op">Operator</th>
+                    <th id="rt-rate">Rate / GB (CLP)</th>
+                    <th id="rt-note">Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Claro</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">706</td><td id="rt-claro">Lowest interconnection cost</td></tr>
+                <tr><td>Movistar</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">1,157</td><td id="rt-movistar">1.6× Claro</td></tr>
+                <tr><td>Entel</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">7,987</td><td id="rt-entel">11.3× Claro — critical to monitor</td></tr>
+                <tr><td>WOM (internal)</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-ok);">150</td><td id="rt-wom">Own network transfer price</td></tr>
+            </tbody>
+        </table>
+
+        <div class="insight" style="margin-top: 20px;">
+            <i class="fas fa-lightbulb insight-icon"></i>
+            <p class="insight-text" id="data-insight"><b>Rating group 999 was a data quality signal, not a traffic type.</b> It represented the delta between CDR header and detail — a known discrepancy that needed monitoring to ensure it didn't grow. It was listed separately in every report as a quality flag, not a classification category.</p>
+        </div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · HU_50 — traffic aggregation with operator breakdown</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- Stage 1: aggregate data traffic by subscriber (≥ 50 GB threshold).
+-- Breaks down by operator (ID_CODIGO_OPERADOR), network type (ID_RATTYPE)
+-- and rating group (free, normal, social, music, WhatsApp, video, roaming...).
+-- Result loaded into staging table NZ_USUARIOS.RA.HU_50.</span>
+
+<span class="sql-kw">INSERT INTO</span> <span class="sql-tbl">NZ_USUARIOS.RA.HU_50</span>
+<span class="sql-kw">SELECT</span>
+  A.NUMERO_ABONADO,
+  Z.CICLO_FACTURACION,
+  <span class="sql-comm">-- Total GB (KB_DOWN + KB_UP converted to GB)</span>
+  <span class="sql-func">ROUND</span>((<span class="sql-func">SUM</span>((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024), 2) GB_TOTAL,
+  <span class="sql-comm">-- Per-operator breakdown for cost modelling</span>
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_CODIGO_OPERADOR <span class="sql-kw">IN</span> (<span class="sql-str">'73004'</span>,<span class="sql-str">'73009'</span>) <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) WOM_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_CODIGO_OPERADOR = <span class="sql-str">'73003'</span>              <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) CLARO_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_CODIGO_OPERADOR = <span class="sql-str">'73002'</span>              <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) MOVISTAR_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_CODIGO_OPERADOR <span class="sql-kw">IN</span> (<span class="sql-str">'73001'</span>,<span class="sql-str">'73010'</span>,<span class="sql-str">'73021'</span>) <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) ENTEL_GB,
+  <span class="sql-comm">-- Network type: 4G(6), 3G(1), 2G(2)</span>
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATTYPE = <span class="sql-str">'6'</span> <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) GB_4G,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATTYPE = <span class="sql-str">'1'</span> <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) GB_3G,
+  <span class="sql-comm">-- Rating group breakdown: normal vs free vs social vs music etc.</span>
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATING_GROUP <span class="sql-kw">IN</span> (<span class="sql-str">'103'</span>,<span class="sql-str">'203'</span>,<span class="sql-str">'303'</span>) <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) NORMAL_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATING_GROUP <span class="sql-kw">IN</span> (<span class="sql-str">'101'</span>,<span class="sql-str">'201'</span>,<span class="sql-str">'301'</span>) <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) FREE_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATING_GROUP = <span class="sql-str">'302'</span> <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) RRSS_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATING_GROUP = <span class="sql-str">'305'</span> <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) WSP_GB,
+  <span class="sql-func">NVL</span>(<span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> A.ID_RATING_GROUP = <span class="sql-str">'999'</span> <span class="sql-kw">THEN</span> ((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024 <span class="sql-kw">END</span>),0) DIF_GB  <span class="sql-comm">-- CDR header/detail delta — quality flag</span>
+<span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_PROD.STG_TRAF.AGG_TRF_DATOS_ABONADO</span> A
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.BT_CLE_PARQUE</span> Z    <span class="sql-kw">ON</span> A.NUMERO_ABONADO = Z.NUMERO_ABONADO <span class="sql-kw">AND</span> Z.PERIODO_PARQUE = $PeriodoParque
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.LK_PLN_PLAN</span> B          <span class="sql-kw">ON</span> A.ID_PLAN = B.ID_PLAN
+<span class="sql-kw">WHERE</span>
+  A.ID_DWH_DIA <span class="sql-op">BETWEEN</span> $desde <span class="sql-kw">AND</span> $hasta
+  <span class="sql-kw">AND</span> Z.ESTADO_CONTRATO <span class="sql-op">!=</span> <span class="sql-str">'d'</span>
+  <span class="sql-kw">AND</span> Z.CICLO_FACTURACION <span class="sql-kw">IN</span> ($CICLO)
+<span class="sql-kw">GROUP BY</span> A.NUMERO_ABONADO, Z.CICLO_FACTURACION, B.DESC_CORTA_PLAN, ...
+<span class="sql-kw">HAVING SUM</span>(((A.KB_DOWN_IX+A.KB_UP_IX)/1024)/1024) <span class="sql-op">>=</span> 50;  <span class="sql-comm">-- 50 GB threshold</span></code></pre></div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · Classification — theoretical cap vs actual, cost formula</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- Stage 3: classify each subscriber and compute interconnection cost.
+-- GB_TEORICO = (plan_cap * 1.2) + extra_bags + double_bags + triple_bags
+-- Cost: each operator's GB × their interconnection rate in CLP.</span>
+
+<span class="sql-kw">SELECT</span>
+  <span class="sql-comm">-- Theoretical cap calculation (only for non-unlimited plans)</span>
+  <span class="sql-kw">CASE WHEN</span> A.CAP <span class="sql-op">!=</span> <span class="sql-str">'ilimitado'</span>
+       <span class="sql-kw">THEN</span> (<span class="sql-func">CAST</span>(<span class="sql-func">TRANSLATE</span>(A.CAP,<span class="sql-str">','</span>,<span class="sql-str">'.'</span>) <span class="sql-kw">AS</span> INT) * 1.2)
+            + <span class="sql-func">NVL</span>(A.BOLSA_ADICIONAL_GB,0)
+            + <span class="sql-func">NVL</span>(A.BOLSA_DOBLE_GB,0)
+            + <span class="sql-func">NVL</span>(A.BOLSA_TRIPLE_GB,0)
+  <span class="sql-kw">END</span> GB_TEORICO,
+
+  <span class="sql-comm">-- Classification CASE: priority order matters</span>
+  <span class="sql-kw">CASE</span>
+    <span class="sql-kw">WHEN</span> A.BOLSA_4G_ILI_HOUR   <span class="sql-op">>=</span> 1 <span class="sql-kw">THEN</span> <span class="sql-str">'4G LIBRE, BAJA HORARIA'</span>
+    <span class="sql-kw">WHEN</span> A.BOLSA_4G_ILI_50GB   <span class="sql-op">>=</span> 1 <span class="sql-kw">THEN</span> <span class="sql-str">'4G LIBRE, BAJA VELOCIDAD'</span>
+    <span class="sql-kw">WHEN</span> A.PPG_UNLIMITED        <span class="sql-op">>=</span> 1 <span class="sql-kw">THEN</span> <span class="sql-str">'BOLSA ILIMITADA TODA RED'</span>
+    <span class="sql-kw">WHEN</span> A.CAP = <span class="sql-str">'ilimitado'</span>        <span class="sql-kw">THEN</span> <span class="sql-str">'PLAN LIBRE'</span>
+    <span class="sql-kw">WHEN</span> A.NORMAL_GB <span class="sql-op">></span> GB_TEORICO  <span class="sql-kw">THEN</span> <span class="sql-str">'IRREGULAR'</span>  <span class="sql-comm">← action required</span>
+    <span class="sql-kw">WHEN</span> A.NORMAL_GB <span class="sql-op"><=</span> GB_TEORICO <span class="sql-kw">THEN</span> <span class="sql-str">'CORRECTO'</span>
+    <span class="sql-kw">ELSE</span> <span class="sql-str">'OTRO'</span>
+  <span class="sql-kw">END</span> CLAS,
+
+  <span class="sql-comm">-- Consumption range for executive summary</span>
+  <span class="sql-kw">CASE</span>
+    <span class="sql-kw">WHEN</span> A.GB_TOTAL <span class="sql-op">BETWEEN</span> 50  <span class="sql-kw">AND</span> 100.999  <span class="sql-kw">THEN</span> <span class="sql-str">'MAYOR A 50 GB'</span>
+    <span class="sql-kw">WHEN</span> A.GB_TOTAL <span class="sql-op">BETWEEN</span> 101 <span class="sql-kw">AND</span> 250.999  <span class="sql-kw">THEN</span> <span class="sql-str">'MAYOR A 100 GB'</span>
+    <span class="sql-kw">WHEN</span> A.GB_TOTAL <span class="sql-op">BETWEEN</span> 251 <span class="sql-kw">AND</span> 500.999  <span class="sql-kw">THEN</span> <span class="sql-str">'MAYOR A 250 GB'</span>
+    <span class="sql-kw">WHEN</span> A.GB_TOTAL <span class="sql-op">></span>   1000          <span class="sql-kw">THEN</span> <span class="sql-str">'MAYOR A 1000 GB'</span>
+  <span class="sql-kw">END</span> RANGO_CONSUMO,
+
+  <span class="sql-comm">-- Real interconnection cost per operator (CLP)</span>
+  (A.CLARO_GB    * 706)   COSTO_CLARO,
+  (A.MOVISTAR_GB * 1157)  COSTO_MOVISTAR,
+  (A.ENTEL_GB    * 7987)  COSTO_ENTEL,        <span class="sql-comm">-- highest rate — 11× Claro</span>
+  (A.WOM_GB      * 150)   COSTO_WOM,
+  (COSTO_CLARO + COSTO_MOVISTAR + COSTO_ENTEL) COSTO_RN
+<span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_USUARIOS.RA.HU_50_PASO</span> A
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_USUARIOS.RA.FRD_STOCK_DEMOS</span> Z <span class="sql-kw">ON</span> A.NUMERO_ABONADO = Z.MOVIL
+<span class="sql-kw">ORDER BY</span> A.NORMAL_GB <span class="sql-kw">DESC</span>;</code></pre></div>
+    </div><!-- /pane-data -->
+
+    <!-- VOICE PANE -->
+    <div class="tab-pane" id="pane-voice">
+        <div class="narrative" id="voice-narrative">
+            <p>The voice control targets postpaid subscribers who made calls to <strong>more than 300 distinct destination numbers</strong> in one billing cycle. This threshold flags two scenarios: automated dialers (fraud risk) and business-segment subscribers incorrectly billed on consumer voice plans. The query runs against <strong>RTX billing tables</strong> — the rated, invoice-ready view of traffic — not raw CDRs, so all figures carry real billing amounts.</p>
+            <p>A second query then adds the <em>mediated traffic layer</em> to compute off-net and roaming-national minutes per competitor operator, enabling a full <strong>cost vs plan value</strong> margin analysis for each flagged line.</p>
+        </div>
+
+        <div style="margin: 22px 0 8px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="voice-pipe-label">UNION across billing cycles → cost enrichment</div>
+        <div class="pipeline-grid">
+            <div class="pipe-step">
+                <div class="pipe-label" id="vp1">RTX extract</div>
+                <div class="pipe-val">UDR_LT<br>SNCODE=3<br>per cycle</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="vp2">UNION</div>
+                <div class="pipe-val">All billing<br>cycles<br>→ 300_DEST</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="vp3">Cost join</div>
+                <div class="pipe-val">Mediated<br>traffic<br>AGG_VOZ</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="vp4">Margin</div>
+                <div class="pipe-val">Cost vs<br>plan value<br>→ Excel</div>
+            </div>
+        </div>
+
+        <div style="margin: 22px 0 8px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="voice-rates-label">Voice interconnection rates (CLP / minute)</div>
+        <table class="rate-table">
+            <thead>
+                <tr><th id="vrt-op">Traffic type</th><th id="vrt-rate">Rate (CLP/min)</th><th id="vrt-note">Context</th></tr>
+            </thead>
+            <tbody>
+                <tr><td id="vrt-offnet">Off-net (all operators)</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">8.3</td><td id="vrt-offnet-n">Average interconnection outpayment</td></tr>
+                <tr><td>Roaming Nacional · Claro</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">5.1</td><td id="vrt-claro">Lowest RN rate</td></tr>
+                <tr><td>Roaming Nacional · Movistar</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">7.8</td><td id="vrt-movistar">Mid-range RN rate</td></tr>
+                <tr><td>Roaming Nacional · Entel</td><td class="cost-num" style="font-size:0.9rem;color:var(--c-warn);">21</td><td id="vrt-entel">Highest RN rate — 4× Claro</td></tr>
+            </tbody>
+        </table>
+
+        <div class="insight">
+            <i class="fas fa-lightbulb insight-icon"></i>
+            <p class="insight-text" id="voice-insight"><b>XFILE_IND ≠ 'V' filters out international roaming records</b> from the RTX table — otherwise roaming calls from subscribers abroad would inflate destination counts and generate false positives. SNCODE = 3 isolates voice telephony only, excluding SMS, data bearer and supplementary services.</p>
+        </div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · 300_DESTINOS_VOZ — UNION across billing cycles + cost model</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- Voice control: detect postpaid lines with >300 distinct destinations per cycle.
+-- Uses RTX billing table (UDR_LT) = rated, invoice-ready traffic.
+-- SNCODE=3: voice telephony only. XFILE_IND != 'V': excludes intl roaming.
+-- UNION covers all billing cycles in the period (each has different date ranges).</span>
+
+<span class="sql-kw">TRUNCATE TABLE</span> <span class="sql-tbl">NZ_USUARIOS.RA.RTX_300_DESTINOS</span>;
+<span class="sql-kw">INSERT INTO</span> <span class="sql-tbl">NZ_USUARIOS.RA.RTX_300_DESTINOS</span>
+<span class="sql-kw">SELECT</span> B.RUT, B.NUMERO_ABONADO, B.NOM_APE_CRP, D.DESC_CORTA_PLAN,
+       Z.Q_DESTINOS, Z.MIN_RTX, Z.MONTO_NETO, Z.DESDE, Z.HASTA
+<span class="sql-kw">FROM</span> (
+  <span class="sql-kw">SELECT</span> A.CUST_INFO_BILL_CYCLE, A.CUST_INFO_CONTRACT_ID,
+         <span class="sql-func">SUM</span>(<span class="sql-func">CAST</span>(A.ROUNDED_VOLUME <span class="sql-kw">AS</span> FLOAT)/60) MIN_RTX,
+         <span class="sql-func">SUM</span>(A.RATED_FLAT_AMOUNT) MONTO_NETO,
+         <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> A.O_P_NUMBER_ADDRESS) Q_DESTINOS,
+         <span class="sql-str">'20181126'</span> DESDE, <span class="sql-str">'20181225'</span> HASTA
+  <span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_PROD.STG_RTX.UDR_LT</span> A
+  <span class="sql-kw">WHERE</span>
+    <span class="sql-func">TO_CHAR</span>(A.INITIAL_START_TIME_TIMESTAMP ...) <span class="sql-op">BETWEEN</span> 20181126 <span class="sql-kw">AND</span> 20181225
+    <span class="sql-kw">AND</span> A.CUST_INFO_BILL_CYCLE = <span class="sql-str">'03'</span>
+    <span class="sql-kw">AND</span> A.TARIFF_INFO_SNCODE = 3        <span class="sql-comm">-- voice only</span>
+    <span class="sql-kw">AND</span> A.XFILE_IND <span class="sql-op">!=</span> <span class="sql-str">'V'</span>              <span class="sql-comm">-- exclude intl roaming</span>
+  <span class="sql-kw">GROUP BY</span> A.CUST_INFO_BILL_CYCLE, A.CUST_INFO_CONTRACT_ID, A.TARIFF_INFO_TMCODE
+  <span class="sql-kw">HAVING COUNT</span>(<span class="sql-kw">DISTINCT</span> A.O_P_NUMBER_ADDRESS) <span class="sql-op">></span> 300  <span class="sql-comm">-- threshold</span>
+
+  <span class="sql-kw">UNION</span>  <span class="sql-comm">-- ... same query for cycles 07, 01/02, 06 with their date ranges</span>
+
+) Z
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.BT_CLE_PARQUE</span> B <span class="sql-kw">ON</span> Z.CUST_INFO_CONTRACT_ID = B.NUMERO_CONTRATO
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.LK_PLN_PLAN</span>   D <span class="sql-kw">ON</span> B.ID_PLAN = D.ID_PLAN
+<span class="sql-kw">ORDER BY</span> Z.Q_DESTINOS <span class="sql-kw">DESC</span>;
+
+<span class="sql-comm">-- Stage 2: add mediated traffic for per-operator cost breakdown</span>
+<span class="sql-kw">SELECT</span> A.*, 
+  (MIN_OFFNET*8.3)      MONTO_OFFNET,
+  (MIN_RN_CLARO*5.1)    MONTO_RN_CLARO,
+  (MIN_RN_MOVISTAR*7.8) MONTO_RN_MOVISTAR,
+  (MIN_RN_ENTEL*21)     MONTO_RN_ENTEL,
+  (MONTO_OFFNET + MONTO_RN_CLARO + MONTO_RN_MOVISTAR + MONTO_RN_ENTEL) TOTAL_COST,
+  C.VALOR_PLAN
+<span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_USUARIOS.RA.RTX_300_DESTINOS</span> A
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.STG_TRAF.AGG_TRF_VOZ_MED_ABONADO</span> B
+       <span class="sql-kw">ON</span> A.NUMERO_ABONADO = B.NUMERO_ABONADO
+      <span class="sql-kw">AND</span> B.ID_DWH_DIA <span class="sql-op">BETWEEN</span> A.DESDE <span class="sql-kw">AND</span> A.HASTA
+      <span class="sql-kw">AND</span> B.STATUS_CODE = <span class="sql-str">'H900'</span>;</code></pre></div>
+    </div><!-- /pane-voice -->
+
+    <!-- SMS PANE -->
+    <div class="tab-pane" id="pane-sms">
+        <div class="narrative" id="sms-narrative">
+            <p>The SMS control mirrors the voice logic but runs against the SMSC traffic table instead of RTX. Any mobile line sending SMS to <strong>more than 300 distinct destination numbers</strong> in January 2019 is extracted. Two additional flags make the detection more precise: a <em>HOOK</em> flag that marks number ranges known to be used in SIM-swap fraud patterns, and a <em>TIPO</em> flag that identifies lines declared as internal test lines (from the fraud stock table).</p>
+            <p>Off-net SMS (SINK_NAME contains 'OUT') vs on-net (SINK_NAME = 'mt default') vs other are counted separately to assess interconnection exposure.</p>
+        </div>
+
+        <div class="insight">
+            <i class="fas fa-lightbulb insight-icon"></i>
+            <p class="insight-text" id="sms-insight"><b>The HOOK flag marks SIM ranges associated with fraud patterns.</b> If a line's MSISDN falls within those ranges and it's sending SMS to 300+ destinations, the interpretation is different from a regular subscriber — it goes directly to the fraud team, not to the commercial teams.</p>
+        </div>
+        <div class="insight is-ok" style="margin-top: 12px;">
+            <i class="fas fa-info-circle insight-icon"></i>
+            <p class="insight-text" id="sms-insight-2"><b>SRC_NAME = 'Nextel'</b> filters to the WOM network origin (the Nextel brand that became WOM Chile). Without this filter, the query would pick up transit traffic from other operators passing through the SMSC, creating false positives for subscriber detection.</p>
+        </div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · DESTINO_300_SMS — with fraud HOOK flag and onnet/offnet split</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- SMS control: subscribers sending to >300 distinct destinations in Jan 2019.
+-- HOOK: marks MSISDN ranges associated with fraud / SIM-swap patterns.
+-- TIPO: identifies internal test lines from the fraud stock table.
+-- Onnet vs offnet vs other counted separately for interconnection exposure.</span>
+
+<span class="sql-kw">SELECT</span>
+  <span class="sql-func">SUBSTR</span>(A.ENTRY_DATE,1,6) PERIODO,
+  A.ORIG, B.RUT, B.NOM_APE_CRP, B.NUMERO_CONTRATO,
+  C.DESC_CORTA_PLAN, C.DESC_PLAN,
+
+  <span class="sql-comm">-- Fraud indicator: known high-risk MSISDN ranges</span>
+  <span class="sql-kw">CASE WHEN</span> A.NUMERO_ABONADO <span class="sql-op">BETWEEN</span> <span class="sql-str">'56945950000'</span> <span class="sql-kw">AND</span> <span class="sql-str">'56945950999'</span>
+            <span class="sql-kw">OR</span> A.NUMERO_ABONADO <span class="sql-op">BETWEEN</span> <span class="sql-str">'56964590000'</span> <span class="sql-kw">AND</span> <span class="sql-str">'56964590999'</span>
+            <span class="sql-kw">OR</span> A.NUMERO_ABONADO <span class="sql-op">BETWEEN</span> <span class="sql-str">'56931402001'</span> <span class="sql-kw">AND</span> <span class="sql-str">'56931402501'</span>
+            <span class="sql-kw">OR</span> A.NUMERO_ABONADO <span class="sql-op">BETWEEN</span> <span class="sql-str">'56935500000'</span> <span class="sql-kw">AND</span> <span class="sql-str">'56935509999'</span>
+       <span class="sql-kw">THEN</span> <span class="sql-str">'SI'</span> <span class="sql-kw">ELSE</span> <span class="sql-str">'NO'</span>
+  <span class="sql-kw">END</span> HOOK,
+
+  <span class="sql-comm">-- Test line identifier (fraud team's internal stock)</span>
+  <span class="sql-kw">CASE WHEN</span> A.ORIG = Z.MOVIL <span class="sql-kw">THEN</span> <span class="sql-str">'PRUEBAS'</span> <span class="sql-kw">ELSE</span> <span class="sql-str">'NO'</span> <span class="sql-kw">END</span> TIPO,
+
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> A.DEST1)                                              Q_DESTINO,
+  <span class="sql-func">COUNT</span>(1)                                                               Q_SMS,
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">CASE WHEN UPPER</span>(A.SINK_NAME) <span class="sql-kw">LIKE</span> <span class="sql-str">'%OUT%'</span>     <span class="sql-kw">THEN</span> 1 <span class="sql-kw">END</span>) OFFNET,
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">CASE WHEN</span> A.SINK_NAME = <span class="sql-str">'mt default'</span>          <span class="sql-kw">THEN</span> 1 <span class="sql-kw">END</span>) ONNET,
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">CASE WHEN</span> (<span class="sql-kw">UPPER</span>(A.SINK_NAME) <span class="sql-kw">NOT LIKE</span> <span class="sql-str">'%OUT%'</span>
+               <span class="sql-kw">AND</span> A.SINK_NAME <span class="sql-op">!=</span> <span class="sql-str">'mt default'</span>)   <span class="sql-kw">THEN</span> 1 <span class="sql-kw">END</span>) OTROS
+
+<span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_PROD.STG_TRAF.BT_TRAFICO_SMSC_SYMSOFT</span> A
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.BT_CLE_PARQUE</span>       B <span class="sql-kw">ON</span> A.ORIG = B.NUMERO_ABONADO <span class="sql-kw">AND</span> B.PERIODO_PARQUE = 201901
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.LK_PLN_PLAN</span>          C <span class="sql-kw">ON</span> B.ID_PLAN = C.ID_PLAN
+<span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_USUARIOS.RA.FRD_STOCK_DEMOS</span>       Z <span class="sql-kw">ON</span> A.ORIG = Z.MOVIL
+<span class="sql-kw">WHERE</span>
+  A.ENTRY_DATE <span class="sql-op">BETWEEN</span> 20190101 <span class="sql-kw">AND</span> 20190131
+  <span class="sql-kw">AND</span> <span class="sql-func">LENGTH</span>(A.ORIG)  = 11          <span class="sql-comm">-- 11-digit MSISDN only</span>
+  <span class="sql-kw">AND</span> <span class="sql-func">LENGTH</span>(A.DEST1) = 11
+  <span class="sql-kw">AND</span> A.SRC_NAME = <span class="sql-str">'Nextel'</span>         <span class="sql-comm">-- WOM network origin only</span>
+  <span class="sql-kw">AND</span> A.STATE <span class="sql-kw">IN</span> (<span class="sql-str">'Delivered direct'</span>, <span class="sql-str">'Delivered'</span>)
+  <span class="sql-kw">AND</span> A.TYPE = <span class="sql-str">'M'</span>                  <span class="sql-comm">-- mobile-originated</span>
+<span class="sql-kw">GROUP BY</span> PERIODO, A.ORIG, B.RUT, B.NOM_APE_CRP, ...
+<span class="sql-kw">HAVING</span> Q_DESTINO <span class="sql-op">></span> 300
+<span class="sql-kw">ORDER BY</span> Q_SMS <span class="sql-kw">DESC</span>;</code></pre></div>
+    </div><!-- /pane-sms -->
+
+  </div><!-- /card -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     03 · WHAT I OWNED
+════════════════════════════════════════════════════════════ -->
+<section>
+  <div class="card">
+    <span class="eyebrow" id="label-3">03 · What I Owned</span>
+    <h2 class="section-title" id="title-3">The design choices that separate <b>detection</b> from <b>false positives.</b></h2>
+
+    <div class="twocol">
+        <div class="twocol-block">
+            <h4><i class="fas fa-compass"></i> <span id="dec-head">Decisions I owned</span></h4>
+            <ul class="twocol-list">
+                <li>
+                    <b id="d1-t">3-stage pipeline separates concerns cleanly.</b>
+                    <span id="d1-d">Stage 1 aggregates traffic. Stage 2 joins PCRF service state. Stage 3 classifies and computes cost. Each stage can be re-run independently — if the PCRF date needs correction, only Stage 2 re-executes without re-running the heavy traffic aggregation.</span>
+                </li>
+                <li>
+                    <b id="d2-t">NORMAL_GB vs GB_TEORICO — the right comparison axis.</b>
+                    <span id="d2-d">Comparing total GB would create false positives for subscribers with legitimate free-rated traffic (social networks, music, WhatsApp). Isolating <code>NORMAL_GB</code> (rating groups 103/203/303) against the theoretical cap is the only fair comparison.</span>
+                </li>
+                <li>
+                    <b id="d3-t">Per-operator cost modelling, not aggregate.</b>
+                    <span id="d3-d">Entel's interconnection rate is 11× Claro's. A subscriber routing 1 GB through Entel costs more than 11 subscribers routing through Claro. Breaking cost by operator let Finance prioritise which heavy users to act on first — not by volume, but by actual cost exposure.</span>
+                </li>
+                <li>
+                    <b id="d4-t">HOOK + TIPO flags separate fraud from commercial cases.</b>
+                    <span id="d4-d">A 300-destination SMS sender in a known fraud MSISDN range gets routed to the fraud team. The same subscriber outside those ranges goes to Marketing and Customer Experience. Same detection logic, different escalation path — encoded in the query output, not decided ad hoc.</span>
+                </li>
+            </ul>
+        </div>
+        <div class="twocol-block is-fail">
+            <h4><i class="fas fa-bug"></i> <span id="fail-head">Constraints + what I'd change</span></h4>
+            <ul class="twocol-list">
+                <li>
+                    <b id="f1-t">Manual Excel export and email delivery.</b>
+                    <span id="f1-d">All three controls ended with an Excel export and a manual email to 5–10 recipients. A shared dashboard or automated distribution (e.g. Looker, Power BI, or even a scheduled SQL Server report) would have reduced the cycle from analysis → action by days.</span>
+                </li>
+                <li>
+                    <b id="f2-t">PCRF date hardcoded in Stage 2.</b>
+                    <span id="f2-d">The join to <code>BT_CLE_SALDO_SERVICIO_DIA</code> required manually setting the date to "yesterday" before each run. A parameterised <code>$fecha_pcrf = CURRENT_DATE - 1</code> would have eliminated this operational risk with zero cost.</span>
+                </li>
+                <li>
+                    <b id="f3-t">No longitudinal tracking across cycles.</b>
+                    <span id="f3-d">Each control produced a point-in-time snapshot. There was no way to answer "is this subscriber a recurring heavy user or a one-time spike?" An append pattern into a permanent table would have enabled recurrence analysis without re-running historical data.</span>
+                </li>
+                <li>
+                    <b id="f4-t">Interconnection rates hardcoded in SQL.</b>
+                    <span id="f4-d">CLP rates (706, 1157, 7987, 8.3, 5.1, 7.8, 21) were embedded directly in the cost calculation queries. A lookup table in <code>NZ_USUARIOS.RA</code> would have made rate updates a data change, not a code change.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<blockquote class="closing-take">
+    <span id="closing-quote">"'Unlimited' is a commercial promise. The network still has a cost per GB — and someone has to know who's consuming 800 of them."</span>
+    <span class="closing-author" id="closing-author">— Working principle from this project</span>
+</blockquote>
+
+<div class="contact-section">
+    <p class="contact-text" id="contact-text">
+        Revenue assurance, anomaly detection, cost modelling — this work sits at the intersection of data engineering and business intelligence. If that's the profile you're hiring for, let's talk.
+    </p>
+    <a href="../index.html#convergence-section" class="contact-btn" id="contact-btn">
+        <i class="fas fa-arrow-right"></i> Contact Javier
+    </a>
+</div>
+
+</div><!-- /container -->
+
+<script>
+function toggleCode(btn) {
+    btn.nextElementSibling.classList.toggle('active');
+    btn.classList.toggle('is-open');
+}
+function switchTab(tab) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('is-active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('is-active'));
+    document.getElementById('pane-' + tab).classList.add('is-active');
+    document.getElementById('tab-' + tab + '-btn').classList.add('is-active');
+}
+
+const T = {
+    en: {
+        navBack:"Back to Portfolio", badge:"Case Study · WOM Chile · 2019",
+        title:"Heavy User<br><span class='text-accent'>Detection</span>",
+        lead:"Three monthly controls — data, voice and SMS — to surface subscribers consuming far beyond their plan, detect roaming cost exposure, and separate irregular use from legitimate promotions. Built in Netezza SQL, loaded to SQL Server, reported to Marketing, Finance and Customer Experience.",
+        kpi1:"Data detection threshold", kpi2:"Voice / SMS destination threshold",
+        kpi3:"Network cost flagged (data)", kpi4:"Controls per cycle",
+        metaPeriod:"Monthly · per billing cycle", metaRole:"Data Analyst",
+        label1:"01 · Context",
+        title1:"A subscriber using <b>800 GB</b> on a 10 GB plan doesn't appear in any alert. Until someone writes the query.",
+        text1:"<p>WOM Chile's commercial strategy — unlimited 4G promotions, double and triple data bags, social network zero-rating — was designed for growth. But it created a monitoring gap: a subscriber with enough promotional services stacked could consume <strong>hundreds of gigabytes</strong> without triggering any automated limit, while generating real interconnection costs to other operators at fixed per-GB or per-minute rates.</p><p>The same problem appeared in voice and SMS. A postpaid line calling <strong>more than 300 distinct destinations</strong> in one cycle is not normal consumer use — it's either a fraud pattern or a business line incorrectly tariffed on a consumer plan. Without a monthly detection process, both scenarios were invisible.</p><p><em>The three controls in this case study were the detection layer that didn't exist yet. Each produced a cost-modelled report delivered to Marketing, Customer Experience, Finance and Interconnections.</em></p>",
+        label2:"02 · The Three Controls",
+        title2:"Data. Voice. SMS. Each a different <b>abuse pattern,</b> each a different detection logic.",
+        tabData:"📊 Data · 50 GB", tabVoice:"📞 Voice · 300+ dest.", tabSms:"💬 SMS · 300+ dest.",
+        dataNarr:"<p>The data heavy user control runs <strong>once per month per billing cycle</strong> (up to 7 cycles). Any subscriber consuming <strong>≥ 50 GB</strong> in their cycle window is extracted, classified and cost-modelled against interconnection rates by operator (Claro, Movistar, Entel) and WOM's own network at CLP 150/GB. The result separates legitimate cases (unlimited plans, promotional bags) from <em>irregular</em> — subscribers whose normal-traffic GB exceeds their theoretical cap.</p>",
+        dataPipeLabel:"3-stage detection pipeline",
+        dp1:"Stage 1", dp2:"Stage 2", dp3:"Stage 3",
+        dataClassLabel:"Classification logic",
+        dcIrreg:"<code>NORMAL_GB > GB_TEORICO</code> — actual traffic exceeds theoretical cap (plan base × 1.2 + extra bags + double/triple bags).",
+        dcOk:"<code>NORMAL_GB ≤ GB_TEORICO</code> — consumption within theoretical cap. No action required.",
+        dc4g:"Subscriber has an unlimited 4G promotional bag with speed throttling or hourly restrictions. Exempt from cap comparison.",
+        dcUnl:"Plan is unlimited or subscriber purchased an unlimited prepaid bag. Exempt. Reported for volume visibility only.",
+        dataCostLabel:"Network cost breakdown (example period)",
+        dccRn:"Interconnection cost · other operators", dccRnSub:"Claro @706/GB · Movistar @1,157/GB · Entel @7,987/GB. Entel's rate is 11× Claro — roaming distribution matters.",
+        dccWom:"WOM own-network cost", dccWomSub:"@CLP 150/GB internal transfer price. Majority of heavy-user traffic flows through WOM's own 4G — so the internal cost dominates.",
+        rtOp:"Operator", rtRate:"Rate / GB (CLP)", rtNote:"Note",
+        rtClaro:"Lowest interconnection cost", rtMovistar:"1.6× Claro", rtEntel:"11.3× Claro — critical to monitor",
+        dataInsight:"<b>Rating group 999 was a data quality signal, not a traffic type.</b> It represented the delta between CDR header and detail — a known discrepancy that needed monitoring to ensure it didn't grow. It was listed separately in every report as a quality flag, not a classification category.",
+        voiceNarr:"<p>The voice control targets postpaid subscribers who made calls to <strong>more than 300 distinct destination numbers</strong> in one billing cycle. This threshold flags two scenarios: automated dialers (fraud risk) and business-segment subscribers incorrectly billed on consumer voice plans. The query runs against <strong>RTX billing tables</strong> — the rated, invoice-ready view of traffic — not raw CDRs, so all figures carry real billing amounts.</p><p>A second query then adds the <em>mediated traffic layer</em> to compute off-net and roaming-national minutes per competitor operator, enabling a full <strong>cost vs plan value</strong> margin analysis for each flagged line.</p>",
+        voicePipeLabel:"UNION across billing cycles → cost enrichment",
+        vp1:"RTX extract", vp2:"UNION", vp3:"Cost join", vp4:"Margin",
+        voiceRatesLabel:"Voice interconnection rates (CLP / minute)",
+        vrtOp:"Traffic type", vrtRate:"Rate (CLP/min)", vrtNote:"Context",
+        vrtOffnet:"Off-net (all operators)", vrtOffnetN:"Average interconnection outpayment", vrtClaro:"Lowest RN rate", vrtMovistar:"Mid-range RN rate", vrtEntel:"Highest RN rate — 4× Claro",
+        voiceInsight:"<b>XFILE_IND ≠ 'V' filters out international roaming records</b> from the RTX table — otherwise roaming calls from subscribers abroad would inflate destination counts and generate false positives. SNCODE = 3 isolates voice telephony only.",
+        smsNarr:"<p>The SMS control mirrors the voice logic but runs against the SMSC traffic table instead of RTX. Any mobile line sending SMS to <strong>more than 300 distinct destination numbers</strong> in January 2019 is extracted. Two additional flags make the detection more precise: a <em>HOOK</em> flag that marks number ranges known to be used in fraud patterns, and a <em>TIPO</em> flag that identifies lines declared as internal test lines.</p><p>Off-net SMS (SINK_NAME contains 'OUT') vs on-net (SINK_NAME = 'mt default') vs other are counted separately to assess interconnection exposure.</p>",
+        smsInsight:"<b>The HOOK flag marks SIM ranges associated with fraud patterns.</b> If a line's MSISDN falls within those ranges and it's sending SMS to 300+ destinations, the interpretation is different — it goes directly to the fraud team, not to the commercial teams.",
+        smsInsight2:"<b>SRC_NAME = 'Nextel'</b> filters to the WOM network origin. Without this filter, the query would pick up transit traffic from other operators passing through the SMSC, creating false positives.",
+        label3:"03 · What I Owned",
+        title3:"The design choices that separate <b>detection</b> from <b>false positives.</b>",
+        decHead:"Decisions I owned",
+        d1t:"3-stage pipeline separates concerns cleanly.", d1d:"Stage 1 aggregates traffic. Stage 2 joins PCRF service state. Stage 3 classifies and computes cost. Each stage can be re-run independently — if the PCRF date needs correction, only Stage 2 re-executes without re-running the heavy traffic aggregation.",
+        d2t:"NORMAL_GB vs GB_TEORICO — the right comparison axis.", d2d:"Comparing total GB would create false positives for subscribers with legitimate free-rated traffic (social networks, music, WhatsApp). Isolating <code>NORMAL_GB</code> (rating groups 103/203/303) against the theoretical cap is the only fair comparison.",
+        d3t:"Per-operator cost modelling, not aggregate.", d3d:"Entel's interconnection rate is 11× Claro's. A subscriber routing 1 GB through Entel costs more than 11 subscribers routing through Claro. Breaking cost by operator let Finance prioritise which heavy users to act on first — not by volume, but by actual cost exposure.",
+        d4t:"HOOK + TIPO flags separate fraud from commercial cases.", d4d:"A 300-destination SMS sender in a known fraud MSISDN range gets routed to the fraud team. The same subscriber outside those ranges goes to Marketing and Customer Experience. Same detection logic, different escalation path — encoded in the query output, not decided ad hoc.",
+        failHead:"Constraints + what I'd change",
+        f1t:"Manual Excel export and email delivery.", f1d:"All three controls ended with an Excel export and a manual email to 5–10 recipients. A shared dashboard or automated distribution would have reduced the cycle from analysis → action by days.",
+        f2t:"PCRF date hardcoded in Stage 2.", f2d:"The join to <code>BT_CLE_SALDO_SERVICIO_DIA</code> required manually setting the date to 'yesterday' before each run. A parameterised <code>$fecha_pcrf</code> would have eliminated this operational risk with zero cost.",
+        f3t:"No longitudinal tracking across cycles.", f3d:"Each control produced a point-in-time snapshot. There was no way to answer 'is this subscriber a recurring heavy user or a one-time spike?' An append pattern into a permanent table would have enabled recurrence analysis.",
+        f4t:"Interconnection rates hardcoded in SQL.", f4d:"CLP rates (706, 1157, 7987, 8.3, 5.1, 7.8, 21) were embedded directly in cost calculation queries. A lookup table would have made rate updates a data change, not a code change.",
+        closingQuote:"\"'Unlimited' is a commercial promise. The network still has a cost per GB — and someone has to know who's consuming 800 of them.\"",
+        closingAuthor:"— Working principle from this project",
+        contactText:"Revenue assurance, anomaly detection, cost modelling — this work sits at the intersection of data engineering and business intelligence. If that's the profile you're hiring for, let's talk.",
+        contactBtn:"Contact Javier", queryLabel:"Source"
+    },
+    es: {
+        navBack:"Volver al Portafolio", badge:"Caso de Estudio · WOM Chile · 2019",
+        title:"Detección de<br><span class='text-accent'>Heavy Users</span>",
+        lead:"Tres controles mensuales — datos, voz y SMS — para detectar abonados con consumo muy superior a su plan, medir la exposición de costos de roaming, y separar el uso irregular de las promociones legítimas. Construidos en Netezza SQL, cargados a SQL Server, reportados a Marketing, Finanzas y Customer Experience.",
+        kpi1:"Umbral detección datos", kpi2:"Umbral destinos voz / SMS",
+        kpi3:"Costo de red detectado (datos)", kpi4:"Controles por ciclo",
+        metaPeriod:"Mensual · por ciclo de facturación", metaRole:"Analista de Datos",
+        label1:"01 · Contexto",
+        title1:"Un abonado usando <b>800 GB</b> en un plan de 10 GB no aparece en ninguna alerta. Hasta que alguien escribe la query.",
+        text1:"<p>La estrategia comercial de WOM Chile — promociones 4G ilimitadas, bolsas dobles y triples, zero-rating de redes sociales — estaba diseñada para crecer. Pero creó un vacío de monitoreo: un abonado con suficientes servicios promocionales apilados podía consumir <strong>cientos de gigabytes</strong> sin activar ningún límite automático, mientras generaba costos reales de interconexión con otros operadores.</p><p>El mismo problema apareció en voz y SMS. Una línea postpago llamando a <strong>más de 300 destinos distintos</strong> en un ciclo no es uso normal — es un patrón de fraude o una línea de empresa tarificada incorrectamente en un plan de consumidor. Sin un proceso mensual de detección, ambos escenarios eran invisibles.</p><p><em>Los tres controles en este caso de estudio fueron la capa de detección que no existía. Cada uno produjo un reporte con modelamiento de costos entregado a Marketing, Customer Experience, Finanzas e Interconexiones.</em></p>",
+        label2:"02 · Los Tres Controles",
+        title2:"Datos. Voz. SMS. Cada uno un <b>patrón de abuso distinto,</b> cada uno una lógica de detección diferente.",
+        tabData:"📊 Datos · 50 GB", tabVoice:"📞 Voz · 300+ dest.", tabSms:"💬 SMS · 300+ dest.",
+        dataNarr:"<p>El control de heavy users de datos se ejecuta <strong>una vez al mes por ciclo de facturación</strong> (hasta 7 ciclos). Todo abonado que consuma <strong>≥ 50 GB</strong> en su ventana de ciclo es extraído, clasificado y modelado en costos por operador (Claro, Movistar, Entel) y la propia red de WOM a CLP 150/GB. El resultado separa los casos legítimos (planes libres, bolsas promocionales) de los <em>irregulares</em> — abonados cuyo GB de tráfico normal supera el cap teórico.</p>",
+        dataPipeLabel:"Pipeline de detección en 3 etapas",
+        dp1:"Etapa 1", dp2:"Etapa 2", dp3:"Etapa 3",
+        dataClassLabel:"Lógica de clasificación",
+        dcIrreg:"<code>NORMAL_GB > GB_TEORICO</code> — el tráfico real supera el cap teórico (base del plan × 1,2 + bolsas adicionales + bolsas dobles/triples).",
+        dcOk:"<code>NORMAL_GB ≤ GB_TEORICO</code> — consumo dentro del cap teórico. Sin acción requerida.",
+        dc4g:"El abonado tiene una bolsa promocional ilimitada en 4G con throttling de velocidad o restricción horaria. Exento de la comparación de cap.",
+        dcUnl:"El plan es ilimitado o el abonado compró una bolsa prepago ilimitada. Exento. Se reporta solo para visibilidad de volumen.",
+        dataCostLabel:"Desglose de costo de red (período de ejemplo)",
+        dccRn:"Costo interconexión · otros operadores", dccRnSub:"Claro @706/GB · Movistar @1.157/GB · Entel @7.987/GB. La tarifa de Entel es 11× la de Claro — la distribución de roaming importa.",
+        dccWom:"Costo red propia WOM", dccWomSub:"@CLP 150/GB precio de transferencia interno. La mayoría del tráfico heavy user fluye por la propia 4G de WOM, por eso el costo interno domina.",
+        rtOp:"Operador", rtRate:"Tarifa / GB (CLP)", rtNote:"Nota",
+        rtClaro:"Menor costo de interconexión", rtMovistar:"1,6× Claro", rtEntel:"11,3× Claro — crítico monitorear",
+        dataInsight:"<b>El rating group 999 era una señal de calidad de datos, no un tipo de tráfico.</b> Representaba el delta entre header y detalle en el CDR — una discrepancia conocida que necesitaba monitoreo para que no creciera. Se listaba por separado en cada reporte como indicador de calidad, no como categoría de clasificación.",
+        voiceNarr:"<p>El control de voz apunta a abonados postpago que realizaron llamadas a <strong>más de 300 números de destino distintos</strong> en un ciclo de facturación. Este umbral detecta dos escenarios: marcadores automáticos (riesgo fraude) y abonados de segmento empresa tarificados incorrectamente en planes de consumidor. La query corre contra las <strong>tablas de facturación RTX</strong> — la vista tasada y lista para factura — no CDRs crudos, por eso todos los montos tienen valor real de facturación.</p><p>Una segunda query agrega la capa de tráfico mediado para calcular minutos off-net y roaming nacional por operador competidor, habilitando un análisis completo de <strong>costo vs valor del plan</strong> para cada línea detectada.</p>",
+        voicePipeLabel:"UNION por ciclos de facturación → enriquecimiento de costos",
+        vp1:"Extracción RTX", vp2:"UNION", vp3:"Join costos", vp4:"Margen",
+        voiceRatesLabel:"Tarifas interconexión voz (CLP / minuto)",
+        vrtOp:"Tipo tráfico", vrtRate:"Tarifa (CLP/min)", vrtNote:"Contexto",
+        vrtOffnet:"Off-net (todos los operadores)", vrtOffnetN:"Promedio pago de interconexión saliente", vrtClaro:"Menor tarifa RN", vrtMovistar:"Tarifa RN media", vrtEntel:"Mayor tarifa RN — 4× Claro",
+        voiceInsight:"<b>XFILE_IND ≠ 'V' filtra los registros de roaming internacional</b> de la tabla RTX — de lo contrario las llamadas en roaming desde el exterior inflarían el conteo de destinos y generarían falsos positivos. SNCODE = 3 aísla solo telefonía de voz.",
+        smsNarr:"<p>El control SMS replica la lógica del de voz pero corre contra la tabla de tráfico SMSC en lugar de RTX. Cualquier línea móvil que envíe SMS a <strong>más de 300 números de destino distintos</strong> en enero 2019 es extraída. Dos flags adicionales hacen la detección más precisa: un flag <em>HOOK</em> que marca rangos de números asociados a patrones de fraude, y un flag <em>TIPO</em> que identifica líneas declaradas como internas de prueba.</p><p>SMS off-net (SINK_NAME contiene 'OUT') vs on-net (SINK_NAME = 'mt default') vs otros se cuentan por separado para medir la exposición de interconexión.</p>",
+        smsInsight:"<b>El flag HOOK marca rangos de SIM asociados a patrones de fraude.</b> Si el MSISDN de una línea cae en esos rangos y envía SMS a 300+ destinos, la interpretación es distinta — va directo al equipo de fraude, no a los equipos comerciales.",
+        smsInsight2:"<b>SRC_NAME = 'Nextel'</b> filtra al origen de red WOM. Sin este filtro, la query captaría tráfico de tránsito de otros operadores pasando por el SMSC, generando falsos positivos.",
+        label3:"03 · Lo que Tuve a Cargo",
+        title3:"Las decisiones de diseño que separan la <b>detección</b> de los <b>falsos positivos.</b>",
+        decHead:"Decisiones que tomé",
+        d1t:"Pipeline en 3 etapas separa responsabilidades limpiamente.", d1d:"Etapa 1 agrega tráfico. Etapa 2 cruza estado de servicios PCRF. Etapa 3 clasifica y calcula costos. Cada etapa puede re-ejecutarse de forma independiente — si la fecha de PCRF requiere corrección, solo re-ejecuta Etapa 2 sin volver a correr la pesada agregación de tráfico.",
+        d2t:"NORMAL_GB vs GB_TEORICO — el eje de comparación correcto.", d2d:"Comparar el GB total crearía falsos positivos para abonados con tráfico legítimo zero-rated (redes sociales, música, WhatsApp). Aislar <code>NORMAL_GB</code> (rating groups 103/203/303) contra el cap teórico es la única comparación justa.",
+        d3t:"Modelamiento de costo por operador, no agregado.", d3d:"La tarifa de interconexión de Entel es 11× la de Claro. Un abonado que rutee 1 GB por Entel cuesta más que 11 abonados ruteando por Claro. Desagregar el costo por operador permitió a Finanzas priorizar qué heavy users atender primero — no por volumen, sino por exposición de costo real.",
+        d4t:"Flags HOOK + TIPO separan fraude de casos comerciales.", d4d:"Un emisor de 300 destinos SMS en un rango de MSISDN de fraude conocido va al equipo de fraude. El mismo abonado fuera de esos rangos va a Marketing y Customer Experience. Misma lógica de detección, camino de escalación diferente — codificado en el output de la query, no decidido ad hoc.",
+        failHead:"Limitaciones + qué cambiaría",
+        f1t:"Exportación a Excel y envío por correo manuales.", f1d:"Los tres controles terminaban con una exportación a Excel y un correo manual a 5–10 destinatarios. Un dashboard compartido o distribución automatizada habría reducido el ciclo de análisis → acción en días.",
+        f2t:"Fecha de PCRF hardcodeada en Etapa 2.", f2d:"El join a <code>BT_CLE_SALDO_SERVICIO_DIA</code> requería ajustar manualmente la fecha a 'ayer' antes de cada ejecución. Un <code>$fecha_pcrf</code> parametrizado habría eliminado este riesgo operacional a costo cero.",
+        f3t:"Sin seguimiento longitudinal entre ciclos.", f3d:"Cada control producía un snapshot puntual. No había forma de responder '¿es este abonado un heavy user recurrente o un spike de una vez?' Un patrón de append a una tabla permanente habría habilitado análisis de recurrencia.",
+        f4t:"Tarifas de interconexión hardcodeadas en SQL.", f4d:"Las tarifas en CLP (706, 1157, 7987, 8.3, 5.1, 7.8, 21) estaban embebidas directamente en las queries de cálculo de costos. Una tabla de lookup habría convertido las actualizaciones de tarifas en un cambio de datos, no de código.",
+        closingQuote:"\"'Ilimitado' es una promesa comercial. La red igual tiene un costo por GB — y alguien tiene que saber quién está consumiendo 800 de ellos.\"",
+        closingAuthor:"— Principio de trabajo de este proyecto",
+        contactText:"Revenue assurance, detección de anomalías, modelamiento de costos — este trabajo está en la intersección de ingeniería de datos e inteligencia de negocios. Si ese es el perfil que buscas contratar, hablemos.",
+        contactBtn:"Contactar a Javier", queryLabel:"Consulta"
+    }
+};
+
+function changeLang(lang) {
+    document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('is-active'));
+    document.getElementById('btn-' + lang).classList.add('is-active');
+    const t = T[lang];
+    const s = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+    const h = (id,v) => { const e=document.getElementById(id); if(e) e.innerHTML=v; };
+
+    s('nav-back',t.navBack); s('hero-badge',t.badge); h('hero-title',t.title); s('hero-lead',t.lead);
+    s('kpi-1',t.kpi1); s('kpi-2',t.kpi2); s('kpi-3',t.kpi3); s('kpi-4',t.kpi4);
+    s('meta-period',t.metaPeriod); s('meta-role',t.metaRole);
+    s('label-1',t.label1); h('title-1',t.title1); h('text-1',t.text1);
+    s('label-2',t.label2); h('title-2',t.title2);
+    s('tab-data-btn',t.tabData); s('tab-voice-btn',t.tabVoice); s('tab-sms-btn',t.tabSms);
+    h('data-narrative',t.dataNarr); s('data-pipe-label',t.dataPipeLabel);
+    s('dp1',t.dp1); s('dp2',t.dp2); s('dp3',t.dp3);
+    s('data-class-label',t.dataClassLabel);
+    h('dc-irreg',t.dcIrreg); h('dc-ok',t.dcOk); h('dc-4g',t.dc4g); h('dc-unl',t.dcUnl);
+    s('data-cost-label',t.dataCostLabel);
+    s('dcc-rn',t.dccRn); s('dcc-rn-sub',t.dccRnSub);
+    s('dcc-wom',t.dccWom); s('dcc-wom-sub',t.dccWomSub);
+    s('rt-op',t.rtOp); s('rt-rate',t.rtRate); s('rt-note',t.rtNote);
+    s('rt-claro',t.rtClaro); s('rt-movistar',t.rtMovistar); s('rt-entel',t.rtEntel);
+    h('data-insight',t.dataInsight);
+    h('voice-narrative',t.voiceNarr); s('voice-pipe-label',t.voicePipeLabel);
+    s('vp1',t.vp1); s('vp2',t.vp2); s('vp3',t.vp3); s('vp4',t.vp4);
+    s('voice-rates-label',t.voiceRatesLabel);
+    s('vrt-op',t.vrtOp); s('vrt-rate',t.vrtRate); s('vrt-note',t.vrtNote);
+    s('vrt-offnet',t.vrtOffnet); s('vrt-offnet-n',t.vrtOffnetN);
+    s('vrt-claro',t.vrtClaro); s('vrt-movistar',t.vrtMovistar); s('vrt-entel',t.vrtEntel);
+    h('voice-insight',t.voiceInsight);
+    h('sms-narrative',t.smsNarr); h('sms-insight',t.smsInsight); h('sms-insight-2',t.smsInsight2);
+    s('label-3',t.label3); h('title-3',t.title3);
+    s('dec-head',t.decHead);
+    s('d1-t',t.d1t); h('d1-d',t.d1d);
+    s('d2-t',t.d2t); h('d2-d',t.d2d);
+    s('d3-t',t.d3t); h('d3-d',t.d3d);
+    s('d4-t',t.d4t); h('d4-d',t.d4d);
+    s('fail-head',t.failHead);
+    s('f1-t',t.f1t); h('f1-d',t.f1d);
+    s('f2-t',t.f2t); h('f2-d',t.f2d);
+    s('f3-t',t.f3t); h('f3-d',t.f3d);
+    s('f4-t',t.f4t); h('f4-d',t.f4d);
+    s('closing-quote',t.closingQuote); s('closing-author',t.closingAuthor);
+    s('contact-text',t.contactText);
+    h('contact-btn','<i class="fas fa-arrow-right"></i> '+t.contactBtn);
+    document.querySelectorAll('.query-label').forEach(e=>e.textContent=t.queryLabel);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const p = new URLSearchParams(window.location.search);
+    const lang = p.get('lang') || 'en';
+    changeLang(lang);
+    const backBtn = document.querySelector('.back-link');
+    if (backBtn) {
+        let url = "../index.html";
+        const ps = [];
+        if (p.get('v')) ps.push('v='+p.get('v'));
+        if (lang) ps.push('lang='+lang);
+        if (ps.length) url += '?' + ps.join('&');
+        url += '#projects';
+        backBtn.href = url;
+    }
+});
+</script>
+</body>
+</html>

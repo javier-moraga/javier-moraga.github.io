@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entel · Billing Pipeline Debugging · Javier Moraga</title>
+    <meta name="description" content="Case study: Auditing a legacy extraction script to uncover a silent data failure, boosting billing notification reach from 76% to 99%.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
+    <style>
+/* ═══════════════════════════════════════════════════════════════════
+   ENTEL Billing Pipeline Case Study — Premium UX
+═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg:        #050505;
+    --bg2:       #08080c;
+    --surface:   rgba(12,12,16,0.6);
+    --border:    rgba(255,255,255,0.05);
+    --border-hi: rgba(255,255,255,0.12);
+    --text:      rgba(255,255,255,0.92);
+    --muted:     #94a3b8;
+    --dim:       rgba(255,255,255,0.22);
+
+    /* Entel Colors */
+    --c-eng:     #2563eb;   /* Primary accent - Blue */
+    --c-viz:     #ff6a00;   /* Analytics / warnings - Orange */
+    --c-biz:     #00e5ff;   /* Secondary - Cyan */
+
+    --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body: 'Inter', sans-serif;
+    --font-disp: 'Jost', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #050505 0%, #050505 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    padding-top: 64px;
+}
+
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* NAV */
+.nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; padding: 0 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(5,5,5,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+}
+.back-link {
+    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border); padding: 7px 14px 7px 12px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 8px; transition: all 0.25s var(--ease);
+}
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s var(--ease); }
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-eng); opacity: 1; }
+
+.nav-name {
+    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border); padding: 7px 16px; border-radius: 100px;
+}
+.nav-name b { color: var(--c-eng); margin-left: 10px; font-weight: 500; letter-spacing: 0.14em; }
+
+/* LANG SWITCH */
+.lang-switch {
+    display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px;
+    border: 1px solid var(--border); border-radius: 100px; background: rgba(255,255,255,0.015);
+}
+.lang-opt {
+    background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.62rem;
+    font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
+    padding: 5px 10px; border-radius: 100px; transition: all 0.25s var(--ease);
+}
+.lang-opt:hover { color: var(--text); }
+.lang-opt.is-active { color: var(--c-eng); background: rgba(37, 99, 235, 0.15); text-shadow: 0 0 12px rgba(37, 99, 235, 0.5); }
+.lang-sep { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); pointer-events: none; }
+
+/* SCROLLBAR */
+* { scrollbar-width: thin; scrollbar-color: rgba(37, 99, 235, 0.4) transparent; }
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.3); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(37, 99, 235, 0.6); }
+
+/* HERO */
+header {
+    padding: 72px 24px 56px; text-align: center; border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(37, 99, 235, 0.08), transparent 60%);
+}
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 18px;
+    background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 100px; color: #60a5fa; font-family: var(--font-mono); font-size: 0.65rem;
+    font-weight: 500; margin-bottom: 28px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.hero-badge::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--c-eng);
+    box-shadow: 0 0 10px var(--c-eng); animation: dotPulse 2.5s infinite ease-in-out;
+}
+@keyframes dotPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } }
+
+h1.hero-title {
+    font-family: var(--font-disp); font-weight: 400; font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.05; letter-spacing: -0.035em; text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 10%, #d8dde1 40%, #5c626e 70%, #121417 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0px 12px 30px rgba(0,0,0,0.6)); margin: 0 0 22px;
+}
+.text-gradient {
+    background: linear-gradient(90deg, #fff 10%, #60a5fa 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.lead {
+    font-family: var(--font-body); font-weight: 300; color: rgba(255,255,255,0.55);
+    max-width: 760px; margin: 0 auto 36px; font-size: clamp(0.95rem, 1.4vw, 1.1rem); line-height: 1.65;
+}
+
+.hero-kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr); max-width: 920px; margin: 0 auto;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: rgba(5,5,5,0.5); backdrop-filter: blur(10px);
+}
+.hero-kpi {
+    padding: 26px 18px; border-right: 1px solid var(--border); text-align: center;
+    position: relative; overflow: hidden; transition: background 0.5s var(--ease);
+}
+.hero-kpi:last-child { border-right: none; }
+.hero-kpi::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: var(--kc, var(--c-eng)); box-shadow: 0 0 14px var(--kc, var(--c-eng));
+    opacity: 0; transition: opacity 0.5s var(--ease);
+}
+.hero-kpi:hover::after { opacity: 0.85; }
+.hero-kpi:hover { background: rgba(255,255,255,0.012); }
+
+.hero-kpi-value {
+    font-family: var(--font-disp); font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 400;
+    line-height: 1; background: linear-gradient(180deg, #fff, #94a3b8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    display: block; margin-bottom: 10px; letter-spacing: -0.01em;
+}
+.hero-kpi-value b {
+    background: linear-gradient(180deg, #fff, #60a5fa); -webkit-background-clip: text;
+    background-clip: text; -webkit-text-fill-color: transparent; font-weight: 400;
+}
+.hero-kpi-label { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); display: block; }
+.hero-meta { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); max-width: 880px; margin-left: auto; margin-right: auto; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; color: var(--muted); line-height: 1.7; }
+.hero-meta b { color: #60a5fa; font-weight: 500; letter-spacing: 0.12em; }
+
+.stack-strip { max-width: 880px; margin: 26px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.stack-pill { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text); background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; transition: all 0.3s var(--ease); }
+.stack-pill.is-primary { border-color: rgba(37, 99, 235, 0.4); color: #60a5fa; background: rgba(37, 99, 235, 0.08); }
+.stack-pill:hover { border-color: rgba(37, 99, 235, 0.6); color: #60a5fa; background: rgba(37, 99, 235, 0.1); }
+
+/* LAYOUT & CARDS */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+section { padding: 64px 0; }
+.card {
+    background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--border);
+    border-radius: 6px; padding: 44px; margin-bottom: 28px; position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35); transition: all 0.4s var(--ease);
+}
+.card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c-eng), transparent); opacity: 0.45; border-radius: 6px 6px 0 0;
+}
+
+.section-label { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: #60a5fa; margin-bottom: 16px; }
+.section-label::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--c-eng); box-shadow: 0 0 10px var(--c-eng); }
+.narrative-title { font-family: var(--font-disp); font-size: clamp(1.5rem, 2.7vw, 2.1rem); font-weight: 300; line-height: 1.18; letter-spacing: -0.022em; color: var(--text); margin-bottom: 22px; }
+.narrative-title b { color: #60a5fa; font-weight: 400; }
+.narrative-text { font-size: 0.95rem; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 760px; }
+.narrative-text p + p { margin-top: 14px; }
+.narrative-text strong { color: var(--text); font-weight: 500; }
+.narrative-text em { color: #60a5fa; font-style: normal; font-weight: 400; }
+
+/* COMPARISON */
+.compare-block { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; margin: 28px 0 4px; }
+.compare-side { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; }
+.compare-side.is-after { border-color: rgba(37, 99, 235, 0.3); background: rgba(37, 99, 235, 0.05); }
+.compare-tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; display: block; }
+.compare-side.is-after .compare-tag { color: #60a5fa; }
+.compare-text { font-size: 0.9rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.compare-arrow { color: var(--c-eng); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; opacity: 0.7; }
+
+/* CHARTS & INSIGHTS */
+.chart-wrapper { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1px solid var(--border); }
+.chart-wrapper:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.chart-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; gap: 14px; flex-wrap: wrap; }
+.chart-title { font-family: var(--font-disp); font-size: 1.05rem; color: var(--text); font-weight: 400; letter-spacing: -0.005em; }
+.chart-subtitle { font-family: var(--font-mono); font-size: 0.65rem; color: var(--dim); letter-spacing: 0.06em; }
+
+.insight { display: flex; gap: 12px; margin-top: 16px; padding: 14px 16px; background: rgba(37, 99, 235, 0.06); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 4px; }
+.insight-icon { color: #60a5fa; font-size: 0.85rem; flex-shrink: 0; padding-top: 2px; }
+.insight-text { font-size: 0.84rem; color: var(--text); line-height: 1.6; font-weight: 300; }
+.insight-text b { color: #60a5fa; font-weight: 500; }
+
+/* ACCORDION (CODE) */
+.accordion-btn {
+    background: rgba(255,255,255,0.018); border: 1px solid var(--border); width: 100%; padding: 10px 14px;
+    text-align: left; color: var(--muted); cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.04em; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;
+    margin-top: 14px; transition: all 0.3s var(--ease);
+}
+.accordion-btn:hover { background: rgba(37, 99, 235, 0.08); color: #60a5fa; border-color: rgba(37, 99, 235, 0.3); }
+.accordion-btn .fa-chevron-down { transition: transform 0.3s var(--ease); font-size: 0.7rem; }
+.accordion-btn.is-open .fa-chevron-down { transform: rotate(180deg); }
+.code-panel { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: var(--bg2); border-radius: 0 0 4px 4px; margin-top: -2px; }
+.code-panel.active { max-height: 700px; overflow: auto; border: 1px solid var(--border); border-top: none; padding: 12px; }
+pre { margin: 0; padding: 0.8rem; overflow-x: auto; }
+code { font-family: var(--font-mono); color: rgba(255,255,255,0.78); font-size: 0.72rem; line-height: 1.6; }
+.bash-kw { color: #a78bfa; font-weight: 500; } .bash-str { color: #34d399; } .bash-flag { color: #fbbf24; } .bash-comm { color: rgba(255,255,255,0.3); font-style: italic; }
+
+/* PIPELINE DIAGRAM */
+.pipeline-grid { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:18px; background:rgba(0,0,0,0.2); border-radius:8px; margin:22px 0 8px; flex-wrap:wrap; }
+.pipe-step { flex:1; min-width:80px; text-align:center; background:rgba(255,255,255,0.025); border:1px solid var(--border); border-radius:6px; padding:14px 10px; transition:border-color 0.4s; }
+.pipe-step:hover { border-color:rgba(37,99,235,0.3); }
+.pipe-label { font-family:var(--font-mono); font-size:0.56rem; text-transform:uppercase; color:var(--muted); margin-bottom:7px; letter-spacing:0.1em; }
+.pipe-val { font-family:var(--font-mono); font-size:0.72rem; color:#60a5fa; line-height:1.45; }
+.pipe-arrow { color:var(--dim); font-size:0.8rem; flex-shrink:0; }
+
+/* MICRO METRIC CARDS */
+.micro-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0 8px; }
+.micro-card { background:rgba(0,0,0,0.22); border:1px solid var(--border); border-radius:6px; padding:20px; }
+.micro-label { font-family:var(--font-mono); font-size:0.6rem; font-weight:500; color:#60a5fa; text-transform:uppercase; letter-spacing:0.16em; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px; }
+.micro-num { font-family:var(--font-disp); font-size:1.65rem; font-weight:300; letter-spacing:-0.015em; margin-bottom:4px; }
+.micro-sub { font-size:0.76rem; color:var(--muted); font-weight:300; line-height:1.5; }
+
+/* INSIGHT WARN */
+.insight.is-warn { background:rgba(255,106,0,0.06); border-color:rgba(255,106,0,0.25); }
+.insight.is-warn .insight-icon { color:var(--c-viz); }
+.insight.is-warn .insight-text b { color:var(--c-viz); }
+
+/* TWO COL (DECISIONS) */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+.twocol-block h4 { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: #60a5fa; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.twocol-block.is-fail h4 { color: var(--c-viz); }
+.twocol-list { display: flex; flex-direction: column; gap: 14px; }
+.twocol-list li { background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-left: 2px solid var(--c-eng); border-radius: 4px; padding: 16px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; font-weight: 300; transition: border-color 0.4s var(--ease); }
+.twocol-list li:hover { border-color: var(--border-hi); }
+.twocol-list li b { display: block; font-family: var(--font-disp); font-size: 0.98rem; color: var(--text); font-weight: 500; margin-bottom: 5px; letter-spacing: -0.005em; }
+
+/* CTA */
+.closing-take { max-width: 820px; margin: 56px auto 36px; padding: 36px 38px; text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-family: var(--font-disp); font-size: clamp(1.15rem, 2vw, 1.55rem); font-weight: 300; line-height: 1.45; color: rgba(255,255,255,0.82); letter-spacing: -0.005em; }
+.closing-take-author { display: block; margin-top: 14px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+.contact-section { text-align: center; margin: 30px 0 80px; padding-top: 36px; border-top: 1px solid var(--border); }
+.contact-text { color: var(--muted); font-size: 0.92rem; margin: 0 auto 28px; max-width: 620px; line-height: 1.65; font-weight: 300; }
+.contact-btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 28px; border: 1px solid rgba(37, 99, 235, 0.5); background: rgba(37, 99, 235, 0.1); color: #60a5fa; border-radius: 3px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; transition: all 0.3s var(--ease); }
+.contact-btn:hover { background: rgba(37, 99, 235, 0.2); transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(37, 99, 235, 0.5); }
+
+@media (max-width: 768px) {
+    .nav-bar { padding: 0 18px; height: 60px; } .nav-name { display: none; }
+    .container { padding: 0 18px; } section { padding: 40px 0; } .card { padding: 26px 22px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .hero-kpi { border-bottom: 1px solid var(--border); padding: 20px 14px; } .hero-kpi:nth-child(2) { border-right: none; }
+    .compare-block { grid-template-columns: 1fr; } .compare-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .twocol { grid-template-columns: 1fr; }
+    .micro-grid { grid-template-columns: 1fr; }
+    .pipeline-grid { padding:12px 8px; } .pipe-arrow { display:none; }
+}
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+        </a>
+
+        <div class="nav-name">Javier Moraga <b>ENTEL · Pipeline Debugging</b></div>
+
+        <div class="lang-switch" role="group" aria-label="Language">
+            <button class="lang-opt is-active" data-lang="en" onclick="changeLang('en')" id="btn-en">EN</button>
+            <span class="lang-sep">·</span>
+            <button class="lang-opt" data-lang="es" onclick="changeLang('es')" id="btn-es">ES</button>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <span class="hero-badge" id="hero-badge">Case Study · Entel Chile · 2023</span>
+            <h1 id="main-title">
+                DataOps Pipeline Debugging —<br>
+                <span class="text-gradient">The "K" Anomaly.</span>
+            </h1>
+            <p class="lead" id="main-desc">
+                How auditing a legacy Bash/AWK extraction script uncovered a silent data failure, boosting the reach of billing notifications by +18.7% overnight.
+            </p>
+
+            <div class="hero-kpis">
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value"><b>~99%</b></span>
+                    <span class="hero-kpi-label" id="kpi-label-1">Notification Reach</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value">+18.7%</span>
+                    <span class="hero-kpi-label" id="kpi-label-2">Monthly YoY Growth</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value">1</span>
+                    <span class="hero-kpi-label" id="kpi-label-3">Character bug ('K')</span>
+                </div>
+                <div class="hero-kpi" style="--kc: var(--c-biz);">
+                    <span class="hero-kpi-value"><b>Bash</b></span>
+                    <span class="hero-kpi-label" id="kpi-label-4">Scripting Stack (AWK)</span>
+                </div>
+            </div>
+
+            <p class="hero-meta">
+                <span id="meta-1">Production Fix · Q2 2023</span> · <b>Data Operations</b> · <span id="meta-2">Role:</span> Senior Data Analyst
+            </p>
+
+            <div class="stack-strip">
+                <span class="stack-pill is-primary">Bash / Shell</span>
+                <span class="stack-pill is-primary">AWK</span>
+                <span class="stack-pill is-primary">SED</span>
+                <span class="stack-pill">ETL Pipelines</span>
+                <span class="stack-pill">Regex</span>
+                <span class="stack-pill">Data Quality</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- 01. CONTEXT -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-1">01 · Context</span>
+                <h3 class="narrative-title" id="title-1">The silent failure of the 18%.</h3>
+                <div class="narrative-text" id="text-1">
+                    <p>
+                        Every month, Entel sends millions of billing and collection notifications (SMS, IVR, Mail, App). However, the overall reach was mysteriously underperforming, stagnating around <strong>~80-84%</strong>. The business side assumed it was simply an issue with outdated contact information or unreachable devices.
+                    </p>
+                    <p>
+                        The reality was hidden deep in the legacy code. A silent failure in the extraction pipeline was indiscriminately dropping nearly a fifth of the customer base before the notifications were even dispatched or cross-referenced. Customers were not being notified, leading to involuntary early arrears and saturated support channels.
+                    </p>
+                </div>
+
+                <div class="compare-block">
+                    <div class="compare-side">
+                        <span class="compare-tag" id="before-tag">The Business Assumption</span>
+                        <p class="compare-text" id="before-text">"Our customers change their phone numbers or emails constantly. There is nothing we can do to improve the hit rate."</p>
+                    </div>
+                    <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="compare-side is-after">
+                        <span class="compare-tag" id="after-tag">The Engineering Reality</span>
+                        <p class="compare-text" id="after-text">"The extraction script drops any National ID (RUT) that doesn't parse as a perfect integer or fails on joins. We are deleting our own data."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02. ARCHITECTURE & CODE -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-2">02 · The Deep Dive</span>
+                <h3 class="narrative-title" id="title-2">Auditing the raw text processing layer.</h3>
+                <div class="narrative-text" id="text-2">
+                    <p>
+                        Before data reaches a clean cloud warehouse or a polished dashboard, it often exists as gigabytes of raw, tab-separated <code>.txt</code> logs generated by core legacy systems. To find the missing ~18%, I audited the <code>AWK</code> and <code>sed</code> scripts responsible for preparing the daily flat files (e.g., <code>NOTIFICACIONES_DIARIAS.txt</code>).
+                    </p>
+                    <p>
+                        <strong>The Bug:</strong> The Chilean National ID (RUT) ends in a verification digit, which can be a number from 0-9 or the letter <strong>'K'</strong>. The legacy parsing logic used functions that either failed when encountering the non-numeric 'K' or retained it in a way that broke downstream <code>JOIN</code> operations against pure-integer customer tables. This systemic error marginalized any ID ending in that character and caused widespread format mismatches.
+                    </p>
+                </div>
+
+                <button class="accordion-btn" onclick="toggleCode(this)">
+                    <span><i class="fas fa-terminal"></i> &nbsp; <span class="query-label">Bash/AWK Script</span> · notificacion_pipeline.sh</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="code-panel"><pre><code><span class="bash-comm"># The corrected AWK pipeline to process and format the raw .txt logs</span>
+<span class="bash-comm"># 1. Cleans leading zeros: sub(/^0*/,"")</span>
+<span class="bash-comm"># 2. Dynamically truncates the verification digit (r=substr($1, 0, length($1)-1))</span>
+<span class="bash-comm">#    to ensure 100% of IDs pass as clean integers for downstream JOINs.</span>
+<span class="bash-comm"># 3. Formats dates and normalizes channels (SMS, IVR, MAIL) to boolean flags</span>
+
+<span class="bash-kw">awk</span> <span class="bash-flag">-F</span> <span class="bash-str">"\t"</span> <span class="bash-flag">-v</span> OFS=<span class="bash-str">"|"</span> <span class="bash-str">"{
+  del=\"-\";
+  sub(/^0*/,\"\");
+  r=substr(\$1, 0, length(\$1)-1);
+  y=substr(\$4,length(\$4)-3,4);
+  m=\"00\"substr(\$4,4,2)+0;
+  d=substr(\$4,1,2);
+  dd=substr(\$9,1,2);
+  mm=substr(\$9,4,3);
+  yy=20substr(\$9,length(\$9)-1,3);
+  print y,m,d,del,\$1,\$2,\$3,\$5,\$6,\$7,\$8,\$9,yy,dd,mm,r
+}"</span> NOTIFICACIONES_DIARIAS_MARZO.txt | \
+<span class="bash-kw">awk</span> <span class="bash-flag">-F</span> <span class="bash-str">"|"</span> <span class="bash-flag">-v</span> OFS=<span class="bash-str">"|"</span> <span class="bash-str">"{
+  print 202303, \$16, \$6, \$7, \$1\$4\$2\$4\$3, \$8, \$9, \$10, \$11,
+  \$13\$4\$15\$4\$14,
+  gsub(/SMS/,\"1\"),
+  gsub(/IVR/,\"1\"),
+  gsub(/MAIL/,\"1\"),
+  gsub(/APP/,\"1\"),
+  gsub(/WSP/,\"1\"),
+  gsub(/RECOVERY/,\"1\")
+}"</span> | \
+<span class="bash-kw">sed</span> <span class="bash-str">"s/ene/01/g;s/feb/02/g;s/mar/03/g;s/abr/04/g;s/may/05/g;s/jun/06/g;
+     s/jul/07/g;s/ago/08/g;s/sep/09/g;s/oct/10/g;s/nov/11/g;s/dic/12/g;"</span> \
+&gt; notificaciones_bi_202303.csv</code></pre></div>
+            </div>
+        </section>
+
+        <!-- 02b. CHANNEL EVOLUTION + PIPELINE -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-2b">02b · Channel Evolution</span>
+                <h3 class="narrative-title" id="title-2b">From IVR-only to <b>5 channels</b> — while the bug persisted silently across all of them.</h3>
+                <div class="narrative-text" id="text-2b">
+                    <p>The notification system wasn't static — it was actively expanding. When the AWK pipeline was first written, Entel only sent notifications via <strong>IVR and SMS</strong>. Over 2022, the team rolled out <em>APP push</em> (February), <em>MAIL</em> (June), and <em>WhatsApp</em> (April) — each requiring the same parsed flat file as input. The RUT-K bug silently propagated to every new channel because they all consumed the same upstream extraction.</p>
+                </div>
+
+                <div style="margin:24px 0 6px; font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);" id="pipe-label">End-to-end notification pipeline</div>
+                <div class="pipeline-grid">
+                    <div class="pipe-step">
+                        <div class="pipe-label" id="pp1">Source</div>
+                        <div class="pipe-val">BSCS billing<br>flat file<br>(.txt, tab-sep)</div>
+                    </div>
+                    <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+                    <div class="pipe-step">
+                        <div class="pipe-label" id="pp2">Transform</div>
+                        <div class="pipe-val">AWK parse<br>+ sed dates<br>→ pipe-delim</div>
+                    </div>
+                    <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+                    <div class="pipe-step">
+                        <div class="pipe-label" id="pp3">Load</div>
+                        <div class="pipe-val">SQL Server<br>BI tables<br>btc_notif_*</div>
+                    </div>
+                    <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+                    <div class="pipe-step">
+                        <div class="pipe-label" id="pp4">Dispatch</div>
+                        <div class="pipe-val">IVR · SMS<br>APP · MAIL<br>WSP</div>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper" style="margin-top:28px;">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-2">Channel mix evolution · Jan 2022 – Nov 2022</div>
+                        <span class="chart-subtitle" id="chart-sub-2">% share by notification channel</span>
+                    </div>
+                    <div id="chart-channels" style="height:280px;"></div>
+                    <div class="insight is-warn">
+                        <i class="fas fa-exclamation-triangle insight-icon"></i>
+                        <p class="insight-text" id="insight-2"><b>Every new channel inherited the same blind spot.</b> When APP launched in Feb 2022, it consumed the same parsed file — so ~24% of accounts were already missing from day one. When MAIL launched in June, the same gap followed. The bug wasn't in any single channel's logic; it was in the shared upstream extraction that fed all of them.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03. IMPACT (enhanced) -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-3">03 · Operational Impact</span>
+                <h3 class="narrative-title" id="title-3">The leap from March to April 2023.</h3>
+
+                <div class="micro-grid">
+                    <div class="micro-card">
+                        <div class="micro-label" id="mc-1-label">Accounts recovered</div>
+                        <div class="micro-num" style="color:#60a5fa;">~460K</div>
+                        <div class="micro-sub" id="mc-1-sub">accounts per billing cycle that were silently excluded. 24% of ~2M unique accounts/month, now receiving notifications correctly.</div>
+                    </div>
+                    <div class="micro-card">
+                        <div class="micro-label" id="mc-2-label">Monthly balance at risk</div>
+                        <div class="micro-num" style="color:var(--c-viz);">CLP ~50B</div>
+                        <div class="micro-sub" id="mc-2-sub">total monthly billing balance across all cycles. Unnotified accounts had higher arrears rates, directly impacting collection KPIs.</div>
+                    </div>
+                    <div class="micro-card">
+                        <div class="micro-label" id="mc-3-label">Channels impacted</div>
+                        <div class="micro-num" style="color:#34d399;">5</div>
+                        <div class="micro-sub" id="mc-3-sub">IVR, SMS, APP, MAIL, WSP — all channels fed from the same upstream flat file. One fix propagated across all five.</div>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper" style="margin-top:24px;">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-1">Notification Sent Volume by Billing Cycle</div>
+                        <span class="chart-subtitle" id="chart-sub-1">12-Month Trend (Jun 2022 - May 2023)</span>
+                    </div>
+                    <div id="chart-impact" style="height: 400px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-1">
+                            <b>An instant +18.7% gain overall.</b> Fixing the string parsing logic instantly restored the missing data flow across all billing cycles (vencimientos). In April 2023, the total volume jumped from ~10M to ~11.9M notifications (+1.87 million clients recovered), directly translating to higher on-time collections and reduced call center load. Notice how the peaks in specific cycles (e.g., the 28th) also normalized due to grouping adjustments.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04. WHAT I OWNED -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-4">04 · What I Owned</span>
+                <h3 class="narrative-title" id="title-4">Engineering grit and data defense.</h3>
+
+                <div class="twocol">
+                    <div class="twocol-block">
+                        <h4><i class="fas fa-shield-alt"></i> <span id="dec-head">Data Quality as a Feature</span></h4>
+                        <ul class="twocol-list">
+                            <li>
+                                <b id="dec-1-title">Never trust assumptions.</b>
+                                <span id="dec-1-desc">Assuming that an identifier is strictly numeric is a million-dollar design flaw. Validating data types and handling edge cases (like truncating a verification digit to ensure clean <code>JOIN</code> operations) during the ingestion phase isn't bureaucracy; it's prevention.</span>
+                            </li>
+                            <li>
+                                <b id="dec-2-title">One fix, five channels.</b>
+                                <span id="dec-2-desc">Because the bug was in the shared upstream extraction — not in any individual channel's dispatch logic — fixing <code>substr($1, 0, length($1)-1)</code> in the AWK script propagated the correction to IVR, SMS, APP, MAIL and WSP simultaneously. This is the argument for keeping transformations at the extraction layer, not duplicating them per channel.</span>
+                            </li>
+                            <li>
+                                <b id="dec-3-title">Auditing the script, not the dashboard.</b>
+                                <span id="dec-3-desc">The coverage gap was invisible in the downstream reports because the denominator was also wrong — the system was measuring "notifications sent vs accounts in the parsed file," not "notifications sent vs accounts in the source system." The audit had to go upstream of the BI layer to find the real gap.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="twocol-block is-fail">
+                        <h4><i class="fas fa-terminal"></i> <span id="fail-head">Low-Level Processing</span></h4>
+                        <ul class="twocol-list">
+                            <li>
+                                <b id="fail-1-title">Bash scripting for Big Data.</b>
+                                <span id="fail-1-desc">Before data reaches a sleek cloud warehouse or an elegant dashboard, someone has to process the raw text files from the core systems. <code>AWK</code> and <code>sed</code> remain invaluable tools for transforming gigabytes of logs ultra-fast at the OS level.</span>
+                            </li>
+                            <li>
+                                <b id="fail-2-title">No unit tests on the pipeline.</b>
+                                <span id="fail-2-desc">The AWK scripts had no validation step — no row count comparison between source and output, no RUT format assertion, no channel flag completeness check. A 5-line <code>wc -l</code> comparison between input and output would have caught the 24% drop on day one.</span>
+                            </li>
+                            <li>
+                                <b id="fail-3-title">Spanish month names in raw dates.</b>
+                                <span id="fail-3-desc">The <code>sed</code> pipeline converted "ene/feb/mar..." to "01/02/03..." — a brittle approach that breaks on uppercase or abbreviated variants. A locale-aware date parser would have been more robust, but in a legacy BAT/AWK context, the <code>sed</code> chain was the pragmatic fix.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLOSING -->
+        <blockquote class="closing-take">
+            <span id="closing-quote">"Data engineering is not just building pipelines; it's defending them from the ground up."</span>
+            <span class="closing-take-author" id="closing-author">— Working principle from this project</span>
+        </blockquote>
+
+        <div class="contact-section">
+            <p class="contact-text" id="contact-text">
+                This case demonstrates the ability to dig into legacy scripts, debug low-level data extraction pipelines, and deliver massive, quantifiable business value through rigorous auditing.
+            </p>
+            <a href="../index.html#projects" class="contact-btn" id="contact-btn-text">
+                <i class="fas fa-arrow-right"></i> Contact Javier
+            </a>
+        </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // ── Accordion toggle ─────────────────────────────────
+        function toggleCode(btn) {
+            const panel = btn.nextElementSibling;
+            panel.classList.toggle('active');
+            btn.classList.toggle('is-open');
+        }
+
+        // ── Translations ─────────────────────────────────────
+        const translations = {
+            en: {
+                navBack: "Back to Portfolio",
+                badge: "Case Study · Entel Chile · 2023",
+                title: "DataOps Pipeline Debugging —<br><span class='text-gradient'>The \"K\" Anomaly.</span>",
+                desc: "How auditing a legacy Bash/AWK extraction script uncovered a silent data failure, boosting the reach of billing notifications by +18.7% overnight.",
+                kpiL1: "Notification Reach", kpiL2: "Monthly YoY Growth", kpiL3: "Character bug ('K')", kpiL4: "Scripting Stack (AWK)",
+                meta1: "Production Fix · Q2 2023", meta2: "Role:",
+
+                label1: "01 · Context",
+                title1: "The silent failure of the 18%.",
+                text1: "<p>Every month, Entel sends millions of billing and collection notifications (SMS, IVR, Mail, App). However, the overall reach was mysteriously underperforming, stagnating around <strong>~80-84%</strong>. The business side assumed it was simply an issue with outdated contact information or unreachable devices.</p><p>The reality was hidden deep in the legacy code. A silent failure in the extraction pipeline was indiscriminately dropping nearly a fifth of the customer base before the notifications were even dispatched or cross-referenced. Customers were not being notified, leading to involuntary early arrears and saturated support channels.</p>",
+                beforeTag: "The Business Assumption", beforeText: "\"Our customers change their phone numbers or emails constantly. There is nothing we can do to improve the hit rate.\"",
+                afterTag: "The Engineering Reality", afterText: "\"The extraction script drops any National ID (RUT) that doesn't parse as a perfect integer or fails on joins. We are deleting our own data.\"",
+
+                label2: "02 · The Deep Dive",
+                title2: "Auditing the raw text processing layer.",
+                text2: "<p>Before data reaches a clean cloud warehouse or a polished dashboard, it often exists as gigabytes of raw, tab-separated <code>.txt</code> logs generated by core legacy systems. To find the missing ~18%, I audited the <code>AWK</code> and <code>sed</code> scripts responsible for preparing the daily flat files.</p><p><strong>The Bug:</strong> The Chilean National ID (RUT) ends in a verification digit, which can be a number from 0-9 or the letter <strong>'K'</strong>. The legacy parsing logic used functions that either failed when encountering the non-numeric 'K' or retained it in a way that broke downstream <code>JOIN</code> operations against pure-integer customer tables. This systemic error marginalized any ID ending in that character and caused widespread format mismatches.</p>",
+
+                label3: "03 · Operational Impact",
+                title3: "The leap from March to April 2023.",
+                ch1Title: "Notification Sent Volume by Billing Cycle", ch1Sub: "12-Month Trend (Jun 2022 - May 2023)",
+                in1: "<b>An instant +18.7% gain overall.</b> Fixing the string parsing logic instantly restored the missing data flow across all billing cycles (vencimientos). In April 2023, the total volume jumped from ~10M to ~11.9M notifications (+1.87 million clients recovered), directly translating to higher on-time collections and reduced call center load. Notice how the peaks in specific cycles (e.g., the 28th) also normalized due to grouping adjustments.",
+
+                label4: "04 · What I Owned",
+                title4: "Engineering grit and data defense.",
+                decHead: "Data Quality as a Feature",
+                dec1T: "Never trust assumptions.", dec1D: "Assuming that an identifier is strictly numeric is a million-dollar design flaw. Validating data types and handling edge cases (like truncating a verification digit to ensure clean <code>JOIN</code> operations) during the ingestion phase isn't bureaucracy; it's prevention.",
+                dec2T: "One fix, five channels.", dec2D: "Because the bug was in the shared upstream extraction — not in any individual channel's dispatch logic — fixing <code>substr($1, 0, length($1)-1)</code> in the AWK script propagated the correction to IVR, SMS, APP, MAIL and WSP simultaneously. This is the argument for keeping transformations at the extraction layer, not duplicating them per channel.",
+                dec3T: "Auditing the script, not the dashboard.", dec3D: "The coverage gap was invisible in the downstream reports because the denominator was also wrong — the system was measuring 'notifications sent vs accounts in the parsed file,' not 'notifications sent vs accounts in the source system.' The audit had to go upstream of the BI layer to find the real gap.",
+                failHead: "Low-Level Processing",
+                fail1T: "Bash scripting for Big Data.", fail1D: "Before data reaches a sleek cloud warehouse or an elegant dashboard, someone has to process the raw text files from the core systems. <code>AWK</code> and <code>sed</code> remain invaluable tools for transforming gigabytes of logs ultra-fast at the OS level.",
+                fail2T: "No unit tests on the pipeline.", fail2D: "The AWK scripts had no validation step — no row count comparison between source and output, no RUT format assertion, no channel flag completeness check. A 5-line <code>wc -l</code> comparison between input and output would have caught the 24% drop on day one.",
+                fail3T: "Spanish month names in raw dates.", fail3D: "The <code>sed</code> pipeline converted 'ene/feb/mar...' to '01/02/03...' — a brittle approach that breaks on uppercase or abbreviated variants. A locale-aware date parser would have been more robust, but in a legacy BAT/AWK context, the <code>sed</code> chain was the pragmatic fix.",
+
+                label2b: "02b · Channel Evolution",
+                title2b: "From IVR-only to 5 channels — while the bug persisted silently across all of them.",
+                text2b: "<p>The notification system wasn't static — it was actively expanding. When the AWK pipeline was first written, Entel only sent notifications via <strong>IVR and SMS</strong>. Over 2022, the team rolled out <em>APP push</em> (February), <em>MAIL</em> (June), and <em>WhatsApp</em> (April) — each requiring the same parsed flat file as input. The RUT-K bug silently propagated to every new channel because they all consumed the same upstream extraction.</p>",
+                pipeLabel: "End-to-end notification pipeline",
+                pp1:"Source", pp2:"Transform", pp3:"Load", pp4:"Dispatch",
+                ch2Title: "Channel mix evolution · Jan 2022 – Nov 2022", ch2Sub: "% share by notification channel",
+                in2: "<b>Every new channel inherited the same blind spot.</b> When APP launched in Feb 2022, it consumed the same parsed file — so ~24% of accounts were already missing from day one. When MAIL launched in June, the same gap followed. The bug wasn't in any single channel's logic; it was in the shared upstream extraction that fed all of them.",
+                mc1Label: "Accounts recovered", mc1Sub: "accounts per billing cycle that were silently excluded. 24% of ~2M unique accounts/month, now receiving notifications correctly.",
+                mc2Label: "Monthly balance at risk", mc2Sub: "total monthly billing balance across all cycles. Unnotified accounts had higher arrears rates, directly impacting collection KPIs.",
+                mc3Label: "Channels impacted", mc3Sub: "IVR, SMS, APP, MAIL, WSP — all channels fed from the same upstream flat file. One fix propagated across all five.",
+
+                closingQuote: "\"Data engineering is not just building pipelines; it's defending them from the ground up.\"",
+                closingAuthor: "— Working principle from this project",
+                queryLabel: "Bash/AWK Script",
+                contactText: "This case demonstrates the ability to dig into legacy scripts, debug low-level data extraction pipelines, and deliver massive, quantifiable business value through rigorous auditing.",
+                contactBtn: "Contact Javier"
+            },
+            es: {
+                navBack: "Volver al Portafolio",
+                badge: "Caso de Estudio · Entel Chile · 2023",
+                title: "DataOps Pipeline Debugging —<br><span class='text-gradient'>El Bug de la letra 'K'.</span>",
+                desc: "Cómo la auditoría de un script de extracción legacy en Bash/AWK descubrió una falla silenciosa en los datos, elevando el alcance de las notificaciones de facturación en un +18,7% de la noche a la mañana.",
+                kpiL1: "Cobertura Alcanzada", kpiL2: "Crecimiento Mensual", kpiL3: "Bug de carácter ('K')", kpiL4: "Stack de Scripting (AWK)",
+                meta1: "Corrección en Producción · Q2 2023", meta2: "Rol:",
+
+                label1: "01 · Contexto",
+                title1: "La falla silenciosa del 18%.",
+                text1: "<p>Cada mes, Entel envía millones de notificaciones de cobranza y facturación (SMS, IVR, Mail, App). Sin embargo, la cobertura general estaba misteriosamente por debajo de lo esperado, estancada alrededor del <strong>~80-84%</strong>. El área de negocio asumía que era simplemente un problema de información de contacto desactualizada o dispositivos inalcanzables.</p><p>La realidad estaba oculta en lo profundo del código legacy. Una falla silenciosa en el pipeline de extracción estaba eliminando indiscriminadamente a casi un quinto de la base de clientes antes de que las notificaciones siquiera se despacharan o cruzaran con otras bases. Los clientes no estaban siendo notificados, lo que llevaba a mora temprana involuntaria y saturación en los canales de soporte.</p>",
+                beforeTag: "La Asunción del Negocio", beforeText: "\"Nuestros clientes cambian de teléfono o correo constantemente. No hay nada que podamos hacer para mejorar la tasa de acierto.\"",
+                afterTag: "La Realidad de Ingeniería", afterText: "\"El script de extracción elimina cualquier RUT que no se parsee como un entero perfecto o falla en los cruces (JOINs). Estamos borrando nuestros propios datos.\"",
+
+                label2: "02 · El Análisis Profundo",
+                title2: "Auditando la capa de procesamiento de texto crudo.",
+                text2: "<p>Antes de que los datos lleguen a un warehouse en la nube o a un dashboard elegante, a menudo existen como gigabytes de logs crudos en archivos <code>.txt</code> generados por sistemas core legacy. Para encontrar el ~18% faltante, audité los scripts <code>AWK</code> y <code>sed</code> responsables de preparar los archivos planos diarios.</p><p><strong>El Bug:</strong> El RUT chileno termina en un dígito verificador, que puede ser un número o la letra <strong>'K'</strong>. La lógica de parseo legacy usaba funciones que fallaban al encontrar la 'K' o la retenían de una forma que rompía las operaciones <code>JOIN</code> posteriores contra tablas de clientes que usaban enteros puros. Este error sistémico marginaba a cualquier ID que terminara en ese carácter y causaba desajustes de formato masivos.</p>",
+
+                label3: "03 · Impacto Operacional",
+                title3: "El salto de Marzo a Abril de 2023.",
+                ch1Title: "Volumen de Notificaciones Enviadas por Ciclo de Facturación", ch1Sub: "Tendencia de 12 Meses (Jun 2022 - May 2023)",
+                in1: "<b>Una ganancia global instantánea de +18,7%.</b> Arreglar la lógica de parseo restauró al instante el flujo de datos faltante en todos los ciclos de facturación (vencimientos). En Abril de 2023, el volumen total saltó de ~10M a ~11.9M de notificaciones (+1.87 millones de clientes recuperados), traduciéndose directamente en mayor recaudación a tiempo y menor carga para el call center. Nota cómo los peaks en ciertos ciclos (ej. el día 28) también se normalizaron debido a ajustes de agrupación.",
+
+                label4: "04 · Lo Que Tuve a Cargo",
+                title4: "Determinación ingenieril y defensa de datos.",
+                decHead: "Calidad de Datos como Feature",
+                dec1T: "Nunca confíes en las suposiciones.", dec1D: "Asumir que un identificador es estrictamente numérico es un error de diseño que cuesta millones. Validar los tipos de datos y manejar los casos límite (como truncar un dígito verificador para asegurar operaciones <code>JOIN</code> limpias) durante la fase de ingesta no es burocracia; es prevención.",
+                dec2T: "Un fix, cinco canales.", dec2D: "Como el bug estaba en la extracción compartida — no en la lógica de despacho de cada canal — corregir <code>substr($1, 0, length($1)-1)</code> en el script AWK propagó la corrección a IVR, SMS, APP, MAIL y WSP simultáneamente. Este es el argumento para mantener las transformaciones en la capa de extracción, no duplicarlas por canal.",
+                dec3T: "Auditar el script, no el dashboard.", dec3D: "La brecha de cobertura era invisible en los reportes downstream porque el denominador también estaba mal — el sistema medía 'notificaciones enviadas vs cuentas en el archivo parseado', no 'notificaciones enviadas vs cuentas en el sistema fuente'. La auditoría tuvo que ir upstream de la capa BI para encontrar la brecha real.",
+                failHead: "Procesamiento a Bajo Nivel",
+                fail1T: "Bash scripting para Big Data.", fail1D: "Antes de que los datos lleguen a un warehouse en la nube o un dashboard, alguien tiene que procesar los archivos de texto desde el sistema core. <code>AWK</code> y <code>sed</code> siguen siendo herramientas invaluables para transformar gigabytes de logs de forma ultra rápida a nivel de OS.",
+                fail2T: "Sin tests unitarios en el pipeline.", fail2D: "Los scripts AWK no tenían paso de validación — sin comparación de conteo de filas entre entrada y salida, sin aserción de formato de RUT, sin chequeo de completitud de flags de canal. Un <code>wc -l</code> comparando input y output habría capturado la caída del 24% el primer día.",
+                fail3T: "Nombres de meses en español en las fechas crudas.", fail3D: "El pipeline <code>sed</code> convertía 'ene/feb/mar...' a '01/02/03...' — un enfoque frágil que se rompe con mayúsculas o variantes abreviadas. Un parser de fechas con locale habría sido más robusto, pero en un contexto legacy BAT/AWK, la cadena de <code>sed</code> fue el fix pragmático.",
+
+                label2b: "02b · Evolución de Canales",
+                title2b: "De solo IVR a 5 canales — mientras el bug persistía silenciosamente en todos.",
+                text2b: "<p>El sistema de notificaciones no era estático — estaba en expansión activa. Cuando el pipeline AWK fue escrito originalmente, Entel solo enviaba notificaciones por <strong>IVR y SMS</strong>. Durante 2022, el equipo desplegó <em>APP push</em> (febrero), <em>MAIL</em> (junio) y <em>WhatsApp</em> (abril) — cada uno requiriendo el mismo archivo plano parseado como input. El bug del RUT-K se propagó silenciosamente a cada nuevo canal porque todos consumían la misma extracción upstream.</p>",
+                pipeLabel: "Pipeline de notificación end-to-end",
+                pp1:"Fuente", pp2:"Transformación", pp3:"Carga", pp4:"Despacho",
+                ch2Title: "Evolución del mix de canales · Ene 2022 – Nov 2022", ch2Sub: "% de participación por canal de notificación",
+                in2: "<b>Cada nuevo canal heredó el mismo punto ciego.</b> Cuando APP lanzó en feb 2022, consumía el mismo archivo parseado — así que ~24% de las cuentas ya faltaban desde el día uno. Cuando MAIL lanzó en junio, la misma brecha se repitió. El bug no estaba en la lógica de ningún canal individual; estaba en la extracción compartida upstream que alimentaba a todos.",
+                mc1Label: "Cuentas recuperadas", mc1Sub: "cuentas por ciclo de facturación que estaban silenciosamente excluidas. 24% de ~2M cuentas únicas/mes, ahora recibiendo notificaciones correctamente.",
+                mc2Label: "Saldo mensual en riesgo", mc2Sub: "saldo total de facturación mensual en todos los ciclos. Las cuentas no notificadas tenían mayor tasa de mora, impactando directamente los KPIs de cobranza.",
+                mc3Label: "Canales impactados", mc3Sub: "IVR, SMS, APP, MAIL, WSP — todos los canales alimentados desde el mismo archivo upstream. Un fix se propagó a los cinco.",
+
+                closingQuote: "\"La ingeniería de datos no es solo construir pipelines; es defenderlos desde los cimientos.\"",
+                closingAuthor: "— Principio de trabajo de este proyecto",
+                queryLabel: "Script Bash/AWK",
+                contactText: "Este caso demuestra la capacidad de profundizar en scripts legacy, depurar pipelines de extracción de datos a bajo nivel y entregar un valor de negocio masivo y cuantificable a través de auditorías rigurosas.",
+                contactBtn: "Contactar a Javier"
+            }
+        };
+
+        let cImpact;
+
+        function changeLang(lang) {
+            document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('is-active'));
+            const btn = document.getElementById('btn-' + lang);
+            if (btn) btn.classList.add('is-active');
+            document.documentElement.lang = lang;
+            const t = translations[lang];
+
+            const setText  = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            const setHTML  = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+
+            setText('nav-back', t.navBack); setText('hero-badge', t.badge); setHTML('main-title', t.title); setText('main-desc', t.desc);
+            setText('kpi-label-1', t.kpiL1); setText('kpi-label-2', t.kpiL2); setText('kpi-label-3', t.kpiL3); setText('kpi-label-4', t.kpiL4);
+            setText('meta-1', t.meta1); setText('meta-2', t.meta2);
+            
+            setText('label-1', t.label1); setText('title-1', t.title1); setHTML('text-1', t.text1);
+            setText('before-tag', t.beforeTag); setText('before-text', t.beforeText); setText('after-tag', t.afterTag); setText('after-text', t.afterText);
+            
+            setText('label-2', t.label2); setText('title-2', t.title2); setHTML('text-2', t.text2);
+            
+            setText('label-3', t.label3); setText('title-3', t.title3);
+            setText('chart-title-1', t.ch1Title); setText('chart-sub-1', t.ch1Sub); setHTML('insight-1', t.in1);
+            
+            setText('label-4', t.label4); setText('title-4', t.title4);
+            setText('dec-head', t.decHead); setText('dec-1-title', t.dec1T); setHTML('dec-1-desc', t.dec1D); 
+            setText('dec-2-title', t.dec2T); setHTML('dec-2-desc', t.dec2D);
+            setText('dec-3-title', t.dec3T); setHTML('dec-3-desc', t.dec3D);
+            setText('fail-head', t.failHead); setText('fail-1-title', t.fail1T); setHTML('fail-1-desc', t.fail1D);
+            setText('fail-2-title', t.fail2T); setHTML('fail-2-desc', t.fail2D);
+            setText('fail-3-title', t.fail3T); setHTML('fail-3-desc', t.fail3D);
+            
+            // Section 02b
+            setText('label-2b', t.label2b); setText('title-2b', t.title2b); setHTML('text-2b', t.text2b);
+            setText('pipe-label', t.pipeLabel);
+            setText('pp1', t.pp1); setText('pp2', t.pp2); setText('pp3', t.pp3); setText('pp4', t.pp4);
+            setText('chart-title-2', t.ch2Title); setText('chart-sub-2', t.ch2Sub); setHTML('insight-2', t.in2);
+            // Micro metrics
+            setText('mc-1-label', t.mc1Label); setText('mc-1-sub', t.mc1Sub);
+            setText('mc-2-label', t.mc2Label); setText('mc-2-sub', t.mc2Sub);
+            setText('mc-3-label', t.mc3Label); setText('mc-3-sub', t.mc3Sub);
+            
+            setText('closing-quote', t.closingQuote); setText('closing-author', t.closingAuthor);
+            setText('contact-text', t.contactText); setHTML('contact-btn-text', '<i class="fas fa-arrow-right"></i> ' + t.contactBtn);
+            
+            document.querySelectorAll('.query-label').forEach(el => el.textContent = t.queryLabel);
+
+            if(cImpact) {
+                // Update Month Labels
+                const engMonths = ['Jun 22', 'Jul 22', 'Aug 22', 'Sep 22', 'Oct 22', 'Nov 22', 'Dec 22', 'Jan 23', 'Feb 23', 'Mar 23', 'Apr 23', 'May 23'];
+                const espMonths = ['Jun 22', 'Jul 22', 'Ago 22', 'Sep 22', 'Oct 22', 'Nov 22', 'Dic 22', 'Ene 23', 'Feb 23', 'Mar 23', 'Abr 23', 'May 23'];
+                cImpact.xAxis[0].setCategories(lang === 'es' ? espMonths : engMonths);
+                
+                // Note: Series names could be updated here if needed, but they are just numbers so they are fine.
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            Highcharts.setOptions({
+                chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter' }, spacingTop: 14, animation: { duration: 900 } },
+                title: { text: null }, credits: { enabled: false },
+                colors: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#ff6a00', '#fb923c', '#fcd34d', '#10b981', '#34d399', '#a855f7'],
+                tooltip: { backgroundColor: 'rgba(5,5,5,0.95)', borderColor: 'rgba(37, 99, 235, 0.4)', style: { color: '#fff', fontSize: '12px' } }
+            });
+
+            // ── IMPACT CHART (Stacked Area) ──
+            try {
+                cImpact = Highcharts.chart('chart-impact', {
+                    chart: { type: 'area' },
+                    xAxis: {
+                        categories: ['Jun 22', 'Jul 22', 'Aug 22', 'Sep 22', 'Oct 22', 'Nov 22', 'Dec 22', 'Jan 23', 'Feb 23', 'Mar 23', 'Apr 23', 'May 23'],
+                        tickmarkPlacement: 'on',
+                        labels: { style: { color: '#94a3b8', fontSize: '11px', fontFamily: 'Fira Code' } },
+                        gridLineWidth: 0, lineWidth: 0,
+                        plotLines: [{
+                            color: 'rgba(255, 255, 255, 0.4)', width: 2, value: 9.5, zIndex: 5, dashStyle: 'dash',
+                            label: { text: 'Script Fix', align: 'left', style: { color: '#fff', fontSize: '10px' }, y: 20, x: -60 }
+                        }]
+                    },
+                    yAxis: {
+                        title: { text: null },
+                        labels: { 
+                            formatter: function() { return (this.value / 1000000) + 'M'; },
+                            style: { color: '#94a3b8', fontFamily: 'Fira Code' } 
+                        },
+                        gridLineColor: 'rgba(255,255,255,0.05)'
+                    },
+                    tooltip: {
+                        shared: true,
+                        valueDecimals: 0,
+                        formatter: function () {
+                            let s = '<b>' + this.x + '</b><br/>';
+                            let sum = 0;
+                            this.points.forEach(point => {
+                                s += '<span style="color:' + point.color + '">\u25CF</span> Venc. ' + point.series.name + ': <b>' + point.y.toLocaleString() + '</b><br/>';
+                                sum += point.y;
+                            });
+                            s += '<b>Total: ' + sum.toLocaleString() + '</b>';
+                            return s;
+                        }
+                    },
+                    plotOptions: {
+                        area: {
+                            stacking: 'normal',
+                            lineColor: '#ffffff',
+                            lineWidth: 1,
+                            marker: { lineWidth: 1, lineColor: '#ffffff', radius: 3, symbol: 'circle' }
+                        }
+                    },
+                    series: [
+                        { name: '5',  data: [177023, 254133, 319470, 285876, 267041, 218717, 313731, 304041, 183161, 205365, 237289, 256854] },
+                        { name: '6',  data: [1197520, 1255189, 967540, 1319561, 1425813, 1029047, 1285124, 1202717, 1633320, 1203325, 1471768, 1457635] },
+                        { name: '8',  data: [1522484, 1772942, 1887717, 1344907, 1457368, 1794927, 1222204, 1428377, 1216629, 1269211, 1119928, 1465360] },
+                        { name: '10', data: [211018, 208417, 259672, 185485, 113544, 283568, 201966, 264310, 240936, 177628, 198692, 252509] },
+                        { name: '13', data: [1391432, 1560879, 1040634, 1530758, 1843949, 1242282, 1416926, 1581091, 1808099, 1683732, 2115307, 1908054] },
+                        { name: '15', data: [384258, 633766, 581910, 747082, 596940, 720869, 530116, 624374, 613629, 717231, 666089, 647540] },
+                        { name: '21', data: [973080, 1557747, 1485509, 1620836, 1636250, 1584410, 1504726, 1202756, 1220702, 1445101, 1761259, 1388639] },
+                        { name: '25', data: [460060, 1135587, 1080797, 884684, 1064871, 882052, 961083, 840341, 811480, 627189, 830245, 861277] },
+                        { name: '28', data: [1134446, 1656655, 1708700, 1745283, 1505899, 1746187, 2284701, 1765476, 2594088, 2710856, 3513091, 3100814] },
+                        { name: '30', data: [0, 0, 0, 173, 0, 0, 0, 0, 98, 98, 36, 44] }
+                    ]
+                });
+            } catch(e) {}
+
+            // ── CHANNEL EVOLUTION CHART (Stacked Area) ──
+            try {
+                Highcharts.chart('chart-channels', {
+                    chart: { type:'area' },
+                    xAxis: {
+                        categories:['Jan 22','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],
+                        tickmarkPlacement:'on',
+                        labels:{ style:{color:'#94a3b8',fontSize:'10px',fontFamily:'Fira Code'} },
+                        gridLineWidth:0, lineWidth:0
+                    },
+                    yAxis: {
+                        title:{text:null}, max:100,
+                        labels:{ format:'{value}%', style:{color:'#94a3b8',fontFamily:'Fira Code'} },
+                        gridLineColor:'rgba(255,255,255,0.05)'
+                    },
+                    tooltip: {
+                        shared:true,
+                        formatter: function(){
+                            let s='<b>'+this.x+'</b><br/>';
+                            this.points.forEach(p => { s+='<span style="color:'+p.color+'">●</span> '+p.series.name+': <b>'+p.y+'%</b><br/>'; });
+                            return s;
+                        }
+                    },
+                    plotOptions: {
+                        area: { stacking:'percent', lineWidth:1, marker:{enabled:false},
+                            fillOpacity:0.6 }
+                    },
+                    series: [
+                        { name:'IVR', color:'#2563eb', data:[51,44,44,41,43,28,28,30,22,20,22] },
+                        { name:'SMS', color:'#f97316', data:[45,49,51,51,45,42,33,32,43,35,39] },
+                        { name:'APP', color:'#a855f7', data:[4,6,5,8,11,21,18,15,23,19,20] },
+                        { name:'MAIL', color:'#34d399', data:[0,0,0,0,0,8,20,21,10,24,18] },
+                        { name:'WSP', color:'#fbbf24', data:[0,0,0,0,1,1,1,1,2,1,1] }
+                    ]
+                });
+            } catch(e) {}
+
+            // Reflow observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && entry.target.id === 'chart-impact' && cImpact) {
+                        cImpact.reflow();
+                    }
+                });
+            });
+            document.querySelectorAll('[id^="chart-"]').forEach(el => observer.observe(el));
+
+            // URL Params Setup
+            const params = new URLSearchParams(window.location.search);
+            const lang = params.get('lang') || 'en';
+            if (typeof changeLang === 'function') changeLang(lang);
+            
+            const backBtn = document.querySelector('.back-link');
+            if (backBtn) {
+                let returnUrl = "../index.html";
+                let returnParams = [];
+                const mode = params.get('v');
+                const country = params.get('pais');
+                if (mode) returnParams.push(`v=${mode}`);
+                if (country) returnParams.push(`pais=${country}`);
+                if (lang) returnParams.push(`lang=${lang}`);
+                if (returnParams.length > 0) returnUrl += "?" + returnParams.join("&");
+                returnUrl += "#projects";
+                backBtn.href = returnUrl;
+            }
+        });
+    </script>
+</body>
+</html>

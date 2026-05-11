@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entel · Strategic Collections Analytics · Javier Moraga</title>
+    <meta name="description" content="Case study: Strategic collections analytics for Entel. Transforming flat billing tables into actionable risk quadrants to optimize recovery efforts.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/heatmap.js"></script>
+
+    <style>
+/* ═══════════════════════════════════════════════════════════════════
+   ENTEL Collections Case Study — UX-aligned with Amelia Template
+═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg:        #050505;
+    --bg2:       #08080c;
+    --surface:   rgba(12,12,16,0.6);
+    --surface-2: rgba(255,255,255,0.025);
+    --border:    rgba(255,255,255,0.05);
+    --border-hi: rgba(255,255,255,0.12);
+    --text:      rgba(255,255,255,0.92);
+    --muted:     #94a3b8;
+    --dim:       rgba(255,255,255,0.22);
+
+    /* Adaptado sutilmente a tonos Entel (Azul Neón y Naranja) */
+    --c-eng:     #2563eb;   /* Primary accent - Blue */
+    --c-viz:     #ff6a00;   /* Analytics / warnings - Orange */
+    --c-biz:     #00e5ff;   /* Secondary - Cyan */
+
+    --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body: 'Inter', sans-serif;
+    --font-disp: 'Jost', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; background: var(--bg); }
+
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(37, 99, 235, 0.08) 0%, transparent 60%),
+        linear-gradient(180deg, #050505 0%, #050505 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    padding-top: 64px;
+}
+
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* NAV */
+.nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 64px; padding: 0 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(5,5,5,0.85); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+}
+.back-link {
+    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border); padding: 7px 14px 7px 12px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 8px; transition: all 0.25s var(--ease);
+}
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s var(--ease); }
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-eng); opacity: 1; }
+
+.nav-name {
+    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border); padding: 7px 16px; border-radius: 100px;
+}
+.nav-name b { color: var(--c-eng); margin-left: 10px; font-weight: 500; letter-spacing: 0.14em; }
+
+/* LANG SWITCH */
+.lang-switch {
+    display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px;
+    border: 1px solid var(--border); border-radius: 100px; background: rgba(255,255,255,0.015);
+}
+.lang-opt {
+    background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 0.62rem;
+    font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
+    padding: 5px 10px; border-radius: 100px; transition: all 0.25s var(--ease);
+}
+.lang-opt:hover { color: var(--text); }
+.lang-opt.is-active { color: var(--c-eng); background: rgba(37, 99, 235, 0.15); text-shadow: 0 0 12px rgba(37, 99, 235, 0.5); }
+.lang-sep { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); pointer-events: none; }
+
+/* SCROLLBAR */
+* { scrollbar-width: thin; scrollbar-color: rgba(37, 99, 235, 0.4) transparent; }
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.3); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(37, 99, 235, 0.6); }
+
+.code-panel::-webkit-scrollbar-thumb, .code-panel pre::-webkit-scrollbar-thumb { background: rgba(37, 99, 235, 0.3); }
+
+/* HERO */
+header {
+    padding: 72px 24px 56px; text-align: center; border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(37, 99, 235, 0.08), transparent 60%);
+}
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 18px;
+    background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 100px; color: #60a5fa; font-family: var(--font-mono); font-size: 0.65rem;
+    font-weight: 500; margin-bottom: 28px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.hero-badge::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--c-eng);
+    box-shadow: 0 0 10px var(--c-eng); animation: dotPulse 2.5s infinite ease-in-out;
+}
+@keyframes dotPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } }
+
+h1.hero-title {
+    font-family: var(--font-disp); font-weight: 400; font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.05; letter-spacing: -0.035em; text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 10%, #d8dde1 40%, #5c626e 70%, #121417 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0px 12px 30px rgba(0,0,0,0.6)); margin: 0 0 22px;
+}
+.text-gradient {
+    background: linear-gradient(90deg, #fff 10%, #60a5fa 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.lead {
+    font-family: var(--font-body); font-weight: 300; color: rgba(255,255,255,0.55);
+    max-width: 760px; margin: 0 auto 36px; font-size: clamp(0.95rem, 1.4vw, 1.1rem); line-height: 1.65;
+}
+
+.hero-kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr); max-width: 920px; margin: 0 auto;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: rgba(5,5,5,0.5); backdrop-filter: blur(10px);
+}
+.hero-kpi {
+    padding: 26px 18px; border-right: 1px solid var(--border); text-align: center;
+    position: relative; overflow: hidden; transition: background 0.5s var(--ease);
+}
+.hero-kpi:last-child { border-right: none; }
+.hero-kpi::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: var(--kc, var(--c-eng)); box-shadow: 0 0 14px var(--kc, var(--c-eng));
+    opacity: 0; transition: opacity 0.5s var(--ease);
+}
+.hero-kpi:hover::after { opacity: 0.85; }
+.hero-kpi:hover { background: rgba(255,255,255,0.012); }
+
+.hero-kpi-value {
+    font-family: var(--font-disp); font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 400;
+    line-height: 1; background: linear-gradient(180deg, #fff, #94a3b8);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    display: block; margin-bottom: 10px; letter-spacing: -0.01em;
+}
+.hero-kpi-value b {
+    background: linear-gradient(180deg, #fff, #60a5fa); -webkit-background-clip: text;
+    background-clip: text; -webkit-text-fill-color: transparent; font-weight: 400;
+}
+.hero-kpi-label { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); display: block; }
+.hero-meta { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); max-width: 880px; margin-left: auto; margin-right: auto; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; color: var(--muted); line-height: 1.7; }
+.hero-meta b { color: #60a5fa; font-weight: 500; letter-spacing: 0.12em; }
+
+.stack-strip { max-width: 880px; margin: 26px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.stack-pill { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--text); background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; transition: all 0.3s var(--ease); }
+.stack-pill.is-primary { border-color: rgba(37, 99, 235, 0.4); color: #60a5fa; background: rgba(37, 99, 235, 0.08); }
+.stack-pill:hover { border-color: rgba(37, 99, 235, 0.6); color: #60a5fa; background: rgba(37, 99, 235, 0.1); }
+
+/* LAYOUT & CARDS */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+section { padding: 64px 0; }
+.card {
+    background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--border);
+    border-radius: 6px; padding: 44px; margin-bottom: 28px; position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35); transition: all 0.4s var(--ease);
+}
+.card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c-eng), transparent); opacity: 0.45; border-radius: 6px 6px 0 0;
+}
+
+.section-label { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: #60a5fa; margin-bottom: 16px; }
+.section-label::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--c-eng); box-shadow: 0 0 10px var(--c-eng); }
+.narrative-title { font-family: var(--font-disp); font-size: clamp(1.5rem, 2.7vw, 2.1rem); font-weight: 300; line-height: 1.18; letter-spacing: -0.022em; color: var(--text); margin-bottom: 22px; }
+.narrative-title b { color: #60a5fa; font-weight: 400; }
+.narrative-text { font-size: 0.95rem; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 760px; }
+.narrative-text p + p { margin-top: 14px; }
+.narrative-text strong { color: var(--text); font-weight: 500; }
+.narrative-text em { color: #60a5fa; font-style: normal; font-weight: 400; }
+.narrative-text code, .insight-text code, .twocol-list li code, .rag-step code { font-family: var(--font-mono); font-size: 0.78em; color: #60a5fa; background: rgba(37, 99, 235, 0.15); padding: 1px 6px; border-radius: 3px; letter-spacing: 0.02em; }
+
+/* COMPARISON */
+.compare-block { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; margin: 28px 0 4px; }
+.compare-side { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; }
+.compare-side.is-after { border-color: rgba(37, 99, 235, 0.3); background: rgba(37, 99, 235, 0.05); }
+.compare-tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; display: block; }
+.compare-side.is-after .compare-tag { color: #60a5fa; }
+.compare-text { font-size: 0.9rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.compare-arrow { color: var(--c-eng); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; opacity: 0.7; }
+
+/* ARCHITECTURE / PIPELINE */
+.section-sub-label { margin: 32px 0 12px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+.rag-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 8px; }
+.rag-step { background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-radius: 6px; padding: 18px 16px; transition: border-color 0.4s var(--ease); }
+.rag-step:hover { border-color: var(--border-hi); }
+.rag-step-num { font-family: var(--font-mono); font-size: 0.6rem; color: #60a5fa; letter-spacing: 0.16em; margin-bottom: 10px; display: block; }
+.rag-step-title { font-family: var(--font-disp); font-size: 1rem; font-weight: 400; color: var(--text); margin-bottom: 6px; letter-spacing: -0.005em; }
+.rag-step-desc { font-size: 0.78rem; color: var(--muted); font-weight: 300; line-height: 1.55; }
+
+/* CHARTS & INSIGHTS */
+.chart-wrapper { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1px solid var(--border); }
+.chart-wrapper:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+.chart-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; gap: 14px; flex-wrap: wrap; }
+.chart-title { font-family: var(--font-disp); font-size: 1.05rem; color: var(--text); font-weight: 400; letter-spacing: -0.005em; }
+.chart-subtitle { font-family: var(--font-mono); font-size: 0.65rem; color: var(--dim); letter-spacing: 0.06em; }
+
+.insight { display: flex; gap: 12px; margin-top: 16px; padding: 14px 16px; background: rgba(37, 99, 235, 0.06); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 4px; }
+.insight.warning { background: rgba(255, 106, 0, 0.06); border-color: rgba(255, 106, 0, 0.2); }
+.insight-icon { color: #60a5fa; font-size: 0.85rem; flex-shrink: 0; padding-top: 2px; }
+.insight.warning .insight-icon { color: var(--c-viz); }
+.insight-text { font-size: 0.84rem; color: var(--text); line-height: 1.6; font-weight: 300; }
+.insight-text b { color: #60a5fa; font-weight: 500; }
+.insight.warning .insight-text b { color: var(--c-viz); }
+
+/* ACCORDION (CODE) */
+.accordion-btn {
+    background: rgba(255,255,255,0.018); border: 1px solid var(--border); width: 100%; padding: 10px 14px;
+    text-align: left; color: var(--muted); cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.04em; display: flex; justify-content: space-between; align-items: center; border-radius: 4px;
+    margin-top: 14px; transition: all 0.3s var(--ease);
+}
+.accordion-btn:hover { background: rgba(37, 99, 235, 0.08); color: #60a5fa; border-color: rgba(37, 99, 235, 0.3); }
+.accordion-btn .fa-chevron-down { transition: transform 0.3s var(--ease); font-size: 0.7rem; }
+.accordion-btn.is-open .fa-chevron-down { transform: rotate(180deg); }
+.code-panel { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: var(--bg2); border-radius: 0 0 4px 4px; margin-top: -2px; }
+.code-panel.active { max-height: 700px; overflow: auto; border: 1px solid var(--border); border-top: none; padding: 12px; }
+pre { margin: 0; padding: 0.8rem; overflow-x: auto; }
+code { font-family: var(--font-mono); color: rgba(255,255,255,0.78); font-size: 0.72rem; line-height: 1.6; }
+.sql-kw { color: #a78bfa; font-weight: 500; } .sql-str { color: #34d399; } .sql-func { color: #fbbf24; } .sql-comm { color: rgba(255,255,255,0.3); font-style: italic; } .sql-tbl { color: #60a5fa; }
+
+/* TWO COL (DECISIONS) */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+.twocol-block h4 { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: #60a5fa; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.twocol-block.is-fail h4 { color: var(--c-viz); }
+.twocol-list { display: flex; flex-direction: column; gap: 14px; }
+.twocol-list li { background: rgba(0,0,0,0.22); border: 1px solid var(--border); border-left: 2px solid var(--c-eng); border-radius: 4px; padding: 16px 18px; font-size: 0.88rem; color: var(--muted); line-height: 1.6; font-weight: 300; transition: border-color 0.4s var(--ease); }
+.twocol-block.is-fail .twocol-list li { border-left-color: var(--c-viz); }
+.twocol-list li:hover { border-color: var(--border-hi); }
+.twocol-list li b { display: block; font-family: var(--font-disp); font-size: 0.98rem; color: var(--text); font-weight: 500; margin-bottom: 5px; letter-spacing: -0.005em; }
+
+/* CTA */
+.closing-take { max-width: 820px; margin: 56px auto 36px; padding: 36px 38px; text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-family: var(--font-disp); font-size: clamp(1.15rem, 2vw, 1.55rem); font-weight: 300; line-height: 1.45; color: rgba(255,255,255,0.82); letter-spacing: -0.005em; }
+.closing-take-author { display: block; margin-top: 14px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+.contact-section { text-align: center; margin: 30px 0 80px; padding-top: 36px; border-top: 1px solid var(--border); }
+.contact-text { color: var(--muted); font-size: 0.92rem; margin: 0 auto 28px; max-width: 620px; line-height: 1.65; font-weight: 300; }
+.contact-btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 28px; border: 1px solid rgba(37, 99, 235, 0.5); background: rgba(37, 99, 235, 0.1); color: #60a5fa; border-radius: 3px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; transition: all 0.3s var(--ease); }
+.contact-btn:hover { background: rgba(37, 99, 235, 0.2); transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(37, 99, 235, 0.5); }
+
+@media (max-width: 768px) {
+    .nav-bar { padding: 0 18px; height: 60px; } .nav-name { display: none; }
+    .container { padding: 0 18px; } section { padding: 40px 0; } .card { padding: 26px 22px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .hero-kpi { border-bottom: 1px solid var(--border); padding: 20px 14px; } .hero-kpi:nth-child(2) { border-right: none; }
+    .compare-block { grid-template-columns: 1fr; } .compare-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .rag-flow { grid-template-columns: 1fr 1fr; } .twocol { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+        </a>
+
+        <div class="nav-name">Javier Moraga <b>ENTEL · Collections</b></div>
+
+        <div class="lang-switch" role="group" aria-label="Language">
+            <button class="lang-opt is-active" data-lang="en" onclick="changeLang('en')" id="btn-en">EN</button>
+            <span class="lang-sep">·</span>
+            <button class="lang-opt" data-lang="es" onclick="changeLang('es')" id="btn-es">ES</button>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <span class="hero-badge" id="hero-badge">Case Study · Entel Chile · 2023</span>
+            <h1 id="main-title">
+                Collections Analytics —<br>
+                <span class="text-gradient">From Flat Tables to Risk Quadrants.</span>
+            </h1>
+            <p class="lead" id="main-desc">
+                How segmenting 90-day arrears by region, service type, and client volume reshaped Entel's call center recovery strategy — shifting focus from 'chasing percentages' to 'protecting capital'.
+            </p>
+
+            <div class="hero-kpis">
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value">16</span>
+                    <span class="hero-kpi-label" id="kpi-label-1">Regions analyzed</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value"><b>2</b></span>
+                    <span class="hero-kpi-label" id="kpi-label-2">Business lines (Fix/Mob)</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value">4</span>
+                    <span class="hero-kpi-label" id="kpi-label-3">Risk Quadrants defined</span>
+                </div>
+                <div class="hero-kpi" style="--kc: var(--c-viz);">
+                    <span class="hero-kpi-value"><b>0.00%</b></span>
+                    <span class="hero-kpi-label" id="kpi-label-4">Data anomaly caught</span>
+                </div>
+            </div>
+
+            <p class="hero-meta">
+                <span id="meta-1">May 2023 Executive Report</span> · <b>Business Analytics</b> · <span id="meta-2">Role:</span> Senior Data Analyst
+            </p>
+
+            <div class="stack-strip">
+                <span class="stack-pill is-primary">SQL</span>
+                <span class="stack-pill is-primary">Data Warehousing</span>
+                <span class="stack-pill">Power BI</span>
+                <span class="stack-pill">Highcharts</span>
+                <span class="stack-pill">Financial Analytics</span>
+                <span class="stack-pill">Risk Segmentation</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- 01. CONTEXT -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-1">01 · Context</span>
+                <h3 class="narrative-title" id="title-1">Stop chasing every debt. Chase the debt that impacts the bottom line.</h3>
+                <div class="narrative-text" id="text-1">
+                    <p>
+                        In telecommunications, 90-day arrears (mora 90 días) is a critical health metric. However, looking at a global percentage across millions of clients obscures actionable reality. A 9% arrears rate in a region with 1,000 clients is a local operational issue. A 4% arrears rate in a region with 1,000,000 clients is a massive financial risk.
+                    </p>
+                    <p>
+                        The goal of this analysis was to move management away from reading flat Excel-style tables and towards a <strong>visual risk-matrix</strong> that allows the Collections team (Call Center) to prioritize resources based on capital exposure, segmenting by Wireline (Alámbrico) and Wireless (Inalámbrico) services.
+                    </p>
+                </div>
+
+                <div class="compare-block">
+                    <div class="compare-side">
+                        <span class="compare-tag" id="before-tag">The Old Way</span>
+                        <p class="compare-text" id="before-text">Looking at 16x12 data grids of percentages. Management reacts to the "highest red number" regardless of underlying client volume.</p>
+                    </div>
+                    <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="compare-side is-after">
+                        <span class="compare-tag" id="after-tag">The New Strategy</span>
+                        <p class="compare-text" id="after-text">Scatter plots mapping Arrears Rate vs. Client Volume. Collections team instantly identifies the "High Risk / High Volume" quadrant.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02. PIPELINE -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-2">02 · The Analytics Pipeline</span>
+                <h3 class="narrative-title" id="title-2">Joining billing facts with collection states.</h3>
+                
+                <div class="rag-flow" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="rag-step">
+                        <span class="rag-step-num">01 · INGEST</span>
+                        <div class="rag-step-title" id="arch-1-title">Billing & Collections DB</div>
+                        <p class="rag-step-desc" id="arch-1-desc">Extracting monthly snapshots of invoiced accounts and payment statuses per service ID.</p>
+                    </div>
+                    <div class="rag-step">
+                        <span class="rag-step-num">02 · TRANSFORM</span>
+                        <div class="rag-step-title" id="arch-2-title">Service & Region Mapping</div>
+                        <p class="rag-step-desc" id="arch-2-desc">Categorizing services (Wireline vs Wireless) and joining with geospatial dimension tables.</p>
+                    </div>
+                    <div class="rag-step">
+                        <span class="rag-step-num">03 · AGGREGATE</span>
+                        <div class="rag-step-title" id="arch-3-title">Risk Calculation</div>
+                        <p class="rag-step-desc" id="arch-3-desc">Computing 90-day arrears (Mora) and total client base (Q) partitioned by YearMonth and Region.</p>
+                    </div>
+                </div>
+
+                <button class="accordion-btn" onclick="toggleCode(this)">
+                    <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">SQL Mockup</span> · arrears_aggregation.sql</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="code-panel"><pre><code><span class="sql-comm">-- Example logic for aggregating arrears by region and service type</span>
+<span class="sql-kw">WITH</span> ClientStatus <span class="sql-kw">AS</span> (
+    <span class="sql-kw">SELECT</span> 
+        r.region_name,
+        s.service_type, <span class="sql-comm">-- 'Alámbrico' or 'Inalámbrico'</span>
+        b.period_yyyymm,
+        <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> b.client_id) <span class="sql-kw">AS</span> q_clientes,
+        <span class="sql-func">SUM</span>(<span class="sql-kw">CASE WHEN</span> c.days_overdue &gt;= 90 <span class="sql-kw">THEN</span> 1 <span class="sql-kw">ELSE</span> 0 <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> q_mora_90
+    <span class="sql-kw">FROM</span> fact_billing b
+    <span class="sql-kw">LEFT JOIN</span> fact_collections c <span class="sql-kw">ON</span> b.invoice_id = c.invoice_id
+    <span class="sql-kw">JOIN</span> dim_region r <span class="sql-kw">ON</span> b.region_id = r.region_id
+    <span class="sql-kw">JOIN</span> dim_service s <span class="sql-kw">ON</span> b.service_id = s.service_id
+    <span class="sql-kw">GROUP BY</span> 1, 2, 3
+)
+<span class="sql-kw">SELECT</span> 
+    region_name, service_type, period_yyyymm,
+    q_clientes,
+    <span class="sql-func">ROUND</span>((q_mora_90 * 100.0) / q_clientes, 2) <span class="sql-kw">AS</span> tasa_mora_pct
+<span class="sql-kw">FROM</span> ClientStatus;</code></pre></div>
+            </div>
+        </section>
+
+        <!-- 03. VISUAL INSIGHTS -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-3">03 · Insights & Risk Matrix</span>
+                <h3 class="narrative-title" id="title-3">Translating data into call center priorities.</h3>
+
+                <div style="display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);">
+                    <button class="tab-btn is-active" onclick="switchBiz('wire')" id="tab-wire" style="background:none;border:none;cursor:pointer;font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:#60a5fa;padding:10px 18px;border-bottom:2px solid #2563eb;position:relative;top:1px;">🔌 Wireline</button>
+                    <button class="tab-btn" onclick="switchBiz('mob')" id="tab-mob" style="background:none;border:none;cursor:pointer;font-family:var(--font-mono);font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);padding:10px 18px;border-bottom:2px solid transparent;position:relative;top:1px;">📱 Wireless</button>
+                </div>
+
+                <div id="pane-wire">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-1">Wireline Risk Matrix: Arrears Rate vs. Client Volume</div>
+                        <span class="chart-subtitle" id="chart-sub-1">Snapshot: Regional distribution</span>
+                    </div>
+                    <div id="chart-scatter" style="height: 400px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-1">
+                            <b>The quadrant defines the action.</b> Atacama has a high rate (~8.9%) but very low volume. Valparaíso has a lower rate (~4.3%) but massive volume. <em>Collections focus should prioritize Valparaíso to recover the most capital, not Atacama just because its percentage is red.</em>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper" style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-2">90-Day Arrears Heatmap (Wireline) & The 0.00% Catch</div>
+                        <span class="chart-subtitle" id="chart-sub-2">Monthly trend 202208 - 202302</span>
+                    </div>
+                    <div id="chart-heatmap" style="height: 350px;"></div>
+                    <div class="insight warning">
+                        <i class="fas fa-bug insight-icon"></i>
+                        <p class="insight-text" id="insight-2">
+                            <b>Data Quality Catch:</b> Looking at the raw data for Q1 2023, the arrears rate suddenly drops to exactly <b>0.00%</b> across all regions. This isn't a miraculous recovery; it's an unclosed financial month in the database. Spotting this anomaly before presenting to the board prevents loss of trust in the entire report.
+                        </p>
+                    </div>
+                </div>
+                </div><!-- /pane-wire -->
+
+                <div id="pane-mob" style="display:none;">
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-3">Wireless Risk Matrix: Arrears Rate vs. Client Volume</div>
+                        <span class="chart-subtitle" id="chart-sub-3">16 regions · Inalámbrico · Jan 2023</span>
+                    </div>
+                    <div id="chart-scatter-wireless" style="height: 400px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-3"><b>Wireless tells a completely different story.</b> The arrears spread is compressed (1.6% – 2.9% vs wireline's 2.7% – 8.9%) — mobile customers pay more consistently. But Antofagasta emerges as the outlier: high rate (2.88%) AND high volume (~5K). In wireline, Antofagasta was mid-pack. This confirms that wireline and wireless need separate collection strategies — the same region behaves differently by product.</p>
+                    </div>
+                </div>
+                </div><!-- /pane-mob -->
+            </div>
+        </section>
+
+        <!-- 04. DECISIONS -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-4">04 · What I Owned</span>
+                <h3 class="narrative-title" id="title-4">Strategic choices and data quality assurance.</h3>
+
+                <div class="twocol">
+                    <div class="twocol-block">
+                        <h4><i class="fas fa-chess-knight"></i> <span id="dec-head">Strategic Decisions</span></h4>
+                        <ul class="twocol-list">
+                            <li>
+                                <b id="dec-1-title">Splitting Wireline vs. Wireless.</b>
+                                <span id="dec-1-desc">Customer payment behavior varies drastically between a fixed home fiber connection and a mobile plan. Aggregating them blurs the reality. Segmenting them allows for tailored collection scripts.</span>
+                            </li>
+                            <li>
+                                <b id="dec-2-title">Killing the "Table of Percentages".</b>
+                                <span id="dec-2-desc">A 16x12 grid of numbers is unreadable for a C-Level executive. Introducing the Scatter Plot (Risk Matrix) immediately answers the question: "Who do we call first today?"</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="twocol-block is-fail">
+                        <h4><i class="fas fa-shield-alt"></i> <span id="fail-head">Data Quality Defense</span></h4>
+                        <ul class="twocol-list">
+                            <li>
+                                <b id="fail-1-title">The "Zero Percent" Trap.</b>
+                                <span id="fail-1-desc">Dashboards that blindly ingest data will plot a 0% as a massive success. I implemented a hard rule: if standard deviation drops to absolute zero across all regions, flag the month as "Data Not Closed" rather than rendering a misleading chart. Data engineering isn't just pipeline creation; it's defense.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLOSING -->
+        <blockquote class="closing-take">
+            <span id="closing-quote">"Effective collections isn't about chasing every debt; it's about chasing the right debt based on capital exposure."</span>
+            <span class="closing-take-author" id="closing-author">— Business takeaway from this analysis</span>
+        </blockquote>
+
+        <div class="contact-section">
+            <p class="contact-text" id="contact-text">
+                This case demonstrates the ability to translate raw financial data into strategic, actionable matrices for C-Level management, while maintaining strict data quality defenses.
+            </p>
+            <a href="../index.html#projects" class="contact-btn" id="contact-btn-text">
+                <i class="fas fa-arrow-right"></i> Contact Javier
+            </a>
+        </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // ── Accordion toggle ─────────────────────────────────
+        function toggleCode(btn) {
+            const panel = btn.nextElementSibling;
+            panel.classList.toggle('active');
+            btn.classList.toggle('is-open');
+        }
+        function switchBiz(tab) {
+            document.getElementById('pane-wire').style.display = tab==='wire' ? 'block' : 'none';
+            document.getElementById('pane-mob').style.display = tab==='mob' ? 'block' : 'none';
+            document.getElementById('tab-wire').style.color = tab==='wire' ? '#60a5fa' : 'var(--muted)';
+            document.getElementById('tab-wire').style.borderBottomColor = tab==='wire' ? '#2563eb' : 'transparent';
+            document.getElementById('tab-mob').style.color = tab==='mob' ? '#60a5fa' : 'var(--muted)';
+            document.getElementById('tab-mob').style.borderBottomColor = tab==='mob' ? '#2563eb' : 'transparent';
+            if(tab==='wire' && cScatter) cScatter.reflow();
+            if(tab==='mob' && typeof cScatterWireless!=='undefined' && cScatterWireless) cScatterWireless.reflow();
+        }
+
+        // ── Translations ─────────────────────────────────────
+        const translations = {
+            en: {
+                navBack: "Back to Portfolio",
+                badge: "Case Study · Entel Chile · 2023",
+                title: "Collections Analytics —<br><span class='text-gradient'>From Flat Tables to Risk Quadrants.</span>",
+                desc: "How segmenting 90-day arrears by region, service type, and client volume reshaped Entel's call center recovery strategy — shifting focus from 'chasing percentages' to 'protecting capital'.",
+                kpiL1: "Regions analyzed", kpiL2: "Business lines (Fix/Mob)", kpiL3: "Risk Quadrants defined", kpiL4: "Data anomaly caught",
+                meta1: "May 2023 Executive Report", meta2: "Role:",
+
+                label1: "01 · Context",
+                title1: "Stop chasing every debt. Chase the debt that impacts the bottom line.",
+                text1: "<p>In telecommunications, 90-day arrears (mora 90 días) is a critical health metric. However, looking at a global percentage across millions of clients obscures actionable reality. A 9% arrears rate in a region with 1,000 clients is a local operational issue. A 4% arrears rate in a region with 1,000,000 clients is a massive financial risk.</p><p>The goal of this analysis was to move management away from reading flat Excel-style tables and towards a <strong>visual risk-matrix</strong> that allows the Collections team (Call Center) to prioritize resources based on capital exposure, segmenting by Wireline (Alámbrico) and Wireless (Inalámbrico) services.</p>",
+                beforeTag: "The Old Way", beforeText: "Looking at 16x12 data grids of percentages. Management reacts to the 'highest red number' regardless of underlying client volume.",
+                afterTag: "The New Strategy", afterText: "Scatter plots mapping Arrears Rate vs. Client Volume. Collections team instantly identifies the 'High Risk / High Volume' quadrant.",
+
+                label2: "02 · The Analytics Pipeline",
+                title2: "Joining billing facts with collection states.",
+                arch1T: "Billing & Collections DB", arch1D: "Extracting monthly snapshots of invoiced accounts and payment statuses.",
+                arch2T: "Service & Region Mapping", arch2D: "Categorizing services (Wireline vs Wireless) and joining geospatial tables.",
+                arch3T: "Risk Calculation", arch3D: "Computing 90-day arrears and total client base partitioned by YearMonth.",
+
+                label3: "03 · Insights & Risk Matrix",
+                title3: "Translating data into call center priorities.",
+                ch1Title: "Wireline Risk Matrix: Arrears Rate vs. Client Volume", ch1Sub: "Snapshot: Regional distribution",
+                in1: "<b>The quadrant defines the action.</b> Atacama has a high rate (~8.9%) but very low volume. Valparaíso has a lower rate (~4.3%) but massive volume. <em>Collections focus should prioritize Valparaíso to recover the most capital, not Atacama just because its percentage is red.</em>",
+                ch2Title: "90-Day Arrears Heatmap (Wireline) & The 0.00% Catch", ch2Sub: "Monthly trend 202208 - 202302",
+                in2: "<b>Data Quality Catch:</b> Looking at the raw data for Q1 2023, the arrears rate suddenly drops to exactly <b>0.00%</b> across all regions. This isn't a miraculous recovery; it's an unclosed financial month in the database. Spotting this anomaly before presenting to the board prevents loss of trust.",
+                ch3Title: "Wireless Risk Matrix: Arrears Rate vs. Client Volume", ch3Sub: "16 regions · Inalámbrico · Jan 2023",
+                in3: "<b>Wireless tells a completely different story.</b> The arrears spread is compressed (1.6% – 2.9% vs wireline's 2.7% – 8.9%) — mobile customers pay more consistently. But Antofagasta emerges as the outlier: high rate (2.88%) AND high volume (~5K). In wireline, Antofagasta was mid-pack. This confirms that wireline and wireless need separate collection strategies — the same region behaves differently by product.",
+
+                label4: "04 · What I Owned",
+                title4: "Strategic choices and data quality assurance.",
+                decHead: "Strategic Decisions",
+                dec1T: "Splitting Wireline vs. Wireless.", dec1D: "Customer payment behavior varies drastically between a fixed home fiber connection and a mobile plan. Aggregating them blurs the reality. Segmenting them allows for tailored collection scripts.",
+                dec2T: "Killing the 'Table of Percentages'.", dec2D: "A 16x12 grid of numbers is unreadable for a C-Level executive. Introducing the Scatter Plot (Risk Matrix) immediately answers the question: 'Who do we call first today?'",
+                failHead: "Data Quality Defense",
+                fail1T: "The 'Zero Percent' Trap.", fail1D: "Dashboards that blindly ingest data will plot a 0% as a massive success. I implemented a hard rule: if standard deviation drops to zero across all regions, flag the month as 'Data Not Closed' rather than rendering a misleading chart.",
+
+                closingQuote: "\"Effective collections isn't about chasing every debt; it's about chasing the right debt based on capital exposure.\"",
+                closingAuthor: "— Business takeaway from this analysis",
+                queryLabel: "SQL Mockup",
+                contactText: "This case demonstrates the ability to translate raw financial data into strategic, actionable matrices for C-Level management, while maintaining strict data quality defenses.",
+                contactBtn: "Contact Javier",
+                
+                chartLabels: { scatterX: 'Quantity of Clients', scatterY: 'Arrears Rate (%)' }
+            },
+            es: {
+                navBack: "Volver al Portafolio",
+                badge: "Caso de Estudio · Entel Chile · 2023",
+                title: "Analytics de Cobranzas —<br><span class='text-gradient'>De Tablas Planas a Matrices de Riesgo.</span>",
+                desc: "Cómo segmentar la mora a 90 días por región, tipo de servicio y volumen de clientes reconfiguró la estrategia de recuperación del Call Center — pasando de 'perseguir porcentajes' a 'proteger capital'.",
+                kpiL1: "Regiones analizadas", kpiL2: "Líneas de negocio", kpiL3: "Cuadrantes de Riesgo", kpiL4: "Anomalía detectada",
+                meta1: "Reporte Ejecutivo May 2023", meta2: "Rol:",
+
+                label1: "01 · Contexto",
+                title1: "Deja de perseguir cada deuda. Persigue la deuda que impacta los resultados.",
+                text1: "<p>En telecomunicaciones, la mora a 90 días es una métrica crítica. Sin embargo, mirar un porcentaje global sobre millones de clientes oculta la realidad accionable. Una mora del 9% en una región con 1.000 clientes es un problema operativo local. Un 4% en una región con 1.000.000 de clientes es un riesgo financiero masivo.</p><p>El objetivo de este análisis fue alejar a la gerencia de leer tablas tipo Excel y llevarlos hacia una <strong>matriz de riesgo visual</strong> que permite al equipo de Cobranzas priorizar recursos basados en la exposición de capital, segmentando por servicios Alámbrico e Inalámbrico.</p>",
+                beforeTag: "La Forma Antigua", beforeText: "Mirar grillas 16x12 de porcentajes. La gerencia reacciona al 'número rojo más alto' sin importar el volumen subyacente de clientes.",
+                afterTag: "La Nueva Estrategia", afterText: "Gráficos de dispersión mapeando Tasa de Mora vs. Volumen. El equipo identifica al instante el cuadrante de 'Alto Riesgo / Alto Volumen'.",
+
+                label2: "02 · El Pipeline Analítico",
+                title2: "Uniendo facturación con estados de cobranza.",
+                arch1T: "BD Facturación y Pagos", arch1D: "Extracción de snapshots mensuales de cuentas facturadas y estados de pago.",
+                arch2T: "Mapeo de Servicio y Región", arch2D: "Categorización de servicios (Alámbrico vs Inalámbrico) y cruce con tablas geoespaciales.",
+                arch3T: "Cálculo de Riesgo", arch3D: "Cómputo de mora a 90 días y base total de clientes particionado por Año/Mes.",
+
+                label3: "03 · Insights y Matriz de Riesgo",
+                title3: "Traduciendo datos en prioridades para el call center.",
+                ch1Title: "Matriz de Riesgo Alámbrico: Tasa Mora vs. Volumen de Clientes", ch1Sub: "Snapshot: Distribución regional",
+                in1: "<b>El cuadrante define la acción.</b> Atacama tiene una tasa alta (~8.9%) pero muy bajo volumen. Valparaíso tiene una tasa menor (~4.3%) pero un volumen masivo. <em>El foco de cobranzas debe priorizar Valparaíso para recuperar más capital, no Atacama solo porque su porcentaje es rojo.</em>",
+                ch2Title: "Heatmap Mora 90 Días (Alámbrico) & La Trampa del 0.00%", ch2Sub: "Tendencia mensual 202208 - 202302",
+                in2: "<b>Hallazgo de Calidad de Datos:</b> Mirando los datos crudos del Q1 2023, la tasa de mora cae de repente a exactamente <b>0.00%</b> en todas las regiones. No es una recuperación milagrosa; es un mes financiero no cerrado en la base de datos. Detectar esta anomalía antes de presentar al directorio evita la pérdida de confianza en el reporte.",
+                ch3Title: "Matriz de Riesgo Inalámbrico: Tasa Mora vs. Volumen de Clientes", ch3Sub: "16 regiones · Inalámbrico · Ene 2023",
+                in3: "<b>Inalámbrico cuenta una historia completamente diferente.</b> El rango de mora es comprimido (1.6% – 2.9% vs alámbrico 2.7% – 8.9%) — los clientes móviles pagan más consistentemente. Pero Antofagasta emerge como outlier: alta tasa (2.88%) Y alto volumen (~5K). En alámbrico, Antofagasta estaba en la media. Esto confirma que alámbrico e inalámbrico necesitan estrategias de cobranza separadas — la misma región se comporta distinto por producto.",
+
+                label4: "04 · Lo Que Tuve a Cargo",
+                title4: "Decisiones estratégicas y aseguramiento de calidad de datos.",
+                decHead: "Decisiones Estratégicas",
+                dec1T: "Separar Alámbrico vs. Inalámbrico.", dec1D: "El comportamiento de pago varía drásticamente entre una conexión de fibra hogar y un plan móvil. Agregarlos distorsiona la realidad. Segmentarlos permite guiones de cobranza personalizados.",
+                dec2T: "Matar la 'Tabla de Porcentajes'.", dec2D: "Una grilla 16x12 es ilegible para un ejecutivo C-Level. Introducir el Gráfico de Dispersión (Matriz de Riesgo) responde inmediatamente la pregunta: '¿A quién llamamos primero hoy?'",
+                failHead: "Defensa de Calidad de Datos",
+                fail1T: "La Trampa del 'Cero Porciento'.", fail1D: "Los dashboards que ingieren datos a ciegas graficarán un 0% como un éxito masivo. Implementé una regla dura: si la desviación estándar cae a cero en todas las regiones, marcar el mes como 'Datos No Cerrados' en lugar de renderizar un gráfico engañoso.",
+
+                closingQuote: "\"La cobranza efectiva no se trata de perseguir cada deuda; se trata de perseguir la deuda correcta basándose en la exposición de capital.\"",
+                closingAuthor: "— Conclusión de negocio de este análisis",
+                queryLabel: "Mockup SQL",
+                contactText: "Este caso demuestra la capacidad de traducir datos financieros crudos en matrices estratégicas y accionables para la gerencia C-Level, manteniendo estrictas defensas de calidad de datos.",
+                contactBtn: "Contactar a Javier",
+                
+                chartLabels: { scatterX: 'Cantidad de Clientes', scatterY: 'Tasa de Mora (%)' }
+            }
+        };
+
+        let cScatter, cHeatmap, cScatterWireless;
+
+        function changeLang(lang) {
+            document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('is-active'));
+            const btn = document.getElementById('btn-' + lang);
+            if (btn) btn.classList.add('is-active');
+            document.documentElement.lang = lang;
+            const t = translations[lang];
+
+            const setText  = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            const setHTML  = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+
+            setText('nav-back', t.navBack); setText('hero-badge', t.badge); setHTML('main-title', t.title); setText('main-desc', t.desc);
+            setText('kpi-label-1', t.kpiL1); setText('kpi-label-2', t.kpiL2); setText('kpi-label-3', t.kpiL3); setText('kpi-label-4', t.kpiL4);
+            setText('meta-1', t.meta1); setText('meta-2', t.meta2);
+            setText('label-1', t.label1); setText('title-1', t.title1); setHTML('text-1', t.text1);
+            setText('before-tag', t.beforeTag); setText('before-text', t.beforeText); setText('after-tag', t.afterTag); setText('after-text', t.afterText);
+            setText('label-2', t.label2); setText('title-2', t.title2);
+            setText('arch-1-title', t.arch1T); setHTML('arch-1-desc', t.arch1D);
+            setText('arch-2-title', t.arch2T); setHTML('arch-2-desc', t.arch2D);
+            setText('arch-3-title', t.arch3T); setHTML('arch-3-desc', t.arch3D);
+            setText('label-3', t.label3); setText('title-3', t.title3);
+            setText('chart-title-1', t.ch1Title); setText('chart-sub-1', t.ch1Sub); setHTML('insight-1', t.in1);
+            setText('chart-title-2', t.ch2Title); setText('chart-sub-2', t.ch2Sub); setHTML('insight-2', t.in2);
+            setText('chart-title-3', t.ch3Title); setText('chart-sub-3', t.ch3Sub); setHTML('insight-3', t.in3);
+            setText('label-4', t.label4); setText('title-4', t.title4);
+            setText('dec-head', t.decHead); setText('dec-1-title', t.dec1T); setHTML('dec-1-desc', t.dec1D); setText('dec-2-title', t.dec2T); setHTML('dec-2-desc', t.dec2D);
+            setText('fail-head', t.failHead); setText('fail-1-title', t.fail1T); setHTML('fail-1-desc', t.fail1D);
+            setText('closing-quote', t.closingQuote); setText('closing-author', t.closingAuthor);
+            setText('contact-text', t.contactText); setHTML('contact-btn-text', '<i class="fas fa-arrow-right"></i> ' + t.contactBtn);
+            
+            document.querySelectorAll('.query-label').forEach(el => el.textContent = t.queryLabel);
+
+            // Update Chart Axis Labels
+            if(cScatter) {
+                cScatter.xAxis[0].update({ title: { text: t.chartLabels.scatterX }});
+                cScatter.yAxis[0].update({ title: { text: t.chartLabels.scatterY }});
+            }
+            if(cScatterWireless) {
+                cScatterWireless.xAxis[0].update({ title: { text: t.chartLabels.scatterX }});
+                cScatterWireless.yAxis[0].update({ title: { text: t.chartLabels.scatterY }});
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            Highcharts.setOptions({
+                chart: { backgroundColor: 'transparent', style: { fontFamily: 'Inter' }, spacingTop: 14, animation: { duration: 900 } },
+                title: { text: null }, credits: { enabled: false },
+                colors: ['#2563eb', '#ff6a00', '#00e5ff', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#3b82f6'],
+                tooltip: { backgroundColor: 'rgba(5,5,5,0.95)', borderColor: 'rgba(37, 99, 235, 0.4)', style: { color: '#fff', fontSize: '12px' } }
+            });
+
+            // ── SCATTER PLOT (Risk Matrix - Alámbrico - REAL DATA from PPTX slide 4) ──
+            try {
+                cScatter = Highcharts.chart('chart-scatter', {
+                    chart: { type: 'scatter', zoomType: 'xy' },
+                    xAxis: {
+                        title: { text: 'Quantity of Clients (k)', style: { color: '#94a3b8' } },
+                        labels: { style: { color: '#94a3b8' }, format: '{value}k' },
+                        gridLineColor: 'rgba(255,255,255,0.05)',
+                        plotLines: [{ value: 5, color: 'rgba(255,106,0,0.4)', width: 1, dashStyle: 'dash', zIndex: 3 }]
+                    },
+                    yAxis: {
+                        title: { text: 'Arrears Rate (%)', style: { color: '#94a3b8' } },
+                        labels: { style: { color: '#94a3b8' }, format: '{value}%' },
+                        gridLineColor: 'rgba(255,255,255,0.05)',
+                        plotLines: [{ value: 6.5, color: 'rgba(255,106,0,0.4)', width: 1, dashStyle: 'dash', zIndex: 3 }]
+                    },
+                    tooltip: { useHTML:true, headerFormat:'<b>{series.name}</b><br>', pointFormat:'Clients: <b>{point.x}k</b><br>Arrears: <b>{point.y}%</b>' },
+                    plotOptions: { scatter: { marker: { radius: 6, states: { hover: { enabled: true } } } } },
+                    series: [
+                        { name:'Atacama', data:[{x:1.2,y:8.48}], color:'#ef4444', marker:{radius:7} },
+                        { name:'Ñuble', data:[{x:1.8,y:7.69}], color:'#f59e0b' },
+                        { name:'Araucanía', data:[{x:2.5,y:7.76}], color:'#f97316' },
+                        { name:'Tarapacá', data:[{x:1.5,y:7.14}], color:'#a855f7' },
+                        { name:'Arica y Parinacota', data:[{x:0.7,y:6.44}], color:'#ec4899' },
+                        { name:'Los Ríos', data:[{x:0.7,y:6.56}], color:'#14b8a6' },
+                        { name:'Aysén', data:[{x:0.6,y:6.62}], color:'#f43f5e' },
+                        { name:'Los Lagos', data:[{x:1.8,y:6.15}], color:'#22c55e' },
+                        { name:'O\'Higgins', data:[{x:3.5,y:6.17}], color:'#e879f9' },
+                        { name:'Coquimbo', data:[{x:3.5,y:6.50}], color:'#fb923c' },
+                        { name:'Maule', data:[{x:2.5,y:5.72}], color:'#c084fc' },
+                        { name:'Biobío', data:[{x:3.0,y:5.01}], color:'#60a5fa' },
+                        { name:'Antofagasta', data:[{x:3.2,y:5.17}], color:'#0ea5e9' },
+                        { name:'Magallanes', data:[{x:0.9,y:4.65}], color:'#10b981' },
+                        { name:'Valparaíso', data:[{x:16.5,y:4.31}], color:'#f59e0b', marker:{radius:8} },
+                        { name:'RM (excl. for scale)', data:[{x:45,y:2.74}], color:'rgba(37,99,235,0.25)', marker:{radius:10,symbol:'diamond'} }
+                    ]
+                });
+            } catch(e) {}
+
+            // ── SCATTER PLOT 2 (Risk Matrix - Inalámbrico - REAL DATA from PPTX slide 7) ──
+            try {
+                cScatterWireless = Highcharts.chart('chart-scatter-wireless', {
+                    chart: { type: 'scatter', zoomType: 'xy' },
+                    xAxis: {
+                        title: { text: 'Quantity of Clients (k)', style: { color: '#94a3b8' } },
+                        labels: { style: { color: '#94a3b8' }, format: '{value}k' },
+                        gridLineColor: 'rgba(255,255,255,0.05)',
+                        plotLines: [{ value: 5, color: 'rgba(255,106,0,0.4)', width: 1, dashStyle: 'dash', zIndex: 3 }]
+                    },
+                    yAxis: {
+                        title: { text: 'Arrears Rate (%)', style: { color: '#94a3b8' } },
+                        labels: { style: { color: '#94a3b8' }, format: '{value}%' },
+                        gridLineColor: 'rgba(255,255,255,0.05)', min:1.4, max:3.2,
+                        plotLines: [{ value: 2.2, color: 'rgba(255,106,0,0.4)', width: 1, dashStyle: 'dash', zIndex: 3 }]
+                    },
+                    tooltip: { useHTML:true, headerFormat:'<b>{series.name}</b><br>', pointFormat:'Clients: <b>{point.x}k</b><br>Arrears: <b>{point.y}%</b>' },
+                    plotOptions: { scatter: { marker: { radius: 6, states: { hover: { enabled: true } } } } },
+                    series: [
+                        { name:'Antofagasta', data:[{x:5,y:2.88}], color:'#0ea5e9', marker:{radius:7} },
+                        { name:'Aysén', data:[{x:0.5,y:2.73}], color:'#f43f5e' },
+                        { name:'Tarapacá', data:[{x:2.5,y:2.49}], color:'#a855f7' },
+                        { name:'Los Lagos', data:[{x:5.5,y:2.28}], color:'#22c55e' },
+                        { name:'Ñuble', data:[{x:3.5,y:2.28}], color:'#f59e0b' },
+                        { name:'Coquimbo', data:[{x:7,y:2.31}], color:'#fb923c' },
+                        { name:'Atacama', data:[{x:2.3,y:2.20}], color:'#ef4444' },
+                        { name:'Los Ríos', data:[{x:2,y:2.17}], color:'#14b8a6' },
+                        { name:'Biobío', data:[{x:8.5,y:2.03}], color:'#60a5fa' },
+                        { name:'Maule', data:[{x:7.5,y:1.99}], color:'#c084fc' },
+                        { name:'O\'Higgins', data:[{x:7.5,y:1.96}], color:'#e879f9' },
+                        { name:'RM (excl. for scale)', data:[{x:73,y:1.98}], color:'rgba(37,99,235,0.25)', marker:{radius:10,symbol:'diamond'} },
+                        { name:'Valparaíso', data:[{x:17,y:1.86}], color:'#f59e0b', marker:{radius:8} },
+                        { name:'Magallanes', data:[{x:1.2,y:1.85}], color:'#10b981' },
+                        { name:'Araucanía', data:[{x:5.3,y:1.73}], color:'#f97316' },
+                        { name:'Arica y Parinacota', data:[{x:1.7,y:1.60}], color:'#ec4899' }
+                    ]
+                });
+            } catch(e) {}
+
+            // ── HEATMAP (Real data from PPTX - Alámbrico mora 90d) ──
+            try {
+                const xCats = ['202208','202209','202210','202211','202212','202301','202302'];
+                const yCats = ['Atacama','Arica/Parin.','Ñuble','Araucanía','Tarapacá','L. Ríos','Los Lagos','Aysén','L.B.O\'Hig.','Coquimbo','Magallanes','Biobío','Antofagasta','Maule','Valparaíso','RM'];
+                const d = [
+                    // Atacama
+                    [0,0,7.36],[1,0,5.89],[2,0,7.16],[3,0,7.46],[4,0,8.86],[5,0,8.48],[6,0,0],
+                    // Arica y Parinacota
+                    [0,1,7.94],[1,1,6.39],[2,1,8.31],[3,1,9.01],[4,1,11.66],[5,1,6.44],[6,1,0],
+                    // Ñuble
+                    [0,2,9.18],[1,2,9.38],[2,2,9.42],[3,2,9.71],[4,2,8.43],[5,2,7.69],[6,2,0],
+                    // Araucanía
+                    [0,3,7.97],[1,3,6.75],[2,3,6.54],[3,3,7.31],[4,3,8.14],[5,3,7.76],[6,3,0],
+                    // Tarapacá
+                    [0,4,7.81],[1,4,6.94],[2,4,6.40],[3,4,8.11],[4,4,7.71],[5,4,7.14],[6,4,0],
+                    // Los Ríos
+                    [0,5,7.42],[1,5,7.32],[2,5,6.25],[3,5,7.67],[4,5,10.12],[5,5,6.56],[6,5,0],
+                    // Los Lagos
+                    [0,6,7.69],[1,6,8.65],[2,6,8.57],[3,6,8.76],[4,6,7.26],[5,6,6.15],[6,6,0],
+                    // Aysén
+                    [0,7,7.31],[1,7,6.04],[2,7,6.15],[3,7,5.75],[4,7,5.73],[5,7,6.62],[6,7,0],
+                    // O'Higgins
+                    [0,8,5.23],[1,8,6.23],[2,8,5.93],[3,8,6.36],[4,8,6.80],[5,8,6.17],[6,8,0],
+                    // Coquimbo
+                    [0,9,5.68],[1,9,5.35],[2,9,5.22],[3,9,6.27],[4,9,6.91],[5,9,6.50],[6,9,0],
+                    // Magallanes
+                    [0,10,5.64],[1,10,4.01],[2,10,5.20],[3,10,5.07],[4,10,5.62],[5,10,4.65],[6,10,0],
+                    // Biobío
+                    [0,11,7.54],[1,11,7.57],[2,11,6.11],[3,11,5.88],[4,11,5.80],[5,11,5.01],[6,11,0],
+                    // Antofagasta
+                    [0,12,6.66],[1,12,4.62],[2,12,5.72],[3,12,7.19],[4,12,6.94],[5,12,5.17],[6,12,0],
+                    // Maule
+                    [0,13,7.06],[1,13,5.68],[2,13,4.72],[3,13,4.69],[4,13,5.14],[5,13,5.72],[6,13,0],
+                    // Valparaíso
+                    [0,14,4.00],[1,14,4.11],[2,14,4.08],[3,14,4.48],[4,14,4.64],[5,14,4.31],[6,14,0],
+                    // RM
+                    [0,15,2.57],[1,15,2.63],[2,15,2.59],[3,15,2.80],[4,15,2.90],[5,15,2.74],[6,15,0]
+                ];
+
+                cHeatmap = Highcharts.chart('chart-heatmap', {
+                    chart: { type: 'heatmap', height: 520 },
+                    xAxis: { categories: xCats, labels: { style: { color:'#94a3b8', fontSize:'10px' } } },
+                    yAxis: { categories: yCats, labels: { style: { color:'#94a3b8', fontSize:'9px' } }, reversed: false },
+                    colorAxis: {
+                        stops: [[0,'#0f172a'],[0.25,'#1e40af'],[0.45,'#2563eb'],[0.6,'#f59e0b'],[0.8,'#ef4444'],[1,'#dc2626']],
+                        min: 0, max: 12
+                    },
+                    tooltip: { formatter: function(){ return '<b>'+this.series.yAxis.categories[this.point.y]+'</b><br>Month: '+this.series.xAxis.categories[this.point.x]+'<br>Arrears: <b>'+this.point.value.toFixed(2)+'%</b>'; } },
+                    series: [{ name:'Mora %', borderWidth:1, borderColor:'#1e293b', data:d,
+                        dataLabels: { enabled:true, color:'#fff', style:{textOutline:'none',fontWeight:'400',fontSize:'8px'}, formatter:function(){ return this.point.value===0?'—':this.point.value.toFixed(1)+'%'; } }
+                    }]
+                });
+            } catch(e) {}
+
+            // Reflow observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if(entry.target.id === 'chart-scatter' && cScatter) cScatter.reflow();
+                        if(entry.target.id === 'chart-heatmap' && cHeatmap) cHeatmap.reflow();
+                    }
+                });
+            });
+            document.querySelectorAll('[id^="chart-"]').forEach(el => observer.observe(el));
+
+            // URL Params Setup
+            const params = new URLSearchParams(window.location.search);
+            const lang = params.get('lang') || 'en';
+            if (typeof changeLang === 'function') changeLang(lang);
+            
+            const backBtn = document.querySelector('.back-link');
+            if (backBtn) {
+                let returnUrl = "../index.html";
+                let returnParams = [];
+                const mode = params.get('v');
+                const country = params.get('pais');
+                if (mode) returnParams.push(`v=${mode}`);
+                if (country) returnParams.push(`pais=${country}`);
+                if (lang) returnParams.push(`lang=${lang}`);
+                if (returnParams.length > 0) returnUrl += "?" + returnParams.join("&");
+                returnUrl += "#projects";
+                backBtn.href = returnUrl;
+            }
+        });
+    </script>
+</body>
+</html>

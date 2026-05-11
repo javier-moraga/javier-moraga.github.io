@@ -1,0 +1,2125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Alemana · Medical Templates Framework — Javier Moraga</title>
+    <meta name="description" content="Case study: From a 320-PL/SQL nightmare to a metadata-driven framework. How I rebuilt the ingestion of medical templates at Clínica Alemana — JSON-native in BigQuery, idempotent, and CDC-driven.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
+<style>
+:root {
+    --bg:        #050505;
+    --bg2:       #08080c;
+    --surface:   rgba(12,12,16,0.6);
+    --surface-2: rgba(255,255,255,0.025);
+    --border:    rgba(255,255,255,0.05);
+    --border-hi: rgba(255,255,255,0.12);
+    --text:      rgba(255,255,255,0.92);
+    --muted:     #94a3b8;
+    --dim:       rgba(255,255,255,0.22);
+
+    --c-eng:     #00e5ff;
+    --c-viz:     #d500f9;
+    --c-biz:     #fbbf24;
+    --c-ok:      #4ade80;
+    --c-fail:    #f87171;
+    --border-glass: rgba(255,255,255,0.08);
+
+    --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body: 'Inter', sans-serif;
+    --font-disp: 'Jost', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,229,255,0.05) 0%, transparent 60%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    padding-top: 64px;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* ── NAV ── */
+.nav-bar {
+    position: fixed; top:0; left:0; right:0; z-index:1000; height:64px;
+    padding: 0 48px; display:flex; justify-content:space-between; align-items:center;
+    background: rgba(5,5,5,0.85); backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+}
+.back-link, .nav-name {
+    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--border); padding: 7px 14px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s var(--ease); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-eng); opacity:1; }
+.nav-name b { color: var(--c-eng); margin-left: 10px; font-weight: 500; letter-spacing: 0.14em; }
+
+.lang-switch {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 6px; border: 1px solid var(--border); border-radius: 100px;
+    background: rgba(255,255,255,0.015);
+}
+.lang-opt {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
+    padding: 5px 10px; border-radius: 100px;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.lang-opt.is-active { color: var(--c-eng); background: rgba(0,229,255,0.08); }
+.lang-sep { font-family: var(--font-mono); color: var(--dim); user-select: none; }
+
+/* ── SCROLLBAR ── */
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.18); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,0.4); }
+
+/* ── HERO ── */
+header {
+    padding: 80px 48px 60px;
+    border-bottom: 1px solid var(--border);
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+.hero-badge {
+    display: inline-block; font-family: var(--font-mono);
+    font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-eng); padding: 5px 12px;
+    border: 1px solid rgba(0,229,255,0.3); border-radius: 100px;
+    background: rgba(0,229,255,0.04); margin-bottom: 28px;
+}
+
+h1 {
+    font-family: var(--font-disp); font-weight: 300;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    line-height: 1.08; letter-spacing: -0.025em; margin-bottom: 24px;
+}
+.text-gradient {
+    background: linear-gradient(120deg, var(--c-eng) 0%, var(--c-viz) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.lead {
+    color: var(--muted); font-size: 1.05rem; line-height: 1.7;
+    max-width: 760px; margin-bottom: 40px;
+}
+
+.hero-kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-bottom: 32px;
+}
+.hero-kpi {
+    padding: 18px 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.3s var(--ease);
+}
+.hero-kpi:hover { border-color: var(--border-hi); }
+.hero-kpi-value {
+    display: block; font-family: var(--font-disp);
+    font-size: 1.7rem; font-weight: 400; color: var(--text);
+    letter-spacing: -0.02em; margin-bottom: 4px;
+}
+.hero-kpi-value b { color: var(--c-eng); font-weight: 400; }
+.hero-kpi-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+}
+
+.hero-meta {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted); margin-bottom: 28px;
+}
+.hero-meta b { color: var(--c-eng); font-weight: 500; }
+
+.stack-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.stack-pill {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 6px 12px; border: 1px solid var(--border);
+    border-radius: 100px; color: var(--muted);
+    background: var(--surface-2); transition: all 0.25s var(--ease);
+}
+.stack-pill:hover { border-color: var(--border-hi); color: var(--text); }
+.stack-pill.is-primary {
+    color: var(--c-eng); border-color: rgba(0,229,255,0.25);
+    background: rgba(0,229,255,0.05);
+}
+
+/* ── SECTIONS ── */
+main { padding: 60px 48px 80px; }
+section { margin-bottom: 48px; }
+
+.card {
+    max-width: 1200px; margin: 0 auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 44px 48px;
+    transition: border-color 0.4s var(--ease);
+}
+.card:hover { border-color: var(--border-hi); }
+
+.section-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 14px; display: block;
+}
+
+.narrative-title {
+    font-family: var(--font-disp); font-weight: 300;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.2; letter-spacing: -0.02em;
+    margin-bottom: 24px; color: var(--text);
+    max-width: 860px;
+}
+
+.narrative-text { color: var(--muted); margin-bottom: 36px; max-width: 880px; }
+.narrative-text p { margin-bottom: 16px; line-height: 1.75; }
+.narrative-text p:last-child { margin-bottom: 0; }
+.narrative-text strong { color: var(--text); font-weight: 500; }
+.narrative-text em { color: var(--c-eng); font-style: normal; }
+.narrative-text code {
+    font-family: var(--font-mono); font-size: 0.85em;
+    background: rgba(0,229,255,0.08); color: var(--c-eng);
+    padding: 1px 7px; border-radius: 4px;
+}
+
+.section-sub-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin: 32px 0 14px; display: block;
+}
+
+/* ── COMPARE BEFORE/AFTER ── */
+.compare-block {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 16px; align-items: stretch; margin-top: 32px;
+}
+.compare-side {
+    padding: 22px 24px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+}
+.compare-side.is-after { border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.03); }
+.compare-tag {
+    display: inline-block; font-family: var(--font-mono);
+    font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px; margin-bottom: 12px;
+    color: var(--c-fail); background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+}
+.compare-side.is-after .compare-tag {
+    color: var(--c-eng); background: rgba(0,229,255,0.08);
+    border-color: rgba(0,229,255,0.2);
+}
+.compare-text { color: var(--muted); font-size: 0.92rem; line-height: 1.65; }
+.compare-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-eng); font-size: 1.3rem;
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow-block {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; margin-top: 16px;
+}
+.flow-step {
+    padding: 16px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+    text-align: center; position: relative;
+}
+.flow-step-day {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 8px; display: block;
+}
+.flow-step-title {
+    font-family: var(--font-disp); font-size: 0.95rem;
+    color: var(--text); margin-bottom: 6px;
+}
+.flow-step-meta {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    color: var(--muted); line-height: 1.5;
+}
+
+/* ── TWO COL ── */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+.twocol-block {
+    padding: 26px 28px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+}
+.twocol-block h4 {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: 1.1rem; color: var(--text); margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+}
+.twocol-block h4 i { color: var(--c-eng); font-size: 1rem; }
+.twocol-block.is-fail h4 i { color: var(--c-fail); }
+.twocol-list li {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    color: var(--muted); font-size: 0.92rem; line-height: 1.65;
+}
+.twocol-list li:last-child { border-bottom: none; }
+.twocol-list b { color: var(--text); font-weight: 500; display: block; margin-bottom: 4px; }
+.twocol-list code {
+    font-family: var(--font-mono); font-size: 0.82em;
+    background: rgba(0,229,255,0.06); color: var(--c-eng);
+    padding: 1px 5px; border-radius: 3px;
+}
+
+/* ── METRIC CARDS ── */
+.metric-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-top: 28px;
+}
+.metric-card {
+    padding: 22px 24px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+}
+.metric-card-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px; display: block;
+}
+.metric-card-value {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: 1.8rem; color: var(--c-eng);
+    letter-spacing: -0.02em; line-height: 1; margin-bottom: 8px;
+}
+.metric-card-desc { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+
+/* ── SCHEMA / CODE ── */
+.schema-card {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 18px 22px; margin-top: 20px;
+    font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--muted); line-height: 1.7; overflow-x: auto;
+    white-space: pre;
+}
+.schema-card .kw { color: var(--c-viz); }
+.schema-card .col { color: var(--c-eng); }
+.schema-card .com { color: var(--dim); }
+
+/* ── CONTACT ── */
+.contact-section {
+    max-width: 1200px; margin: 60px auto 40px;
+    padding: 44px 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+}
+.contact-section h3 {
+    font-family: var(--font-disp); font-weight: 300;
+    font-size: 1.6rem; color: var(--text); margin-bottom: 12px;
+}
+.contact-section p { color: var(--muted); margin-bottom: 24px; }
+.contact-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.contact-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 10px 20px; border: 1px solid var(--border);
+    border-radius: 100px; color: var(--muted);
+    transition: all 0.25s var(--ease);
+}
+.contact-link:hover { color: var(--c-eng); border-color: var(--c-eng); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .nav-bar, header, main { padding-left: 20px; padding-right: 20px; }
+    .card { padding: 32px 24px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .compare-block { grid-template-columns: 1fr; }
+    .compare-arrow { transform: rotate(90deg); }
+    .flow-block { grid-template-columns: 1fr 1fr; }
+    .twocol { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ── EVIDENCE BLOCK · before/after data transformation ── */
+.evidence-grid {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 14px; margin-top: 28px; align-items: stretch;
+}
+.evidence-card {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    font-family: var(--font-mono); font-size: 0.72rem;
+    line-height: 1.6; overflow: hidden;
+}
+.evidence-card.is-output { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.02); }
+.evidence-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px; display: block;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.evidence-card.is-output .evidence-label { color: var(--c-eng); }
+.evidence-code { color: var(--muted); white-space: pre; overflow-x: auto; }
+.evidence-code .kw  { color: var(--c-viz); }
+.evidence-code .col { color: var(--c-eng); }
+.evidence-code .str { color: var(--c-biz); }
+.evidence-code .num { color: var(--c-ok); }
+.evidence-code .com { color: var(--dim); font-style: italic; }
+.evidence-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-eng); font-size: 1.4rem;
+}
+.evidence-arrow-label {
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); writing-mode: horizontal-tb;
+    text-align: center; margin-top: 6px;
+}
+
+/* ── TERMINAL · pseudo console output ── */
+.terminal-card {
+    background: #0a0a0d; border: 1px solid var(--border);
+    border-radius: 10px; padding: 0;
+    margin-top: 28px; overflow: hidden;
+}
+.terminal-bar {
+    background: rgba(255,255,255,0.03);
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+.terminal-dot.r { background: #ff5f57; }
+.terminal-dot.y { background: #febc2e; }
+.terminal-dot.g { background: #28c840; }
+.terminal-title {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    color: var(--muted); margin-left: 8px;
+}
+.terminal-body {
+    padding: 18px 22px;
+    font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--text); line-height: 1.7;
+    overflow-x: auto; white-space: pre;
+}
+.terminal-body .prompt  { color: var(--c-eng); }
+.terminal-body .input   { color: var(--c-biz); }
+.terminal-body .ok      { color: var(--c-ok); }
+.terminal-body .label   { color: var(--c-viz); font-weight: 500; }
+.terminal-body .muted   { color: var(--muted); }
+.terminal-body .header  { color: var(--text); font-weight: 500; }
+
+/* ── DELTA COMPOSITION ── */
+.delta-composition {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 28px; margin-top: 28px; align-items: center;
+}
+.delta-bars { display: flex; flex-direction: column; gap: 12px; }
+.delta-bar-row {
+    display: grid; grid-template-columns: 110px 1fr 60px;
+    gap: 12px; align-items: center;
+    font-family: var(--font-mono); font-size: 0.72rem;
+}
+.delta-bar-label { color: var(--muted); letter-spacing: 0.06em; }
+.delta-bar-track {
+    height: 12px; background: rgba(255,255,255,0.04);
+    border-radius: 100px; overflow: hidden; position: relative;
+}
+.delta-bar-fill {
+    height: 100%; border-radius: 100px;
+    transition: width 0.6s var(--ease);
+}
+.delta-bar-fill.is-new   { background: var(--c-eng); }
+.delta-bar-fill.is-upd   { background: var(--c-biz); }
+.delta-bar-fill.is-del   { background: var(--c-fail); }
+.delta-bar-value { color: var(--text); font-weight: 500; text-align: right; }
+.delta-summary {
+    padding: 22px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+    font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--muted); line-height: 1.8;
+}
+.delta-summary b { color: var(--c-eng); font-weight: 500; }
+
+/* ── EXCEL MOCK ── */
+.excel-mock {
+    margin-top: 28px;
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    font-family: var(--font-mono); font-size: 0.72rem;
+}
+.excel-tabs {
+    display: flex; background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    padding: 0 12px;
+}
+.excel-tab {
+    padding: 10px 16px; color: var(--muted);
+    border-right: 1px solid var(--border);
+    font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.excel-tab.is-active { color: var(--c-eng); background: var(--surface); }
+.excel-table { width: 100%; }
+.excel-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr 100px;
+    border-bottom: 1px solid var(--border);
+}
+.excel-row.is-header {
+    background: rgba(255,255,255,0.04); color: var(--text);
+    font-weight: 500; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+}
+.excel-row.is-new  { background: rgba(74,222,128,0.05); }
+.excel-row.is-upd  { background: rgba(251,191,36,0.04); }
+.excel-row.is-del  { background: rgba(248,113,113,0.05); }
+.excel-cell {
+    padding: 9px 14px;
+    border-right: 1px solid var(--border);
+    color: var(--muted); overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.excel-cell:last-child { border-right: none; }
+.excel-cell.is-new   { color: var(--c-ok); }
+.excel-cell.is-upd   { color: var(--c-biz); }
+.excel-cell.is-del   { color: var(--c-fail); }
+.excel-cell .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 100px;
+    font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.badge.is-new { background: rgba(74,222,128,0.1); color: var(--c-ok); }
+.badge.is-upd { background: rgba(251,191,36,0.1); color: var(--c-biz); }
+.badge.is-del { background: rgba(248,113,113,0.1); color: var(--c-fail); }
+
+/* ── RESPONSIVE additions ── */
+@media (max-width: 768px) {
+    .evidence-grid { grid-template-columns: 1fr; }
+    .evidence-arrow { transform: rotate(90deg); padding: 8px 0; }
+    .delta-composition { grid-template-columns: 1fr; }
+    .excel-row { grid-template-columns: 60px 1fr 90px; }
+    .excel-cell:nth-child(3) { display: none; }
+}
+
+
+
+/* ── JOURNEY FLOW · horizontal template-to-dashboard ── */
+.journey-flow {
+    display: flex; align-items: center; gap: 16px;
+    margin-top: 28px; overflow-x: auto; padding: 20px 0;
+}
+.journey-step {
+    min-width: 140px; text-align: center;
+    padding: 18px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+    transition: border-color 0.3s var(--ease);
+}
+.journey-step:hover { border-color: var(--border-hi); }
+.journey-step.is-highlight {
+    border-color: rgba(0,229,255,0.3);
+    background: rgba(0,229,255,0.03);
+}
+.journey-icon {
+    font-size: 1.8rem; color: var(--c-eng);
+    margin-bottom: 10px; display: block;
+}
+.journey-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); line-height: 1.5;
+}
+.journey-arrow {
+    font-size: 1.2rem; color: var(--dim);
+    flex-shrink: 0;
+}
+
+/* ── TEMPLATE WIREFRAME · módulos del formulario ── */
+.template-wireframe {
+    margin-top: 28px; padding: 24px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface-2);
+}
+.wireframe-title {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 18px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.wireframe-modules {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+.wireframe-module {
+    padding: 14px; border: 1px solid var(--border);
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+}
+.wireframe-module-name {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--text); font-weight: 500; margin-bottom: 8px;
+}
+.wireframe-field {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    color: var(--muted); padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.wireframe-field:last-child { border-bottom: none; }
+
+/* ── FLATTEN · 3 estados del dato ── */
+.flatten-grid {
+    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 12px; align-items: center; margin-top: 28px;
+}
+.flatten-card {
+    padding: 18px 20px; border: 1px solid var(--border);
+    border-radius: 10px; background: rgba(0,0,0,0.3);
+    font-family: var(--font-mono); font-size: 0.72rem;
+}
+.flatten-card.is-final {
+    border-color: rgba(0,229,255,0.2);
+    background: rgba(0,229,255,0.02);
+}
+.flatten-label {
+    font-size: 0.6rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 12px; display: block;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.flatten-card.is-final .flatten-label { color: var(--c-eng); }
+.flatten-code {
+    color: var(--muted); white-space: pre-wrap;
+    line-height: 1.7; overflow-x: auto;
+}
+.flatten-code .key { color: var(--c-eng); }
+.flatten-code .val { color: var(--c-biz); }
+.flatten-code .type { color: var(--c-viz); }
+.flatten-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-eng); font-size: 1.3rem;
+}
+.flatten-arrow-label {
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); writing-mode: horizontal-tb;
+    text-align: center; margin-top: 6px;
+}
+
+/* ── EVOLUTION TIMELINE ── */
+.evolution-timeline {
+    margin-top: 28px; padding: 24px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface-2);
+}
+.timeline-row {
+    display: grid; grid-template-columns: 100px 1fr;
+    gap: 20px; padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+.timeline-row:last-child { border-bottom: none; }
+.timeline-date {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.12em; color: var(--c-eng);
+    font-weight: 500;
+}
+.timeline-event {
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--muted); line-height: 1.7;
+}
+.timeline-event b { color: var(--text); font-weight: 500; }
+.timeline-event code {
+    background: rgba(0,229,255,0.06); color: var(--c-eng);
+    padding: 1px 6px; border-radius: 3px; font-size: 0.7rem;
+}
+.timeline-event .ok  { color: var(--c-ok); }
+.timeline-event .fail { color: var(--c-fail); }
+
+/* ── RESPONSIVE additions for new components ── */
+@media (max-width: 768px) {
+    .journey-flow { flex-direction: column; }
+    .journey-arrow { transform: rotate(90deg); }
+    .flatten-grid { grid-template-columns: 1fr; }
+    .flatten-arrow { transform: rotate(90deg); padding: 8px 0; }
+    .wireframe-modules { grid-template-columns: 1fr; }
+}
+
+
+
+/* ── FORM MOCK · realistic medical template ── */
+.form-mock {
+    margin-top: 28px; border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    background: rgba(255,255,255,0.01);
+}
+.form-header {
+    background: linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(213,0,249,0.06) 100%);
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+}
+.form-logo {
+    width: 40px; height: 40px; border-radius: 6px;
+    background: var(--c-eng); display: flex;
+    align-items: center; justify-content: center;
+    font-family: var(--font-disp); font-weight: 500;
+    color: var(--bg); font-size: 1.1rem;
+}
+.form-title-block h4 {
+    font-family: var(--font-disp); font-size: 1.1rem;
+    color: var(--text); margin: 0 0 4px 0; font-weight: 400;
+}
+.form-title-block p {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin: 0;
+}
+.form-body { padding: 0; }
+.form-section {
+    border-bottom: 1px solid var(--border);
+}
+.form-section:last-child { border-bottom: none; }
+.form-section-header {
+    padding: 14px 24px; background: rgba(0,229,255,0.03);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--c-eng); font-weight: 500;
+    letter-spacing: 0.06em;
+    display: flex; align-items: center; gap: 10px;
+}
+.form-section-header i { font-size: 0.9rem; opacity: 0.8; }
+.form-section-body { padding: 20px 24px; }
+.form-field {
+    margin-bottom: 18px; display: grid;
+    grid-template-columns: 200px 1fr; gap: 16px;
+    align-items: start;
+}
+.form-field:last-child { margin-bottom: 0; }
+.form-label {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted); padding-top: 8px;
+}
+.form-label.is-required::after {
+    content: "*"; color: var(--c-fail);
+    margin-left: 3px;
+}
+.form-input {
+    height: 36px; border: 1px solid var(--border);
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+    padding: 0 12px; font-family: var(--font-mono);
+    font-size: 0.7rem; color: var(--dim);
+    display: flex; align-items: center;
+}
+.form-input.is-dropdown::after {
+    content: "▼"; margin-left: auto;
+    font-size: 0.6rem; opacity: 0.5;
+}
+.form-textarea {
+    min-height: 60px; border: 1px solid var(--border);
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+    padding: 10px 12px; font-family: var(--font-mono);
+    font-size: 0.7rem; color: var(--dim);
+}
+.form-checkbox-group {
+    display: flex; flex-wrap: wrap; gap: 14px;
+}
+.form-checkbox {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted);
+}
+.form-checkbox-box {
+    width: 16px; height: 16px; border: 1px solid var(--border);
+    border-radius: 3px; background: rgba(0,0,0,0.2);
+}
+.form-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="nav-bar">
+    <a href="../index.html#projects" class="back-link">
+        <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+    </a>
+    <div class="nav-name">Javier Moraga <b>Clínica Alemana · Templates</b></div>
+    <div class="lang-switch" role="group" aria-label="Language">
+        <button class="lang-opt is-active" data-lang="en" id="btn-en" onclick="changeLang('en')">EN</button>
+        <span class="lang-sep">·</span>
+        <button class="lang-opt" data-lang="es" id="btn-es" onclick="changeLang('es')">ES</button>
+    </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header>
+    <div class="container">
+        <span class="hero-badge" id="hero-badge">Case Study · Clínica Alemana · 2025–2026</span>
+        <h1 id="main-title">
+            Medical Templates Framework —<br>
+            <span class="text-gradient">From PL/SQL Sprawl to Metadata.</span>
+        </h1>
+        <p class="lead" id="main-desc">
+            320+ medical templates, one ingestion engine. The bottleneck was never the code —
+            it was understanding what the variables meant, how the template flowed, and how the
+            data travelled. Standardize the comprehension and the rest collapses from
+            <strong>one month per template</strong> to <strong>one hour</strong>.
+        </p>
+
+        <div class="hero-kpis">
+            <div class="hero-kpi">
+                <span class="hero-kpi-value">320+</span>
+                <span class="hero-kpi-label" id="kpi-label-1">Templates ingested</span>
+            </div>
+            <div class="hero-kpi">
+                <span class="hero-kpi-value"><b>1 month → 1 hour</b></span>
+                <span class="hero-kpi-label" id="kpi-label-2">Time per new template</span>
+            </div>
+            <div class="hero-kpi">
+                <span class="hero-kpi-value">−99%</span>
+                <span class="hero-kpi-label" id="kpi-label-3">Time-to-insight cut</span>
+            </div>
+            <div class="hero-kpi">
+                <span class="hero-kpi-value"><b>0</b></span>
+                <span class="hero-kpi-label" id="kpi-label-4">Code deploys per change</span>
+            </div>
+        </div>
+
+        <p class="hero-meta">
+            <span id="meta-1">2025 — 2026</span> · <b data-en="Production framework" data-es="Framework productivo">Production framework</b> ·
+            <span id="meta-2">Role:</span> <span data-en="Data Engineer &amp; Platform Architect" data-es="Data Engineer &amp; Platform Architect">Data Engineer &amp; Platform Architect</span>
+        </p>
+
+        <div class="stack-strip">
+            <span class="stack-pill is-primary">BigQuery</span>
+            <span class="stack-pill is-primary">Python</span>
+            <span class="stack-pill is-primary">Oracle</span>
+            <span class="stack-pill is-primary">JSON-native</span>
+            <span class="stack-pill">Standard SQL</span>
+            <span class="stack-pill">CDC / Snapshot</span>
+            <span class="stack-pill">Looker Studio</span>
+            <span class="stack-pill">GCP Labels</span>
+            <span class="stack-pill">PARSE_JSON</span>
+            <span class="stack-pill">JSON_KEYS</span>
+            <span class="stack-pill">Scheduled Queries</span>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<!-- ═══════════ 01 · CONTEXT ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-1">01 · Context</span>
+        <h3 class="narrative-title" id="title-1">
+            A 320-template hospital doesn't have a templates problem. It has a schema-drift problem.
+        </h3>
+        <div class="narrative-text" id="text-1">
+            <p>
+                Clínica Alemana de Santiago is one of Chile's largest private hospitals.
+                Inside its EHR, doctors use more than <strong>320 medical templates</strong> —
+                forms for hospitalization, surgery, oncology follow-up, home care, every clinical
+                workflow has its own. Each template has dozens of variables that <em>change</em>
+                as protocols evolve.
+            </p>
+            <p>
+                The legacy system was a constellation of <strong>PL/SQL stored procedures</strong>
+                — one per template, each one a <code>PRC_PLANT_*</code> with thousands of hardcoded
+                <code>IF-ELSIF</code> branches mapping vertical key-value rows to relational columns.
+                When a doctor added a new variable in production, the procedure either failed silently
+                or dropped the data on the floor.
+            </p>
+            <p>
+                Every change required engineering intervention. The data team became a bottleneck
+                for clinical operations.
+            </p>
+        </div>
+
+        <div class="compare-block">
+            <div class="compare-side">
+                <span class="compare-tag" id="before-tag">Before the framework</span>
+                <p class="compare-text" id="before-text">
+                    The cost wasn't typing — it was <em>understanding</em>. A new template took
+                    <strong>≈1 month</strong> per developer, not because they wrote code daily,
+                    but because they had to decode what each variable meant, how the template
+                    rendered, how the data travelled from Oracle to the report. Domain knowledge
+                    lived in the heads of senior staff, not in code.
+                </p>
+            </div>
+            <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="compare-side is-after">
+                <span class="compare-tag" id="after-tag">After the framework</span>
+                <p class="compare-text" id="after-text">
+                    The mock template (the form layout) is now the only artefact a developer needs.
+                    The framework infers the rest from metadata. Onboarding a template:
+                    <strong>≈1 hour</strong>. Same engine, same SQL, same DDL — only the metadata
+                    changes. The understanding is encoded once, in the data, not re-decoded per template.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 02 · ARCHITECTURE ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-2">02 · Architecture</span>
+        <h3 class="narrative-title" id="title-2">
+            One engine, N templates. The schema is data, not code.
+        </h3>
+        <div class="narrative-text" id="text-2">
+            <p>
+                The bet was simple: <strong>treat the template structure as metadata in BigQuery</strong>,
+                not as columns in physical tables. A single ingestion engine reads the metadata,
+                normalizes names to <code>snake_case</code>, and emits idempotent SQL deltas — the
+                same engine handles 320 templates without a single line of template-specific code.
+            </p>
+            <p>
+                Variable values live as <code>json_general</code> objects per module/group, leveraging
+                BigQuery's native <code>PARSE_JSON</code>, <code>JSON_KEYS</code> and <code>JSON_TYPE</code>.
+                This means <em>one physical table</em> supports all templates without ever altering
+                the schema. Adding a new template is a data event, not a deploy.
+            </p>
+        </div>
+
+        <div class="section-sub-label" id="arch-flow-label">Weekly cycle · Mon → Fri</div>
+        <div class="flow-block">
+            <div class="flow-step">
+                <span class="flow-step-day" data-en="MON" data-es="LUN">MON</span>
+                <div class="flow-step-title" data-en="Extract" data-es="Extraer">Extract</div>
+                <p class="flow-step-meta" data-en="01_global_variables_v2.sql<br>JSON per template" data-es="01_variables_globales_v2.sql<br>JSON por plantilla">01_global_variables_v2.sql<br>JSON per template</p>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-day" data-en="TUE" data-es="MAR">TUE</span>
+                <div class="flow-step-title" data-en="Reconcile" data-es="Reconciliar">Reconcile</div>
+                <p class="flow-step-meta" data-en="run_template.py<br>3-level matching" data-es="run_plantilla.py<br>matching 3 niveles">run_template.py<br>3-level matching</p>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-day" data-en="WED" data-es="MIE">WED</span>
+                <div class="flow-step-title" data-en="Apply" data-es="Aplicar">Apply</div>
+                <p class="flow-step-meta" data-en="delta.sql + ddl.sql<br>BigQuery merge" data-es="delta.sql + ddl.sql<br>merge BigQuery">delta.sql + ddl.sql<br>BigQuery merge</p>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-day" data-en="THU" data-es="JUE">THU</span>
+                <div class="flow-step-title" data-en="Close CDC" data-es="Cerrar CDC">Close CDC</div>
+                <p class="flow-step-meta" data-en="close_cdc.sql<br>PROCESSED_INGESTION" data-es="cierre_cdc.sql<br>PROCESADO_INGESTA">close_cdc.sql<br>PROCESSED_INGESTION</p>
+            </div>
+            <div class="flow-step">
+                <span class="flow-step-day" data-en="FRI" data-es="VIE">FRI</span>
+                <div class="flow-step-title" data-en="Snapshot" data-es="Snapshot">Snapshot</div>
+                <p class="flow-step-meta" data-en="Scheduled Query<br>auto-detect drift" data-es="Consulta Programada<br>auto-detectar drift">Scheduled Query<br>auto-detect drift</p>
+            </div>
+        </div>
+
+        <div class="section-sub-label" id="schema-label">Catalog tables · single source of truth</div>
+        <div class="schema-card">
+<span class="kw">CREATE TABLE</span> <span class="col" data-en="template_field_catalog" data-es="catalogo_campos_plantilla">template_field_catalog</span>     <span class="com" data-en="-- field dictionary, soft-delete" data-es="-- diccionario de campos, soft-delete">-- field dictionary, soft-delete</span>
+<span class="kw">CREATE TABLE</span> <span class="col" data-en="template_value_catalog" data-es="catalogo_valores_plantilla">template_value_catalog</span>    <span class="com" data-en="-- variable_id ↔ field name mapping" data-es="-- mapeo variable_id ↔ nombre campo">-- variable_id ↔ field name mapping</span>
+<span class="kw">CREATE TABLE</span> <span class="col" data-en="template_module_order_catalog" data-es="catalogo_orden_modulos_plantilla">template_module_order_catalog</span> <span class="com" data-en="-- module ordering per template" data-es="-- orden de módulos por plantilla">-- module ordering per template</span>
+<span class="kw">CREATE TABLE</span> <span class="col" data-en="template_registry_snapshot" data-es="registro_plantillas_snapshot">template_registry_snapshot</span>   <span class="com" data-en="-- weekly catalog photo, partitioned" data-es="-- foto semanal del catálogo, particionado">-- weekly catalog photo, partitioned</span>
+<span class="kw">CREATE TABLE</span> <span class="col" data-en="template_registry_cdc_log" data-es="registro_plantillas_cdc_log">template_registry_cdc_log</span>    <span class="com" data-en="-- detected changes, clustered" data-es="-- cambios detectados, clusterizado">-- detected changes, clustered</span>
+<span class="kw">CREATE VIEW</span>  <span class="col">v_template_{id}</span>                <span class="com" data-en="-- per-template flat view, auto-rebuilt" data-es="-- vista plana por plantilla, auto-reconstruida">-- per-template flat view, auto-rebuilt</span>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════ 02b · TEMPLATE JOURNEY ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-journey">02b · The Journey</span>
+        <h3 class="narrative-title" id="title-journey">
+            From a doctor's click to a Looker dashboard — six hops, zero manual mappings.
+        </h3>
+        <div class="narrative-text" id="text-journey">
+            <p>
+                Plantilla 329 has 67 fields spread across 5 clinical modules. The doctor fills
+                the form in the EHR, Oracle stores it vertically, the framework normalizes it
+                to JSON, BigQuery flattens it to a view, and Looker renders it. At no point
+                does a human write <code>IF variable_id = 41892 THEN nombre_antibiotico_3</code>.
+                The metadata drives everything.
+            </p>
+        </div>
+
+        <div class="journey-flow">
+            <div class="journey-step is-highlight">
+                <i class="journey-icon fas fa-notes-medical"></i>
+                <div class="journey-label" id="journey-1">Doctor fills<br>template 329</div>
+            </div>
+            <i class="journey-arrow fas fa-arrow-right"></i>
+            <div class="journey-step">
+                <i class="journey-icon fas fa-database"></i>
+                <div class="journey-label" id="journey-2">Oracle stores<br>vertical rows</div>
+            </div>
+            <i class="journey-arrow fas fa-arrow-right"></i>
+            <div class="journey-step">
+                <i class="journey-icon fas fa-file-code"></i>
+                <div class="journey-label" id="journey-3">JSON export<br>via 01_variables</div>
+            </div>
+            <i class="journey-arrow fas fa-arrow-right"></i>
+            <div class="journey-step is-highlight">
+                <i class="journey-icon fas fa-gears"></i>
+                <div class="journey-label" id="journey-4">Framework<br>reconciles</div>
+            </div>
+            <i class="journey-arrow fas fa-arrow-right"></i>
+            <div class="journey-step">
+                <i class="journey-icon fas fa-table"></i>
+                <div class="journey-label" id="journey-5">BQ catalog<br>+ json_general</div>
+            </div>
+            <i class="journey-arrow fas fa-arrow-right"></i>
+            <div class="journey-step">
+                <i class="journey-icon fas fa-layer-group"></i>
+                <div class="journey-label" id="journey-6">View flattens<br>w/ JSON_VALUE</div>
+            </div>
+            <i class="journey-arrow fas fa-arrow-right"></i>
+            <div class="journey-step is-highlight">
+                <i class="journey-icon fas fa-chart-line"></i>
+                <div class="journey-label" id="journey-7">Looker<br>dashboard</div>
+            </div>
+        </div>
+
+        <div class="form-mock" id="form-mock">
+            <div class="form-header">
+                <div class="form-logo">CA</div>
+                <div class="form-title-block">
+                    <h4 id="form-title">Template 329 · Home Hospitalization HOSDOM</h4>
+                    <p id="form-subtitle">Treatment / Follow-up · 67 fields · 5 clinical modules</p>
+                </div>
+            </div>
+            <div class="form-body">
+                <!-- Módulo 1: Plan de tratamiento -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-notes-medical"></i>
+                        <span id="form-sec-1">Treatment plan</span>
+                    </div>
+                    <div class="form-section-body">
+                        <div class="form-field">
+                            <label class="form-label" data-en="Patient unit" data-es="Unidad paciente">Patient unit</label>
+                            <div class="form-input is-dropdown" data-en="Select an option" data-es="Seleccione una opción">Select an option</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label is-required" data-en="Main diagnosis" data-es="Diagnóstico principal">Main diagnosis</label>
+                            <div class="form-input" data-en="Enter a value" data-es="Ingresa un valor">Enter a value</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-en="Abbreviated medical history" data-es="Historia Clínica Abreviada">Abbreviated medical history</label>
+                            <div class="form-textarea"></div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-en="Main treatment" data-es="Tratamiento diagnóstico principal">Main treatment</label>
+                            <div class="form-checkbox-group">
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Antibiotics" data-es="Antibióticos">Antibiotics</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Physical therapy" data-es="Kinesioterapia">Physical therapy</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Oxygen therapy" data-es="Oxigenoterapia">Oxygen therapy</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Speech therapy" data-es="Fonoaudiología">Speech therapy</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Occupational therapy" data-es="Terapia ocupacional">Occupational therapy</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="TENS" data-es="TENS">TENS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-en="Antibiotic name 2" data-es="Nombre antibiótico 2">Antibiotic name 2</label>
+                            <div class="form-input" data-en="Enter a value" data-es="Ingresa un valor">Enter a value</div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-field" style="grid-template-columns: 1fr; gap: 8px;">
+                                <label class="form-label" data-en="Start date" data-es="Fecha inicio">Start date</label>
+                                <div class="form-input" data-en="Date" data-es="Fecha">Date</div>
+                            </div>
+                            <div class="form-field" style="grid-template-columns: 1fr; gap: 8px;">
+                                <label class="form-label" data-en="End date" data-es="Fecha término">End date</label>
+                                <div class="form-input" data-en="Date" data-es="Fecha">Date</div>
+                            </div>
+                            <div class="form-field" style="grid-template-columns: 1fr; gap: 8px;">
+                                <label class="form-label" data-en="Duration (days)" data-es="Duración (días)">Duration (days)</label>
+                                <div class="form-input">7</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Módulo 2: Médico tratante -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-user-doctor"></i>
+                        <span id="form-sec-2">Attending physician main diagnosis</span>
+                    </div>
+                    <div class="form-section-body">
+                        <div class="form-field">
+                            <label class="form-label is-required" data-en="Attending physician specialty" data-es="Especialidad del médico tratante">Attending physician specialty</label>
+                            <div class="form-input is-dropdown" data-en="Select an option" data-es="Seleccione una opción">Select an option</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-en="Preferred contact method" data-es="Vía preferente de contacto">Preferred contact method</label>
+                            <div class="form-checkbox-group">
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span>WhatsApp</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Phone call" data-es="Llamada telefónica">Phone call</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Email" data-es="Mail">Email</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Módulo 3: Plan seguimiento -->
+                <div class="form-section">
+                    <div class="form-section-header">
+                        <i class="fas fa-calendar-check"></i>
+                        <span id="form-sec-3">Follow-up plan</span>
+                    </div>
+                    <div class="form-section-body">
+                        <div class="form-field">
+                            <label class="form-label is-required" data-en="Proposed follow-up date" data-es="Fecha propuesta de control">Proposed follow-up date</label>
+                            <div class="form-input" data-en="Date" data-es="Fecha">Date</div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label is-required" data-en="Control modality" data-es="Modalidad de control médico">Control modality</label>
+                            <div class="form-checkbox-group">
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="In-person" data-es="Presencial">In-person</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Telemedicine" data-es="Telemedicina">Telemedicine</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Home visit" data-es="Domicilio">Home visit</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label class="form-label" data-en="Requires prior exams?" data-es="¿Requiere exámenes previo a su control médico?">Requires prior exams?</label>
+                            <div class="form-checkbox-group">
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="Yes" data-es="Sí">Yes</span>
+                                </div>
+                                <div class="form-checkbox">
+                                    <div class="form-checkbox-box"></div>
+                                    <span data-en="No" data-es="No">No</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ═══════════ 03 · THE ENGINE ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-3">03 · The Engine</span>
+        <h3 class="narrative-title" id="title-3">
+            Reconciliation isn't a SQL JOIN. It's a 3-level fallback that tolerates schema drift.
+        </h3>
+        <div class="narrative-text" id="text-3">
+            <p>
+                The engine — <code>plantilla_ingestor_v5.py</code> — compares the new Oracle JSON
+                against the current BigQuery state and decides, per field, whether it's <em>new</em>,
+                <em>updated</em>, <em>deactivated</em>, or <em>unchanged</em>. The hard part isn't the
+                comparison; it's that the catalog has been written by <strong>multiple versions of
+                the script over time</strong>. UUID vs MD5 IDs, stopword stripping that changed,
+                module names that drifted (<code>datos_paciente</code> vs <code>datos_de_paciente</code>).
+            </p>
+            <p>
+                A naive join produces 87 false positives where there are 35 real changes. The fix:
+                a three-level resolver that tries id_registro first, falls back to natural key,
+                and finally to drift-tolerant matching.
+            </p>
+        </div>
+
+        <div class="twocol">
+            <div class="twocol-block">
+                <h4><i class="fas fa-layer-group"></i> <span id="resolver-head">Resolver levels</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b id="lvl-1-title">Level 1 — id_registro exact match</b>
+                        <span id="lvl-1-desc">When BQ was loaded with the same MD5 algorithm.
+                        Hash hits → record is identical.</span>
+                    </li>
+                    <li>
+                        <b id="lvl-2-title">Level 2 — natural key (module + field)</b>
+                        <span id="lvl-2-desc">When BQ has UUIDs from <code>GENERATE_UUID()</code>.
+                        Same module + same field name → same conceptual record.</span>
+                    </li>
+                    <li>
+                        <b id="lvl-3-title">Level 3 — drift-tolerant match</b>
+                        <span id="lvl-3-desc">When module names changed across script versions.
+                        Strip stopwords, compare. Catches the 52 false renames a naive matcher misses.</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="twocol-block">
+                <h4><i class="fas fa-shield-halved"></i> <span id="immut-head">Immutability guard</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b id="imm-1-title">aplicar_inmutabilidad()</b>
+                        <span id="imm-1-desc">Before reconciliation, force new field names to match
+                        their historical names in BQ (matched by Oracle <code>variable_id</code>). This
+                        protects 200+ existing dashboards from cosmetic name changes.</span>
+                    </li>
+                    <li>
+                        <b id="imm-2-title">Soft delete only</b>
+                        <span id="imm-2-desc">Fields are never removed from <code>catalogo_campos</code>
+                        — they're flagged <code>activo = FALSE</code> with a termination date.
+                        History stays queryable.</span>
+                    </li>
+                    <li>
+                        <b id="imm-3-title">Idempotent by design</b>
+                        <span id="imm-3-desc">Running the same JSON twice produces identical SQL.
+                        <code>id_registro</code> is deterministic MD5 — no auto-increments, no UUIDs
+                        in the engine's output.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-sub-label" id="impact-label">Real run, plantilla 329 (Hospital Home Care)</div>
+        <div class="metric-grid">
+            <div class="metric-card">
+                <span class="metric-card-label" id="m-1-label">Naive matching</span>
+                <div class="metric-card-value">+87 / −79</div>
+                <p class="metric-card-desc" id="m-1-desc">
+                    What a one-level join would say happened — mostly false noise from
+                    schema-version drift.
+                </p>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label" id="m-2-label">3-level resolver</span>
+                <div class="metric-card-value">+35 / ~52 / −34</div>
+                <p class="metric-card-desc" id="m-2-desc">
+                    Real changes plus 52 silent renames preserved. Over half the apparent
+                    diff was version drift, not Oracle drift.
+                </p>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label" id="m-3-label">Generated SQL</span>
+                <div class="metric-card-value">1,258 lines</div>
+                <p class="metric-card-desc" id="m-3-desc">
+                    INSERTs, UPDATEs and soft-deletes — fully idempotent.
+                    Re-runnable until the end of time.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 04 · EVIDENCE ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-evidence">04 · Evidence</span>
+        <h3 class="narrative-title" id="title-evidence">
+            From Oracle key-value rows to idempotent BigQuery SQL — the actual transformation.
+        </h3>
+        <div class="narrative-text" id="text-evidence">
+            <p>
+                What follows is a real run on plantilla 329 (Hospital Home Care). On the left,
+                the JSON exported from Oracle — vertical, flat, semantically opaque without context.
+                On the right, what the engine produces — categorized, hashed, idempotent SQL
+                ready to merge into BigQuery.
+            </p>
+            <p>
+                <strong>Nothing was hand-edited between input and output.</strong> The same engine
+                handles all 320 templates with this exact contract.
+            </p>
+            <p style="margin-top: 16px; padding: 12px 16px; background: rgba(0,229,255,0.04); border-left: 3px solid var(--c-eng); border-radius: 6px; font-size: 0.9rem;">
+                <strong style="color: var(--c-eng);">Note on language:</strong>
+                Production code is in Spanish (hospital standard). Field names like
+                <code>plan_tratamiento</code> and <code>nombre_antibiotico_3</code> translate
+                to <code>treatment_plan</code> and <code>antibiotic_name_3</code>. The framework
+                preserves whatever naming convention Oracle uses — no translation layer.
+            </p>
+        </div>
+
+        <div class="evidence-grid">
+            <div class="evidence-card">
+                <span class="evidence-label" id="evidence-input-label">Input · Oracle JSON (extract)</span>
+<div class="evidence-code">[
+  {
+    <span class="col" data-en="&quot;template_id&quot;" data-es="&quot;plantilla_id&quot;">"template_id"</span>: <span class="num">329</span>,
+    <span class="col" data-en="&quot;group&quot;" data-es="&quot;agrupador&quot;">"group"</span>: <span class="str" data-en="&quot;Treatment plan&quot;" data-es="&quot;Plan de tratamiento&quot;">"Treatment plan"</span>,
+    <span class="col" data-en="&quot;variable_name&quot;" data-es="&quot;variable_nombre&quot;">"variable_name"</span>: <span class="str" data-en="&quot;Antibiotic name 3&quot;" data-es="&quot;Nombre antibiótico 3&quot;">"Antibiotic name 3"</span>,
+    <span class="col" data-en="&quot;variable_id&quot;" data-es="&quot;variable_id&quot;">"variable_id"</span>: <span class="num">41892</span>,
+    <span class="col" data-en="&quot;group_id&quot;" data-es="&quot;id_agrupador&quot;">"group_id"</span>: <span class="num">1247</span>,
+    <span class="col" data-en="&quot;variable_row&quot;" data-es="&quot;variable_numero_fila&quot;">"variable_row"</span>: <span class="num">0</span>,
+    <span class="col" data-en="&quot;variable_col&quot;" data-es="&quot;variable_numero_columna&quot;">"variable_col"</span>: <span class="num">2</span>
+  },
+  {
+    <span class="col" data-en="&quot;template_id&quot;" data-es="&quot;plantilla_id&quot;">"template_id"</span>: <span class="num">329</span>,
+    <span class="col" data-en="&quot;group&quot;" data-es="&quot;agrupador&quot;">"group"</span>: <span class="str" data-en="&quot;Treatment plan&quot;" data-es="&quot;Plan de tratamiento&quot;">"Treatment plan"</span>,
+    <span class="col" data-en="&quot;variable_name&quot;" data-es="&quot;variable_nombre&quot;">"variable_name"</span>: <span class="str" data-en="&quot;Antibiotic duration 3&quot;" data-es="&quot;Duración antibiótico 3&quot;">"Antibiotic duration 3"</span>,
+    <span class="col" data-en="&quot;variable_id&quot;" data-es="&quot;variable_id&quot;">"variable_id"</span>: <span class="num">41893</span>,
+    ...
+  }
+]</div>
+            </div>
+
+            <div class="evidence-arrow">
+                <div>
+                    <i class="fas fa-arrow-right"></i>
+                    <div class="evidence-arrow-label" id="evidence-arrow-label">3-level reconciler</div>
+                </div>
+            </div>
+
+            <div class="evidence-card is-output">
+                <span class="evidence-label" id="evidence-output-label">Output · 329_delta.sql (extract)</span>
+<div class="evidence-code"><span class="com" data-en="-- NEW in catalogo_campos_plantilla (35)" data-es="-- NUEVOS en catalogo_campos_plantilla (35)">-- NEW in catalogo_campos_plantilla (35)</span>
+<span class="kw">INSERT INTO</span> <span class="col">catalogo_campos_plantilla</span> (
+  id_registro, plantilla_id_origen,
+  <span data-en="module" data-es="modulo">module</span>_estandar, nombre_campo_estandar,
+  orden, activo, fecha_inicio_vigencia
+) <span class="kw">VALUES</span>
+  (<span class="str">'c022332d9b86f519...'</span>,<span class="num">329</span>,
+   <span class="str">'plan_de_tratamiento'</span>,
+   <span class="str">'nombre_antibiotico_3'</span>,
+   <span class="num">42</span>,<span class="kw">TRUE</span>,<span class="str">'2026-04-27'</span>),
+  (<span class="str">'35b8bcd4fffebedd...'</span>,<span class="num">329</span>,
+   <span class="str">'plan_de_tratamiento'</span>,
+   <span class="str">'duracion_antibiotico_3'</span>,
+   <span class="num">50</span>,<span class="kw">TRUE</span>,<span class="str">'2026-04-27'</span>);
+
+<span class="com" data-en="-- DELETIONS · soft-delete (preserves history)" data-es="-- BAJAS · soft-delete (preserva historia)">-- DELETIONS · soft-delete (preserves history)</span>
+<span class="kw">UPDATE</span> <span class="col">catalogo_campos_plantilla</span> <span class="kw">SET</span>
+  activo                 = <span class="kw">FALSE</span>,
+  fecha_termino_vigencia = <span class="str">'2026-04-27'</span>
+<span class="kw">WHERE</span> id_registro = <span class="str">'a4f2...'</span>;</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 04B · THE FLATTEN ═══════════ -->
+
+<!-- ═══════════ 04C · THE RECONSTRUCTION ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-reconstruction">04c · The Reconstruction</span>
+        <h3 class="narrative-title" id="title-reconstruction">
+            The view writes itself. JSON_KEYS reads the catalog, generates the DDL.
+        </h3>
+        <div class="narrative-text" id="text-reconstruction">
+            <p>
+                The final view for plantilla 329 has <strong>67 flattened columns</strong>.
+                Each one is a <code>JSON_VALUE</code> extraction from <code>json_general</code>.
+                Without the framework, those 67 columns would have been 67 hardcoded
+                <code>IF-ELSIF</code> branches in PL/SQL. With the framework, they're
+                <em>generated automatically</em> by reading the JSON structure that's
+                already stored in BigQuery.
+            </p>
+            <p>
+                This is <strong>reverse engineering as a design pattern</strong>. The schema
+                doesn't dictate the data — the data dictates the schema. When Oracle adds
+                a field, it appears in the JSON. The DDL constructor reads the JSON keys,
+                writes the new column, and rebuilds the view. No human touches the SQL.
+            </p>
+        </div>
+
+        <div class="section-sub-label" id="reconstruction-ddl-label">The final view · 67 columns from JSON paths</div>
+        <div class="schema-card">
+<span class="kw">CREATE OR REPLACE VIEW</span>
+  <span class="col"><span data-en="`analytics_ds.home_hospitalization_treatment_followup`" data-es="`ds_cns_datalake_nucleo.registro_hosdom_tratamiento_seguimiento`">`analytics_ds.home_hospitalization_treatment_followup`</span></span>
+<span class="kw">AS SELECT</span>
+  <span data-en="module_incident_id" data-es="incidencia_modulo_id">module_incident_id</span>,
+  <span data-en="template_id" data-es="plantilla_id">template_id</span>,
+  <span data-en="record_id" data-es="ficha_id">record_id</span>,
+  <span data-en="created_date" data-es="fecha_creacion">created_date</span>,
+  <span class="com" data-en="-- Patient data (7 fields)" data-es="-- Datos paciente (7 campos)">-- Patient data (7 fields)</span>
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col"><span data-en="'patient_data'" data-es="'datos_paciente'">'patient_data'</span></span>][<span class="col"><span data-en="'patient_phone'" data-es="'telefono_paciente'">'patient_phone'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="patient_data_patient_phone" data-es="datos_paciente_telefono_paciente">patient_data_patient_phone</span>,
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col" data-en="'patient_data'" data-es="'datos_paciente'">'patient_data'</span>][<span class="col"><span data-en="'rest_address'" data-es="'direccion_reposo'">'rest_address'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="patient_data_rest_address" data-es="datos_paciente_direccion_reposo">patient_data_rest_address</span>,
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col">'datos_paciente'</span>][<span class="col"><span data-en="'district'" data-es="'comuna'">'district'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="patient_data_district" data-es="datos_paciente_comuna">patient_data_district</span>,
+  
+  <span class="com" data-en="-- Treatment plan (42 fields)" data-es="-- Plan tratamiento (42 campos)">-- Treatment plan (42 fields)</span>
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col"><span data-en="'treatment_plan'" data-es="'plan_tratamiento'">'treatment_plan'</span></span>][<span class="col"><span data-en="'main_diagnosis'" data-es="'diagnostico_principal'">'main_diagnosis'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="treatment_plan_main_diagnosis" data-es="plan_tratamiento_diagnostico_principal">treatment_plan_main_diagnosis</span>,
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col" data-en="'treatment_plan'" data-es="'plan_tratamiento'">'treatment_plan'</span>][<span class="col"><span data-en="'antibiotic_name_2'" data-es="'nombre_antibiotico_2'">'antibiotic_name_2'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="treatment_plan_antibiotic_name_2" data-es="plan_tratamiento_nombre_antibiotico_2">treatment_plan_antibiotic_name_2</span>,
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col">'plan_tratamiento'</span>][<span class="col"><span data-en="'antibiotic_duration_2'" data-es="'duracion_antibiotico_2'">'antibiotic_duration_2'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="treatment_plan_antibiotic_duration_2" data-es="plan_tratamiento_duracion_antibiotico_2">treatment_plan_antibiotic_duration_2</span>,
+  
+  <span class="com" data-en="-- Attending physician (3 fields)" data-es="-- Médico tratante (3 campos)">-- Attending physician (3 fields)</span>
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col"><span data-en="'attending_physician'" data-es="'medico_tratante'">'attending_physician'</span></span>][<span class="col"><span data-en="'specialty'" data-es="'especialidad'">'specialty'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="attending_physician_specialty" data-es="medico_tratante_especialidad">attending_physician_specialty</span>,
+  
+  <span class="com" data-en="-- Follow-up plan (8 fields)" data-es="-- Plan seguimiento (8 campos)">-- Follow-up plan (8 fields)</span>
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col"><span data-en="'followup_plan'" data-es="'plan_seguimiento'">'followup_plan'</span></span>][<span class="col"><span data-en="'proposed_control_date'" data-es="'fecha_propuesta_control'">'proposed_control_date'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="followup_plan_proposed_control_date" data-es="plan_seguimiento_fecha_propuesta_control">followup_plan_proposed_control_date</span>,
+  
+  <span class="com" data-en="-- Sincerely (2 fields)" data-es="-- Atentamente (2 campos)">-- Sincerely (2 fields)</span>
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col"><span data-en="'sincerely'" data-es="'atentamente'">'sincerely'</span></span>][<span class="col"><span data-en="'physician_name'" data-es="'nombre_medico'">'physician_name'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="sincerely_physician_name" data-es="atentamente_nombre_medico">sincerely_physician_name</span>,
+  <span class="kw">JSON_VALUE</span>(json_general[<span class="col" data-en="'sincerely'" data-es="'atentamente'">'sincerely'</span>][<span class="col"><span data-en="'physician_id'" data-es="'rut_medico'">'physician_id'</span></span>], <span class="col">'$'</span>)
+    <span class="kw">AS</span> <span data-en="sincerely_physician_id" data-es="atentamente_rut_medico">sincerely_physician_id</span>
+  
+<span class="kw">FROM</span> <span class="col"><span data-en="`transform_ds.template_registry`" data-es="`ds_trf_datalake_nucleo.registro_plantillas`">`transform_ds.template_registry`</span></span>
+<span class="kw">WHERE</span> plantilla_id = <span class="col">329</span>;</div>
+
+        <div class="section-sub-label" id="reconstruction-engine-label">The DDL constructor · 08_constructor_ddl_plantillas.sql</div>
+        <div class="schema-card">
+<span class="com" data-en="-- Step 1: Sample the JSON to discover keys" data-es="-- Paso 1: Muestrear el JSON para descubrir claves">-- Step 1: Sample the JSON to discover keys</span>
+<span class="kw">WITH</span> <span data-en="sampled" data-es="sampled">sampled</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> <span data-en="template_id" data-es="plantilla_id">template_id</span>, json_general <span class="kw">AS</span> j
+  <span class="kw">FROM</span> <span class="col" data-en="template_registry" data-es="registro_plantillas">template_registry</span>
+  <span class="kw">WHERE</span> <span data-en="template_id" data-es="plantilla_id">template_id</span> = <span class="col">329</span>
+  <span class="kw">LIMIT</span> <span class="col">1</span>
+),
+
+<span class="com" data-en="-- Step 2: Extract top-level modules using JSON_KEYS" data-es="-- Paso 2: Extraer módulos top-level usando JSON_KEYS">-- Step 2: Extract top-level modules using JSON_KEYS</span>
+<span data-en="blocks" data-es="bloques">blocks</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    <span data-en="template_id" data-es="plantilla_id">template_id</span>,
+    k <span class="kw">AS</span> <span data-en="module" data-es="modulo">module</span>,
+    j[k] <span class="kw">AS</span> <span data-en="module_json" data-es="modulo_json">module_json</span>
+  <span class="kw">FROM</span> <span data-en="sampled" data-es="sampled">sampled</span>,
+  <span class="kw">UNNEST</span>(<span class="kw">JSON_KEYS</span>(j)) <span class="kw">AS</span> k
+  <span class="kw">WHERE JSON_TYPE</span>(j[k]) = <span class="col">'object'</span>
+),
+
+<span class="com" data-en="-- Step 3: Extract fields within each module" data-es="-- Paso 3: Extraer <span data-en="fields" data-es="campos">fields</span> dentro de cada módulo">-- Step 3: Extract fields within each module</span>
+<span data-en="fields" data-es="campos">fields</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    <span data-en="template_id" data-es="plantilla_id">template_id</span>,
+    <span data-en="module" data-es="modulo">module</span>,
+    subk <span class="kw">AS</span> <span data-en="field" data-es="campo">field</span>,
+    <span class="kw">CONCAT</span>(
+      <span class="col">'JSON_VALUE(json_general['</span>, <span class="col">"'"</span>, <span data-en="module" data-es="modulo">module</span>, <span class="col">"']['"</span>, subk, <span class="col">"'], '$') AS "</span>,
+      <span class="kw">LOWER</span>(<span data-en="module" data-es="modulo">module</span> || <span class="col">'_'</span> || subk)
+    ) <span class="kw">AS</span> <span data-en="ddl_column" data-es="columna_ddl">ddl_column</span>
+  <span class="kw">FROM</span> <span data-en="blocks" data-es="bloques">blocks</span>,
+  <span class="kw">UNNEST</span>(<span class="kw">JSON_KEYS</span>(<span data-en="module_json" data-es="modulo_json">module_json</span>)) <span class="kw">AS</span> subk
+),
+
+<span class="com" data-en="-- Step 4: Aggregate all columns into a SELECT statement" data-es="-- Paso 4: Agregar todas las columnas en un SELECT">-- Step 4: Aggregate all columns into a SELECT statement</span>
+<span data-en="complete_ddl" data-es="ddl_completo">complete_ddl</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    <span class="kw">STRING_AGG</span>(<span data-en="ddl_column" data-es="columna_ddl">ddl_column</span>, <span class="col">',\n  '</span> <span class="kw">ORDER BY</span> <span data-en="module" data-es="modulo">module</span>, <span data-en="field" data-es="campo">field</span>) <span class="kw">AS</span> <span data-en="select_cols" data-es="select_cols">select_cols</span>
+  <span class="kw">FROM</span> <span data-en="fields" data-es="campos">fields</span>
+)
+
+<span class="kw">SELECT</span> <span class="kw">CONCAT</span>(
+  <span class="col">'CREATE OR REPLACE VIEW v_template_329 AS SELECT\n  '</span>,
+  <span data-en="select_cols" data-es="select_cols">select_cols</span>,
+  <span class="col">'\nFROM template_registry WHERE template_id = 329;'</span>
+) <span class="kw">AS</span> <span data-en="ddl_output" data-es="ddl_output">ddl_output</span>
+<span class="kw">FROM</span> <span data-en="complete_ddl" data-es="ddl_completo">complete_ddl</span>;</div>
+
+        <div class="narrative-text" style="margin-top: 24px;" id="text-reconstruction-bottom">
+            <p>
+                The constructor runs once per template whenever the catalog changes.
+                It reads the <em>actual JSON stored in BigQuery</em>, discovers the
+                structure with <code>JSON_KEYS</code>, and writes the DDL. The analyst
+                copies the output, pastes it into BigQuery, and the view rebuilds.
+            </p>
+            <p>
+                <strong>This is the opposite of schema-first design.</strong> The data
+                defines the schema. When Oracle evolves, the JSON evolves, the constructor
+                re-reads it, and the DDL regenerates. Zero migrations, zero ALTER TABLE,
+                zero manual column mapping.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="card">
+        <span class="section-label" id="label-console">05 · Operator Console</span>
+        <h3 class="narrative-title" id="title-console">
+            The wizard turns 8 flags into 7 questions. Anyone runs it.
+        </h3>
+        <div class="narrative-text" id="text-console">
+            <p>
+                Clinical analysts run this — not engineers. The original argparse CLI required
+                memorizing 8 flags and remembering output paths. The wizard asks one question
+                at a time, validates each answer in place, and confirms the plan before executing.
+                Output goes to the script's folder, period — no "where do you want this?" prompt
+                that shifts cognitive load to the operator.
+            </p>
+        </div>
+
+        <div class="terminal-card">
+            <div class="terminal-bar">
+                <span class="terminal-dot r"></span>
+                <span class="terminal-dot y"></span>
+                <span class="terminal-dot g"></span>
+                <span class="terminal-title" id="terminal-title">~/plantillas_control · python run_plantilla.py</span>
+            </div>
+            <div class="terminal-body" id="terminal-body"><span class="header">══════════════════════════════════════════════════════════════</span>
+<span class="header">  MEDICAL TEMPLATE INGESTION</span>
+<span class="header">══════════════════════════════════════════════════════════════</span>
+
+  <span class="muted">── 1 · Identification ────────────────────────────────</span>
+  <span class="prompt">Template ID to process:</span> <span class="input">329</span>
+  <span class="prompt">JSON path [plantilla_329.json]:</span> <span class="input">variables_329_20260427.json</span>
+  <span class="prompt">Start date [2026-04-27]:</span> <span class="muted">(Enter)</span>
+
+  <span class="muted">── 2 · BQ state reconciliation ───────────────────────</span>
+  <span class="prompt">Do you have the 3 BQ state files? (y/n):</span> <span class="input">y</span>
+  <span class="prompt">bq_campos.json file [bq_campos.json]:</span> <span class="muted">(Enter)</span>
+  <span class="prompt">bq_valores.json file [bq_valores.json]:</span> <span class="muted">(Enter)</span>
+  <span class="prompt">bq_modulos.json file [bq_modulos.json]:</span> <span class="muted">(Enter)</span>
+  <span class="prompt">Confirm and run? (y/n):</span> <span class="input">y</span>
+
+  <span class="ok">[1/8]</span> <span data-en="Validate input files" data-es="Validar archivos de entrada">Validate input files</span>           <span class="ok">✓</span>
+  <span class="ok">[2/8]</span> <span data-en="Validate Oracle JSON data" data-es="Validar datos del JSON Oracle">Validate Oracle JSON data</span>         <span class="ok">✓</span>  486 rows, plantilla_id=329
+  <span class="ok">[3/8]</span> <span data-en="Process and reconcile catalog" data-es="Procesar y conciliar catálogo">Process and reconcile catalog</span>         <span class="ok">✓</span>  +35 ~52 -34 =0  (3-level resolver)
+  <span class="ok">[4/8]</span> <span data-en="Generate SQL delta" data-es="Generar SQL delta">Generate SQL delta</span>                     <span class="ok">✓</span>  1,258 lines
+  <span class="ok">[5/8]</span> <span data-en="Generate Data Studio view DDL" data-es="Generar DDL vista Data Studio">Generate Data Studio view DDL</span>         <span class="ok">✓</span>  v_template_329
+  <span class="ok">[6/8]</span> <span data-en="Generate revision Excel" data-es="Generar Excel de revisión">Generate revision Excel</span>             <span class="ok">✓</span>  4 sheets, 6 collisions
+  <span class="ok">[7/8]</span> <span data-en="Register execution" data-es="Registrar ejecución">Register execution</span>                   <span class="ok">✓</span>  SHA-256 786f406c…
+  <span class="ok">[8/8]</span> <span data-en="Generate CDC cycle close" data-es="Generar cierre ciclo CDC">Generate CDC cycle close</span>              <span class="ok">✓</span>
+
+  <span class="ok">✓ COMPLETED</span>  plantilla 329  ·  3.2s  ·  DELTA</div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 06 · DELTA COMPOSITION ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-composition">06 · Delta Composition</span>
+        <h3 class="narrative-title" id="title-composition">
+            What a single weekly run actually moves through the catalog.
+        </h3>
+        <div class="narrative-text" id="text-composition">
+            <p>
+                The naive matcher would have reported 87 new fields and 79 deletions for plantilla 329 —
+                a panic-inducing diff. The 3-level resolver tells the truth: 35 genuinely new fields,
+                52 silent renames preserved, 34 actual soft-deletes. Most of the apparent churn was
+                schema drift between script versions, not Oracle drift.
+            </p>
+        </div>
+
+        <div class="delta-composition">
+            <div class="delta-bars">
+                <div class="delta-bar-row">
+                    <span class="delta-bar-label" data-en="NEW fields" data-es="NUEVOS campos">NEW fields</span>
+                    <div class="delta-bar-track"><div class="delta-bar-fill is-new" style="width: 16.5%"></div></div>
+                    <span class="delta-bar-value">+35</span>
+                </div>
+                <div class="delta-bar-row">
+                    <span class="delta-bar-label" data-en="UPDATED" data-es="ACTUALIZADOS">UPDATED</span>
+                    <div class="delta-bar-track"><div class="delta-bar-fill is-upd" style="width: 57%"></div></div>
+                    <span class="delta-bar-value">~121</span>
+                </div>
+                <div class="delta-bar-row">
+                    <span class="delta-bar-label" data-en="SOFT-DELETE" data-es="BAJA LÓGICA">SOFT-DELETE</span>
+                    <div class="delta-bar-track"><div class="delta-bar-fill is-del" style="width: 16%"></div></div>
+                    <span class="delta-bar-value">−34</span>
+                </div>
+                <div class="delta-bar-row">
+                    <span class="delta-bar-label" data-en="VALUES new" data-es="VALORES nuevos">VALUES new</span>
+                    <div class="delta-bar-track"><div class="delta-bar-fill is-new" style="width: 43%"></div></div>
+                    <span class="delta-bar-value">+92</span>
+                </div>
+                <div class="delta-bar-row">
+                    <span class="delta-bar-label" data-en="VALUES del" data-es="VALORES eliminados">VALUES del</span>
+                    <div class="delta-bar-track"><div class="delta-bar-fill is-del" style="width: 31%"></div></div>
+                    <span class="delta-bar-value">−67</span>
+                </div>
+                <div class="delta-bar-row">
+                    <span class="delta-bar-label" data-en="MODULES Δ" data-es="MÓDULOS Δ">MODULES Δ</span>
+                    <div class="delta-bar-track"><div class="delta-bar-fill is-upd" style="width: 6%"></div></div>
+                    <span class="delta-bar-value">~12</span>
+                </div>
+            </div>
+            <div class="delta-summary" id="composition-summary">
+                <b>132 INSERTs</b> · <b>125 UPDATEs</b> · <b>70 DELETEs</b><br>
+                <b>1,258 lines</b> of generated SQL<br><br>
+                Without the framework, this run would have been a one-month engineering ticket.
+                With the framework, it's the output of <em>one</em> Python invocation.
+                Re-runnable. Idempotent. Auditable.
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 07 · REVISION SHEET ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-revision">07 · Revision Sheet</span>
+        <h3 class="narrative-title" id="title-revision">
+            Every run produces an Excel for human validation. Color-coded. Sortable. Auditable.
+        </h3>
+        <div class="narrative-text" id="text-revision">
+            <p>
+                Before the SQL ever touches BigQuery, the analyst opens the auto-generated Excel and
+                reviews what's about to change. Green is new, amber is updated, red is soft-delete.
+                The collisions tab flags fields whose name appears in more than one module — the
+                engine resolves them with deterministic prefixes, but the human gets the final say.
+            </p>
+        </div>
+
+        <div class="excel-mock">
+            <div class="excel-tabs">
+                <div class="excel-tab is-active" id="exc-tab-1" data-en="field_detail" data-es="detalle_campos">field_detail</div>
+                <div class="excel-tab" id="exc-tab-2" data-en="collisions_to_review" data-es="colisiones_a_revisar">collisions_to_review</div>
+                <div class="excel-tab" id="exc-tab-3" data-en="value_detail" data-es="detalle_valores">value_detail</div>
+                <div class="excel-tab" id="exc-tab-4" data-en="omitted_fields" data-es="campos_omitidos">omitted_fields</div>
+            </div>
+            <div class="excel-table">
+                <div class="excel-row is-header">
+                    <div class="excel-cell" data-en="Status" data-es="Estado">Status</div>
+                    <div class="excel-cell" data-en="Module" data-es="Módulo">Module</div>
+                    <div class="excel-cell" data-en="Field"  data-es="Campo">Field</div>
+                    <div class="excel-cell" data-en="Action" data-es="Acción">Action</div>
+                </div>
+                <div class="excel-row is-new">
+                    <div class="excel-cell"><span class="badge is-new" data-en="NEW" data-es="NUEVO">NEW</span></div>
+                    <div class="excel-cell">plan_de_tratamiento</div>
+                    <div class="excel-cell">nombre_antibiotico_3</div>
+                    <div class="excel-cell is-new">INSERT</div>
+                </div>
+                <div class="excel-row is-new">
+                    <div class="excel-cell"><span class="badge is-new">NEW</span></div>
+                    <div class="excel-cell">plan_de_tratamiento</div>
+                    <div class="excel-cell">duracion_antibiotico_3</div>
+                    <div class="excel-cell is-new">INSERT</div>
+                </div>
+                <div class="excel-row is-upd">
+                    <div class="excel-cell"><span class="badge is-upd" data-en="UPD" data-es="ACT">UPD</span></div>
+                    <div class="excel-cell">datos_de_paciente</div>
+                    <div class="excel-cell">comuna  ←  was: comuna_paciente</div>
+                    <div class="excel-cell is-upd">UPDATE</div>
+                </div>
+                <div class="excel-row is-upd">
+                    <div class="excel-cell"><span class="badge is-upd">UPD</span></div>
+                    <div class="excel-cell">plan_de_seguimiento</div>
+                    <div class="excel-cell">nombre_medico_tratante  ←  module renamed</div>
+                    <div class="excel-cell is-upd">UPDATE</div>
+                </div>
+                <div class="excel-row is-del">
+                    <div class="excel-cell"><span class="badge is-del" data-en="DEL" data-es="BAJ">DEL</span></div>
+                    <div class="excel-cell">atentamente</div>
+                    <div class="excel-cell">firma  (no longer in Oracle)</div>
+                    <div class="excel-cell is-del">SOFT-DEL</div>
+                </div>
+                <div class="excel-row is-del">
+                    <div class="excel-cell"><span class="badge is-del">DEL</span></div>
+                    <div class="excel-cell">atentamente</div>
+                    <div class="excel-cell">confirmacion_tratancia_plan_terapeutico</div>
+                    <div class="excel-cell is-del">SOFT-DEL</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 08 · GOVERNANCE / CDC ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-4">08 · Governance &amp; CDC</span>
+        <h3 class="narrative-title" id="title-4">
+            The cycle closes itself. Friday's CDC is the next Monday's worklist.
+        </h3>
+        <div class="narrative-text" id="text-4">
+            <p>
+                The Friday CDC is a Scheduled Query that compares the current catalog against the
+                previous week's snapshot and writes detected changes into <code>registro_plantillas_cdc_log</code>
+                with state <code>PENDIENTE</code>. The dashboard shows it. The next Monday, the analyst
+                downloads the state for those exact templates — no need to know which templates need
+                attention, the CDC tells them.
+            </p>
+            <p>
+                The orchestrator <strong>generates the closing SQL itself</strong> — every run produces
+                a <code>cierre_cdc.sql</code> that flips the processed records to
+                <code>PROCESADO_INGESTA</code>. Without that file, the next CDC re-detects the same
+                changes as pending. The cycle's self-closing is what makes the system operational
+                at scale.
+            </p>
+        </div>
+
+        <div class="twocol">
+            <div class="twocol-block">
+                <h4><i class="fas fa-circle-check"></i> <span id="cdc-tracks-head">What CDC tracks</span></h4>
+                <ul class="twocol-list">
+                    <li><b>NUEVA_VARIABLE</b><span data-en="New field added in Oracle" data-es="Nuevo campo agregado en Oracle">New field added in Oracle</span></li>
+                    <li><b>BAJA_VARIABLE</b><span data-en="Field removed from Oracle (soft-delete in BQ)" data-es="Campo eliminado en Oracle (soft-delete en BQ)">Field removed from Oracle (soft-delete in BQ)</span></li>
+                    <li><b>CAMBIO_MODULO</b><span data-en="Field moved between sections" data-es="Campo movido entre secciones">Field moved between sections</span></li>
+                    <li><b>CAMBIO_NOMBRE</b><span data-en="Field renamed in Oracle" data-es="Campo renombrado en Oracle">Field renamed in Oracle</span></li>
+                    <li><b>CAMBIO_COORDENADAS_ORDEN</b><span data-en="Layout/ordering change" data-es="Cambio de layout/orden">Layout/ordering change</span></li>
+                </ul>
+            </div>
+            <div class="twocol-block">
+                <h4><i class="fas fa-tags"></i> <span id="labels-head">GCP data governance</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b>Labels at DDL time</b>
+                        <span data-en="Every <code>CREATE TABLE</code> ships with <code>dg-layer</code>,
+                        <code>dg-source</code>, <code>dg-domain</code>, <code>dg-has-pii</code>
+                        and <code>dg-data-classification</code>. No retroactive tagging." data-es="Cada <code>CREATE TABLE</code> incluye <code>dg-layer</code>,
+                        <code>dg-source</code>, <code>dg-domain</code>, <code>dg-has-pii</code>
+                        y <code>dg-data-classification</code>. Sin tagging retroactivo.">Every <code>CREATE TABLE</code> ships with <code>dg-layer</code>,
+                        <code>dg-source</code>, <code>dg-domain</code>, <code>dg-has-pii</code>
+                        and <code>dg-data-classification</code>. No retroactive tagging.</span>
+                    </li>
+                    <li>
+                        <b>TRF / CNS layering</b>
+                        <span data-en="Transformation tables in <code>ds_trf_datalake_nucleo</code>,
+                        analytics views in <code>ds_cns_datalake_nucleo</code>. Strict separation
+                        prevents reporting from coupling to upstream changes." data-es="Tablas de transformación en <code>ds_trf_datalake_nucleo</code>,
+                        vistas analíticas en <code>ds_cns_datalake_nucleo</code>. Separación estricta
+                        evita que reporting se acople a cambios upstream.">Transformation tables in <code>ds_trf_datalake_nucleo</code>,
+                        analytics views in <code>ds_cns_datalake_nucleo</code>. Strict separation
+                        prevents reporting from coupling to upstream changes.</span>
+                    </li>
+                    <li>
+                        <b>Partitioning &amp; clustering</b>
+                        <span data-en="Snapshot partitioned by <code>fecha_snapshot</code>, CDC log clustered
+                        by <code>(plantilla_id, tipo_cambio, estado_revision)</code> for cheap
+                        Looker queries." data-es="Snapshot particionado por <code>fecha_snapshot</code>, CDC log clusterizado
+                        por <code>(plantilla_id, tipo_cambio, estado_revision)</code> para queries
+                        Looker baratos.">Snapshot partitioned by <code>fecha_snapshot</code>, CDC log clustered
+                        by <code>(plantilla_id, tipo_cambio, estado_revision)</code> for cheap
+                        Looker queries.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 09 · OPERATIONAL UX ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-5">09 · Operational UX</span>
+        <h3 class="narrative-title" id="title-5">
+            The orchestrator is a wizard. The output is a folder. The audit is a JSONL.
+        </h3>
+        <div class="narrative-text" id="text-5">
+            <p>
+                The original <code>argparse</code> CLI required the operator to remember 8 flags.
+                That was wrong for the user — clinical analysts run this, not engineers.
+                <code>run_plantilla.py</code> now opens an <strong>interactive wizard</strong>:
+                step-by-step questions, smart defaults, validation in-place. No flags, no manual,
+                no decisions about output paths.
+            </p>
+            <p>
+                Every execution writes to a deterministic folder structure
+                (<code>{id}/</code> for individual runs, <code>bloque_{date}/</code> for batches),
+                logs to a single <code>ejecuciones.jsonl</code> audit file with SHA-256 hashes of
+                every input, and ends by printing the next 4 manual steps in execution order.
+            </p>
+        </div>
+
+        <div class="metric-grid">
+            <div class="metric-card">
+                <span class="metric-card-label" id="ux-1-label">8 steps</span>
+                <div class="metric-card-value">0 flags</div>
+                <p class="metric-card-desc" id="ux-1-desc">
+                    Validate · Validate · Reconcile · Generate SQL · Generate DDL ·
+                    Excel · Audit · Close CDC. Each one fail-fast, idempotent.
+                </p>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label" id="ux-2-label">Output</span>
+                <div class="metric-card-value">5 files</div>
+                <p class="metric-card-desc" id="ux-2-desc">
+                    delta.sql · ddl_vista.sql · revision.xlsx · cierre_cdc.sql · run.log.
+                    All timestamped, all in one folder, all idempotent.
+                </p>
+            </div>
+            <div class="metric-card">
+                <span class="metric-card-label" id="ux-3-label">Audit</span>
+                <div class="metric-card-value">JSONL</div>
+                <p class="metric-card-desc" id="ux-3-desc">
+                    Every run appends a record with SHA-256, counts, timestamp and final state.
+                    No execution is ever lost.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 09B · SCHEMA EVOLUTION ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-6">10 · What I Owned</span>
+        <h3 class="narrative-title" id="title-6">
+            The decisions I'd defend in any interview — and the ones I had to rethink.
+        </h3>
+
+        <div class="twocol">
+            <div class="twocol-block">
+                <h4><i class="fas fa-compass"></i> <span id="dec-head">Decisions I owned</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b id="dec-1-title">Metadata-driven over schema-per-template.</b>
+                        <span id="dec-1-desc">Refused to add columns. JSON-native in BigQuery
+                        means 320 templates share <code>one</code> physical table.
+                        Adding template 321 is zero infra work.</span>
+                    </li>
+                    <li>
+                        <b id="dec-2-title">Soft delete, never hard delete.</b>
+                        <span id="dec-2-desc"><code>catalogo_campos_plantilla</code> is immutable.
+                        Fields removed in Oracle stay in the catalog with <code>activo = FALSE</code>.
+                        Historical reports keep working forever.</span>
+                    </li>
+                    <li>
+                        <b id="dec-3-title">CDC drives the worklist, not the calendar.</b>
+                        <span id="dec-3-desc">The Monday queue isn't "all 320 templates" — it's
+                        only the ones with <code>PENDIENTE</code> changes. Operator sees a clean
+                        worklist, not a haystack.</span>
+                    </li>
+                    <li>
+                        <b id="dec-4-title">Wizard over CLI flags.</b>
+                        <span id="dec-4-desc">Removed argparse for the operator-facing scripts.
+                        Clinical analysts shouldn't memorize <code>--bq-campos --bq-valores</code>.
+                        Step-by-step questions, smart defaults, exit on Ctrl+C.</span>
+                    </li>
+                    <li>
+                        <b id="dec-5-title">Output folder = script folder.</b>
+                        <span id="dec-5-desc">No "where do you want to save this?" prompt. The output
+                        is always next to the script. Predictable for the user, scriptable for
+                        downstream automation.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="twocol-block is-fail">
+                <h4><i class="fas fa-rotate"></i> <span id="rev-head">Decisions I had to rethink</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b id="rev-1-title">Initial 1-level reconciliation.</b>
+                        <span id="rev-1-desc">First version compared by <code>id_registro</code> only.
+                        It failed on the first plantilla in production because BQ had been seeded with
+                        <code>GENERATE_UUID()</code>. Had to add 2 fallback levels, then a 3rd for
+                        stopword drift.</span>
+                    </li>
+                    <li>
+                        <b id="rev-2-title">A separate "deletions" table.</b>
+                        <span id="rev-2-desc">Considered backing up every soft-delete to a dedicated
+                        audit table. Rejected — it duplicated data already living in three places
+                        (catalog, snapshot, CDC log). Built a <code>v_bajas</code> view instead.</span>
+                    </li>
+                    <li>
+                        <b id="rev-3-title">Dry-run as a wizard option.</b>
+                        <span id="rev-3-desc">Originally a question in the operator wizard.
+                        Wrong abstraction — operators want to <em>run</em>, not simulate.
+                        Removed entirely; dry-run is a developer-only flag now.</span>
+                    </li>
+                    <li>
+                        <b id="rev-4-title">Manual ID list per week.</b>
+                        <span id="rev-4-desc">First version of the batch required typing the IDs.
+                        Replaced with <code>--ids-desde-cdc</code>: read pending from the CDC log
+                        directly. Removed an entire class of operator error.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ═══════════ CONTACT ═══════════ -->
+<div class="contact-section">
+    <h3 id="contact-head">Want the implementation details?</h3>
+    <p id="contact-text">
+        The framework spans 10+ SQL scripts, 3 Python orchestrators, and 700+ pages of documentation.
+        Happy to walk through any layer in detail.
+    </p>
+    <div class="contact-links">
+        <a class="contact-link" href="mailto:javier.moraga@example.com">
+            <i class="fas fa-envelope"></i> <span data-en="Email" data-es="Correo">Email</span>
+        </a>
+        <a class="contact-link" href="https://www.linkedin.com/in/javiermoragan/" target="_blank">
+            <i class="fab fa-linkedin"></i> LinkedIn
+        </a>
+        <a class="contact-link" href="../index.html">
+            <i class="fas fa-arrow-left"></i> <span data-en="Back to portfolio" data-es="Volver al portfolio">Back to portfolio</span>
+        </a>
+    </div>
+</div>
+
+<script>
+// ═══════════ LANGUAGE SYSTEM ═══════════
+// Strategy: snapshot original EN DOM on load, restore from snapshot for EN.
+// For ES: apply i18n object (id-based) + data-en/data-es attributes.
+// Terminal uses stored EN/ES constants — no cumulative string replacement.
+
+var _enSnapshots = {};   // { elementId: originalInnerHTML }
+var _terminalEN  = '';   // original terminal HTML
+var _currentLang = 'en';
+
+// ── Snapshot on DOMContentLoaded ──
+document.addEventListener('DOMContentLoaded', function() {
+    // Snapshot all translatable ids
+    var ids = document.querySelectorAll('[id]');
+    ids.forEach(function(el) {
+        if (el.id && el.innerHTML !== undefined) {
+            _enSnapshots[el.id] = el.innerHTML;
+        }
+    });
+    // Snapshot terminal separately
+    var term = document.getElementById('terminal-body');
+    if (term) _terminalEN = term.innerHTML;
+});
+
+// ── Terminal ES version (constant, never derived from DOM) ──
+var _terminalES = `<span class="header">══════════════════════════════════════════════════════════════</span>
+<span class="header">  INGESTA DE PLANTILLA MÉDICA</span>
+<span class="header">══════════════════════════════════════════════════════════════</span>
+
+  <span class="muted">── 1 · Identificación ────────────────────────────────</span>
+  <span class="prompt">ID de la plantilla a procesar:</span> <span class="input">329</span>
+  <span class="prompt">Ruta del JSON [plantilla_329.json]:</span> <span class="input">variables_329_20260427.json</span>
+  <span class="prompt">Fecha de inicio de vigencia [2026-04-27]:</span> <span class="muted">(Enter)</span>
+
+  <span class="muted">── 2 · Conciliación con estado BQ ────────────────────</span>
+  <span class="prompt">¿Tienes los 3 archivos de estado BQ? (s/n):</span> <span class="input">s</span>
+  <span class="prompt">Archivo bq_campos.json [bq_campos.json]:</span> <span class="muted">(Enter)</span>
+  <span class="prompt">Archivo bq_valores.json [bq_valores.json]:</span> <span class="muted">(Enter)</span>
+  <span class="prompt">Archivo bq_modulos.json [bq_modulos.json]:</span> <span class="muted">(Enter)</span>
+  <span class="prompt">¿Confirmar y ejecutar? (s/n):</span> <span class="input">s</span>
+
+  <span class="ok">[1/8]</span> Validar archivos de entrada           <span class="ok">✓</span>
+  <span class="ok">[2/8]</span> Validar datos del JSON Oracle         <span class="ok">✓</span>  486 filas, plantilla_id=329
+  <span class="ok">[3/8]</span> Procesar y conciliar catálogo         <span class="ok">✓</span>  +35 ~52 -34 =0  (resolver 3 niveles)
+  <span class="ok">[4/8]</span> Generar SQL delta                     <span class="ok">✓</span>  1,258 líneas
+  <span class="ok">[5/8]</span> Generar DDL vista Data Studio         <span class="ok">✓</span>  v_template_329
+  <span class="ok">[6/8]</span> Generar Excel de revisión             <span class="ok">✓</span>  4 hojas, 6 colisiones
+  <span class="ok">[7/8]</span> Registrar ejecución                   <span class="ok">✓</span>  SHA-256 786f406c…
+  <span class="ok">[8/8]</span> Generar cierre ciclo CDC              <span class="ok">✓</span>
+
+  <span class="ok">✓ COMPLETADO</span>  plantilla 329  ·  3.2s  ·  DELTA`;
+
+// ── i18n object (ES translations only) ──
+var i18n = {
+    en: {},
+    es: {
+        'nav-back': 'Volver al Portfolio',
+        'hero-badge': 'Caso de estudio · Clínica Alemana · 2025–2026',
+        'main-title': 'Framework de Plantillas Médicas —<br><span class="text-gradient">De PL/SQL Disperso a Metadatos.</span>',
+        'main-desc': '320+ plantillas médicas, un solo motor de ingesta. El cuello de botella nunca fue el código — era entender qué significaban las variables, cómo fluía la plantilla y cómo viajaban los datos. Estandarizar la comprensión y todo lo demás colapsa de <strong>un mes por plantilla</strong> a <strong>una hora</strong>.',
+        'kpi-label-1': 'Plantillas ingestadas',
+        'kpi-label-2': 'Tiempo por plantilla nueva',
+        'kpi-label-3': 'Reducción time-to-insight',
+        'kpi-label-4': 'Deploys de código por cambio',
+        'meta-1': '2025 — 2026',
+        'meta-2': 'Rol:',
+        'label-1': '01 · Contexto',
+        'title-1': 'Un hospital con 320 plantillas no tiene un problema de plantillas. Tiene un problema de schema-drift.',
+        'text-1': '<p>Clínica Alemana de Santiago es uno de los hospitales privados más grandes de Chile. Dentro de su EHR, los médicos usan más de <strong>320 plantillas médicas</strong> — formularios para hospitalización, cirugía, seguimiento oncológico, atención domiciliaria. Cada plantilla tiene decenas de variables que <em>cambian</em> conforme los protocolos evolucionan.</p><p>El sistema legado era una constelación de <strong>procedimientos almacenados PL/SQL</strong> — uno por plantilla, cada uno un <code>PRC_PLANT_*</code> con miles de ramas <code>IF-ELSIF</code> hardcodeadas. Cuando un médico agregaba una nueva variable en producción, el procedimiento fallaba silenciosamente o tiraba el dato. Cada cambio requería intervención de ingeniería.</p>',
+        'before-tag': 'Antes del framework',
+        'before-text': 'El costo no era escribir código — era <em>entender</em>. Una plantilla nueva tomaba <strong>≈1 mes</strong> por desarrollador: descifrar qué significaba cada variable, cómo se renderizaba la plantilla, cómo viajaba el dato. El conocimiento vivía en la cabeza de personas senior, no en código.',
+        'after-tag': 'Con el framework',
+        'after-text': 'La maqueta de la plantilla es ahora el único artefacto que necesita el desarrollador. El framework infiere lo demás desde metadatos. Onboarding de una plantilla: <strong>≈1 hora</strong>. Mismo motor, mismo SQL, mismo DDL — solo cambian los metadatos.',
+        'label-2': '02 · Arquitectura',
+        'title-2': 'Un solo motor, N plantillas. El esquema es dato, no código.',
+        'text-2': '<p>La apuesta: <strong>tratar la estructura de la plantilla como metadato en BigQuery</strong>, no como columnas físicas. Un único motor de ingesta lee los metadatos, normaliza a <code>snake_case</code> y emite SQL deltas idempotentes. Los valores viven como objetos <code>json_general</code> por módulo, usando <code>PARSE_JSON</code>, <code>JSON_KEYS</code> y <code>JSON_TYPE</code> nativos de BigQuery.</p>',
+        'arch-flow-label': 'Ciclo semanal · Lun → Vie',
+        'schema-label': 'Tablas del catálogo · única fuente de verdad',
+        'label-journey': '02b · El recorrido',
+        'title-journey': 'Del clic del médico al dashboard de Looker — seis saltos, cero mapeos manuales.',
+        'text-journey': '<p>La plantilla 329 tiene 67 campos en 5 módulos clínicos. El médico rellena el formulario, Oracle lo guarda verticalmente, el framework normaliza a JSON, BigQuery aplana a una vista y Looker renderiza. En ningún punto un humano escribe <code>IF variable_id = 41892 THEN nombre_antibiotico_3</code>.</p>',
+        'journey-1': 'Médico rellena<br>plantilla 329',
+        'journey-2': 'Oracle guarda<br>filas verticales',
+        'journey-3': 'Exporta JSON<br>vía 01_variables',
+        'journey-4': 'Framework<br>reconcilia',
+        'journey-5': 'Catálogo BQ<br>+ json_general',
+        'journey-6': 'Vista aplana<br>con JSON_VALUE',
+        'journey-7': 'Dashboard<br>Looker',
+        'form-title': 'Plantilla 329 · Hospitalización Domiciliaria HOSDOM',
+        'form-subtitle': 'Tratamiento / Seguimiento · 67 campos · 5 módulos clínicos',
+        'form-sec-1': 'Plan de tratamiento',
+        'form-sec-2': 'Médico tratante diagnóstico principal',
+        'form-sec-3': 'Plan seguimiento',
+        'label-3': '03 · El motor',
+        'title-3': 'La reconciliación no es un JOIN. Es un fallback de 3 niveles que tolera el schema-drift.',
+        'text-3': '<p>El motor — <code>plantilla_ingestor_v5.py</code> — compara el JSON de Oracle contra el estado en BigQuery y decide, por <span data-en="field" data-es="campo">field</span>, si es <em>nuevo</em>, <em>actualizado</em>, <em>desactivado</em> o <em>sin cambios</em>. Un join simple produce 87 falsos positivos donde hay 35 cambios reales. La solución: resolver de tres niveles.</p>',
+        'resolver-head': 'Niveles del resolver',
+        'lvl-1-title': 'Nivel 1 — id_registro exacto',
+        'lvl-1-desc': 'Cuando BQ fue cargado con el mismo MD5. Hash coincide → registro idéntico.',
+        'lvl-2-title': 'Nivel 2 — clave natural (módulo + campo)',
+        'lvl-2-desc': 'Cuando BQ tiene UUIDs de <code>GENERATE_UUID()</code>. Mismo módulo + mismo nombre → mismo registro conceptual.',
+        'lvl-3-title': 'Nivel 3 — match tolerante a drift',
+        'lvl-3-desc': 'Cuando los nombres de módulo cambiaron entre versiones del script. Atrapa los 52 falsos renames.',
+        'immut-head': 'Guardia de inmutabilidad',
+        'imm-1-title': 'aplicar_inmutabilidad()',
+        'imm-1-desc': 'Fuerza los nombres nuevos a coincidir con sus nombres históricos en BQ. Protege 200+ dashboards de cambios cosméticos.',
+        'imm-2-title': 'Solo soft delete',
+        'imm-2-desc': 'Los campos nunca se eliminan de <code>catalogo_campos</code> — se marcan <code>activo = FALSE</code>.',
+        'imm-3-title': 'Idempotente por diseño',
+        'imm-3-desc': 'Correr el mismo JSON dos veces produce SQL idéntico. <code>id_registro</code> es MD5 determinista.',
+        'impact-label': 'Corrida real, plantilla 329 (Hospitalización Domiciliaria)',
+        'm-1-label': 'Match ingenuo',
+        'm-1-desc': 'Lo que un join de un nivel diría — mayormente ruido falso de schema-drift entre versiones.',
+        'm-2-label': 'Resolver de 3 niveles',
+        'm-2-desc': 'Cambios reales más 52 renames silenciosos preservados.',
+        'm-3-label': 'SQL generado',
+        'm-3-desc': 'INSERTs, UPDATEs y soft-deletes — totalmente idempotente.',
+        'label-evidence': '04 · Evidencia',
+        'title-evidence': 'De filas key-value Oracle a SQL idempotente BigQuery — la transformación real.',
+        'text-evidence': '<p>Corrida real sobre la plantilla 329. A la izquierda, el JSON de Oracle — vertical, plano, semánticamente opaco. A la derecha, lo que produce el motor — categorizado, hasheado, SQL idempotente.</p><p style="margin-top:16px;padding:12px 16px;background:rgba(0,229,255,0.04);border-left:3px solid var(--c-eng);border-radius:6px;font-size:0.9rem;"><strong style="color:var(--c-eng);">Nota sobre el idioma:</strong> El código de producción está en español (estándar del hospital). <code>plan_tratamiento</code> = <code>treatment_plan</code>, <code>nombre_antibiotico_3</code> = <code>antibiotic_name_3</code>.</p>',
+        'evidence-input-label': 'Input · Oracle JSON (extracto)',
+        'evidence-arrow-label': 'Reconciliador 3 niveles',
+        'evidence-output-label': 'Output · 329_delta.sql (extracto)',
+        'label-flatten': '04b · El aplanamiento',
+        'title-flatten': 'Un campo, tres estados. Sin ALTER TABLE entre ellos.',
+        'text-flatten': '<p>El mismo campo clínico existe en tres formas. Oracle lo guarda vertical. BigQuery consolida en <code>json_general</code> por módulo. La vista lo aplana a columna nombrada. <strong>Cuando Oracle agrega una variable, el catálogo se actualiza, el JSON crece y la vista se reconstruye sola.</strong></p>',
+        'flatten-oracle-label': 'Estado 1 · Oracle (vertical)',
+        'flatten-json-label': 'Estado 2 · BQ json_general',
+        'flatten-view-label': 'Estado 3 · Columna de vista (virtual)',
+        'flatten-arrow-1': 'consolidar',
+        'flatten-arrow-2': 'aplanar',
+        'text-flatten-bottom': '<p>La vista tiene <strong>67 columnas</strong>. Cada una es un <code>JSON_VALUE</code>. Cuando un campo se elimina en Oracle, el <code>JSON_VALUE</code> retorna <code>NULL</code> sin romper la vista. <em>El schema es metadato, no estructura.</em></p>',
+        'label-reconstruction': '04c · La reconstrucción',
+        'title-reconstruction': 'La vista se escribe sola. JSON_KEYS lee el catálogo, genera el DDL.',
+        'text-reconstruction': '<p>La vista final tiene <strong>67 columnas aplanadas</strong>. Sin el framework, habrían sido 67 ramas <code>IF-ELSIF</code> en PL/SQL. Con el framework, se <em>generan automáticamente</em> desde el JSON almacenado en BigQuery.</p><p>Esto es <strong>ingeniería inversa como patrón de diseño</strong>. Los datos dictan el schema, no al revés.</p>',
+        'reconstruction-ddl-label': 'La vista final · 67 columnas desde paths JSON',
+        'reconstruction-engine-label': 'El constructor DDL · 08_constructor_ddl_plantillas.sql',
+        'text-reconstruction-bottom': '<p>El constructor corre una vez por plantilla cuando cambia el catálogo. Lee el JSON real con <code>JSON_KEYS</code> y escribe el DDL. Cero migraciones, cero ALTER TABLE, cero mapeo manual.</p>',
+        'label-console': '05 · Consola operador',
+        'title-console': 'El asistente convierte 8 flags en 7 preguntas. Cualquiera lo corre.',
+        'text-console': '<p>Lo corren analistas clínicos — no ingenieros. El asistente pregunta una cosa a la vez, valida en el momento, confirma antes de ejecutar. La salida va a la carpeta del script, sin preguntar.</p>',
+        'label-composition': '06 · Composición del delta',
+        'title-composition': 'Lo que una sola corrida semanal mueve realmente en el catálogo.',
+        'text-composition': '<p>El matcher ingenuo habría reportado 87 nuevos y 79 eliminaciones. El resolver de 3 niveles dice la verdad: 35 nuevos, 52 renames preservados, 34 soft-deletes reales.</p>',
+        'composition-summary': '<b>132 INSERTs</b> · <b>125 UPDATEs</b> · <b>70 DELETEs</b><br><b>1.258 líneas</b> de SQL generado<br><br>Sin el framework, un ticket de ingeniería de un mes. Con el framework, una invocación Python.',
+        'label-revision': '07 · Hoja de revisión',
+        'title-revision': 'Cada corrida produce un Excel para validación humana. Coloreado. Ordenable. Auditable.',
+        'text-revision': '<p>Antes de que el SQL toque BigQuery, el analista revisa el Excel auto-generado. Verde es nuevo, ámbar es actualizado, rojo es soft-delete.</p>',
+        'label-4': '08 · Gobernanza y CDC',
+        'title-4': 'El ciclo se cierra solo. El CDC del viernes es la worklist del lunes siguiente.',
+        'text-4': '<p>El CDC del viernes detecta cambios y los escribe en <code>registro_plantillas_cdc_log</code> con estado <code>PENDIENTE</code>. El orquestador genera el <code>cierre_cdc.sql</code> que cierra el ciclo automáticamente.</p>',
+        'cdc-tracks-head': 'Qué rastrea el CDC',
+        'labels-head': 'Gobernanza de datos GCP',
+        'label-5': '09 · UX operativa',
+        'title-5': 'El orquestador es un asistente. La salida es una carpeta. La auditoría es un JSONL.',
+        'text-5': '<p>La CLI <code>argparse</code> original requería 8 flags. <code>run_plantilla.py</code> es ahora un <strong>asistente interactivo</strong> con preguntas paso a paso, defaults inteligentes y carpeta de salida determinista.</p>',
+        'ux-1-label': '8 pasos',
+        'ux-1-desc': 'Validar · Validar · Reconciliar · Generar SQL · Generar DDL · Excel · Auditar · Cerrar CDC.',
+        'ux-2-label': 'Salida',
+        'ux-2-desc': 'delta.sql · ddl_vista.sql · revision.xlsx · cierre_cdc.sql · run.log.',
+        'ux-3-label': 'Auditoría',
+        'ux-3-desc': 'Cada corrida agrega un registro con SHA-256, contadores, timestamp y estado final.',
+        'label-evolution': '09b · Evolución del schema',
+        'title-evolution': 'Las plantillas cambian. Las variables se agregan, eliminan, renombran. La vista se reconstruye sola.',
+        'text-evolution': '<p>Los protocolos médicos evolucionan. El framework trata estos cambios como <strong>eventos de datos, no eventos de código</strong>. Abajo: el ciclo de vida del campo <code>firma</code> en la plantilla 329.</p>',
+        'label-6': '10 · Lo que diseñé',
+        'title-6': 'Las decisiones que defendería en cualquier entrevista — y las que tuve que repensar.',
+        'dec-head': 'Decisiones que tomé',
+        'dec-1-title': 'Metadatos, no esquema por plantilla.',
+        'dec-1-desc': 'Me negué a agregar columnas. JSON-nativo en BigQuery: 320 plantillas, una tabla física.',
+        'dec-2-title': 'Soft delete, nunca hard delete.',
+        'dec-2-desc': '<code>catalogo_campos_plantilla</code> es inmutable. Campos eliminados quedan con <code>activo = FALSE</code>.',
+        'dec-3-title': 'El CDC define la worklist, no el calendario.',
+        'dec-3-desc': 'La cola del lunes son solo las plantillas con cambios <code>PENDIENTE</code>.',
+        'dec-4-title': 'Asistente en lugar de flags CLI.',
+        'dec-4-desc': 'Los analistas clínicos no deberían memorizar <code>--bq-campos --bq-valores</code>.',
+        'dec-5-title': 'Carpeta de salida = carpeta del script.',
+        'dec-5-desc': 'Sin pregunta de ubicación. Predecible para el usuario, scriptable para automatización.',
+        'rev-head': 'Decisiones que tuve que repensar',
+        'rev-1-title': 'Reconciliación inicial de 1 nivel.',
+        'rev-1-desc': 'Falló en la primera plantilla en producción. Tuve que agregar 3 niveles de fallback.',
+        'rev-2-title': 'Una tabla separada de eliminaciones.',
+        'rev-2-desc': 'Rechazado — duplicaba datos en tres lugares. Hice una vista <code>v_bajas</code>.',
+        'rev-3-title': 'Dry-run como opción del asistente.',
+        'rev-3-desc': 'Abstracción equivocada. Eliminado del todo; dry-run es solo para desarrollo.',
+        'rev-4-title': 'Lista manual de IDs por semana.',
+        'rev-4-desc': 'Reemplazado con <code>--ids-desde-cdc</code>. Eliminó una clase entera de error.',
+        'contact-head': '¿Quieres los detalles de implementación?',
+        'contact-text': 'El framework tiene 10+ scripts SQL, 3 orquestadores Python y 700+ páginas de documentación. Feliz de recorrer cualquier capa en detalle.'
+    }
+};
+
+function changeLang(lang) {
+    if (lang === _currentLang) return;
+    _currentLang = lang;
+
+    // Toggle button state
+    document.querySelectorAll('.lang-opt').forEach(function(b) {
+        b.classList.toggle('is-active', b.dataset.lang === lang);
+    });
+    document.documentElement.lang = lang;
+
+    // Update document title
+    document.title = (lang === 'es')
+        ? 'Clínica Alemana · Framework de Plantillas Médicas — Javier Moraga'
+        : 'Clínica Alemana · Medical Templates Framework — Javier Moraga';
+
+    if (lang === 'en') {
+        // ── Restore EN from snapshots ──
+        Object.keys(_enSnapshots).forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.innerHTML = _enSnapshots[id];
+        });
+        // Restore terminal from constant
+        var term = document.getElementById('terminal-body');
+        if (term) term.innerHTML = _terminalEN;
+        // data-en/es elements — restore EN
+        document.querySelectorAll('[data-en]').forEach(function(el) {
+            el.innerHTML = el.dataset.en;
+        });
+        // SQL code comments — restore EN
+        document.querySelectorAll('span.com[data-en]').forEach(function(el) {
+            el.innerHTML = el.dataset.en;
+        });
+
+    } else {
+        // ── Apply ES translations ──
+        // 1. i18n object (id-based)
+        Object.entries(i18n.es).forEach(function(entry) {
+            var el = document.getElementById(entry[0]);
+            if (el) el.innerHTML = entry[1];
+        });
+        // 2. data-en/es elements
+        document.querySelectorAll('[data-es]').forEach(function(el) {
+            el.innerHTML = el.dataset.es;
+        });
+        // 3. SQL code comments — apply ES
+        document.querySelectorAll('span.com[data-es]').forEach(function(el) {
+            el.innerHTML = el.dataset.es;
+        });
+        // 4. Terminal from constant
+        var term = document.getElementById('terminal-body');
+        if (term) term.innerHTML = _terminalES;
+    }
+}
+</script>
+
+</body>
+</html>

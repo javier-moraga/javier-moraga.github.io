@@ -1,0 +1,2455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LATAM · Amelia — Corporate RAG Adoption Analytics · Javier Moraga</title>
+    <meta name="description" content="Case study: 9 months in production of LATAM's corporate AI assistant. 20,523 users · 790.9K interactions · how I designed the analytics pipeline that drove a 98% reduction in retrieval errors.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/heatmap.js"></script>
+
+    <style>
+/* ═══════════════════════════════════════════════════════════════════
+   LATAM · Amelia case study — UX-aligned with portfolio v3
+   Same color tokens, fonts, eyebrow & card patterns.
+═══════════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg:        #050505;
+    --bg2:       #08080c;
+    --surface:   rgba(12,12,16,0.6);
+    --surface-2: rgba(255,255,255,0.025);
+    --border:    rgba(255,255,255,0.05);
+    --border-hi: rgba(255,255,255,0.12);
+    --text:      rgba(255,255,255,0.92);
+    --muted:     #94a3b8;
+    --dim:       rgba(255,255,255,0.22);
+
+    --c-eng:     #00e5ff;   /* engineering — primary accent */
+    --c-viz:     #d500f9;   /* analytics / warnings */
+    --c-biz:     #fbbf24;
+    --border-glass: rgba(255,255,255,0.08);  /* compat alias */   /* business / assistants */
+
+    --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body: 'Inter', sans-serif;
+    --font-disp: 'Jost', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+    scroll-behavior: smooth;
+    background: var(--bg);
+}
+
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,229,255,0.05) 0%, transparent 60%),
+        linear-gradient(180deg, #050505 0%, #050505 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    padding-top: 64px;
+}
+
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* ──────────────────────────────────────────────────────────────────
+   NAV — same pattern as portfolio header
+────────────────────────────────────────────────────────────────── */
+.nav-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    height: 64px;
+    padding: 0 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(5,5,5,0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+}
+
+.back-link {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 7px 14px 7px 12px;
+    border-radius: 100px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s var(--ease); }
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-eng); opacity: 1; }
+
+.nav-name {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 7px 16px;
+    border-radius: 100px;
+}
+.nav-name b { color: var(--c-eng); margin-left: 10px; font-weight: 500; letter-spacing: 0.14em; }
+
+/* ──────────────────────────────────────────────────────────────────
+   LANG SWITCH — segmented mono control aligned to portfolio pills
+────────────────────────────────────────────────────────────────── */
+.lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 6px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: rgba(255,255,255,0.015);
+    transition: border-color 0.3s var(--ease);
+}
+.lang-switch:hover { border-color: var(--border-hi); }
+
+.lang-opt {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding: 5px 10px;
+    border-radius: 100px;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease), text-shadow 0.25s var(--ease);
+}
+.lang-opt:hover { color: var(--text); }
+.lang-opt.is-active {
+    color: var(--c-eng);
+    background: rgba(0,229,255,0.08);
+    text-shadow: 0 0 12px rgba(0,229,255,0.5);
+}
+
+.lang-sep {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--dim);
+    user-select: none;
+    pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   CUSTOM SCROLLBAR — slim cyan, matches site language
+────────────────────────────────────────────────────────────────── */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,229,255,0.25) transparent;
+}
+*::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+    background: rgba(0,229,255,0.18);
+    border-radius: 100px;
+    transition: background 0.25s var(--ease);
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,229,255,0.4);
+}
+*::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Code panels get a darker scrollbar that pops more on the bg2 surface */
+.code-panel::-webkit-scrollbar-thumb,
+.code-panel pre::-webkit-scrollbar-thumb {
+    background: rgba(0,229,255,0.2);
+}
+.code-panel::-webkit-scrollbar-thumb:hover,
+.code-panel pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,229,255,0.5);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   HERO — quieter than the portfolio (no neuro-canvas), same DNA
+────────────────────────────────────────────────────────────────── */
+header {
+    padding: 72px 24px 56px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(0,229,255,0.06), transparent 60%);
+    position: relative;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 18px;
+    background: rgba(0,229,255,0.04);
+    border: 1px solid rgba(0,229,255,0.22);
+    border-radius: 100px;
+    color: var(--c-eng);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    margin-bottom: 28px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+.hero-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--c-eng);
+    box-shadow: 0 0 10px var(--c-eng);
+    animation: dotPulse 2.5s infinite ease-in-out;
+}
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.6); opacity: 0.5; }
+}
+
+h1.hero-title {
+    font-family: var(--font-disp);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 10%, #d8dde1 40%, #5c626e 70%, #121417 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: drop-shadow(0px 12px 30px rgba(0,0,0,0.6));
+    margin: 0 0 22px;
+}
+.text-gradient {
+    background: linear-gradient(90deg, #fff 10%, var(--c-eng) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    filter: none;
+}
+
+.lead {
+    font-family: var(--font-body);
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    max-width: 720px;
+    margin: 0 auto 36px;
+    font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+    line-height: 1.65;
+}
+
+/* Hero KPIs — borrows the portfolio's KPI strip pattern */
+.hero-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 920px;
+    margin: 0 auto;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,5,5,0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+.hero-kpi {
+    padding: 26px 18px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.5s var(--ease);
+}
+.hero-kpi:last-child { border-right: none; }
+.hero-kpi::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: var(--kc, var(--c-eng));
+    box-shadow: 0 0 14px var(--kc, var(--c-eng));
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+}
+.hero-kpi:hover::after { opacity: 0.85; }
+.hero-kpi:hover { background: rgba(255,255,255,0.012); }
+
+.hero-kpi-value {
+    font-family: var(--font-disp);
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-weight: 400;
+    line-height: 1;
+    background: linear-gradient(180deg, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    display: block;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+}
+.hero-kpi-value b {
+    background: linear-gradient(180deg, #fff, var(--c-eng));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: 400;
+}
+.hero-kpi-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    display: block;
+}
+.hero-meta {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    max-width: 880px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    line-height: 1.7;
+}
+.hero-meta b { color: var(--c-eng); font-weight: 500; letter-spacing: 0.12em; }
+
+/* Stack pills — same vibe as evolution stack-tags */
+.stack-strip {
+    max-width: 880px;
+    margin: 26px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+}
+.stack-pill {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 10px;
+    transition: border-color 0.3s var(--ease), color 0.3s var(--ease), background 0.3s var(--ease);
+}
+.stack-pill.is-primary {
+    border-color: rgba(0,229,255,0.3);
+    color: var(--c-eng);
+    background: rgba(0,229,255,0.04);
+}
+.stack-pill:hover {
+    border-color: rgba(0,229,255,0.4);
+    color: var(--c-eng);
+    background: rgba(0,229,255,0.04);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   LAYOUT
+────────────────────────────────────────────────────────────────── */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+section { padding: 64px 0; }
+
+/* Card — same DNA as evo-card.card-inner */
+.card {
+    background: var(--surface);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 44px;
+    margin-bottom: 28px;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    transition: border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c-eng), transparent);
+    opacity: 0.45;
+    border-radius: 6px 6px 0 0;
+}
+
+/* Section eyebrow — same as remote-eyebrow */
+.section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--c-eng);
+    margin-bottom: 16px;
+}
+.section-label::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--c-eng);
+    box-shadow: 0 0 10px var(--c-eng);
+}
+
+/* Section title — same as remote-title */
+.narrative-title {
+    font-family: var(--font-disp);
+    font-size: clamp(1.5rem, 2.7vw, 2.1rem);
+    font-weight: 300;
+    line-height: 1.18;
+    letter-spacing: -0.022em;
+    color: var(--text);
+    margin-bottom: 22px;
+}
+.narrative-title b { color: var(--c-eng); font-weight: 400; }
+
+.narrative-text {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 760px;
+}
+.narrative-text p + p { margin-top: 14px; }
+.narrative-text strong { color: var(--text); font-weight: 500; }
+.narrative-text em { color: var(--c-eng); font-style: normal; font-weight: 400; }
+.narrative-text code, .insight-text code, .twocol-list li code, .rag-quality-item code, .rag-step code {
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    color: var(--c-eng);
+    background: rgba(0,229,255,0.06);
+    padding: 1px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.02em;
+}
+
+/* Pre/post comparison — adapted from compare-block */
+.compare-block {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 18px;
+    align-items: stretch;
+    margin: 28px 0 4px;
+}
+.compare-side {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px;
+}
+.compare-side.is-after {
+    border-color: rgba(0,229,255,0.25);
+    background: rgba(0,229,255,0.03);
+}
+.compare-tag {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 10px;
+    display: block;
+}
+.compare-side.is-after .compare-tag { color: var(--c-eng); }
+.compare-text { font-size: 0.9rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.compare-arrow { color: var(--c-eng); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; opacity: 0.7; }
+
+/* ──────────────────────────────────────────────────────────────────
+   ARCHITECTURE / RAG FLOW
+────────────────────────────────────────────────────────────────── */
+.section-sub-label {
+    margin: 32px 0 12px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+}
+
+.rag-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 8px;
+}
+.rag-step {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 16px;
+    transition: border-color 0.4s var(--ease);
+}
+.rag-step:hover { border-color: var(--border-hi); }
+.rag-step-num {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--c-eng);
+    letter-spacing: 0.16em;
+    margin-bottom: 10px;
+    display: block;
+}
+.rag-step-title {
+    font-family: var(--font-disp);
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.005em;
+}
+.rag-step-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.55;
+}
+
+.arch-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    margin-bottom: 4px;
+    padding: 18px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.arch-step {
+    flex: 1;
+    text-align: center;
+    background: rgba(255,255,255,0.025);
+    padding: 16px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    min-width: 140px;
+    transition: border-color 0.4s var(--ease);
+}
+.arch-step:hover { border-color: var(--border-hi); }
+.arch-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.12em;
+}
+.arch-val {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--c-eng);
+    line-height: 1.45;
+}
+.arrow {
+    color: var(--dim);
+    font-size: 0.9rem;
+    align-self: center;
+    opacity: 0.6;
+}
+
+.schema-block {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 4px;
+}
+.schema-card {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    transition: border-color 0.4s var(--ease);
+}
+.schema-card:hover { border-color: var(--border-hi); }
+.schema-name {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--c-eng);
+    margin-bottom: 7px;
+    letter-spacing: 0.02em;
+}
+.schema-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.55;
+    font-weight: 300;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   CHARTS
+────────────────────────────────────────────────────────────────── */
+.chart-wrapper {
+    margin-bottom: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--border);
+}
+.chart-wrapper:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.chart-title {
+    font-family: var(--font-disp);
+    font-size: 1.05rem;
+    color: var(--text);
+    font-weight: 400;
+    letter-spacing: -0.005em;
+}
+.chart-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--dim);
+    letter-spacing: 0.06em;
+}
+
+.insight {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: rgba(0,229,255,0.03);
+    border: 1px solid rgba(0,229,255,0.12);
+    border-radius: 4px;
+}
+.insight-icon {
+    color: var(--c-eng);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+.insight-text {
+    font-size: 0.84rem;
+    color: var(--text);
+    line-height: 1.6;
+    font-weight: 300;
+}
+.insight-text b { color: var(--c-eng); font-weight: 500; }
+
+.micro-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    width: 100%;
+}
+@media (max-width: 900px) { .micro-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .micro-grid { grid-template-columns: 1fr; } }
+
+.micro-card {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    min-width: 0;
+    overflow: hidden;
+    transition: border-color 0.4s var(--ease);
+}
+.micro-card:hover { border-color: var(--border-hi); }
+.micro-title {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: var(--c-eng);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+/* SQL accordion */
+.accordion-btn {
+    background: rgba(255,255,255,0.018);
+    border: 1px solid var(--border);
+    width: 100%;
+    padding: 10px 14px;
+    text-align: left;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 4px;
+    margin-top: 14px;
+    transition: all 0.3s var(--ease);
+}
+.accordion-btn:hover {
+    background: rgba(0,229,255,0.04);
+    color: var(--c-eng);
+    border-color: rgba(0,229,255,0.22);
+}
+.accordion-btn .fa-chevron-down { transition: transform 0.3s var(--ease); font-size: 0.7rem; }
+.accordion-btn.is-open .fa-chevron-down { transform: rotate(180deg); }
+
+.code-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background: var(--bg2);
+    border-radius: 0 0 4px 4px;
+    margin-top: -2px;
+}
+.code-panel.active {
+    max-height: 700px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 12px;
+}
+pre { margin: 0; padding: 0.8rem; overflow-x: auto; }
+code { font-family: var(--font-mono); color: rgba(255,255,255,0.78); font-size: 0.72rem; line-height: 1.6; }
+.sql-kw { color: var(--c-viz); font-weight: 500; }
+.sql-str { color: var(--c-biz); }
+.sql-func { color: #fbbf24; }
+.sql-comm { color: rgba(255,255,255,0.3); font-style: italic; }
+.sql-tbl { color: var(--c-eng); }
+
+/* ──────────────────────────────────────────────────────────────────
+   RAG QUALITY + LATENCY SPLIT
+────────────────────────────────────────────────────────────────── */
+.rag-quality {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 22px;
+}
+.rag-quality-item {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--c-eng);
+    border-radius: 4px;
+    padding: 16px 18px;
+}
+.rag-quality-item code {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--c-eng);
+    background: rgba(0,229,255,0.06);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+}
+.rag-quality-item p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+}
+.rag-quality-item p b { color: var(--text); font-weight: 500; }
+@media (max-width: 768px) { .rag-quality { grid-template-columns: 1fr; } }
+
+.lat-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+.lat-split-item {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 14px;
+    text-align: center;
+}
+.lat-split-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+.lat-split-value {
+    font-family: var(--font-disp);
+    font-size: 1.2rem;
+    color: var(--text);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+.lat-split-item.is-retrieval .lat-split-value { color: var(--c-eng); }
+.lat-split-item.is-gen .lat-split-value { color: var(--c-biz); }
+
+/* ──────────────────────────────────────────────────────────────────
+   DECISIONS / FAILURES — two columns
+────────────────────────────────────────────────────────────────── */
+.twocol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+}
+@media (max-width: 900px) { .twocol { grid-template-columns: 1fr; } }
+
+.twocol-block h4 {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--c-eng);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+.twocol-block.is-fail h4 { color: var(--c-viz); }
+.twocol-block h4 i { font-size: 0.78rem; opacity: 0.85; }
+
+.twocol-list { display: flex; flex-direction: column; gap: 14px; }
+.twocol-list li {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--c-eng);
+    border-radius: 4px;
+    padding: 16px 18px;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+    transition: border-color 0.4s var(--ease);
+}
+.twocol-block.is-fail .twocol-list li { border-left-color: var(--c-viz); }
+.twocol-list li:hover { border-color: var(--border-hi); }
+.twocol-block.is-fail .twocol-list li:hover { border-left-color: var(--c-viz); }
+.twocol-list li b {
+    display: block;
+    font-family: var(--font-disp);
+    font-size: 0.98rem;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 5px;
+    letter-spacing: -0.005em;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   CLOSING TAKE & CONTACT
+────────────────────────────────────────────────────────────────── */
+.closing-take {
+    max-width: 820px;
+    margin: 56px auto 36px;
+    padding: 36px 38px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-disp);
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    font-weight: 300;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.82);
+    letter-spacing: -0.005em;
+}
+.closing-take b { color: var(--c-eng); font-weight: 400; }
+.closing-take-author {
+    display: block;
+    margin-top: 14px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dim);
+}
+
+.contact-section {
+    text-align: center;
+    margin: 30px 0 80px;
+    padding-top: 36px;
+    border-top: 1px solid var(--border);
+}
+.contact-text {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin: 0 auto 28px;
+    max-width: 620px;
+    line-height: 1.65;
+    font-weight: 300;
+}
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 28px;
+    border: 1px solid rgba(0,229,255,0.4);
+    background: rgba(0,229,255,0.04);
+    color: var(--c-eng);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background 0.3s var(--ease), border-color 0.3s var(--ease), transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.contact-btn:hover {
+    background: rgba(0,229,255,0.08);
+    border-color: var(--c-eng);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -10px rgba(0,229,255,0.4);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   RESPONSIVE
+────────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .nav-bar { padding: 0 28px; }
+    .schema-block { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    body { padding-top: 60px; }
+    .nav-bar { padding: 0 18px; height: 60px; }
+    .nav-name { display: none; }
+    .container { padding: 0 18px; }
+    section { padding: 40px 0; }
+    .card { padding: 26px 22px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .hero-kpi { border-bottom: 1px solid var(--border); padding: 20px 14px; }
+    .hero-kpi:nth-child(2) { border-right: none; }
+    .compare-block { grid-template-columns: 1fr; }
+    .compare-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .rag-flow { grid-template-columns: 1fr 1fr; }
+    .arrow { display: none; }
+    .arch-grid { padding: 14px 10px; }
+    .closing-take { padding: 28px 22px; margin-bottom: 30px; }
+    header { padding: 56px 18px 44px; }
+}
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <a href="../index.html#projects" class="back-link">
+            <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+        </a>
+
+        <div class="nav-name">Javier Moraga <b>LATAM · Amelia</b></div>
+
+        <div class="lang-switch" role="group" aria-label="Language">
+            <button class="lang-opt is-active" data-lang="en" onclick="changeLang('en')" id="btn-en">EN</button>
+            <span class="lang-sep">·</span>
+            <button class="lang-opt" data-lang="es" onclick="changeLang('es')" id="btn-es">ES</button>
+        </div>
+    </nav>
+
+    <header>
+        <div class="container">
+            <span class="hero-badge" id="hero-badge">Case Study · LATAM Airlines · 2024–2025</span>
+            <h1 id="main-title">
+                Amelia —<br>
+                <span class="text-gradient">Corporate AI, Measured.</span>
+            </h1>
+            <p class="lead" id="main-desc">
+                Nine months in production. The analytics layer that powered LATAM's internal RAG assistant —
+                from raw interaction logs to cohort retention to a 98% drop in retrieval errors.
+            </p>
+
+            <div class="hero-kpis">
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value">20,523</span>
+                    <span class="hero-kpi-label" id="kpi-label-1">Unique users</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value"><b>790.9K</b></span>
+                    <span class="hero-kpi-label" id="kpi-label-2">Interactions logged</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value">644</span>
+                    <span class="hero-kpi-label" id="kpi-label-3">Custom assistants</span>
+                </div>
+                <div class="hero-kpi">
+                    <span class="hero-kpi-value"><b>−98%</b></span>
+                    <span class="hero-kpi-label" id="kpi-label-4">Retrieval errors (RH+)</span>
+                </div>
+            </div>
+
+            <p class="hero-meta">
+                <span id="meta-1">Sep 2024 — May 2025</span> · <b>9 months in production</b> · <span id="meta-2">Role:</span> Data &amp; Analytics Engineer
+            </p>
+
+            <div class="stack-strip">
+                <span class="stack-pill is-primary">BigQuery</span>
+                <span class="stack-pill is-primary">Dataform</span>
+                <span class="stack-pill is-primary">Pub/Sub</span>
+                <span class="stack-pill is-primary">Cloud Run</span>
+                <span class="stack-pill">BQ Remote Functions</span>
+                <span class="stack-pill">BQ ML Embeddings</span>
+                <span class="stack-pill">GA4 → BigQuery</span>
+                <span class="stack-pill">CloudSQL (federated)</span>
+                <span class="stack-pill">GPT-4o</span>
+                <span class="stack-pill">Looker</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- ════════════════════════════════════════════════════════
+             01. CONTEXT
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-1">01 · Context</span>
+                <h3 class="narrative-title" id="title-1">A 40,000-employee airline doesn't have a chatbot problem. It has a knowledge-retrieval problem.</h3>
+                <div class="narrative-text" id="text-1">
+                    <p>
+                        LATAM employs <strong>~40,000 people</strong> across 5 countries — pilots, cabin crew, mechanics, sales, ground ops, support. Every one of them needs answers from a sprawl of HR policies, IT runbooks, travel rules, benefits programs, and union agreements. Before Amelia, those answers lived in <em>PDFs, intranet pages, and the institutional memory of overworked specialists.</em>
+                    </p>
+                    <p>
+                        <strong>Amelia is a corporate RAG (Retrieval-Augmented Generation) assistant</strong> grounded in LATAM's own indexed documentation. The hard problem wasn't building it — it was knowing whether it actually worked at scale, for whom, and where it was lying. That's what this dashboard answers.
+                    </p>
+                </div>
+
+                <div class="compare-block">
+                    <div class="compare-side">
+                        <span class="compare-tag" id="before-tag">Before Amelia</span>
+                        <p class="compare-text" id="before-text">"What's the COBUS reimbursement window?" → Slack a colleague → Email HR → Wait 2 days → Maybe wrong policy version.</p>
+                    </div>
+                    <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+                    <div class="compare-side is-after">
+                        <span class="compare-tag" id="after-tag">With Amelia</span>
+                        <p class="compare-text" id="after-text">Same question · 7-second answer · cites source · 553K of these resolved this way in 9 months.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             02. RAG ARCHITECTURE
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-2">02 · Architecture</span>
+                <h3 class="narrative-title" id="title-2">A RAG that lives inside BigQuery — and a pipeline that knows when it lies.</h3>
+                <div class="narrative-text" id="text-2">
+                    <p>
+                        The serving stack is not the conventional "FastAPI + external vector DB" sandwich. <strong>The RAG is invoked as a BigQuery Remote Function</strong> — backed by a Cloud Run endpoint with a <code>max_batching_rows</code> of 10 — which means retrieval, generation, and analytics share the same warehouse. <strong>Embeddings live in BigQuery itself</strong> (<code>staging/embeddings/</code>), not in a separate vector store. There is no glue code between "the AI service" and "the analytics" because they are the same system.
+                    </p>
+                    <p>
+                        Every interaction emits a structured event into a Pub/Sub topic (<code>monitoring_topic</code>) which fans out into a four-layer Dataform pipeline. The internal codename for the analytics layer is <em>Metatron</em> — and it owns adoption, latency, retrieval quality, content gaps, and HR adherence in one place.
+                    </p>
+                </div>
+
+                <div class="section-sub-label" id="rag-flow-label">RAG serving path · invoked from SQL</div>
+                <div class="rag-flow">
+                    <div class="rag-step">
+                        <span class="rag-step-num">01 · CALL</span>
+                        <div class="rag-step-title" id="rag-1-title">SQL invokes RAG</div>
+                        <p class="rag-step-desc" id="rag-1-desc">A <code>REMOTE</code> function in BigQuery calls Cloud Run with <code>(interaction_id, user_profile, query)</code>.</p>
+                    </div>
+                    <div class="rag-step">
+                        <span class="rag-step-num">02 · RETRIEVE</span>
+                        <div class="rag-step-title" id="rag-2-title">Vector search in BQ</div>
+                        <p class="rag-step-desc" id="rag-2-desc">Top-k cosine similarity against <code>document_embeddings</code> + freshness &amp; access filters.</p>
+                    </div>
+                    <div class="rag-step">
+                        <span class="rag-step-num">03 · GROUND</span>
+                        <div class="rag-step-title" id="rag-3-title">Generate w/ context</div>
+                        <p class="rag-step-desc" id="rag-3-desc">GPT-4o called with retrieved chunks + user-profile context + cited sources.</p>
+                    </div>
+                    <div class="rag-step">
+                        <span class="rag-step-num">04 · LOG</span>
+                        <div class="rag-step-title" id="rag-4-title">Dual-track event</div>
+                        <p class="rag-step-desc" id="rag-4-desc">Same call writes both the response and a quality event back to <code>monitoring_topic</code>.</p>
+                    </div>
+                </div>
+
+                <div class="section-sub-label" id="dataform-label">Analytics pipeline · 4 Dataform layers</div>
+                <div class="arch-grid">
+                    <div class="arch-step">
+                        <div class="arch-label" id="arch-raw-label">Sources</div>
+                        <div class="arch-val">monitoring_topic<br>+ GA4 events<br>+ HR (CloudSQL)</div>
+                    </div>
+                    <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+                    <div class="arch-step">
+                        <div class="arch-label" id="arch-silver-label">Staging</div>
+                        <div class="arch-val">logs_type →<br>message_logs +<br>interactions_w/wo_feedback</div>
+                    </div>
+                    <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+                    <div class="arch-step">
+                        <div class="arch-label" id="arch-gold-label">Reporting</div>
+                        <div class="arch-val">37 marts:<br>retention · ga4 ·<br>products · monitoring</div>
+                    </div>
+                    <div class="arrow"><i class="fas fa-chevron-right"></i></div>
+                    <div class="arch-step">
+                        <div class="arch-label" id="arch-serving-label">Serving</div>
+                        <div class="arch-val">Looker views<br>+ Hub schemas<br>+ exec dashboards</div>
+                    </div>
+                </div>
+
+                <div class="section-sub-label" id="schemas-label">BigQuery schemas · clear ownership boundaries</div>
+                <div class="schema-block">
+                    <div class="schema-card">
+                        <div class="schema-name">metatron</div>
+                        <div class="schema-desc" id="schema-1-desc">The platform's analytics core. Raw + staging + reporting layers. Owned by data eng.</div>
+                    </div>
+                    <div class="schema-card">
+                        <div class="schema-name">amelia_datahub</div>
+                        <div class="schema-desc" id="schema-2-desc">Hub-product surface. Custom assistants &amp; user activity. Read-shared with product teams.</div>
+                    </div>
+                    <div class="schema-card">
+                        <div class="schema-name">amelia_rh_plus</div>
+                        <div class="schema-desc" id="schema-3-desc">RH+ specific surface. Subset of interactions filtered to <code>rh_plus</code>. Read-shared with HR analytics.</div>
+                    </div>
+                </div>
+
+                <button class="accordion-btn" onclick="toggleCode(this)" style="margin-top: 24px;">
+                    <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · remote_functions/rag.sqlx</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="code-panel"><pre><code><span class="sql-comm">-- definitions/remote_functions/rag.sqlx
+-- The RAG itself is a BigQuery Remote Function backed by Cloud Run.
+-- Retrieval, generation, and analytics share the same warehouse.</span>
+
+<span class="sql-kw">CREATE OR REPLACE FUNCTION</span> <span class="sql-tbl">${constants.RAG_REMOTE_FUNCTION_PATH}</span>(
+    interaction_id <span class="sql-kw">STRING</span>,
+    user_profile <span class="sql-kw">JSON</span>,
+    query <span class="sql-kw">STRING</span>
+) <span class="sql-kw">RETURNS</span> <span class="sql-kw">JSON</span>
+<span class="sql-kw">REMOTE WITH CONNECTION</span> <span class="sql-tbl">${constants.BQ_REMOTE_CONNECTION}</span>
+<span class="sql-kw">OPTIONS</span> (
+    user_defined_context = [(<span class="sql-str">'function'</span>, <span class="sql-str">'/monitoring/rag'</span>)],
+    endpoint            = <span class="sql-tbl">${constants.CLOUD_RUN_ENDPOINT}</span>,
+    max_batching_rows   = 10
+);</code></pre></div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             03. ADOPTION
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-3">03 · Adoption</span>
+                <h3 class="narrative-title" id="title-3">20,523 users isn't the story. The 50-point gap between Soporte and Tripulantes is.</h3>
+                <div class="narrative-text" id="text-3">
+                    <p>
+                        Headline adoption is healthy — but averages hide the segments that need attention. <strong>Soporte (office workers) sit at 85% adoption. Tripulantes Mando (cockpit crew) sit at 35%.</strong> That's not an ML metric — that's a product surface decision: cabin crew don't sit at desks, and the desktop-first UI was leaving them behind.
+                    </p>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-1">Interactions by product · 9-month total</div>
+                        <span class="chart-subtitle" id="chart-sub-1">n = 790,900 interactions</span>
+                    </div>
+                    <div id="chart-products" style="height: 320px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-1">
+                            <b>Chat Libre (free-form chat) dominates volume at 70%</b> — but RH+ (the RAG-grounded HR assistant) carries the highest user-base reach. They serve different jobs-to-be-done, not the same one with different UIs.
+                        </p>
+                    </div>
+                    <button class="accordion-btn" onclick="toggleCode(this)">
+                        <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · reporting/products_user_avg.sqlx</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="code-panel"><pre><code><span class="sql-comm">-- definitions/reporting/products_user_avg.sqlx
+-- Real query: counts unique users by product per month, with annual cumulative.</span>
+<span class="sql-kw">config</span> {
+    <span class="sql-kw">type</span>: <span class="sql-str">"table"</span>,
+    <span class="sql-kw">name</span>: <span class="sql-str">"product_user_avg"</span>,
+    <span class="sql-kw">dependencies</span>: [<span class="sql-str">"interaction_all_population"</span>],
+    bigquery: { partitionBy: <span class="sql-str">"start_month_date"</span> }
+}
+
+<span class="sql-kw">WITH</span> base <span class="sql-kw">AS</span> (
+  <span class="sql-kw">SELECT</span>
+    start_month_date,
+    <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT CASE WHEN</span> total_rh_plus_interaction    > 0 <span class="sql-kw">THEN</span> employee_email <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> rh_plus,
+    <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT CASE WHEN</span> total_chat_libre_interaction > 0 <span class="sql-kw">THEN</span> employee_email <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> chat_libre,
+    <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT CASE WHEN</span> total_images_interaction     > 0 <span class="sql-kw">THEN</span> employee_email <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> art_maker,
+    <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT CASE WHEN</span> total_other_assistants_interaction > 0 <span class="sql-kw">THEN</span> employee_email <span class="sql-kw">END</span>) <span class="sql-kw">AS</span> other,
+    <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> employee_email) <span class="sql-kw">AS</span> total_amelia
+  <span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"interaction_all_population"</span>)}</span>
+  <span class="sql-kw">GROUP BY</span> 1
+)
+<span class="sql-kw">SELECT</span>
+  start_month_date,
+  rh_plus, chat_libre, art_maker, other, total_amelia,
+  <span class="sql-func">SUM</span>(total_amelia) <span class="sql-kw">OVER</span> (<span class="sql-kw">PARTITION BY</span> <span class="sql-func">EXTRACT</span>(<span class="sql-kw">YEAR FROM</span> start_month_date)
+                            <span class="sql-kw">ORDER BY</span> start_month_date) <span class="sql-kw">AS</span> total_amelia_annual
+<span class="sql-kw">FROM</span> base;</code></pre></div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-2">Adoption by VP · % of headcount that used Amelia</div>
+                        <span class="chart-subtitle" id="chart-sub-2">all VPs ranked</span>
+                    </div>
+                    <div id="chart-vp" style="height: 380px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-2">
+                            <b>Knowledge-worker VPs (Finance, Legal, IT, Comercial) cluster above 86%</b>. Operations-heavy areas (Carga, Operaciones, CEO Brasil) sit between 42–53% — not because they don't need it, because the surface they need it on isn't a desktop browser.
+                        </p>
+                    </div>
+                    <button class="accordion-btn" onclick="toggleCode(this)">
+                        <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · reporting/adherence_current_staffing.sqlx</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="code-panel"><pre><code><span class="sql-comm">-- definitions/reporting/adherence_current_staffing.sqlx
+-- Real query: joins HR staffing (LATAMers only, function_name &lt;&gt; 'EXTERNO')
+-- against active users to compute adoption per VP.</span>
+<span class="sql-kw">config</span> { <span class="sql-kw">type</span>: <span class="sql-str">"view"</span>, <span class="sql-kw">name</span>: <span class="sql-str">"adherence_current_staffing"</span> }
+
+<span class="sql-kw">WITH</span> dotacion <span class="sql-kw">AS</span> (
+  <span class="sql-kw">SELECT</span>
+    <span class="sql-func">LOWER</span>(employee_email)             <span class="sql-kw">AS</span> correo_electronico,
+    organizational_unit_2_name        <span class="sql-kw">AS</span> VP2_DESCRIP,
+    organizational_unit_3_name        <span class="sql-kw">AS</span> VP3_DESCRIP,
+    area_name                         <span class="sql-kw">AS</span> poblacion,
+    role_name                         <span class="sql-kw">AS</span> rol_empleado
+  <span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"current_staffing_rrhh"</span>)}</span>
+  <span class="sql-kw">WHERE</span> function_name <span class="sql-kw">&lt;&gt;</span> <span class="sql-str">'EXTERNO'</span>   <span class="sql-comm">-- LATAMers only</span>
+),
+active_users <span class="sql-kw">AS</span> (
+  <span class="sql-kw">SELECT DISTINCT</span> employee_email
+  <span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"interaction_all_population"</span>)}</span>
+  <span class="sql-kw">WHERE</span> total_rh_plus_interaction
+      + total_chat_libre_interaction
+      + total_images_interaction
+      + total_other_assistants_interaction <span class="sql-kw">&gt;</span> 0
+)
+<span class="sql-kw">SELECT</span>
+  d.VP2_DESCRIP,
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> d.correo_electronico)              <span class="sql-kw">AS</span> headcount,
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> a.employee_email)                   <span class="sql-kw">AS</span> active_users,
+  <span class="sql-func">SAFE_DIVIDE</span>(<span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> a.employee_email),
+              <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> d.correo_electronico)) <span class="sql-kw">AS</span> adoption_rate
+<span class="sql-kw">FROM</span> dotacion d
+<span class="sql-kw">LEFT JOIN</span> active_users a <span class="sql-kw">ON</span> d.correo_electronico = a.employee_email
+<span class="sql-kw">GROUP BY</span> 1 <span class="sql-kw">ORDER BY</span> adoption_rate <span class="sql-kw">DESC</span>;</code></pre></div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-3">Adoption gap · by population type</div>
+                        <span class="chart-subtitle" id="chart-sub-3">desk-bound vs operational</span>
+                    </div>
+                    <div id="chart-population" style="height: 320px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-exclamation-triangle insight-icon" style="color: var(--c-viz);"></i>
+                        <p class="insight-text" id="insight-3">
+                            <b>This is the chart that changed the product roadmap.</b> A 50-point gap between Soporte (85%) and Tripulante Mando (35%) made the case for mobile-first redesign. Adoption isn't an ML problem — it's a UX-and-content-curation problem with an ML-shaped surface.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-4">Monthly active users · stacked by product</div>
+                        <span class="chart-subtitle" id="chart-sub-4">Sep 2024 — May 2025</span>
+                    </div>
+                    <div id="chart-mau" style="height: 320px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-4">
+                            <b>RH+ is the volume base, Chat Libre is the engagement base, Asistentes is the growth signal.</b> The custom-assistants product (orange) didn't exist before Nov 2024 and reached 320 monthly active users by Apr 2025 — a separate growth curve riding on top of the platform.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             04. ENGAGEMENT
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-4">04 · Engagement</span>
+                <h3 class="narrative-title" id="title-4">Top-of-funnel is vanity. What people actually ask is the product.</h3>
+                <div class="narrative-text" id="text-4">
+                    <p>
+                        Per-user intensity tells you whether people came back. Chat Libre averages <strong>22 interactions per user</strong> — these are heavy users. RH+ averages <strong>4 interactions per user</strong> — closer to "I have one question, get me an answer." Two products, two engagement shapes, one platform.
+                    </p>
+                </div>
+
+                <div class="micro-grid">
+                    <div class="micro-card">
+                        <div class="micro-title" id="micro-title-1">Unique users by product</div>
+                        <div id="chart-users" style="height: 200px;"></div>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                            <span><span class="query-label">Query</span> · unique_users.sqlx</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> product_name,
+       <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> user_id)
+<span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"interactions_full"</span>)}</span>
+<span class="sql-kw">GROUP BY</span> 1;</code></pre></div>
+                    </div>
+
+                    <div class="micro-card">
+                        <div class="micro-title" id="micro-title-2">Avg interactions / user</div>
+                        <div id="chart-intensity" style="height: 200px;"></div>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                            <span><span class="query-label">Query</span> · int_per_user.sqlx</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> product_name,
+       <span class="sql-func">SAFE_DIVIDE</span>(<span class="sql-func">COUNT</span>(*),
+                   <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> user_id))
+<span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"interactions_full"</span>)}</span>
+<span class="sql-kw">GROUP BY</span> 1;</code></pre></div>
+                    </div>
+
+                    <div class="micro-card">
+                        <div class="micro-title" id="micro-title-3">Custom assistants ecosystem</div>
+                        <div id="chart-assistants" style="height: 200px;"></div>
+                        <button class="accordion-btn" onclick="toggleCode(this)">
+                            <span><span class="query-label">Query</span> · assistants_top.sqlx</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="code-panel"><pre><code><span class="sql-kw">SELECT</span> assistant_name,
+       <span class="sql-func">COUNT</span>(*) <span class="sql-kw">AS</span> interactions
+<span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"amelia_hub_activity"</span>)}</span>
+<span class="sql-kw">GROUP BY</span> 1
+<span class="sql-kw">ORDER BY</span> 2 <span class="sql-kw">DESC</span> <span class="sql-kw">LIMIT</span> 5;</code></pre></div>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper" style="margin-top: 30px; padding-top: 30px; border-top: 1px solid var(--border-glass); border-bottom: none; padding-bottom: 0;">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title-5">Top RH+ topics · what employees actually ask</div>
+                        <span class="chart-subtitle" id="chart-sub-5">interactions · top 8 categories</span>
+                    </div>
+                    <div id="chart-content" style="height: 340px;"></div>
+                    <div class="insight">
+                        <i class="fas fa-lightbulb insight-icon"></i>
+                        <p class="insight-text" id="insight-5">
+                            <b>Travel policy (Sta Travel) and password resets dominate.</b> This is the chart that sets content curation priorities — every category here is an ROI bet on which sources to keep fresh and well-chunked. The Ops team's job market for AI isn't "smarter model"; it's "this week's COBUS update indexed by Friday."
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             05. OPERATIONAL QUALITY
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-5">05 · Operational Quality</span>
+                <h3 class="narrative-title" id="title-5">"Errors" don't return error codes. They return apologies.</h3>
+                <div class="narrative-text" id="text-5">
+                    <p>
+                        The LLM does not throw exceptions when it can't ground an answer — it apologises. <strong>"Lo siento."</strong> "Desculpe." "Sorry." <em>"La información recuperada no contiene…"</em> Tracking RAG failure at scale meant <strong>pattern-matching the assistant's response across three languages.</strong> A single CASE statement, run nightly across <code>interaction_full</code>, became the entire error rate.
+                    </p>
+                    <p>
+                        October 2024: 7,577 RH+ apology responses. May 2025: 31. <strong>The model didn't change — GPT-4o stayed the same.</strong> What changed: chunking strategy on long-tail policy docs, retrieval-time freshness filters, and a weekly review where each pattern-matched failure category drove the content team's curation queue. <em>Error reduction is a content loop, not an SRE task.</em>
+                    </p>
+                </div>
+
+                <div class="micro-grid" style="margin-top: 24px;">
+                    <div class="micro-card">
+                        <div class="micro-title" id="micro-title-4">RH+ retrieval errors / month</div>
+                        <div id="chart-errors" style="height: 220px;"></div>
+                    </div>
+                    <div class="micro-card">
+                        <div class="micro-title" id="micro-title-5">Response latency (median, sec)</div>
+                        <div id="chart-latency" style="height: 220px;"></div>
+                        <div class="lat-split">
+                            <div class="lat-split-item is-retrieval">
+                                <div class="lat-split-label" id="lat-ret-label">Retrieval</div>
+                                <div class="lat-split-value">~1.8s</div>
+                            </div>
+                            <div class="lat-split-item is-gen">
+                                <div class="lat-split-label" id="lat-gen-label">Generation</div>
+                                <div class="lat-split-value">~4.7s</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="micro-card">
+                        <div class="micro-title" id="micro-title-6">Frequent / Intensive users</div>
+                        <div id="chart-cohorts" style="height: 220px;"></div>
+                    </div>
+                </div>
+
+                <div class="insight" style="margin-top: 24px;">
+                    <i class="fas fa-exclamation-triangle insight-icon" style="color: var(--c-viz);"></i>
+                    <p class="insight-text" id="insight-6">
+                        <b>Late-May latency spike (12.9–13.4s on RH+):</b> traced to an upstream content refresh that doubled the corpus on travel-policy categories. Retrieval time grew first — generation stayed flat. That's why the latency split lives in the same table: <code>index_search_elapsed_time</code> and <code>response_generation_elapsed_time</code> are separate columns from day one. Resolved with retrieval-time filtering + reduced chunk overlap on long policy docs.
+                    </p>
+                </div>
+
+                <button class="accordion-btn" onclick="toggleCode(this)" style="margin-top: 24px;">
+                    <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · reporting/products_error_rate.sqlx</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="code-panel"><pre><code><span class="sql-comm">-- definitions/reporting/products_error_rate.sqlx
+-- Real error detection: pattern-match the LLM's apology phrases in ES / PT / EN.
+-- The model never returned error codes — it apologised. So we parse for that.</span>
+<span class="sql-kw">config</span> {
+    <span class="sql-kw">type</span>: <span class="sql-str">"table"</span>,
+    <span class="sql-kw">name</span>: <span class="sql-str">"products_error_rate"</span>,
+    <span class="sql-kw">dependencies</span>: [<span class="sql-str">"interaction_all_population"</span>],
+    bigquery: { partitionBy: <span class="sql-str">"start_month_date"</span> }
+}
+
+<span class="sql-kw">WITH</span> assistant_product <span class="sql-kw">AS</span> (
+  <span class="sql-kw">SELECT</span>
+    <span class="sql-func">DATE_TRUNC</span>(<span class="sql-func">DATE</span>(interaction_timestamp), <span class="sql-kw">MONTH</span>) <span class="sql-kw">AS</span> year_month,
+    product_name,
+    interaction_id,
+    <span class="sql-kw">CASE</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%lo siento%'</span>                              <span class="sql-kw">THEN</span> <span class="sql-str">'Error: Lo siento'</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%desculpe%'</span>                               <span class="sql-kw">THEN</span> <span class="sql-str">'Error: Desculpe'</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%sorry%'</span>                                  <span class="sql-kw">THEN</span> <span class="sql-str">'Error: I am sorry'</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%la información recuperada no%'</span>          <span class="sql-kw">THEN</span> <span class="sql-str">'Error: ES retrieval miss'</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%a informação recuperada não%'</span>           <span class="sql-kw">THEN</span> <span class="sql-str">'Error: PT retrieval miss'</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%the retrieved information does not%'</span>    <span class="sql-kw">THEN</span> <span class="sql-str">'Error: EN retrieval miss'</span>
+      <span class="sql-kw">WHEN</span> <span class="sql-func">LOWER</span>(assistant) <span class="sql-kw">LIKE</span> <span class="sql-str">'%something went wrong%'</span>                   <span class="sql-kw">THEN</span> <span class="sql-str">'Error: Generic'</span>
+      <span class="sql-kw">ELSE NULL</span>
+    <span class="sql-kw">END</span> <span class="sql-kw">AS</span> error_answer
+  <span class="sql-kw">FROM</span> <span class="sql-tbl">${ref(<span class="sql-str">"interaction_full"</span>)}</span>
+  <span class="sql-kw">WHERE</span> <span class="sql-func">DATE</span>(interaction_timestamp) <span class="sql-kw">&gt;=</span> <span class="sql-str">'2024-09-09'</span>
+)
+<span class="sql-kw">SELECT</span>
+  year_month, product_name,
+  <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> interaction_id)                                    <span class="sql-kw">AS</span> total_interactions,
+  <span class="sql-func">COUNTIF</span>(error_answer <span class="sql-kw">IS NOT NULL</span>)                              <span class="sql-kw">AS</span> total_errors,
+  <span class="sql-func">SAFE_DIVIDE</span>(<span class="sql-func">COUNTIF</span>(error_answer <span class="sql-kw">IS NOT NULL</span>),
+              <span class="sql-func">COUNT</span>(<span class="sql-kw">DISTINCT</span> interaction_id))            <span class="sql-kw">AS</span> error_rate
+<span class="sql-kw">FROM</span> assistant_product
+<span class="sql-kw">WHERE</span> product_name <span class="sql-kw">IN</span> (<span class="sql-str">'rh_plus'</span>, <span class="sql-str">'chat_libre'</span>, <span class="sql-str">'art_maker'</span>)
+<span class="sql-kw">GROUP BY</span> 1, 2;</code></pre></div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             05.5 RAG QUALITY (NEW v3)
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-rag">05b · RAG Quality Loop</span>
+                <h3 class="narrative-title" id="title-rag">Apology rate is the symptom. Hallucination, contextual relevancy and answer correctness are the diagnoses.</h3>
+                <div class="narrative-text" id="text-rag">
+                    <p>
+                        Pattern-matched apologies catch failures the user can <em>see</em>. They miss the worst case: the model answers confidently with the wrong thing. So the pipeline runs an <strong>LLM-as-judge eval suite</strong> in <code>staging/llm_evaluations/</code>, configured in <code>dataform.json</code> with four real metrics — three for runtime RAG behaviour, one for offline regression testing against a golden set.
+                    </p>
+                </div>
+
+                <div class="rag-quality">
+                    <div class="rag-quality-item">
+                        <code>ANSWER_RELEVANCY</code>
+                        <p id="rag-q-1"><b>Does the answer actually address the question?</b> Catches when the model retrieves useful context but generates off-topic text.</p>
+                    </div>
+                    <div class="rag-quality-item">
+                        <code>HALLUCINATION</code>
+                        <p id="rag-q-2"><b>Did the answer go beyond what the retrieved context supports?</b> Catches the dangerous case: confident answer, no source.</p>
+                    </div>
+                    <div class="rag-quality-item">
+                        <code>CONTEXTUAL_RELEVANCY</code>
+                        <p id="rag-q-3"><b>Was the retrieved context actually relevant to the question?</b> Diagnoses retrieval-side failure separate from generation-side.</p>
+                    </div>
+                    <div class="rag-quality-item">
+                        <code>ANSWER_CORRECTNESS</code>
+                        <p id="rag-q-4"><b>Golden-set regression check.</b> A curated set of questions with ground-truth answers, run on every meaningful corpus or model change.</p>
+                    </div>
+                </div>
+
+                <div class="insight" style="margin-top: 22px;">
+                    <i class="fas fa-flask insight-icon"></i>
+                    <p class="insight-text" id="insight-rag">
+                        <b>Synthetic evaluation at the document level too:</b> <code>document_synthetic_questions.sqlx</code> generates K questions per document so we can compute <code>top_k_accuracy</code> against retrieval — i.e. "if a user asked something this document is supposed to answer, does retrieval return it in top-k?" That number is what tells us whether the corpus is the problem or the prompt is.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             06. DECISIONS + FAILURES
+        ════════════════════════════════════════════════════════ -->
+        <section>
+            <div class="card">
+                <span class="section-label" id="label-6">06 · What I Owned</span>
+                <h3 class="narrative-title" id="title-6">The decisions I'd defend in any interview — and the ones I had to course-correct.</h3>
+
+                <div class="twocol">
+                    <div class="twocol-block">
+                        <h4><i class="fas fa-compass"></i> <span id="dec-head">Decisions I owned</span></h4>
+                        <ul class="twocol-list">
+                            <li>
+                                <b id="dec-1-title">RAG as a BigQuery Remote Function.</b>
+                                <span id="dec-1-desc">The RAG service is callable from SQL via a <code>REMOTE</code> function backed by Cloud Run (<code>max_batching_rows=10</code>). Retrieval and analytics share the warehouse — no glue code, no separate vector DB, no double source-of-truth.</span>
+                            </li>
+                            <li>
+                                <b id="dec-2-title">Errors detected by pattern, not by exception.</b>
+                                <span id="dec-2-desc">The LLM doesn't throw — it apologises in ES, PT or EN. So <code>products_error_rate</code> CASEs over apology phrases <em>and</em> separates "retrieval miss" from "generic failure". Every CASE branch maps to a fix in a different team.</span>
+                            </li>
+                            <li>
+                                <b id="dec-3-title">Shadow folder for safe deploys.</b>
+                                <span id="dec-3-desc">Every reporting model has a sibling in <code>reporting/test/</code> — 34 files. New logic lands there first, runs against prod data in parallel, gets row-diffed against the live model, and only then promotes. Zero shipped regressions in 9 months.</span>
+                            </li>
+                            <li>
+                                <b id="dec-4-title">Federated assistants metadata.</b>
+                                <span id="dec-4-desc">Custom-assistants metadata lives in CloudSQL Postgres (operational source-of-truth). Pulled into reporting via <code>EXTERNAL_QUERY()</code> — no nightly dump, no drift, no out-of-band ETL.</span>
+                            </li>
+                            <li>
+                                <b id="dec-5-title">Latency split into retrieval vs generation from day one.</b>
+                                <span id="dec-5-desc"><code>index_search_elapsed_time</code> and <code>response_generation_elapsed_time</code> are separate columns in the staging table. When latency spikes, the chart tells you which team needs to look — content/retrieval or model/inference — without re-instrumenting.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="twocol-block is-fail">
+                        <h4><i class="fas fa-bug"></i> <span id="fail-head">What broke (and how I fixed it)</span></h4>
+                        <ul class="twocol-list">
+                            <li>
+                                <b id="fail-1-title">Latency spike to 13.4s, late May.</b>
+                                <span id="fail-1-desc">Travel-policy corpus doubled overnight after an upstream content refresh. Retrieval time grew; generation stayed flat — the split column made the cause obvious in one query. <em>Fix:</em> retrieval-time freshness filter + reduced chunk overlap on long policy docs.</span>
+                            </li>
+                            <li>
+                                <b id="fail-2-title">Chat Libre apology spike, Dec → Jan (648 → 4,107).</b>
+                                <span id="fail-2-desc">A prompt-template change broke a fallback path silently — apologies in EN went up while ES/PT stayed flat. <em>Fix:</em> contract tests on the prompt-template service so schema changes can't land without CI passing.</span>
+                            </li>
+                            <li>
+                                <b id="fail-3-title">Tripulante adoption gap was a product mistake.</b>
+                                <span id="fail-3-desc">Initial UI was desktop-first. Cabin crew don't sit at desks. <em>Fix:</em> the data made the case; mobile-first redesign followed. The dashboard surfaced the 50pp gap months before any user complaint reached HR.</span>
+                            </li>
+                            <li>
+                                <b id="fail-4-title">"% adoption" alone was misleading.</b>
+                                <span id="fail-4-desc">A user counted as "adopted" with one interaction. <em>Fix:</em> built <code>retention_usage_details</code> with explicit tiers — <code>frequent</code> (above-mean monthly use), <code>intensive</code> (above-mean monthly interactions), <code>is_high_engaged</code> (&gt;10/month), <code>is_churned_this_month</code>. 8,124 frequent / 6,835 intensive — those are the real numbers.</span>
+                            </li>
+                            <li>
+                                <b id="fail-5-title">First cohort table over-counted retention.</b>
+                                <span id="fail-5-desc">Naive cohort SQL counted any record as "active". <em>Fix:</em> rewrote <code>retention_unique_users_cohort</code> with a <code>HAVING SUM(interactions) &gt; 0</code> guard plus <code>FIRST_VALUE(retained_users) OVER (PARTITION BY cohort_month ORDER BY months_since_cohort)</code> as the cohort_size denominator. Retention numbers stopped being optimistic.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════
+             CLOSING
+        ════════════════════════════════════════════════════════ -->
+        <blockquote class="closing-take">
+            <span id="closing-quote">"Adoption isn't an ML problem. It's a UX-and-content-curation problem with an ML-shaped surface."</span>
+            <span class="closing-take-author" id="closing-author">— Working principle from this project</span>
+        </blockquote>
+
+        <div class="contact-section">
+            <p class="contact-text" id="contact-text">
+                This case study integrates data engineering (Dataform · BigQuery · Pub/Sub) with the operational reality of running an AI product in production. If that's the kind of work your team is hiring for, let's talk.
+            </p>
+            <a href="../index.html#convergence-section" class="contact-btn" id="contact-btn-text">
+                <i class="fas fa-arrow-right"></i> Contact Javier
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         SCRIPTS
+    ════════════════════════════════════════════════════════ -->
+    <script>
+
+        // ── Accordion toggle ─────────────────────────────────
+        function toggleCode(btn) {
+            const panel = btn.nextElementSibling;
+            panel.classList.toggle('active');
+            btn.classList.toggle('is-open');
+        }
+
+        // ── Translations ─────────────────────────────────────
+        const translations = {
+            en: {
+                navBack: "Back to Portfolio",
+                badge: "Case Study · LATAM Airlines · 2024–2025",
+                title: "Amelia —<br><span class='text-gradient'>Corporate AI, Measured.</span>",
+                desc: "Nine months in production. The analytics layer that powered LATAM's internal RAG assistant — from raw interaction logs to cohort retention to a 98% drop in retrieval errors.",
+                kpiL1: "Unique users", kpiL2: "Interactions logged", kpiL3: "Custom assistants", kpiL4: "Retrieval errors (RH+)",
+                meta1: "Sep 2024 — May 2025", meta2: "Role:",
+
+                label1: "01 · Context",
+                title1: "A 40,000-employee airline doesn't have a chatbot problem. It has a knowledge-retrieval problem.",
+                text1: "<p>LATAM employs <strong>~40,000 people</strong> across 5 countries — pilots, cabin crew, mechanics, sales, ground ops, support. Every one of them needs answers from a sprawl of HR policies, IT runbooks, travel rules, benefits programs, and union agreements. Before Amelia, those answers lived in <em>PDFs, intranet pages, and the institutional memory of overworked specialists.</em></p><p><strong>Amelia is a corporate RAG (Retrieval-Augmented Generation) assistant</strong> grounded in LATAM's own indexed documentation. The hard problem wasn't building it — it was knowing whether it actually worked at scale, for whom, and where it was lying. That's what this dashboard answers.</p>",
+                beforeTag: "Before Amelia",
+                beforeText: "\"What's the COBUS reimbursement window?\" → Slack a colleague → Email HR → Wait 2 days → Maybe wrong policy version.",
+                afterTag: "With Amelia",
+                afterText: "Same question · 7-second answer · cites source · 553K of these resolved this way in 9 months.",
+
+                label2: "02 · Architecture",
+                title2: "A RAG that lives inside BigQuery — and a pipeline that knows when it lies.",
+                text2: "<p>The serving stack is not the conventional \"FastAPI + external vector DB\" sandwich. <strong>The RAG is invoked as a BigQuery Remote Function</strong> — backed by a Cloud Run endpoint with a <code>max_batching_rows</code> of 10 — which means retrieval, generation, and analytics share the same warehouse. <strong>Embeddings live in BigQuery itself</strong> (<code>staging/embeddings/</code>), not in a separate vector store. There is no glue code between \"the AI service\" and \"the analytics\" because they are the same system.</p><p>Every interaction emits a structured event into a Pub/Sub topic (<code>monitoring_topic</code>) which fans out into a four-layer Dataform pipeline. The internal codename for the analytics layer is <em>Metatron</em> — and it owns adoption, latency, retrieval quality, content gaps, and HR adherence in one place.</p>",
+                ragFlowLabel: "RAG serving path · invoked from SQL",
+                rag1Title: "SQL invokes RAG", rag1Desc: "A <code>REMOTE</code> function in BigQuery calls Cloud Run with <code>(interaction_id, user_profile, query)</code>.",
+                rag2Title: "Vector search in BQ", rag2Desc: "Top-k cosine similarity against <code>document_embeddings</code> + freshness &amp; access filters.",
+                rag3Title: "Generate w/ context", rag3Desc: "GPT-4o called with retrieved chunks + user-profile context + cited sources.",
+                rag4Title: "Dual-track event", rag4Desc: "Same call writes both the response and a quality event back to <code>monitoring_topic</code>.",
+                dataformLabel: "Analytics pipeline · 4 Dataform layers",
+                rawLayer: "Sources", silverLayer: "Staging", goldLayer: "Reporting", servingLayer: "Serving",
+                schemasLabel: "BigQuery schemas · clear ownership boundaries",
+                schema1Desc: "The platform's analytics core. Raw + staging + reporting layers. Owned by data eng.",
+                schema2Desc: "Hub-product surface. Custom assistants &amp; user activity. Read-shared with product teams.",
+                schema3Desc: "RH+ specific surface. Subset of interactions filtered to <code>rh_plus</code>. Read-shared with HR analytics.",
+
+                label3: "03 · Adoption",
+                title3: "20,523 users isn't the story. The 50-point gap between Soporte and Tripulantes is.",
+                text3: "<p>Headline adoption is healthy — but averages hide the segments that need attention. <strong>Soporte (office workers) sit at 85% adoption. Tripulantes Mando (cockpit crew) sit at 35%.</strong> That's not an ML metric — that's a product surface decision: cabin crew don't sit at desks, and the desktop-first UI was leaving them behind.</p>",
+                ch1Title: "Interactions by product · 9-month total", ch1Sub: "n = 790,900 interactions",
+                in1: "<b>Chat Libre (free-form chat) dominates volume at 70%</b> — but RH+ (the RAG-grounded HR assistant) carries the highest user-base reach. They serve different jobs-to-be-done, not the same one with different UIs.",
+                ch2Title: "Adoption by VP · % of headcount that used Amelia", ch2Sub: "all VPs ranked",
+                in2: "<b>Knowledge-worker VPs (Finance, Legal, IT, Comercial) cluster above 86%</b>. Operations-heavy areas (Carga, Operaciones, CEO Brasil) sit between 42–53% — not because they don't need it, because the surface they need it on isn't a desktop browser.",
+                ch3Title: "Adoption gap · by population type", ch3Sub: "desk-bound vs operational",
+                in3: "<b>This is the chart that changed the product roadmap.</b> A 50-point gap between Soporte (85%) and Tripulante Mando (35%) made the case for mobile-first redesign. Adoption isn't an ML problem — it's a UX-and-content-curation problem with an ML-shaped surface.",
+                ch4Title: "Monthly active users · stacked by product", ch4Sub: "Sep 2024 — May 2025",
+                in4: "<b>RH+ is the volume base, Chat Libre is the engagement base, Asistentes is the growth signal.</b> The custom-assistants product (orange) didn't exist before Nov 2024 and reached 320 monthly active users by Apr 2025 — a separate growth curve riding on top of the platform.",
+
+                label4: "04 · Engagement",
+                title4: "Top-of-funnel is vanity. What people actually ask is the product.",
+                text4: "<p>Per-user intensity tells you whether people came back. Chat Libre averages <strong>22 interactions per user</strong> — these are heavy users. RH+ averages <strong>4 interactions per user</strong> — closer to \"I have one question, get me an answer.\" Two products, two engagement shapes, one platform.</p>",
+                micro1: "Unique users by product",
+                micro2: "Avg interactions / user",
+                micro3: "Custom assistants ecosystem",
+                ch5Title: "Top RH+ topics · what employees actually ask", ch5Sub: "interactions · top 8 categories",
+                in5: "<b>Travel policy (Sta Travel) and password resets dominate.</b> This is the chart that sets content curation priorities — every category here is an ROI bet on which sources to keep fresh and well-chunked. The Ops team's job market for AI isn't \"smarter model\"; it's \"this week's COBUS update indexed by Friday.\"",
+
+                label5: "05 · Operational Quality",
+                title5: "\"Errors\" don't return error codes. They return apologies.",
+                text5: "<p>The LLM does not throw exceptions when it can't ground an answer — it apologises. <strong>\"Lo siento.\"</strong> \"Desculpe.\" \"Sorry.\" <em>\"La información recuperada no contiene…\"</em> Tracking RAG failure at scale meant <strong>pattern-matching the assistant's response across three languages.</strong> A single CASE statement, run nightly across <code>interaction_full</code>, became the entire error rate.</p><p>October 2024: 7,577 RH+ apology responses. May 2025: 31. <strong>The model didn't change — GPT-4o stayed the same.</strong> What changed: chunking strategy on long-tail policy docs, retrieval-time freshness filters, and a weekly review where each pattern-matched failure category drove the content team's curation queue. <em>Error reduction is a content loop, not an SRE task.</em></p>",
+                micro4: "RH+ retrieval errors / month",
+                micro5: "Response latency (median, sec)",
+                micro6: "Frequent / Intensive users",
+                latRetLabel: "Retrieval", latGenLabel: "Generation",
+                in6: "<b>Late-May latency spike (12.9–13.4s on RH+):</b> traced to an upstream content refresh that doubled the corpus on travel-policy categories. Retrieval time grew first — generation stayed flat. That's why the latency split lives in the same table: <code>index_search_elapsed_time</code> and <code>response_generation_elapsed_time</code> are separate columns from day one. Resolved with retrieval-time filtering + reduced chunk overlap on long policy docs.",
+
+                labelRag: "05b · RAG Quality Loop",
+                titleRag: "Apology rate is the symptom. Hallucination, contextual relevancy and answer correctness are the diagnoses.",
+                textRag: "<p>Pattern-matched apologies catch failures the user can <em>see</em>. They miss the worst case: the model answers confidently with the wrong thing. So the pipeline runs an <strong>LLM-as-judge eval suite</strong> in <code>staging/llm_evaluations/</code>, configured in <code>dataform.json</code> with four real metrics — three for runtime RAG behaviour, one for offline regression testing against a golden set.</p>",
+                ragQ1: "<b>Does the answer actually address the question?</b> Catches when the model retrieves useful context but generates off-topic text.",
+                ragQ2: "<b>Did the answer go beyond what the retrieved context supports?</b> Catches the dangerous case: confident answer, no source.",
+                ragQ3: "<b>Was the retrieved context actually relevant to the question?</b> Diagnoses retrieval-side failure separate from generation-side.",
+                ragQ4: "<b>Golden-set regression check.</b> A curated set of questions with ground-truth answers, run on every meaningful corpus or model change.",
+                inRag: "<b>Synthetic evaluation at the document level too:</b> <code>document_synthetic_questions.sqlx</code> generates K questions per document so we can compute <code>top_k_accuracy</code> against retrieval — i.e. \"if a user asked something this document is supposed to answer, does retrieval return it in top-k?\" That number is what tells us whether the corpus is the problem or the prompt is.",
+
+                label6: "06 · What I Owned",
+                title6: "The decisions I'd defend in any interview — and the ones I had to course-correct.",
+                decHead: "Decisions I owned",
+                dec1T: "RAG as a BigQuery Remote Function.",
+                dec1D: "The RAG service is callable from SQL via a <code>REMOTE</code> function backed by Cloud Run (<code>max_batching_rows=10</code>). Retrieval and analytics share the warehouse — no glue code, no separate vector DB, no double source-of-truth.",
+                dec2T: "Errors detected by pattern, not by exception.",
+                dec2D: "The LLM doesn't throw — it apologises in ES, PT or EN. So <code>products_error_rate</code> CASEs over apology phrases <em>and</em> separates \"retrieval miss\" from \"generic failure\". Every CASE branch maps to a fix in a different team.",
+                dec3T: "Shadow folder for safe deploys.",
+                dec3D: "Every reporting model has a sibling in <code>reporting/test/</code> — 34 files. New logic lands there first, runs against prod data in parallel, gets row-diffed against the live model, and only then promotes. Zero shipped regressions in 9 months.",
+                dec4T: "Federated assistants metadata.",
+                dec4D: "Custom-assistants metadata lives in CloudSQL Postgres (operational source-of-truth). Pulled into reporting via <code>EXTERNAL_QUERY()</code> — no nightly dump, no drift, no out-of-band ETL.",
+                dec5T: "Latency split into retrieval vs generation from day one.",
+                dec5D: "<code>index_search_elapsed_time</code> and <code>response_generation_elapsed_time</code> are separate columns in the staging table. When latency spikes, the chart tells you which team needs to look — content/retrieval or model/inference — without re-instrumenting.",
+                failHead: "What broke (and how I fixed it)",
+                fail1T: "Latency spike to 13.4s, late May.",
+                fail1D: "Travel-policy corpus doubled overnight after an upstream content refresh. Retrieval time grew; generation stayed flat — the split column made the cause obvious in one query. <em>Fix:</em> retrieval-time freshness filter + reduced chunk overlap on long policy docs.",
+                fail2T: "Chat Libre apology spike, Dec → Jan (648 → 4,107).",
+                fail2D: "A prompt-template change broke a fallback path silently — apologies in EN went up while ES/PT stayed flat. <em>Fix:</em> contract tests on the prompt-template service so schema changes can't land without CI passing.",
+                fail3T: "Tripulante adoption gap was a product mistake.",
+                fail3D: "Initial UI was desktop-first. Cabin crew don't sit at desks. <em>Fix:</em> the data made the case; mobile-first redesign followed. The dashboard surfaced the 50pp gap months before any user complaint reached HR.",
+                fail4T: "\"% adoption\" alone was misleading.",
+                fail4D: "A user counted as \"adopted\" with one interaction. <em>Fix:</em> built <code>retention_usage_details</code> with explicit tiers — <code>frequent</code> (above-mean monthly use), <code>intensive</code> (above-mean monthly interactions), <code>is_high_engaged</code> (&gt;10/month), <code>is_churned_this_month</code>. 8,124 frequent / 6,835 intensive — those are the real numbers.",
+                fail5T: "First cohort table over-counted retention.",
+                fail5D: "Naive cohort SQL counted any record as \"active\". <em>Fix:</em> rewrote <code>retention_unique_users_cohort</code> with a <code>HAVING SUM(interactions) &gt; 0</code> guard plus <code>FIRST_VALUE(retained_users) OVER (PARTITION BY cohort_month ORDER BY months_since_cohort)</code> as the cohort_size denominator. Retention numbers stopped being optimistic.",
+
+                closingQuote: "\"Adoption isn't an ML problem. It's a UX-and-content-curation problem with an ML-shaped surface.\"",
+                closingAuthor: "— Working principle from this project",
+
+                queryLabel: "Query",
+                contactText: "This case study integrates data engineering (Dataform · BigQuery · Pub/Sub) with the operational reality of running an AI product in production. If that's the kind of work your team is hiring for, let's talk.",
+                contactBtn: "Contact Javier",
+
+                chartsData: {
+                    products: { name: "Interactions", libre: "Chat Libre", rh: "RH+", img: "Images", asis: "Assistants" },
+                    vp: { name: "Adoption" },
+                    population: { name: "Adoption", labels: ['Soporte', 'Customer Care', 'Sales', 'CCO', 'Maintenance', 'Airport', 'Cargo', 'Cabin Crew', 'Cockpit Crew'] },
+                    mau: { name: { libre: 'Chat Libre', rh: 'RH+', img: 'Images', asis: 'Assistants' }, x: ['Sep 24','Oct 24','Nov 24','Dec 24','Jan 25','Feb 25','Mar 25','Apr 25','May 25'] },
+                    users: { name: "Users", x: ['RH+', 'Chat Libre', 'Images', 'Assistants'] },
+                    intensity: { name: "Int/User", x: ['Chat Libre', 'Assistants', 'Images', 'RH+'] },
+                    assistants: { name: "Top assistants", x: ['amelia', 'el pana brazipaño', 'rapinha balon d\'or', 'nara', 'crystal pt-br'] },
+                    errors: { name: "RH+ errors", x: ['Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'] },
+                    latency: { name: "Seconds", x: ['Chat Libre', 'RH+ (RAG)'] },
+                    cohorts: { name: "Users", x: ['Total', 'Frequent', 'Intensive'] },
+                    content: { name: "Interactions", x: ['Chat Libre Q', 'Sta Travel', 'Password', 'COBUS', 'Google WS', 'Sta Travel Benef.', 'SAP/ARIBA', 'Tickets'] }
+                }
+            },
+            es: {
+                navBack: "Volver al Portafolio",
+                badge: "Caso de Estudio · LATAM Airlines · 2024–2025",
+                title: "Amelia —<br><span class='text-gradient'>IA Corporativa, Medida.</span>",
+                desc: "Nueve meses en producción. La capa analítica detrás del asistente RAG interno de LATAM — desde logs crudos hasta retención por cohortes y una caída del 98% en errores de recuperación.",
+                kpiL1: "Usuarios únicos", kpiL2: "Interacciones registradas", kpiL3: "Asistentes custom", kpiL4: "Errores retrieval (RH+)",
+                meta1: "Sep 2024 — May 2025", meta2: "Rol:",
+
+                label1: "01 · Contexto",
+                title1: "Una aerolínea de 40.000 empleados no tiene un problema de chatbot. Tiene un problema de recuperación de conocimiento.",
+                text1: "<p>LATAM emplea a <strong>~40.000 personas</strong> en 5 países — pilotos, tripulantes, mecánicos, ventas, operaciones de aeropuerto, soporte. Cada uno necesita respuestas de un universo disperso de políticas de RH, runbooks de IT, reglas de viaje, beneficios y acuerdos sindicales. Antes de Amelia, esas respuestas vivían en <em>PDFs, páginas de intranet y la memoria institucional de especialistas saturados.</em></p><p><strong>Amelia es un asistente corporativo RAG (Retrieval-Augmented Generation)</strong> anclado en la documentación oficial indexada de LATAM. El problema difícil no era construirlo — era saber si realmente funcionaba a escala, para quién, y dónde estaba mintiendo. Eso es lo que responde este dashboard.</p>",
+                beforeTag: "Antes de Amelia",
+                beforeText: "\"¿Cuál es el plazo de reembolso COBUS?\" → Preguntar por Slack → Email a RH → Esperar 2 días → Tal vez una versión vieja de la política.",
+                afterTag: "Con Amelia",
+                afterText: "Misma pregunta · respuesta en 7 segundos · cita la fuente · 553K consultas resueltas así en 9 meses.",
+
+                label2: "02 · Arquitectura",
+                title2: "Un RAG que vive dentro de BigQuery — y un pipeline que sabe cuándo miente.",
+                text2: "<p>El stack de servicio no es el sándwich convencional de \"FastAPI + vector DB externa\". <strong>El RAG se invoca como una BigQuery Remote Function</strong> — respaldada por un endpoint de Cloud Run con <code>max_batching_rows</code> de 10 — lo que significa que retrieval, generación y analítica comparten el mismo warehouse. <strong>Los embeddings viven en BigQuery</strong> (<code>staging/embeddings/</code>), no en un vector store separado. No hay glue code entre \"el servicio de IA\" y \"la analítica\" porque son el mismo sistema.</p><p>Cada interacción emite un evento estructurado a un topic de Pub/Sub (<code>monitoring_topic</code>) que se ramifica en un pipeline Dataform de cuatro capas. El nombre interno de la capa analítica es <em>Metatron</em> — y es dueño de adopción, latencia, calidad de retrieval, vacíos de contenido y adherencia de RH en un solo lugar.</p>",
+                ragFlowLabel: "Path de servicio RAG · invocado desde SQL",
+                rag1Title: "SQL invoca RAG", rag1Desc: "Una función <code>REMOTE</code> en BigQuery llama a Cloud Run con <code>(interaction_id, user_profile, query)</code>.",
+                rag2Title: "Vector search en BQ", rag2Desc: "Top-k similitud coseno contra <code>document_embeddings</code> + filtros de frescura y permisos.",
+                rag3Title: "Generar con contexto", rag3Desc: "GPT-4o llamado con chunks recuperados + contexto del user profile + fuentes citadas.",
+                rag4Title: "Evento dual-track", rag4Desc: "El mismo call escribe la respuesta y un evento de calidad de vuelta a <code>monitoring_topic</code>.",
+                dataformLabel: "Pipeline analítico · 4 capas Dataform",
+                rawLayer: "Sources", silverLayer: "Staging", goldLayer: "Reporting", servingLayer: "Serving",
+                schemasLabel: "Schemas BigQuery · ownership claro",
+                schema1Desc: "El core analítico de la plataforma. Capas raw + staging + reporting. Owner: data eng.",
+                schema2Desc: "Surface del producto Hub. Asistentes custom y user activity. Read-shared con equipos de producto.",
+                schema3Desc: "Surface específica de RH+. Subset de interactions filtrado a <code>rh_plus</code>. Read-shared con HR analytics.",
+
+                label3: "03 · Adopción",
+                title3: "20.523 usuarios no es la historia. El gap de 50 puntos entre Soporte y Tripulantes sí lo es.",
+                text3: "<p>El número grande de adopción es saludable — pero los promedios esconden los segmentos que necesitan atención. <strong>Soporte (oficina) está al 85% de adopción. Tripulantes Mando (pilotos) al 35%.</strong> Eso no es una métrica de ML — es una decisión de superficie de producto: la tripulación no se sienta en escritorios, y la UI desktop-first los estaba dejando atrás.</p>",
+                ch1Title: "Interacciones por producto · total 9 meses", ch1Sub: "n = 790.900 interacciones",
+                in1: "<b>Chat Libre domina el volumen con 70%</b> — pero RH+ (el asistente RAG anclado en docs de RH) tiene el alcance más amplio en base de usuarios. Sirven jobs-to-be-done distintos, no el mismo con UIs distintas.",
+                ch2Title: "Adopción por VP · % del headcount que usó Amelia", ch2Sub: "todas las VPs ranked",
+                in2: "<b>Las VPs de trabajo de oficina (Finanzas, Legal, IT, Comercial) se agrupan sobre 86%</b>. Las áreas operacionales (Carga, Operaciones, CEO Brasil) están entre 42–53% — no porque no la necesiten, sino porque la superficie donde la necesitan no es un browser de escritorio.",
+                ch3Title: "Gap de adopción · por tipo de población", ch3Sub: "trabajo de oficina vs operacional",
+                in3: "<b>Este es el gráfico que cambió el roadmap del producto.</b> Un gap de 50 puntos entre Soporte (85%) y Tripulante Mando (35%) construyó el caso para el rediseño mobile-first. La adopción no es un problema de ML — es un problema de UX y curación de contenido con superficie en forma de ML.",
+                ch4Title: "Usuarios activos mensuales · apilado por producto", ch4Sub: "Sep 2024 — May 2025",
+                in4: "<b>RH+ es la base de volumen, Chat Libre la base de engagement, Asistentes la señal de crecimiento.</b> El producto de asistentes custom (naranjo) no existía antes de Nov 2024 y llegó a 320 usuarios activos mensuales en Abr 2025 — una curva de crecimiento separada montada sobre la plataforma.",
+
+                label4: "04 · Engagement",
+                title4: "El top del funnel es vanidad. Lo que la gente realmente pregunta es el producto.",
+                text4: "<p>La intensidad por usuario te dice si volvieron. Chat Libre promedia <strong>22 interacciones por usuario</strong> — esos son usuarios pesados. RH+ promedia <strong>4 interacciones por usuario</strong> — más cerca de \"tengo una pregunta, dame una respuesta.\" Dos productos, dos formas de engagement, una plataforma.</p>",
+                micro1: "Usuarios únicos por producto",
+                micro2: "Promedio interacciones / usuario",
+                micro3: "Ecosistema asistentes custom",
+                ch5Title: "Top temas RH+ · qué preguntan realmente los empleados", ch5Sub: "interacciones · top 8 categorías",
+                in5: "<b>Política de viajes (Sta Travel) y reset de contraseñas dominan.</b> Este es el gráfico que define las prioridades de curación de contenido — cada categoría aquí es una apuesta de ROI sobre qué fuentes mantener frescas y bien chunkeadas. El job market de IA del equipo de Ops no es \"un modelo más inteligente\"; es \"el update COBUS de esta semana indexado para el viernes.\"",
+
+                label5: "05 · Calidad Operacional",
+                title5: "Los \"errores\" no devuelven códigos de error. Devuelven disculpas.",
+                text5: "<p>El LLM no lanza excepciones cuando no puede anclar una respuesta — pide disculpas. <strong>\"Lo siento.\"</strong> \"Desculpe.\" \"Sorry.\" <em>\"La información recuperada no contiene…\"</em> Trackear el fallo del RAG a escala significó <strong>hacer pattern-matching de la respuesta del asistente en tres idiomas.</strong> Un solo CASE statement, corriendo nightly sobre <code>interaction_full</code>, se convirtió en toda la error rate.</p><p>Octubre 2024: 7,577 disculpas en RH+. Mayo 2025: 31. <strong>El modelo no cambió — GPT-4o se mantuvo igual.</strong> Lo que cambió: estrategia de chunking en docs de política long-tail, filtros de frescura en retrieval, y un loop semanal donde cada categoría de fallo pattern-matched alimentaba la cola de curación del equipo de contenido. <em>Reducir errores es un loop de contenido, no una tarea de SRE.</em></p>",
+                micro4: "Errores retrieval RH+ / mes",
+                micro5: "Latencia respuesta (mediana, seg)",
+                micro6: "Usuarios frecuentes / intensivos",
+                latRetLabel: "Retrieval", latGenLabel: "Generación",
+                in6: "<b>Spike de latencia de fines de Mayo (12.9–13.4s en RH+):</b> rastreado a un refresh upstream de contenido que duplicó el corpus en categorías de política de viajes. El retrieval creció primero — la generación se mantuvo plana. Por eso el split de latencia vive en la misma tabla: <code>index_search_elapsed_time</code> y <code>response_generation_elapsed_time</code> son columnas separadas desde el día uno. Resuelto con filtrado en retrieval + reducción de overlap de chunks en docs largos.",
+
+                labelRag: "05b · Loop de Calidad RAG",
+                titleRag: "La tasa de disculpas es el síntoma. Hallucination, contextual relevancy y answer correctness son los diagnósticos.",
+                textRag: "<p>Las disculpas pattern-matched capturan los fallos que el usuario <em>ve</em>. Se pierden el peor caso: el modelo responde con confianza pero con la cosa equivocada. Por eso el pipeline corre una <strong>suite de evals LLM-as-judge</strong> en <code>staging/llm_evaluations/</code>, configurada en <code>dataform.json</code> con cuatro métricas reales — tres para comportamiento RAG en runtime, una para regression testing offline contra un golden set.</p>",
+                ragQ1: "<b>¿Responde el answer realmente la pregunta?</b> Captura cuando el modelo recupera contexto útil pero genera texto fuera de tema.",
+                ragQ2: "<b>¿La respuesta fue más allá de lo que el contexto recuperado soporta?</b> Captura el caso peligroso: respuesta confiada, sin fuente.",
+                ragQ3: "<b>¿El contexto recuperado era realmente relevante a la pregunta?</b> Diagnostica fallo del lado retrieval separado del lado generación.",
+                ragQ4: "<b>Regression check de golden set.</b> Un set curado de preguntas con ground-truth, corrido en cada cambio relevante de corpus o modelo.",
+                inRag: "<b>Evaluación sintética también a nivel documento:</b> <code>document_synthetic_questions.sqlx</code> genera K preguntas por documento para que podamos calcular <code>top_k_accuracy</code> contra el retrieval — i.e. \"si un usuario preguntara algo que este documento se supone que responde, ¿el retrieval lo devuelve en top-k?\" Ese número es lo que te dice si el problema es el corpus o el prompt.",
+
+                label6: "06 · Lo Que Tuve a Cargo",
+                title6: "Las decisiones que defendería en cualquier entrevista — y las que tuve que corregir en marcha.",
+                decHead: "Decisiones que tomé",
+                dec1T: "RAG como una BigQuery Remote Function.",
+                dec1D: "El servicio RAG es invocable desde SQL vía una función <code>REMOTE</code> respaldada por Cloud Run (<code>max_batching_rows=10</code>). Retrieval y analítica comparten el warehouse — sin glue code, sin vector DB separado, sin doble source-of-truth.",
+                dec2T: "Errores detectados por patrón, no por excepción.",
+                dec2D: "El LLM no lanza — pide disculpas en ES, PT o EN. Por eso <code>products_error_rate</code> hace CASE sobre frases de disculpa <em>y</em> separa \"retrieval miss\" de \"fallo genérico\". Cada rama de CASE mapea a un fix en un equipo distinto.",
+                dec3T: "Shadow folder para deploys seguros.",
+                dec3D: "Cada modelo de reporting tiene un hermano en <code>reporting/test/</code> — 34 archivos. La nueva lógica aterriza ahí primero, corre contra datos de producción en paralelo, se row-diff contra el modelo live, y solo entonces promueve. Cero regresiones en 9 meses.",
+                dec4T: "Metadata de asistentes federada.",
+                dec4D: "La metadata de asistentes custom vive en CloudSQL Postgres (operational source-of-truth). Se trae al reporting vía <code>EXTERNAL_QUERY()</code> — sin nightly dump, sin drift, sin ETL out-of-band.",
+                dec5T: "Latencia split en retrieval vs generación desde el día uno.",
+                dec5D: "<code>index_search_elapsed_time</code> y <code>response_generation_elapsed_time</code> son columnas separadas en la tabla staging. Cuando la latencia spikea, el chart te dice qué equipo necesita mirar — contenido/retrieval o modelo/inferencia — sin re-instrumentar.",
+                failHead: "Lo que se rompió (y cómo lo arreglé)",
+                fail1T: "Spike de latencia a 13.4s, fines de Mayo.",
+                fail1D: "El corpus de viajes se duplicó de la noche a la mañana después de un refresh upstream. El tiempo de retrieval creció; el de generación se mantuvo plano — la columna split hizo obvia la causa en un query. <em>Fix:</em> filtro de frescura en retrieval + reducción de overlap en chunks de docs largos.",
+                fail2T: "Spike de disculpas Chat Libre, Dic → Ene (648 → 4.107).",
+                fail2D: "Un cambio de prompt template rompió silenciosamente un fallback — las disculpas en EN subieron mientras ES/PT se mantuvieron planas. <em>Fix:</em> tests de contrato en el servicio de prompt templates, así los cambios de schema no llegan sin CI verde.",
+                fail3T: "El gap de Tripulantes fue un error de producto.",
+                fail3D: "La UI inicial era desktop-first. La tripulación no se sienta en escritorios. <em>Fix:</em> los datos hicieron el caso; el rediseño mobile-first vino después. El dashboard expuso el gap de 50pp meses antes de que llegara cualquier reclamo a RH.",
+                fail4T: "\"% adopción\" sola era engañosa.",
+                fail4D: "Un usuario contaba como \"adoptado\" con una sola interacción. <em>Fix:</em> construí <code>retention_usage_details</code> con tiers explícitos — <code>frequent</code> (sobre la media mensual de uso), <code>intensive</code> (sobre la media mensual de interacciones), <code>is_high_engaged</code> (&gt;10/mes), <code>is_churned_this_month</code>. 8.124 frecuentes / 6.835 intensivos — esos son los números reales.",
+                fail5T: "La primera tabla de cohortes sobrecontaba retención.",
+                fail5D: "El SQL ingenuo de cohortes contaba cualquier registro como \"activo\". <em>Fix:</em> reescribí <code>retention_unique_users_cohort</code> con un guard <code>HAVING SUM(interactions) &gt; 0</code> más <code>FIRST_VALUE(retained_users) OVER (PARTITION BY cohort_month ORDER BY months_since_cohort)</code> como denominador del cohort_size. Los números de retención dejaron de ser optimistas.",
+
+                closingQuote: "\"La adopción no es un problema de ML. Es un problema de UX y curación de contenido con superficie en forma de ML.\"",
+                closingAuthor: "— Principio de trabajo de este proyecto",
+
+                queryLabel: "Consulta",
+                contactText: "Este caso de estudio integra ingeniería de datos (Dataform · BigQuery · Pub/Sub) con la realidad operacional de correr un producto de IA en producción. Si ese es el tipo de trabajo para el que tu equipo está contratando, hablemos.",
+                contactBtn: "Contactar a Javier",
+
+                chartsData: {
+                    products: { name: "Interacciones", libre: "Chat Libre", rh: "RH+", img: "Imágenes", asis: "Asistentes" },
+                    vp: { name: "Adopción" },
+                    population: { name: "Adopción", labels: ['Soporte', 'Customer Care', 'Ventas', 'CCO', 'Mantenimiento', 'Aeropuerto', 'Carga', 'Tripulante Cabina', 'Tripulante Mando'] },
+                    mau: { name: { libre: 'Chat Libre', rh: 'RH+', img: 'Imágenes', asis: 'Asistentes' }, x: ['Sep 24','Oct 24','Nov 24','Dic 24','Ene 25','Feb 25','Mar 25','Abr 25','May 25'] },
+                    users: { name: "Usuarios", x: ['RH+', 'Chat Libre', 'Imágenes', 'Asistentes'] },
+                    intensity: { name: "Int/Usuario", x: ['Chat Libre', 'Asistentes', 'Imágenes', 'RH+'] },
+                    assistants: { name: "Top asistentes", x: ['amelia', 'el pana brazipaño', 'rapinha balon d\'or', 'nara', 'crystal pt-br'] },
+                    errors: { name: "Errores RH+", x: ['Oct','Nov','Dic','Ene','Feb','Mar','Abr','May'] },
+                    latency: { name: "Segundos", x: ['Chat Libre', 'RH+ (RAG)'] },
+                    cohorts: { name: "Usuarios", x: ['Total', 'Frecuentes', 'Intensivos'] },
+                    content: { name: "Interacciones", x: ['Preg. Chat Libre', 'Sta Travel', 'Password', 'COBUS', 'Google WS', 'Sta Travel Benef.', 'SAP/ARIBA', 'Tickets'] }
+                }
+            }
+        };
+
+        let cProducts, cVP, cPopulation, cMAU, cUsers, cIntensity, cAssistants, cErrors, cLatency, cCohorts, cContent;
+
+        function changeLang(lang) {
+            document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('is-active'));
+            const btn = document.getElementById('btn-' + lang);
+            if (btn) btn.classList.add('is-active');
+            document.documentElement.lang = lang;
+            const t = translations[lang];
+
+            // Static text updates
+            const setText  = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            const setHTML  = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+
+            setText('nav-back', t.navBack);
+            setText('hero-badge', t.badge);
+            setHTML('main-title', t.title);
+            setText('main-desc', t.desc);
+            setText('kpi-label-1', t.kpiL1);
+            setText('kpi-label-2', t.kpiL2);
+            setText('kpi-label-3', t.kpiL3);
+            setText('kpi-label-4', t.kpiL4);
+            setText('meta-1', t.meta1);
+            setText('meta-2', t.meta2);
+
+            setText('label-1', t.label1);
+            setText('title-1', t.title1);
+            setHTML('text-1', t.text1);
+            setText('before-tag', t.beforeTag);
+            setText('before-text', t.beforeText);
+            setText('after-tag', t.afterTag);
+            setText('after-text', t.afterText);
+
+            setText('label-2', t.label2);
+            setText('title-2', t.title2);
+            setHTML('text-2', t.text2);
+            setText('rag-flow-label', t.ragFlowLabel);
+            setText('rag-1-title', t.rag1Title);
+            setHTML('rag-1-desc', t.rag1Desc);
+            setText('rag-2-title', t.rag2Title);
+            setHTML('rag-2-desc', t.rag2Desc);
+            setText('rag-3-title', t.rag3Title);
+            setHTML('rag-3-desc', t.rag3Desc);
+            setText('rag-4-title', t.rag4Title);
+            setHTML('rag-4-desc', t.rag4Desc);
+            setText('dataform-label', t.dataformLabel);
+            setText('arch-raw-label', t.rawLayer);
+            setText('arch-silver-label', t.silverLayer);
+            setText('arch-gold-label', t.goldLayer);
+            setText('arch-serving-label', t.servingLayer);
+            setText('schemas-label', t.schemasLabel);
+            setHTML('schema-1-desc', t.schema1Desc);
+            setHTML('schema-2-desc', t.schema2Desc);
+            setHTML('schema-3-desc', t.schema3Desc);
+
+            setText('label-3', t.label3);
+            setText('title-3', t.title3);
+            setHTML('text-3', t.text3);
+            setText('chart-title-1', t.ch1Title);
+            setText('chart-sub-1', t.ch1Sub);
+            setHTML('insight-1', t.in1);
+            setText('chart-title-2', t.ch2Title);
+            setText('chart-sub-2', t.ch2Sub);
+            setHTML('insight-2', t.in2);
+            setText('chart-title-3', t.ch3Title);
+            setText('chart-sub-3', t.ch3Sub);
+            setHTML('insight-3', t.in3);
+            setText('chart-title-4', t.ch4Title);
+            setText('chart-sub-4', t.ch4Sub);
+            setHTML('insight-4', t.in4);
+
+            setText('label-4', t.label4);
+            setText('title-4', t.title4);
+            setHTML('text-4', t.text4);
+            setText('micro-title-1', t.micro1);
+            setText('micro-title-2', t.micro2);
+            setText('micro-title-3', t.micro3);
+            setText('chart-title-5', t.ch5Title);
+            setText('chart-sub-5', t.ch5Sub);
+            setHTML('insight-5', t.in5);
+
+            setText('label-5', t.label5);
+            setText('title-5', t.title5);
+            setHTML('text-5', t.text5);
+            setText('micro-title-4', t.micro4);
+            setText('micro-title-5', t.micro5);
+            setText('micro-title-6', t.micro6);
+            setText('lat-ret-label', t.latRetLabel);
+            setText('lat-gen-label', t.latGenLabel);
+            setHTML('insight-6', t.in6);
+
+            setText('label-rag', t.labelRag);
+            setText('title-rag', t.titleRag);
+            setHTML('text-rag', t.textRag);
+            setHTML('rag-q-1', t.ragQ1);
+            setHTML('rag-q-2', t.ragQ2);
+            setHTML('rag-q-3', t.ragQ3);
+            setHTML('rag-q-4', t.ragQ4);
+            setHTML('insight-rag', t.inRag);
+
+            setText('label-6', t.label6);
+            setText('title-6', t.title6);
+            setText('dec-head', t.decHead);
+            setText('dec-1-title', t.dec1T); setHTML('dec-1-desc', t.dec1D);
+            setText('dec-2-title', t.dec2T); setHTML('dec-2-desc', t.dec2D);
+            setText('dec-3-title', t.dec3T); setHTML('dec-3-desc', t.dec3D);
+            setText('dec-4-title', t.dec4T); setHTML('dec-4-desc', t.dec4D);
+            setText('dec-5-title', t.dec5T); setHTML('dec-5-desc', t.dec5D);
+            setText('fail-head', t.failHead);
+            setText('fail-1-title', t.fail1T); setHTML('fail-1-desc', t.fail1D);
+            setText('fail-2-title', t.fail2T); setHTML('fail-2-desc', t.fail2D);
+            setText('fail-3-title', t.fail3T); setHTML('fail-3-desc', t.fail3D);
+            setText('fail-4-title', t.fail4T); setHTML('fail-4-desc', t.fail4D);
+            setText('fail-5-title', t.fail5T); setHTML('fail-5-desc', t.fail5D);
+
+            setText('closing-quote', t.closingQuote);
+            setText('closing-author', t.closingAuthor);
+            setText('contact-text', t.contactText);
+            setHTML('contact-btn-text', '<i class="fas fa-arrow-right"></i> ' + t.contactBtn);
+
+            document.querySelectorAll('.query-label').forEach(el => el.textContent = t.queryLabel);
+
+            // Update chart series names + categories
+            if (cProducts) {
+                cProducts.series[0].update({
+                    name: t.chartsData.products.name,
+                    data: [
+                        { name: t.chartsData.products.libre, y: 553000, color: '#00e5ff' },
+                        { name: t.chartsData.products.rh,    y: 179800, color: '#d500f9' },
+                        { name: t.chartsData.products.img,   y: 44500,  color: '#fbbf24' },
+                        { name: t.chartsData.products.asis,  y: 13600,  color: '#94a3b8' }
+                    ]
+                });
+            }
+            if (cVP) cVP.series[0].update({ name: t.chartsData.vp.name });
+            if (cPopulation) {
+                cPopulation.series[0].update({ name: t.chartsData.population.name });
+                cPopulation.xAxis[0].setCategories(t.chartsData.population.labels);
+            }
+            if (cMAU) {
+                cMAU.xAxis[0].setCategories(t.chartsData.mau.x);
+                cMAU.series[0].update({ name: t.chartsData.mau.name.rh });
+                cMAU.series[1].update({ name: t.chartsData.mau.name.libre });
+                cMAU.series[2].update({ name: t.chartsData.mau.name.img });
+                cMAU.series[3].update({ name: t.chartsData.mau.name.asis });
+            }
+            if (cUsers) { cUsers.xAxis[0].setCategories(t.chartsData.users.x); cUsers.series[0].update({ name: t.chartsData.users.name }); }
+            if (cIntensity) { cIntensity.xAxis[0].setCategories(t.chartsData.intensity.x); cIntensity.series[0].update({ name: t.chartsData.intensity.name }); }
+            if (cAssistants) { cAssistants.xAxis[0].setCategories(t.chartsData.assistants.x); cAssistants.series[0].update({ name: t.chartsData.assistants.name }); }
+            if (cErrors) { cErrors.xAxis[0].setCategories(t.chartsData.errors.x); cErrors.series[0].update({ name: t.chartsData.errors.name }); }
+            if (cLatency) { cLatency.xAxis[0].setCategories(t.chartsData.latency.x); cLatency.series[0].update({ name: t.chartsData.latency.name }); }
+            if (cCohorts) { cCohorts.xAxis[0].setCategories(t.chartsData.cohorts.x); cCohorts.series[0].update({ name: t.chartsData.cohorts.name }); }
+            if (cContent) { cContent.xAxis[0].setCategories(t.chartsData.content.x); cContent.series[0].update({ name: t.chartsData.content.name }); }
+        }
+
+        // ════════════════════════════════════════════════════════════
+        // All chart initialization happens INSIDE DOMContentLoaded.
+        // This guarantees that every <div> container has its final
+        // dimensions before Highcharts tries to read them.
+        // ════════════════════════════════════════════════════════════
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // ── Highcharts global theme — aligned with portfolio palette ──
+            Highcharts.setOptions({
+                chart: {
+                    backgroundColor: 'transparent',
+                    style: { fontFamily: 'Inter' },
+                    spacingTop: 14,
+                    spacingBottom: 14,
+                    animation: { duration: 900 }
+                },
+                title: { text: null },
+                credits: { enabled: false },
+                colors: ['#00e5ff', '#d500f9', '#fbbf24', '#94a3b8', '#7c5cff'],
+                xAxis: {
+                    gridLineColor: 'rgba(255,255,255,0.04)',
+                    lineColor: 'rgba(255,255,255,0.08)',
+                    tickColor: 'rgba(255,255,255,0.08)',
+                    labels: { style: { color: '#94a3b8', fontSize: '10px', fontFamily: 'Fira Code' } }
+                },
+                yAxis: {
+                    gridLineColor: 'rgba(255,255,255,0.04)',
+                    title: { text: null },
+                    labels: { style: { color: '#94a3b8', fontSize: '10px', fontFamily: 'Fira Code' } }
+                },
+                legend: {
+                    itemStyle: { color: 'rgba(255,255,255,0.7)', fontWeight: '400', fontSize: '11px', fontFamily: 'Fira Code' },
+                    itemHoverStyle: { color: '#fff' },
+                    itemHiddenStyle: { color: 'rgba(255,255,255,0.2)' }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(5,5,5,0.95)',
+                    borderColor: 'rgba(0,229,255,0.3)',
+                    borderRadius: 4,
+                    shadow: { color: 'rgba(0,229,255,0.15)', offsetX: 0, offsetY: 0, opacity: 0.5, width: 12 },
+                    style: { color: '#fff', fontSize: '12px', fontFamily: 'Inter' },
+                    useHTML: true
+                },
+                plotOptions: {
+                    series: {
+                        animation: { duration: 900 },
+                        states: {
+                            hover: { halo: { size: 8, opacity: 0.18 } },
+                            inactive: { opacity: 0.35 }
+                        }
+                    }
+                }
+            });
+
+            // ── Helper: build a vertical fade gradient for area/column fills ──
+            const fadeGrad = (hex, topAlpha = 0.85, bottomAlpha = 0.05) => ({
+                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                stops: [
+                    [0, Highcharts.color(hex).setOpacity(topAlpha).get('rgba')],
+                    [1, Highcharts.color(hex).setOpacity(bottomAlpha).get('rgba')]
+                ]
+            });
+
+            // ── 1. PRODUCTS — donut ───────────────────────────────
+            try {
+            const cProducts = Highcharts.chart('chart-products', {
+                chart: {
+                    type: 'pie',
+                    events: {
+                        render: function () {
+                            try {
+                                const c = this;
+                                if (!c.series || !c.series[0] || !c.series[0].data) return;
+                                if (c._centerLabel) { c._centerLabel.destroy(); c._centerLabel = null; }
+                                const total = c.series[0].data.reduce((s, p) => s + (p.y || 0), 0);
+                                const fmt = total >= 1e6 ? (total / 1e6).toFixed(1) + 'M' :
+                                            total >= 1e3 ? Math.round(total / 1e3) + 'K' : String(total);
+                                c._centerLabel = c.renderer
+                                    .text(
+                                        `<div style="text-align:center;font-family:'Jost',sans-serif">
+                                           <div style="font-size:1.6rem;color:#fff;font-weight:300;letter-spacing:-0.02em">${fmt}</div>
+                                           <div style="font-size:0.55rem;color:#94a3b8;font-family:'Fira Code',monospace;letter-spacing:0.18em;text-transform:uppercase;margin-top:4px">Total</div>
+                                         </div>`,
+                                        c.plotLeft + (c.plotWidth / 2),
+                                        c.plotTop + (c.plotHeight / 2) - 8,
+                                        null, null, null, true
+                                    )
+                                    .attr({ 'text-anchor': 'middle', zIndex: 5 })
+                                    .add();
+                            } catch (e) { /* defensive — never let this kill the chart */ }
+                        }
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        innerSize: '68%',
+                        borderWidth: 2,
+                        borderColor: '#050505',
+                        showInLegend: true,
+                        dataLabels: {
+                            enabled: true,
+                            distance: 14,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10.5px', fontFamily: 'Fira Code' },
+                            format: '{point.percentage:.0f}%'
+                        },
+                        states: {
+                            hover: { brightness: 0.1, halo: { size: 10, opacity: 0.25 } }
+                        }
+                    }
+                },
+                legend: {
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    layout: 'vertical',
+                    itemMarginBottom: 6,
+                    labelFormatter: function() {
+                        return `<span style="font-size:11px">${this.name}</span> <span style="color:#94a3b8;font-size:10px">${(this.y/1000).toFixed(0)}K</span>`;
+                    },
+                    useHTML: true
+                },
+                tooltip: { pointFormat: '<b>{point.y:,.0f}</b> interactions ({point.percentage:.1f}%)' },
+                series: [{
+                    name: 'Interactions',
+                    data: [
+                        { name: 'Chat Libre',  y: 553000, color: '#00e5ff' },
+                        { name: 'RH+',         y: 179800, color: '#d500f9' },
+                        { name: 'Images',      y: 44500,  color: '#fbbf24' },
+                        { name: 'Assistants',  y: 13600,  color: '#94a3b8' }
+                    ]
+                }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-products:', e); }
+
+            // ── 2. VP ADOPTION — horizontal bar (REAL data from PDF) ───
+            try {
+            const cVP = Highcharts.chart('chart-vp', {
+                chart: { type: 'bar' },
+                xAxis: { categories: [
+                    'CEO Brasil',
+                    'VP Carga',
+                    'VP Operaciones',
+                    'VP Clientes',
+                    'VP Personas',
+                    'Dir. Seguridad',
+                    'VP Comercial',
+                    'Dir. Asuntos Corp.',
+                    'VP IT y Procesos',
+                    'VP Legal',
+                    'VP Finanzas'
+                ] },
+                yAxis: { max: 100, labels: { format: '{value}%' } },
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{y}%',
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontWeight: '500', fontFamily: 'Fira Code' }
+                        },
+                        borderWidth: 0,
+                        borderRadius: 2,
+                        pointPadding: 0.08,
+                        groupPadding: 0.08,
+                        colorByPoint: true,
+                        colors: [
+                            '#d500f9','#d500f9','#d500f9',  // <55% magenta (caution)
+                            '#fbbf24',                       // mid amber
+                            '#fbbf24','#fbbf24',             // mid amber
+                            '#fbbf24',
+                            '#00e5ff','#00e5ff','#00e5ff','#00e5ff'  // top cyan
+                        ]
+                    }
+                },
+                series: [{
+                    name: 'Adoption',
+                    data: [42.0, 45.9, 52.9, 52.7, 81.3, 85.0, 86.1, 91.3, 90.4, 90.9, 91.6]
+                }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-vp:', e); }
+
+            // ── 3. POPULATION TYPE — horizontal bar (REAL data) ─────
+            try {
+            const cPopulation = Highcharts.chart('chart-population', {
+                chart: { type: 'bar' },
+                xAxis: { categories: ['Soporte', 'Customer Care', 'Ventas', 'CCO', 'Mantenimiento', 'Aeropuerto', 'Carga', 'Tripulante Cabina', 'Tripulante Mando'] },
+                yAxis: { max: 100, labels: { format: '{value}%' } },
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{y}%',
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontWeight: '500', fontFamily: 'Fira Code' }
+                        },
+                        borderWidth: 0,
+                        borderRadius: 2,
+                        pointPadding: 0.12,
+                        colorByPoint: true,
+                        colors: ['#00e5ff','#00e5ff','#fbbf24','#fbbf24','#fbbf24','#fbbf24','#d500f9','#d500f9','#d500f9']
+                    }
+                },
+                series: [{ name: 'Adoption', data: [85.1, 84.6, 78.1, 63.1, 48.2, 44.0, 41.4, 39.0, 34.7] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-population:', e); }
+
+            // ── 4. MONTHLY ACTIVE USERS — stacked area-spline with gradients ──
+            try {
+            const cMAU = Highcharts.chart('chart-mau', {
+                chart: { type: 'areaspline' },
+                xAxis: {
+                    categories: ['Sep 24','Oct 24','Nov 24','Dec 24','Jan 25','Feb 25','Mar 25','Apr 25','May 25'],
+                    tickmarkPlacement: 'on'
+                },
+                yAxis: { gridLineDashStyle: 'Dash' },
+                legend: { enabled: true, align: 'left', verticalAlign: 'top', x: -10, y: -10 },
+                tooltip: { shared: true, headerFormat: '<b>{point.key}</b><br>', pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:,.0f}</b><br>' },
+                plotOptions: {
+                    areaspline: {
+                        stacking: 'normal',
+                        lineWidth: 1.5,
+                        marker: { enabled: false, states: { hover: { enabled: true, radius: 4 } } },
+                        fillOpacity: 0.85
+                    }
+                },
+                series: [
+                    { name: 'RH+',         data: [4383, 4677, 6955, 4492, 4664, 4819, 5941, 6503, 3728], color: '#d500f9', fillColor: fadeGrad('#d500f9', 0.55, 0.05) },
+                    { name: 'Chat Libre',  data: [2111, 2762, 2764, 2481, 2633, 2924, 3104, 3356, 2368], color: '#00e5ff', fillColor: fadeGrad('#00e5ff', 0.55, 0.05) },
+                    { name: 'Images',      data: [1336, 1678,  933,  647,  743,  752,  689,  695,  338], color: '#fbbf24', fillColor: fadeGrad('#fbbf24', 0.55, 0.05) },
+                    { name: 'Assistants',  data: [   0,    0,   29,   56,  105,  255,  272,  320,  192], color: '#94a3b8', fillColor: fadeGrad('#94a3b8', 0.55, 0.05) }
+                ]
+            });
+            } catch (e) { console.error('Chart init failed for chart-mau:', e); }
+
+            // ── 5. UNIQUE USERS — column ──────────────────────────
+            try {
+            const cUsers = Highcharts.chart('chart-users', {
+                chart: { type: 'column' },
+                xAxis: { categories: ['RH+', 'Chat Libre', 'Images', 'Assistants'] },
+                yAxis: { labels: { style: { fontSize: '9px' } }, gridLineDashStyle: 'Dash' },
+                tooltip: { pointFormat: '<b>{point.y:,.0f}</b> unique users' },
+                plotOptions: {
+                    column: {
+                        borderWidth: 0,
+                        borderRadius: 3,
+                        pointPadding: 0.12,
+                        dataLabels: {
+                            enabled: true,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontFamily: 'Fira Code', fontWeight: '500' },
+                            format: '{y:,.0f}'
+                        },
+                        colorByPoint: true,
+                        colors: ['#d500f9','#00e5ff','#fbbf24','#94a3b8']
+                    }
+                },
+                series: [{ name: 'Users', data: [19146, 8914, 4637, 809] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-users:', e); }
+
+            // ── 6. INTENSITY — bar ────────────────────────────────
+            try {
+            const cIntensity = Highcharts.chart('chart-intensity', {
+                chart: { type: 'bar' },
+                xAxis: { categories: ['Chat Libre', 'Assistants', 'Images', 'RH+'] },
+                yAxis: { gridLineDashStyle: 'Dash' },
+                tooltip: { pointFormat: '<b>{point.y}</b> interactions / user' },
+                plotOptions: {
+                    bar: {
+                        borderWidth: 0,
+                        borderRadius: 2,
+                        pointPadding: 0.12,
+                        dataLabels: {
+                            enabled: true,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontFamily: 'Fira Code', fontWeight: '500' },
+                            format: '{y}'
+                        },
+                        colorByPoint: true,
+                        colors: ['#00e5ff','#94a3b8','#fbbf24','#d500f9']
+                    }
+                },
+                series: [{ name: 'Int/User', data: [22.2, 17.0, 5.7, 3.9] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-intensity:', e); }
+
+            // ── 7. TOP ASSISTANTS — bar (REAL names) ──────────────
+            try {
+            const cAssistants = Highcharts.chart('chart-assistants', {
+                chart: { type: 'bar' },
+                xAxis: { categories: ['amelia', 'el pana brazipaño', "rapinha balon d'or", 'nara', 'crystal pt-br'] },
+                yAxis: { gridLineDashStyle: 'Dash' },
+                tooltip: { pointFormat: '<b>{point.y:,.0f}</b> interactions' },
+                plotOptions: {
+                    bar: {
+                        borderWidth: 0,
+                        borderRadius: 2,
+                        pointPadding: 0.12,
+                        dataLabels: {
+                            enabled: true,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '9px', fontFamily: 'Fira Code', fontWeight: '500' },
+                            format: '{y:,.0f}'
+                        },
+                        color: '#94a3b8',
+                        states: { hover: { color: '#00e5ff' } }
+                    }
+                },
+                series: [{ name: 'Top assistants', data: [180000, 95000, 78000, 56000, 38000] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-assistants:', e); }
+
+            // ── 8. ERRORS — area-spline with gradient (REAL data, 98% drop) ────
+            try {
+            const cErrors = Highcharts.chart('chart-errors', {
+                chart: { type: 'areaspline' },
+                xAxis: { categories: ['Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'], tickmarkPlacement: 'on' },
+                yAxis: {
+                    type: 'logarithmic',
+                    gridLineDashStyle: 'Dash',
+                    labels: { format: '{value}' },
+                    minorTickInterval: 0
+                },
+                tooltip: { headerFormat: '<b>{point.key} 2024/25</b><br>', pointFormat: '<b>{point.y:,.0f}</b> apologies' },
+                plotOptions: {
+                    areaspline: {
+                        color: '#d500f9',
+                        fillColor: fadeGrad('#d500f9', 0.45, 0.02),
+                        lineWidth: 2,
+                        marker: {
+                            enabled: true,
+                            radius: 3,
+                            fillColor: '#d500f9',
+                            lineColor: '#fff',
+                            lineWidth: 1,
+                            states: { hover: { radius: 5, lineWidth: 2 } }
+                        }
+                    }
+                },
+                series: [{ name: 'RH+ apologies', data: [7577, 2195, 2134, 1333, 723, 364, 230, 31] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-errors:', e); }
+
+            // ── 9. LATENCY — bar (REAL ranges) ────────────────────
+            try {
+            const cLatency = Highcharts.chart('chart-latency', {
+                chart: { type: 'bar' },
+                xAxis: { categories: ['Chat Libre', 'RH+ (RAG)'] },
+                yAxis: { labels: { format: '{value}s' }, gridLineDashStyle: 'Dash' },
+                tooltip: { pointFormat: '<b>{point.y}s</b> median' },
+                plotOptions: {
+                    bar: {
+                        borderWidth: 0,
+                        borderRadius: 2,
+                        pointPadding: 0.18,
+                        dataLabels: {
+                            enabled: true,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontFamily: 'Fira Code', fontWeight: '500' },
+                            format: '{y}s'
+                        },
+                        colorByPoint: true,
+                        colors: ['#00e5ff', '#fbbf24']
+                    }
+                },
+                series: [{ name: 'Seconds', data: [3.2, 6.5] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-latency:', e); }
+
+            // ── 10. COHORTS — column ──────────────────────────────
+            try {
+            const cCohorts = Highcharts.chart('chart-cohorts', {
+                chart: { type: 'column' },
+                xAxis: { categories: ['Total', 'Frequent', 'Intensive'] },
+                yAxis: { labels: { style: { fontSize: '9px' } }, gridLineDashStyle: 'Dash' },
+                tooltip: { pointFormat: '<b>{point.y:,.0f}</b> users' },
+                plotOptions: {
+                    column: {
+                        borderWidth: 0,
+                        borderRadius: 3,
+                        pointPadding: 0.15,
+                        dataLabels: {
+                            enabled: true,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontFamily: 'Fira Code', fontWeight: '500' },
+                            format: '{y:,.0f}'
+                        },
+                        colorByPoint: true,
+                        colors: ['#94a3b8','#fbbf24','#00e5ff']
+                    }
+                },
+                series: [{ name: 'Users', data: [20523, 8124, 6835] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-cohorts:', e); }
+
+            // ── 11. TOP RH+ CONTENT — bar (REAL categories) ───────
+            try {
+            const cContent = Highcharts.chart('chart-content', {
+                chart: { type: 'bar' },
+                xAxis: { categories: ['Preg. Chat Libre', 'Sta Travel', 'Password', 'COBUS', 'Google WS', 'Sta Travel Benef.', 'SAP/ARIBA', 'Tickets'] },
+                yAxis: { gridLineDashStyle: 'Dash' },
+                tooltip: { pointFormat: '<b>{point.y:,.0f}</b> interactions' },
+                plotOptions: {
+                    bar: {
+                        borderWidth: 0,
+                        borderRadius: 2,
+                        pointPadding: 0.1,
+                        dataLabels: {
+                            enabled: true,
+                            style: { color: '#fff', textOutline: 'none', fontSize: '10px', fontFamily: 'Fira Code', fontWeight: '500' },
+                            format: '{y:,.0f}'
+                        },
+                        color: '#00e5ff'
+                    }
+                },
+                series: [{ name: 'Interactions', data: [62573, 22991, 6476, 5453, 5322, 5077, 4052, 3952] }]
+            });
+            } catch (e) { console.error('Chart init failed for chart-content:', e); }
+
+            // ── reflow + IntersectionObserver ─────────────────────
+            // After the DOM is fully laid out (backdrop-filter, padding
+            // and card heights all resolved), fire one forced reflow.
+            // The IntersectionObserver then keeps reflowing each chart
+            // as the user scrolls sections into view.
+            const allCharts = [cProducts, cVP, cPopulation, cMAU, cUsers,
+                               cIntensity, cAssistants, cErrors, cLatency,
+                               cCohorts, cContent];
+
+            const forceReflow = () => {
+                allCharts.forEach(chart => {
+                    if (chart && typeof chart.reflow === 'function') chart.reflow();
+                });
+            };
+
+            // Initial reflow — 100ms gives the browser time to paint
+            // backdrop-filter layers and settle all CSS transitions.
+            setTimeout(forceReflow, 100);
+
+            // Scroll-triggered reflow via IntersectionObserver.
+            // Uses chart.renderTo.id for an unambiguous container match.
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const hit = allCharts.find(
+                        c => c && c.renderTo && c.renderTo.id === entry.target.id
+                    );
+                    if (hit) hit.reflow();
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('[id^="chart-"]').forEach(el => observer.observe(el));
+            window.addEventListener('resize', forceReflow, { passive: true });
+
+            // ── URL params + back-link ────────────────────────────
+            const params = new URLSearchParams(window.location.search);
+            const lang   = params.get('lang') || 'en';
+            if (typeof changeLang === 'function') changeLang(lang);
+
+            const backBtn = document.querySelector('.back-link');
+            if (backBtn) {
+                let returnUrl    = "../index.html";
+                let returnParams = [];
+                const mode    = params.get('v');
+                const country = params.get('pais');
+                if (mode)    returnParams.push(`v=${mode}`);
+                if (country) returnParams.push(`pais=${country}`);
+                if (lang)    returnParams.push(`lang=${lang}`);
+                if (returnParams.length > 0) returnUrl += "?" + returnParams.join("&");
+                returnUrl += "#projects";
+                backBtn.href = returnUrl;
+            }
+        });
+    </script>
+</body>
+</html>

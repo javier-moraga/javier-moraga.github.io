@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOM Chile · Platform Reconciliation — Javier Moraga</title>
+    <meta name="description" content="Case study: Revenue assurance pipeline reconciling 6 telecom platforms at WOM Chile. 4.5M subscribers · 658 rate plans · 30,513 billing discrepancies surfaced weekly.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+/* ═══════════════════════════════════════════════════════════════════
+   WOM · Platform Reconciliation — design tokens from portfolio v4
+═══════════════════════════════════════════════════════════════════ */
+:root {
+    --bg:            #050505;
+    --bg2:           #08080c;
+    --surface:       rgba(12,12,16,0.65);
+    --border:        rgba(255,255,255,0.05);
+    --border-hi:     rgba(255,255,255,0.12);
+    --border-glass:  rgba(255,255,255,0.08);
+    --text:          rgba(255,255,255,0.92);
+    --muted:         #94a3b8;
+    --dim:           rgba(255,255,255,0.22);
+    --c-eng:         #00e5ff;
+    --c-viz:         #d500f9;
+    --c-biz:         #fbbf24;
+    --c-ok:          #22d3a6;
+    --ease:          cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body:     'Inter', sans-serif;
+    --font-disp:     'Jost', sans-serif;
+    --font-mono:     'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,229,255,0.045), transparent 55%),
+        linear-gradient(180deg, #050505 0%, #050505 100%);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    padding-top: 64px;
+    overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+*  { scrollbar-width: thin; scrollbar-color: rgba(0,229,255,0.2) transparent; }
+*::-webkit-scrollbar { width: 5px; height: 5px; }
+*::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.2); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,0.4); }
+
+/* ── NAV ───────────────────────────────────────────────────────── */
+.nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    height: 64px; padding: 0 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(5,5,5,0.88);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+}
+.back-link {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border);
+    padding: 7px 14px 7px 12px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: color 0.25s, border-color 0.25s, transform 0.25s;
+}
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s; }
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-eng); opacity: 1; }
+.nav-name {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--border);
+    padding: 7px 16px; border-radius: 100px;
+}
+.nav-name b { color: var(--c-viz); margin-left: 10px; font-weight: 500; }
+
+.lang-switch {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 6px; border: 1px solid var(--border);
+    border-radius: 100px; background: rgba(255,255,255,0.015);
+}
+.lang-opt {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.62rem;
+    font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--dim); padding: 5px 10px; border-radius: 100px;
+    transition: color 0.25s, background 0.25s;
+}
+.lang-opt.is-active { color: var(--c-eng); background: rgba(0,229,255,0.08); }
+.lang-sep { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); }
+
+/* ── HEADER / HERO ─────────────────────────────────────────────── */
+header {
+    padding: 72px 24px 56px; text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 80% at 50% 30%, rgba(213,0,249,0.05), transparent 60%);
+}
+.hero-badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 6px 14px 6px 18px;
+    background: rgba(213,0,249,0.04);
+    border: 1px solid rgba(213,0,249,0.22); border-radius: 100px;
+    color: var(--c-viz); font-family: var(--font-mono);
+    font-size: 0.65rem; font-weight: 500;
+    margin-bottom: 28px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.hero-badge::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--c-viz); box-shadow: 0 0 10px var(--c-viz);
+    animation: dotPulse 2.5s infinite ease-in-out;
+}
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.6); opacity: 0.5; }
+}
+h1.hero-title {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.05; letter-spacing: -0.03em; text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 10%, #d0d5dd 40%, #5c626e 70%, #121417 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 12px 30px rgba(0,0,0,0.6));
+    margin: 0 0 22px;
+}
+.text-accent {
+    background: linear-gradient(90deg, #fff 10%, var(--c-viz) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent; filter: none;
+}
+.lead {
+    font-weight: 300; color: rgba(255,255,255,0.52);
+    max-width: 680px; margin: 0 auto 36px;
+    font-size: clamp(0.92rem, 1.4vw, 1.05rem); line-height: 1.7;
+}
+
+/* KPI strip */
+.hero-kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    max-width: 900px; margin: 0 auto;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: rgba(5,5,5,0.5);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.hero-kpi {
+    padding: 24px 16px; border-right: 1px solid var(--border); text-align: center;
+    position: relative; overflow: hidden;
+    transition: background 0.4s var(--ease);
+}
+.hero-kpi:last-child { border-right: none; }
+.hero-kpi::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: var(--kc, var(--c-viz));
+    box-shadow: 0 0 12px var(--kc, var(--c-viz));
+    opacity: 0; transition: opacity 0.4s var(--ease);
+}
+.hero-kpi:hover::after { opacity: 0.8; }
+.hero-kpi:hover { background: rgba(255,255,255,0.01); }
+.kpi-value {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: clamp(1.3rem, 2.4vw, 1.9rem); line-height: 1;
+    background: linear-gradient(180deg, #fff, #94a3b8);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    display: block; margin-bottom: 10px; letter-spacing: -0.01em;
+}
+.kpi-value b {
+    background: linear-gradient(180deg, #fff, var(--c-viz));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent; font-weight: 400;
+}
+.kpi-label {
+    font-family: var(--font-mono); font-size: 0.58rem;
+    text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
+}
+.hero-meta {
+    margin: 26px auto 0; padding-top: 20px; border-top: 1px solid var(--border);
+    max-width: 900px; font-family: var(--font-mono);
+    font-size: 0.66rem; letter-spacing: 0.1em; color: var(--muted); line-height: 1.8;
+}
+.hero-meta b { color: var(--c-viz); font-weight: 500; }
+
+/* Stack pills */
+.stack-strip {
+    max-width: 900px; margin: 22px auto 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+}
+.stack-pill {
+    font-family: var(--font-mono); font-size: 0.68rem;
+    letter-spacing: 0.04em; color: var(--text);
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+    border-radius: 100px; padding: 4px 10px;
+    transition: border-color 0.3s, color 0.3s, background 0.3s;
+}
+.stack-pill.hi { border-color: rgba(213,0,249,0.3); color: var(--c-viz); background: rgba(213,0,249,0.04); }
+.stack-pill:hover { border-color: rgba(213,0,249,0.4); color: var(--c-viz); background: rgba(213,0,249,0.04); }
+
+/* ── LAYOUT ────────────────────────────────────────────────────── */
+.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+section { padding: 60px 0; }
+
+.card {
+    background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border); border-radius: 6px; padding: 44px;
+    margin-bottom: 28px; position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    transition: border-color 0.4s var(--ease);
+}
+.card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c-viz), transparent);
+    opacity: 0.4; border-radius: 6px 6px 0 0;
+}
+
+.eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-viz); margin-bottom: 16px;
+}
+.eyebrow::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--c-viz); box-shadow: 0 0 10px var(--c-viz); flex-shrink: 0;
+}
+.section-title {
+    font-family: var(--font-disp); font-size: clamp(1.5rem, 2.7vw, 2.1rem);
+    font-weight: 300; line-height: 1.18; letter-spacing: -0.022em; color: var(--text); margin-bottom: 22px;
+}
+.section-title b { color: var(--c-viz); font-weight: 400; }
+
+.narrative {
+    font-size: 0.95rem; color: var(--muted); line-height: 1.75;
+    font-weight: 300; max-width: 780px;
+}
+.narrative p + p { margin-top: 14px; }
+.narrative strong { color: var(--text); font-weight: 500; }
+.narrative em { color: var(--c-viz); font-style: normal; font-weight: 400; }
+.narrative code {
+    font-family: var(--font-mono); font-size: 0.78em; color: var(--c-eng);
+    background: rgba(0,229,255,0.06); padding: 1px 6px; border-radius: 3px;
+}
+
+/* Compare block */
+.compare-block {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 18px; align-items: stretch; margin: 26px 0 4px;
+}
+.compare-side {
+    background: rgba(0,0,0,0.25); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 20px;
+}
+.compare-side.is-after { border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.03); }
+.compare-tag {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; display: block;
+}
+.compare-side.is-after .compare-tag { color: var(--c-eng); }
+.compare-text { font-size: 0.9rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+.compare-arrow { color: var(--c-viz); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; opacity: 0.7; }
+
+/* ── PIPELINE DIAGRAM ──────────────────────────────────────────── */
+.pipeline-grid {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; padding: 22px 18px;
+    background: rgba(0,0,0,0.2); border-radius: 8px; margin: 24px 0 8px;
+    flex-wrap: wrap;
+}
+.pipe-step {
+    flex: 1; min-width: 100px; text-align: center;
+    background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 12px;
+    transition: border-color 0.4s;
+}
+.pipe-step:hover { border-color: rgba(213,0,249,0.3); }
+.pipe-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.12em;
+}
+.pipe-val {
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-viz); line-height: 1.45;
+}
+.pipe-arrow { color: var(--dim); font-size: 0.9rem; align-self: center; opacity: 0.5; flex-shrink: 0; }
+
+/* Platform cards grid */
+.platform-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin: 24px 0 8px;
+}
+.platform-card {
+    background: rgba(0,0,0,0.22); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 20px;
+    transition: border-color 0.4s var(--ease);
+    position: relative; overflow: hidden;
+}
+.platform-card.is-billing { border-left: 2px solid var(--c-viz); }
+.platform-card.is-network { border-left: 2px solid var(--c-eng); }
+.platform-card.is-dwh     { border-left: 2px solid var(--c-biz); }
+.platform-card:hover { border-color: var(--border-hi); }
+.plat-name {
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--c-eng);
+    margin-bottom: 4px; letter-spacing: 0.04em;
+}
+.platform-card.is-billing .plat-name { color: var(--c-viz); }
+.platform-card.is-dwh .plat-name     { color: var(--c-biz); }
+.plat-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; font-weight: 300; }
+.plat-dif {
+    display: inline-block; margin-top: 10px; padding: 3px 8px;
+    font-family: var(--font-mono); font-size: 0.65rem; border-radius: 3px;
+    background: rgba(213,0,249,0.08); color: var(--c-viz); letter-spacing: 0.08em;
+}
+.plat-dif.ok { background: rgba(34,211,166,0.08); color: var(--c-ok); }
+
+/* ── CHART WRAPPERS ────────────────────────────────────────────── */
+.chart-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+.chart-title { font-family: var(--font-disp); font-size: 1.05rem; color: var(--text); font-weight: 400; }
+.chart-sub { font-family: var(--font-mono); font-size: 0.65rem; color: var(--dim); letter-spacing: 0.06em; }
+.chart-wrap { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1px solid var(--border); }
+.chart-wrap:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+
+/* Bar chart (pure CSS) */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 14px; }
+.bar-label { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); width: 160px; flex-shrink: 0; letter-spacing: 0.02em; text-align: right; }
+.bar-track { flex: 1; background: rgba(255,255,255,0.04); border-radius: 100px; height: 24px; overflow: hidden; position: relative; }
+.bar-fill {
+    height: 100%; border-radius: 100px;
+    display: flex; align-items: center; padding-left: 10px;
+    font-family: var(--font-mono); font-size: 0.65rem; color: #fff; font-weight: 500;
+    transition: width 1s var(--ease);
+    animation: barGrow 1.2s var(--ease) both;
+}
+.bar-fill.c-viz { background: linear-gradient(90deg, rgba(213,0,249,0.8), rgba(213,0,249,0.5)); }
+.bar-fill.c-biz { background: linear-gradient(90deg, rgba(251,191,36,0.8), rgba(251,191,36,0.5)); }
+.bar-fill.c-eng { background: linear-gradient(90deg, rgba(0,229,255,0.8), rgba(0,229,255,0.5)); }
+.bar-fill.c-ok  { background: linear-gradient(90deg, rgba(34,211,166,0.8), rgba(34,211,166,0.5)); }
+@keyframes barGrow {
+    from { width: 0 !important; opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Insight callout */
+.insight {
+    display: flex; gap: 12px; margin-top: 16px;
+    padding: 14px 16px;
+    background: rgba(213,0,249,0.03);
+    border: 1px solid rgba(213,0,249,0.12); border-radius: 4px;
+}
+.insight.is-warn {
+    background: rgba(34,211,166,0.03);
+    border-color: rgba(34,211,166,0.12);
+}
+.insight-icon { color: var(--c-viz); font-size: 0.85rem; flex-shrink: 0; padding-top: 2px; }
+.insight.is-warn .insight-icon { color: var(--c-ok); }
+.insight-text { font-size: 0.84rem; color: var(--text); line-height: 1.6; font-weight: 300; }
+.insight-text b { color: var(--c-viz); font-weight: 500; }
+.insight.is-warn .insight-text b { color: var(--c-ok); }
+
+/* Micro metrics row */
+.micro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.micro-card {
+    background: rgba(0,0,0,0.22); border: 1px solid var(--border);
+    border-radius: 6px; padding: 20px; transition: border-color 0.4s;
+}
+.micro-card:hover { border-color: var(--border-hi); }
+.micro-label {
+    font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500;
+    color: var(--c-viz); text-transform: uppercase; letter-spacing: 0.16em;
+    margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;
+}
+.micro-num {
+    font-family: var(--font-disp); font-size: 1.7rem; font-weight: 300;
+    color: var(--text); letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 4px;
+}
+.micro-sub { font-size: 0.75rem; color: var(--muted); font-weight: 300; line-height: 1.5; }
+
+/* ── SQL ACCORDION ─────────────────────────────────────────────── */
+.accordion-btn {
+    background: rgba(255,255,255,0.018); border: 1px solid var(--border);
+    width: 100%; padding: 10px 14px; text-align: left; color: var(--muted); cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.04em;
+    display: flex; justify-content: space-between; align-items: center;
+    border-radius: 4px; margin-top: 14px; transition: all 0.3s var(--ease);
+}
+.accordion-btn:hover { background: rgba(213,0,249,0.04); color: var(--c-viz); border-color: rgba(213,0,249,0.22); }
+.accordion-btn .fa-chevron-down { transition: transform 0.3s var(--ease); font-size: 0.7rem; }
+.accordion-btn.is-open .fa-chevron-down { transform: rotate(180deg); }
+.code-panel { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: var(--bg2); border-radius: 0 0 4px 4px; margin-top: -2px; }
+.code-panel.active { max-height: 700px; overflow: auto; border: 1px solid var(--border); border-top: none; padding: 12px; }
+pre { margin: 0; overflow-x: auto; }
+code { font-family: var(--font-mono); color: rgba(255,255,255,0.78); font-size: 0.72rem; line-height: 1.65; }
+.sql-kw   { color: var(--c-viz); font-weight: 500; }
+.sql-str  { color: var(--c-biz); }
+.sql-func { color: #fbbf24; }
+.sql-comm { color: rgba(255,255,255,0.28); font-style: italic; }
+.sql-tbl  { color: var(--c-eng); }
+
+/* ── DECISIONS / FAILURES ──────────────────────────────────────── */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 22px; }
+.twocol-block h4 {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px; font-weight: 500;
+}
+.twocol-block.is-fail h4 { color: var(--c-viz); }
+.twocol-list { display: flex; flex-direction: column; gap: 14px; }
+.twocol-list li {
+    background: rgba(0,0,0,0.22); border: 1px solid var(--border);
+    border-left: 2px solid var(--c-eng); border-radius: 4px;
+    padding: 16px 18px; font-size: 0.88rem; color: var(--muted);
+    line-height: 1.6; font-weight: 300; transition: border-color 0.4s;
+}
+.twocol-block.is-fail .twocol-list li { border-left-color: var(--c-viz); }
+.twocol-list li:hover { border-color: var(--border-hi); }
+.twocol-list li b { display: block; font-family: var(--font-disp); font-size: 0.98rem; color: var(--text); font-weight: 500; margin-bottom: 5px; }
+.twocol-list li code { font-family: var(--font-mono); font-size: 0.78em; color: var(--c-eng); background: rgba(0,229,255,0.06); padding: 1px 6px; border-radius: 3px; }
+
+/* ── CLOSING ────────────────────────────────────────────────────── */
+.closing-take {
+    max-width: 820px; margin: 56px auto 36px; padding: 36px 38px;
+    text-align: center; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    font-family: var(--font-disp); font-size: clamp(1.1rem, 1.9vw, 1.5rem);
+    font-weight: 300; line-height: 1.45; color: rgba(255,255,255,0.82); letter-spacing: -0.005em;
+}
+.closing-take b { color: var(--c-viz); font-weight: 400; }
+.closing-author { display: block; margin-top: 14px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+
+.contact-section { text-align: center; margin: 30px 0 80px; padding-top: 36px; border-top: 1px solid var(--border); }
+.contact-text { color: var(--muted); font-size: 0.92rem; margin: 0 auto 28px; max-width: 580px; line-height: 1.65; font-weight: 300; }
+.contact-btn {
+    display: inline-flex; align-items: center; gap: 10px; padding: 13px 28px;
+    border: 1px solid rgba(213,0,249,0.4); background: rgba(213,0,249,0.04); color: var(--c-viz);
+    border-radius: 3px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+.contact-btn:hover { background: rgba(213,0,249,0.08); border-color: var(--c-viz); transform: translateY(-2px); box-shadow: 0 12px 30px -10px rgba(213,0,249,0.4); }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .nav-bar { padding: 0 18px; }
+    .nav-name { display: none; }
+    .container { padding: 0 18px; }
+    section { padding: 40px 0; }
+    .card { padding: 26px 20px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .hero-kpi { border-bottom: 1px solid var(--border); padding: 18px 12px; }
+    .hero-kpi:nth-child(2) { border-right: none; }
+    .compare-block { grid-template-columns: 1fr; }
+    .compare-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .platform-grid { grid-template-columns: 1fr; }
+    .pipeline-grid { padding: 14px 10px; }
+    .pipe-arrow { display: none; }
+    .micro-grid { grid-template-columns: 1fr; }
+    .twocol { grid-template-columns: 1fr; }
+    .bar-label { width: 110px; font-size: 0.6rem; }
+    .closing-take { padding: 28px 20px; }
+}
+    </style>
+</head>
+<body>
+
+<nav class="nav-bar">
+    <a href="../index.html#projects" class="back-link">
+        <i class="fas fa-arrow-left"></i> <span id="nav-back">Back to Portfolio</span>
+    </a>
+    <div class="nav-name">Javier Moraga <b>WOM · Revenue Assurance</b></div>
+    <div class="lang-switch">
+        <button class="lang-opt is-active" onclick="changeLang('en')" id="btn-en">EN</button>
+        <span class="lang-sep">·</span>
+        <button class="lang-opt" onclick="changeLang('es')" id="btn-es">ES</button>
+    </div>
+</nav>
+
+<header>
+    <div class="container">
+        <span class="hero-badge" id="hero-badge">Case Study · WOM Chile · 2018–2019</span>
+        <h1 class="hero-title" id="hero-title">Platform<br><span class="text-accent">Reconciliation</span></h1>
+        <p class="lead" id="hero-lead">
+            Six telecom platforms. 4.5 million subscribers. Weekly billing discrepancies
+            surfaced by an automated pipeline built on BAT, FTP, Oracle SQL and SQL Server —
+            before they became silent revenue losses.
+        </p>
+        <div class="hero-kpis">
+            <div class="hero-kpi" style="--kc: var(--c-viz)">
+                <span class="kpi-value">4.5<b>M</b></span>
+                <span class="kpi-label" id="kpi-1">Valid subscribers</span>
+            </div>
+            <div class="hero-kpi" style="--kc: var(--c-viz)">
+                <span class="kpi-value"><b>6</b></span>
+                <span class="kpi-label" id="kpi-2">Platforms reconciled</span>
+            </div>
+            <div class="hero-kpi" style="--kc: var(--c-biz)">
+                <span class="kpi-value">30<b>K</b></span>
+                <span class="kpi-label" id="kpi-3">Billing gaps per run</span>
+            </div>
+            <div class="hero-kpi" style="--kc: var(--c-eng)">
+                <span class="kpi-value">658</span>
+                <span class="kpi-label" id="kpi-4">Rate plans catalogued</span>
+            </div>
+        </div>
+        <p class="hero-meta">
+            <span id="meta-period">Weekly · 1h automated run</span> · <b>Revenue Assurance · Telecom</b> ·
+            <span id="meta-role">Data Analyst → Analytics Engineer</span>
+        </p>
+        <div class="stack-strip">
+            <span class="stack-pill hi">Oracle SQL (BSCS)</span>
+            <span class="stack-pill hi">Netezza SQL</span>
+            <span class="stack-pill hi">SQL Server</span>
+            <span class="stack-pill">BAT scripting</span>
+            <span class="stack-pill">WinSCP / FTP</span>
+            <span class="stack-pill">gawk + sed</span>
+            <span class="stack-pill">7-zip</span>
+            <span class="stack-pill">Stored Procedures</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- ═══════════════════════════════════════════════════════════
+         01 · CONTEXT
+    ════════════════════════════════════════════════════════════ -->
+    <section>
+      <div class="card">
+        <span class="eyebrow" id="label-1">01 · Context</span>
+        <h2 class="section-title" id="title-1">A telecom doesn't lose revenue from outages. It loses it from <b>mismatches no one is watching.</b></h2>
+        <div class="narrative" id="text-1">
+            <p>WOM Chile was growing fast — new subscribers, new rate plans, constant network expansion across BSCS, HSS, ICC, SYMSOFT, DWH and PCRF. Each platform maintained its own subscriber records. None of them talked to each other automatically.</p>
+            <p>A subscriber <strong>active in the network</strong> (HSS) but <strong>not billed correctly</strong> (BSCS) is silent revenue leakage. Without a cross-platform view, the only way to find those mismatches was to notice them — usually too late, usually by accident.</p>
+            <p><em>The problem wasn't missing data. It was no process that connected it weekly.</em></p>
+        </div>
+        <div class="compare-block" style="margin-top: 26px;">
+            <div class="compare-side">
+                <span class="compare-tag" id="before-tag">Before</span>
+                <p class="compare-text" id="before-text">Platform discrepancies discovered ad hoc, weeks after the fact. No systematic view across BSCS · HSS · ICC · SYMSOFT · PCRF. Escalation by email when someone noticed an anomaly.</p>
+            </div>
+            <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="compare-side is-after">
+                <span class="compare-tag" id="after-tag">After</span>
+                <p class="compare-text" id="after-text">Weekly automated run. 1 hour of execution: FTP extraction, parsing, SQL Server load, stored-procedure cross-join, dashboard view. Discrepancies routed to Backend and IT Monitoring teams with context.</p>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         02 · ARCHITECTURE
+    ════════════════════════════════════════════════════════════ -->
+    <section>
+      <div class="card">
+        <span class="eyebrow" id="label-2">02 · Architecture</span>
+        <h2 class="section-title" id="title-2">One BAT file that orchestrated <b>four runtimes</b>, six platforms and two FTP servers.</h2>
+        <div class="narrative" id="text-2">
+            <p>
+                The pipeline ran from a single Windows BAT file (<code>SCRIPT_CONCILIACION_PARQUE.bat</code>), which was the conductor. It handled FTP via <strong>WinSCP</strong> to pull compressed dumps from HSS and PCRF, decompressed them with <strong>7-zip</strong>, parsed them using <strong>gawk + sed</strong> (the Unix tools running on Windows), then fired Oracle SQL*Plus to extract BSCS and Netezza SQL to extract DWH traffic data. All of it landed in SQL Server, where stored procedures ran the cross-platform joins and built the reconciliation view.
+            </p>
+            <p>
+                The insight buried in the design: <em>this was not a database problem — it was a runtime integration problem.</em> No single database could talk to all six sources. The BAT layer was the ETL.
+            </p>
+        </div>
+
+        <div style="margin: 28px 0 6px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="pipe-label">Execution sequence · ~1 hour end-to-end</div>
+        <div class="pipeline-grid">
+            <div class="pipe-step">
+                <div class="pipe-label" id="p1-label">Trigger</div>
+                <div class="pipe-val">SCRIPT_<br>CONCILIACION<br>.bat</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="p2-label">FTP Pull</div>
+                <div class="pipe-val">WinSCP → HSS,<br>PCRF dumps<br>(.gz / .tar)</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="p3-label">Parse</div>
+                <div class="pipe-val">7-zip → gawk<br>+ sed → flat<br>files</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="p4-label">Extract</div>
+                <div class="pipe-val">SQL*Plus<br>(BSCS Oracle)<br>+ Netezza DWH</div>
+            </div>
+            <div class="pipe-arrow"><i class="fas fa-chevron-right"></i></div>
+            <div class="pipe-step">
+                <div class="pipe-label" id="p5-label">Load + Cross</div>
+                <div class="pipe-val">SQL Server<br>→ Stored Procs<br>→ view</div>
+            </div>
+        </div>
+
+        <div style="margin: 28px 0 6px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);" id="plat-label">Six platforms · three layers</div>
+        <div class="platform-grid">
+            <div class="platform-card is-dwh">
+                <div class="plat-name">DWH (Netezza)</div>
+                <div class="plat-desc" id="dwh-desc">Source of truth. 4.5M valid subscribers. 658 rate plans mapped to <code>LK_PLN_PLAN</code>. Defines what billing should see.</div>
+            </div>
+            <div class="platform-card is-billing">
+                <div class="plat-name">BSCS (Oracle)</div>
+                <div class="plat-desc" id="bscs-desc">Billing system. 7.2M records total (facturable + no-facturable). Extracted via SQL*Plus <code>SPOOL</code> dump. Source of most discrepancies.</div>
+                <span class="plat-dif" id="bscs-dif">Δ 30,513 vs DWH</span>
+            </div>
+            <div class="platform-card is-billing">
+                <div class="plat-name">ICC</div>
+                <div class="plat-desc" id="icc-desc">SIM card inventory. FTP dump pulled weekly. Cross-matched against BSCS active contracts.</div>
+            </div>
+            <div class="platform-card is-network">
+                <div class="plat-name">HSS</div>
+                <div class="plat-desc" id="hss-desc">Network authentication. 11.1M records. Parsed from compressed dump using gawk + sed. The network said these SIMs were active.</div>
+                <span class="plat-dif ok" id="hss-dif">Δ 22 vs DWH ✓</span>
+            </div>
+            <div class="platform-card is-network">
+                <div class="plat-name">SYMSOFT</div>
+                <div class="plat-desc" id="symsoft-desc">SMS platform. Traffic pulled from <code>BT_TRAFICO_SMSC_SYMSOFT</code>. Validated against active subscriber park.</div>
+            </div>
+            <div class="platform-card is-network">
+                <div class="plat-name">PCRF</div>
+                <div class="plat-desc" id="pcrf-desc">Policy and data control. ~4.9M records. Parsed from compressed dump. Cross-matched to validate data service provisioning.</div>
+            </div>
+        </div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · PARQUE_BSCS.sql — active subscriber extraction</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- PARQUE_BSCS.sql — Oracle SQL*Plus
+-- Extracts all active subscribers from BSCS billing system.
+-- CH_STATUS != 'd' → excludes deactivated contracts.
+-- CS_DEACTIV_DATE IS NULL → only lines with no deactivation date (active).
+-- Output: pipe-delimited flat file for SQL Server import.</span>
+
+<span class="sql-kw">WHENEVER</span> SQLERROR EXIT SQL.SQLCODE
+<span class="sql-kw">ALTER SESSION SET</span> NLS_DATE_FORMAT = <span class="sql-str">'YYYYMMDD'</span>;
+<span class="sql-kw">SET</span> colsep <span class="sql-str">'|'</span>;
+<span class="sql-kw">SPOOL</span> D:\03_DUMP\BSCS\DUMP_BSCS.txt;
+
+<span class="sql-kw">SELECT</span>
+    CA.CUSTOMER_ID <span class="sql-comm">-- unique customer</span>
+  , CA.CUSTCODE
+  , CA.CSCOMPTAXNO   <span class="sql-comm">-- RUT / tax ID</span>
+  , CNT.CO_ID        <span class="sql-comm">-- contract ID</span>
+  , CNT.CO_ACTIVATED
+  , CNT.TMCODE       <span class="sql-comm">-- rate plan code (joins to 658-plan catalog)</span>
+  , CNT.RATEPLAN_CHANGE_DATE
+  , CNT.TMCODE_OLD
+  , CNT.CO_CODE
+  , CNT.CH_STATUS
+  , CSC.DN_ID
+  , <span class="sql-func">TO_CHAR</span>(CSC.CS_ACTIV_DATE, <span class="sql-str">'YYYYMMDD'</span>)
+  , <span class="sql-func">TO_CHAR</span>(CSC.CS_DEACTIV_DATE, <span class="sql-str">'YYYYMMDD'</span>)
+  , DN.DN_NUM        <span class="sql-comm">-- MSISDN / phone number</span>
+  , BCY.BILLCYCLE
+  , CNT.CH_STATUS_VALIDFROM
+<span class="sql-kw">FROM</span> <span class="sql-tbl">CUSTOMER_ALL</span> CA
+  <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">CONTRACT_ALL</span>      CNT <span class="sql-kw">ON</span> CA.CUSTOMER_ID = CNT.CUSTOMER_ID
+  <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">CONTR_SERVICES_CAP</span> CSC <span class="sql-kw">ON</span> CNT.CO_ID = CSC.CO_ID
+  <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">DIRECTORY_NUMBER</span>    DN  <span class="sql-kw">ON</span> CSC.DN_ID = DN.DN_ID
+  <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">CUSTOMER_BCH</span>        BCY <span class="sql-kw">ON</span> CA.CUSTCODE = BCY.CUSTCODE
+<span class="sql-kw">WHERE</span>
+  <span class="sql-func">TO_CHAR</span>(CSC.CS_DEACTIV_DATE, <span class="sql-str">'YYYYMMDD'</span>) <span class="sql-kw">IS NULL</span>  <span class="sql-comm">-- no deactivation date = still active</span>
+  <span class="sql-kw">AND</span> CNT.CH_STATUS <span class="sql-kw">!=</span> <span class="sql-str">'d'</span>;                         <span class="sql-comm">-- exclude deleted contracts</span>
+
+<span class="sql-kw">SPOOL OFF</span>;</code></pre></div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · DUMP_DWH — DWH subscriber park with rate plan join</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- DUMP_DWH — Netezza SQL
+-- Pulls yesterday's subscriber park from DWH with full plan classification.
+-- Joins to LK_PLN_PLAN for plan type, market segment, commercial objective.
+-- This is the source of truth for what BSCS and HSS should reflect.</span>
+
+<span class="sql-kw">SELECT</span>
+  A.NUMERO_ABONADO,
+  A.ESTADO_CONTRATO,
+  A.ID_PLAN,
+  B.DESC_CORTA_PLAN,
+  <span class="sql-kw">CASE</span>
+    <span class="sql-kw">WHEN</span> B.ID_TIPO_PLAN = 3 <span class="sql-kw">THEN</span> <span class="sql-str">'UNLIMITED'</span>
+    <span class="sql-kw">WHEN</span> B.ID_TIPO_PLAN = 5 <span class="sql-kw">THEN</span> <span class="sql-str">'Prepago'</span>
+    <span class="sql-kw">WHEN</span> B.ID_TIPO_PLAN = 6 <span class="sql-kw">THEN</span> <span class="sql-str">'Controlado'</span>
+    <span class="sql-kw">ELSE</span> <span class="sql-str">'NA'</span>
+  <span class="sql-kw">END AS</span> TIPO_PLAN,
+  <span class="sql-kw">CASE</span>
+    <span class="sql-kw">WHEN</span> B.ID_MERCADO_PLAN = 2 <span class="sql-kw">THEN</span> <span class="sql-str">'Consumer'</span>
+    <span class="sql-kw">WHEN</span> B.ID_MERCADO_PLAN = 5 <span class="sql-kw">THEN</span> <span class="sql-str">'Business'</span>
+    <span class="sql-kw">WHEN</span> B.ID_MERCADO_PLAN = 4 <span class="sql-kw">THEN</span> <span class="sql-str">'Prepago'</span>
+    <span class="sql-kw">ELSE</span> <span class="sql-str">'NA'</span>
+  <span class="sql-kw">END AS</span> MERCADO,
+  A.ICCID, A.IMSI, A.FECHA_ALTA
+<span class="sql-kw">FROM</span>
+  <span class="sql-tbl">nz_prod.DWH_WOM.BT_CLE_PARQUE</span> A
+  <span class="sql-kw">LEFT JOIN</span> <span class="sql-tbl">NZ_PROD.DWH_WOM.LK_PLN_PLAN</span> B <span class="sql-kw">ON</span> A.ID_PLAN = B.ID_PLAN
+<span class="sql-kw">WHERE</span>
+  A.PERIODO_PARQUE = <span class="sql-func">TO_CHAR</span>(<span class="sql-func">NOW</span>()-1, <span class="sql-str">'YYYYMM'</span>)
+  <span class="sql-kw">AND</span> A.estado_contrato <span class="sql-kw">!=</span> <span class="sql-str">'d'</span>;</code></pre></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         03 · THE DISCREPANCY FINDING
+    ════════════════════════════════════════════════════════════ -->
+    <section>
+      <div class="card">
+        <span class="eyebrow" id="label-3">03 · The Finding</span>
+        <h2 class="section-title" id="title-3">HSS had 22 differences. BSCS had <b>30,513. The network was fine. Billing wasn't.</b></h2>
+        <div class="narrative" id="text-3">
+            <p>
+                Every week the reconciliation produced one number that mattered: the delta between what each platform believed was active. HSS — the network authentication layer — showed only <strong>22 records</strong> diverging from DWH. That meant provisioning was nearly clean: subscribers were correctly registered in the network.
+            </p>
+            <p>
+                BSCS — the billing system — showed <strong>30,513 records</strong> diverging. Subscribers active in the network, correctly in DWH, but with billing records that didn't align: wrong plan codes, missing contracts, status mismatches. <em>Every one of those records was a line item that billing couldn't process correctly.</em>
+            </p>
+        </div>
+
+        <div class="chart-wrap" style="margin-top: 28px;">
+            <div class="chart-header">
+                <div class="chart-title" id="chart-1-title">Platform discrepancy vs DWH baseline</div>
+                <span class="chart-sub" id="chart-1-sub">weekly snapshot — records off from DWH truth</span>
+            </div>
+            <div class="bar-chart">
+                <div class="bar-row">
+                    <div class="bar-label">HSS (network)</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-ok" style="width: 0.07%">22</div>
+                    </div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">ICC (SIM inventory)</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-biz" style="width: 4%">~1.3K</div>
+                    </div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">BSCS (billing)</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-viz" style="width: 100%">30,513</div>
+                    </div>
+                </div>
+            </div>
+            <div class="insight" style="margin-top: 18px;">
+                <i class="fas fa-lightbulb insight-icon"></i>
+                <p class="insight-text" id="insight-1">
+                    <b>The network provisioned correctly. The billing system didn't follow.</b> Without the cross-platform view, these 30,513 records would have been invisible — appearing as "active" in every platform audit, while silently failing to generate correct billing.
+                </p>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="chart-2-title">Subscriber park composition · DWH baseline</div>
+                <span class="chart-sub" id="chart-2-sub">4.5M valid + 2.7M under review</span>
+            </div>
+            <div class="bar-chart">
+                <div class="bar-row">
+                    <div class="bar-label">Consumer Voice</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-eng" style="width: 100%">1,832,786</div>
+                    </div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">Prepaid (no-fact)</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-biz" style="width: 66%">4,086,117</div>
+                    </div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">Consumer Data</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-eng" style="width: 21%">130,519</div>
+                    </div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">Business Voice</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-viz" style="width: 12%">224,831</div>
+                    </div>
+                </div>
+                <div class="bar-row">
+                    <div class="bar-label">Prepaid Data</div>
+                    <div class="bar-track">
+                        <div class="bar-fill c-biz" style="width: 8%">24,827</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-wrap">
+            <div class="chart-header">
+                <div class="chart-title" id="chart-3-title">Revenue at risk · reference estimate</div>
+                <span class="chart-sub" id="chart-3-sub">30,513 mismatches · ~CLP 13,990/plan/month</span>
+            </div>
+            <div class="micro-grid">
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-1-label">Records at risk</div>
+                    <div class="micro-num">30,513</div>
+                    <div class="micro-sub" id="mc-1-sub">BSCS divergences per weekly run vs DWH baseline</div>
+                </div>
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-2-label">Monthly exposure</div>
+                    <div class="micro-num">~USD 427K</div>
+                    <div class="micro-sub" id="mc-2-sub">Reference: ~CLP 13,990 plan / month. Actual varies by plan mix.</div>
+                </div>
+                <div class="micro-card">
+                    <div class="micro-label" id="mc-3-label">Annual projection</div>
+                    <div class="micro-num">~USD 5.1M</div>
+                    <div class="micro-sub" id="mc-3-sub">At constant volume. Identifying the gap is the first condition to recovering it.</div>
+                </div>
+            </div>
+            <div class="insight is-warn" style="margin-top: 18px;">
+                <i class="fas fa-info-circle insight-icon"></i>
+                <p class="insight-text" id="insight-2">
+                    <b>This is a conservative reference estimate, not a recovered revenue figure.</b> The actual monetary impact depended on plan mix, billing cycle timing and whether records were corrected within the same period. What the pipeline guaranteed was that the discrepancy was found weekly — not quarterly.
+                </p>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         04 · TRAFFIC CROSS
+    ════════════════════════════════════════════════════════════ -->
+    <section>
+      <div class="card">
+        <span class="eyebrow" id="label-4">04 · Traffic Enrichment</span>
+        <h2 class="section-title" id="title-4">Knowing a subscriber is miscoded is table stakes. <b>Knowing they're active on the network is the proof.</b></h2>
+        <div class="narrative" id="text-4">
+            <p>
+                Beyond the static park reconciliation, the pipeline joined <strong>30 days of voice, data, SMS and VAS traffic</strong> to the subscriber base. A record showing a billing mismatch becomes much more actionable when you can also say: this line had <em>340 minutes of voice and 2.8GB of data this month</em> — it's not dormant, it's being used without being correctly billed.
+            </p>
+        </div>
+
+        <div class="platform-grid" style="margin-top: 24px;">
+            <div class="platform-card is-network">
+                <div class="plat-name" id="traf-voz-title">Voice Traffic</div>
+                <div class="plat-desc" id="traf-voz-desc">30-day aggregation from <code>AGG_TRF_VOZ_MED_ABONADO</code>. Minutes of voice per subscriber, last traffic date. FULL JOIN with data traffic for unified view.</div>
+            </div>
+            <div class="platform-card is-network">
+                <div class="plat-name" id="traf-data-title">Data Traffic</div>
+                <div class="plat-desc" id="traf-data-desc">30-day MB from <code>AGG_TRF_DATOS_ABONADO</code> (KB_DOWN + KB_UP / 1024). Aggregated per subscriber, last active date.</div>
+            </div>
+            <div class="platform-card is-network">
+                <div class="plat-name" id="traf-sms-title">SMS Traffic</div>
+                <div class="plat-desc" id="traf-sms-desc">Delivered messages from SYMSOFT <code>BT_TRAFICO_SMSC_SYMSOFT</code>. State: 'Delivered' or 'Delivered direct'. Hit count + last delivery date.</div>
+            </div>
+            <div class="platform-card is-billing">
+                <div class="plat-name" id="traf-vas-title">VAS / Shortcode</div>
+                <div class="plat-desc" id="traf-vas-desc">Value-added service charges from <code>BT_TRAFICO_SHRTC</code>. Net amount extracted via <code>SUBSTR + INSTR</code> position parsing on <code>ADDITIONAL_ORIGCHARGEINFO</code>.</div>
+            </div>
+            <div class="platform-card is-dwh">
+                <div class="plat-name" id="traf-result-title">Reconciliation view</div>
+                <div class="plat-desc" id="traf-result-desc">All four traffic sources joined to the park cross in SQL Server. Output: subscribers with platform status + usage evidence, sorted by gap priority.</div>
+            </div>
+            <div class="platform-card is-dwh">
+                <div class="plat-name" id="report-title">Reporting</div>
+                <div class="plat-desc" id="report-desc">Results sent by email to Backend (Héctor Leiva) and IT Monitoring (Theo Soto, César Barrios, Jorge Durán) for investigation and correction.</div>
+            </div>
+        </div>
+
+        <button class="accordion-btn" onclick="toggleCode(this)">
+            <span><i class="fas fa-code"></i> &nbsp; <span class="query-label">Source</span> · TRAFICO_NZ — 30-day voice + data FULL JOIN</span>
+            <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="code-panel"><pre><code><span class="sql-comm">-- TRAFICO_NZ — Netezza SQL (NZ_PROD)
+-- FULL JOIN voice + data so a subscriber with ONLY voice or ONLY data is not lost.
+-- DISTINCT + CASE WHEN handles the NULL from either side of the join.</span>
+
+<span class="sql-kw">SELECT DISTINCT</span>
+  <span class="sql-kw">CASE WHEN</span> A.NUMERO_ABONADO <span class="sql-kw">IS NULL</span>
+       <span class="sql-kw">THEN</span> B.NUMERO_ABONADO
+       <span class="sql-kw">ELSE</span> A.NUMERO_ABONADO
+  <span class="sql-kw">END AS</span> NUM_ABONADO,
+  <span class="sql-func">SUM</span>(A.CANTIDAD_VOZ)  MIN_VOZ,
+  A.ULTIMO_TRAFICO_VOZ,
+  <span class="sql-func">SUM</span>(B.CANTIDAD_MB)   MB_DATOS,
+  B.ULTIMO_TRAFICO_DATOS
+<span class="sql-kw">FROM</span>
+  (<span class="sql-kw">SELECT</span>
+     Z.NUMERO_ABONADO,
+     <span class="sql-func">SUM</span>(<span class="sql-func">CAST</span>(Z.DURACION <span class="sql-kw">AS</span> INT) / 60) CANTIDAD_VOZ,
+     <span class="sql-func">MAX</span>(Z.ID_DWH_DIA) ULTIMO_TRAFICO_VOZ
+   <span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_PROD.STG_TRAF.AGG_TRF_VOZ_MED_ABONADO</span> Z
+   <span class="sql-kw">WHERE</span> Z.ID_DWH_DIA >= <span class="sql-func">TO_CHAR</span>(<span class="sql-func">NOW</span>()-30, <span class="sql-str">'YYYYMMDD'</span>)
+   <span class="sql-kw">GROUP BY</span> Z.NUMERO_ABONADO) A
+
+<span class="sql-kw">FULL JOIN</span>
+
+  (<span class="sql-kw">SELECT</span>
+     X.NUMERO_ABONADO,
+     <span class="sql-func">ROUND</span>(<span class="sql-func">SUM</span>((X.KB_DOWN_IX + X.KB_UP_IX) / 1024), 2) CANTIDAD_MB,
+     <span class="sql-func">MAX</span>(X.ID_DWH_DIA) ULTIMO_TRAFICO_DATOS
+   <span class="sql-kw">FROM</span> <span class="sql-tbl">NZ_PROD.STG_TRAF.AGG_TRF_DATOS_ABONADO</span> X
+   <span class="sql-kw">WHERE</span> X.ID_DWH_DIA >= <span class="sql-func">TO_CHAR</span>(<span class="sql-func">NOW</span>()-30, <span class="sql-str">'YYYYMMDD'</span>)
+   <span class="sql-kw">GROUP BY</span> X.NUMERO_ABONADO) B
+
+<span class="sql-kw">ON</span> A.NUMERO_ABONADO = B.NUMERO_ABONADO
+<span class="sql-kw">GROUP BY</span> NUM_ABONADO, A.ULTIMO_TRAFICO_VOZ, B.ULTIMO_TRAFICO_DATOS;</code></pre></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         05 · WHAT I OWNED
+    ════════════════════════════════════════════════════════════ -->
+    <section>
+      <div class="card">
+        <span class="eyebrow" id="label-5">05 · What I Owned</span>
+        <h2 class="section-title" id="title-5">The decisions I'd defend — and the constraints I worked around.</h2>
+
+        <div class="twocol">
+            <div class="twocol-block">
+                <h4><i class="fas fa-compass"></i> <span id="dec-head">Decisions I owned</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b id="d1-t">BAT as the orchestration layer.</b>
+                        <span id="d1-d">No modern orchestrator existed in the environment. A single <code>.bat</code> file sequencing WinSCP → 7-zip → gawk/sed → SQL*Plus → sqlcmd was the right tool: auditable, runnable by anyone, no dependencies to install.</span>
+                    </li>
+                    <li>
+                        <b id="d2-t">FULL JOIN on voice + data traffic.</b>
+                        <span id="d2-d">An INNER JOIN would have silently dropped subscribers using only voice or only data. The FULL JOIN + CASE WHEN pattern ensures every active subscriber surfaces regardless of which traffic type they generate.</span>
+                    </li>
+                    <li>
+                        <b id="d3-t">Pipe-delimited flat file as the integration format.</b>
+                        <span id="d3-d">BSCS Oracle couldn't write directly to SQL Server. SQL*Plus <code>SPOOL</code> to <code>|</code>-delimited text, then <code>BULK INSERT</code> in SQL Server, was the only format that crossed both runtimes reliably.</span>
+                    </li>
+                    <li>
+                        <b id="d4-t">Stored procedures for the cross-platform join logic.</b>
+                        <span id="d4-d">Keeping the reconciliation logic inside SQL Server stored procedures meant the join rules were versioned in one place — not scattered across shell scripts or ad hoc queries.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="twocol-block is-fail">
+                <h4><i class="fas fa-bug"></i> <span id="fail-head">Constraints + what I'd change</span></h4>
+                <ul class="twocol-list">
+                    <li>
+                        <b id="f1-t">Resolution by email — not automated.</b>
+                        <span id="f1-d">Discrepancies were sent to Backend and IT Monitoring teams by email. The fix depended on human response time. A ticketing integration or automated correction workflow would have closed the loop faster.</span>
+                    </li>
+                    <li>
+                        <b id="f2-t">Credentials embedded in the BAT file.</b>
+                        <span id="f2-d">FTP credentials and SQL connection strings lived inside the script. Acceptable for a local-desktop tool in 2018; the modern fix is a secrets manager or at minimum environment variables.</span>
+                    </li>
+                    <li>
+                        <b id="f3-t">No historical trend — only weekly snapshots.</b>
+                        <span id="f3-d">The process produced a point-in-time view, not a time-series. Adding a weekly append-to table in SQL Server would have let you track whether gaps were growing, shrinking, or recurring seasonally.</span>
+                    </li>
+                    <li>
+                        <b id="f4-t">Manual trigger — not scheduled.</b>
+                        <span id="f4-d">The BAT had to be run manually each week. A SQL Server Agent job or Task Scheduler entry would have made it truly automatic and removed the single point of human failure.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLOSING -->
+    <blockquote class="closing-take">
+        <span id="closing-quote">"A 30,000-record billing gap doesn't announce itself. Someone has to build the system that looks for it every week."</span>
+        <span class="closing-author" id="closing-author">— Working principle from this project</span>
+    </blockquote>
+
+    <div class="contact-section">
+        <p class="contact-text" id="contact-text">
+            Revenue assurance pipelines for telecom, AI adoption analytics for aviation — different domains, same discipline: build the instrumentation before you need it.
+        </p>
+        <a href="../index.html#convergence-section" class="contact-btn" id="contact-btn">
+            <i class="fas fa-arrow-right"></i> Contact Javier
+        </a>
+    </div>
+
+</div><!-- /container -->
+
+<script>
+function toggleCode(btn) {
+    const panel = btn.nextElementSibling;
+    panel.classList.toggle('active');
+    btn.classList.toggle('is-open');
+}
+
+const T = {
+    en: {
+        navBack: "Back to Portfolio",
+        badge: "Case Study · WOM Chile · 2018–2019",
+        title: "Platform<br><span class='text-accent'>Reconciliation</span>",
+        lead: "Six telecom platforms. 4.5 million subscribers. Weekly billing discrepancies surfaced by an automated pipeline built on BAT, FTP, Oracle SQL and SQL Server — before they became silent revenue losses.",
+        kpi1: "Valid subscribers", kpi2: "Platforms reconciled", kpi3: "Billing gaps per run", kpi4: "Rate plans catalogued",
+        metaPeriod: "Weekly · 1h automated run", metaRole: "Data Analyst → Analytics Engineer",
+        label1: "01 · Context",
+        title1: "A telecom doesn't lose revenue from outages. It loses it from <b>mismatches no one is watching.</b>",
+        text1: "<p>WOM Chile was growing fast — new subscribers, new rate plans, constant network expansion across BSCS, HSS, ICC, SYMSOFT, DWH and PCRF. Each platform maintained its own subscriber records. None of them talked to each other automatically.</p><p>A subscriber <strong>active in the network</strong> (HSS) but <strong>not billed correctly</strong> (BSCS) is silent revenue leakage. Without a cross-platform view, the only way to find those mismatches was to notice them — usually too late, usually by accident.</p><p><em>The problem wasn't missing data. It was no process that connected it weekly.</em></p>",
+        beforeTag: "Before", afterTag: "After",
+        beforeText: "Platform discrepancies discovered ad hoc, weeks after the fact. No systematic view across BSCS · HSS · ICC · SYMSOFT · PCRF. Escalation by email when someone noticed an anomaly.",
+        afterText: "Weekly automated run. 1 hour of execution: FTP extraction, parsing, SQL Server load, stored-procedure cross-join, dashboard view. Discrepancies routed to Backend and IT Monitoring teams with context.",
+        label2: "02 · Architecture",
+        title2: "One BAT file that orchestrated <b>four runtimes</b>, six platforms and two FTP servers.",
+        text2: "<p>The pipeline ran from a single Windows BAT file (<code>SCRIPT_CONCILIACION_PARQUE.bat</code>), which was the conductor. It handled FTP via <strong>WinSCP</strong> to pull compressed dumps from HSS and PCRF, decompressed them with <strong>7-zip</strong>, parsed them using <strong>gawk + sed</strong>, then fired Oracle SQL*Plus to extract BSCS and Netezza SQL to extract DWH traffic data. All of it landed in SQL Server, where stored procedures ran the cross-platform joins.</p><p><em>This was not a database problem — it was a runtime integration problem.</em> No single database could talk to all six sources. The BAT layer was the ETL.</p>",
+        pipeLabel: "Execution sequence · ~1 hour end-to-end",
+        p1: "Trigger", p2: "FTP Pull", p3: "Parse", p4: "Extract", p5: "Load + Cross",
+        platLabel: "Six platforms · three layers",
+        dwhDesc: "Source of truth. 4.5M valid subscribers. 658 rate plans mapped to <code>LK_PLN_PLAN</code>. Defines what billing should see.",
+        bscsDesc: "Billing system. 7.2M records total (facturable + no-facturable). Extracted via SQL*Plus <code>SPOOL</code> dump. Source of most discrepancies.",
+        bscsDif: "Δ 30,513 vs DWH",
+        iccDesc: "SIM card inventory. FTP dump pulled weekly. Cross-matched against BSCS active contracts.",
+        hssDesc: "Network authentication. 11.1M records. Parsed from compressed dump using gawk + sed. The network said these SIMs were active.",
+        hssDif: "Δ 22 vs DWH ✓",
+        symsoftDesc: "SMS platform. Traffic pulled from <code>BT_TRAFICO_SMSC_SYMSOFT</code>. Validated against active subscriber park.",
+        pcrfDesc: "Policy and data control. ~4.9M records. Parsed from compressed dump. Cross-matched to validate data service provisioning.",
+        label3: "03 · The Finding",
+        title3: "HSS had 22 differences. BSCS had <b>30,513. The network was fine. Billing wasn't.</b>",
+        text3: "<p>Every week the reconciliation produced one number that mattered: the delta between what each platform believed was active. HSS — the network authentication layer — showed only <strong>22 records</strong> diverging from DWH. That meant provisioning was nearly clean.</p><p>BSCS — the billing system — showed <strong>30,513 records</strong> diverging. <em>Every one of those records was a line item that billing couldn't process correctly.</em></p>",
+        ch1Title: "Platform discrepancy vs DWH baseline", ch1Sub: "weekly snapshot — records off from DWH truth",
+        insight1: "<b>The network provisioned correctly. The billing system didn't follow.</b> Without the cross-platform view, these 30,513 records would have been invisible — appearing as 'active' in every platform audit, while silently failing to generate correct billing.",
+        ch2Title: "Subscriber park composition · DWH baseline", ch2Sub: "4.5M valid + 2.7M under review",
+        ch3Title: "Revenue at risk · reference estimate", ch3Sub: "30,513 mismatches · ~CLP 13,990/plan/month",
+        mc1Label: "Records at risk", mc1Sub: "BSCS divergences per weekly run vs DWH baseline",
+        mc2Label: "Monthly exposure", mc2Sub: "Reference: ~CLP 13,990 plan / month. Actual varies by plan mix.",
+        mc3Label: "Annual projection", mc3Sub: "At constant volume. Identifying the gap is the first condition to recovering it.",
+        insight2: "<b>This is a conservative reference estimate, not a recovered revenue figure.</b> The actual monetary impact depended on plan mix, billing cycle timing and whether records were corrected within the same period. What the pipeline guaranteed was that the discrepancy was found weekly — not quarterly.",
+        label4: "04 · Traffic Enrichment",
+        title4: "Knowing a subscriber is miscoded is table stakes. <b>Knowing they're active on the network is the proof.</b>",
+        text4: "<p>Beyond the static park reconciliation, the pipeline joined <strong>30 days of voice, data, SMS and VAS traffic</strong> to the subscriber base. A billing mismatch becomes much more actionable when you can also say: this line had 340 minutes of voice and 2.8GB of data this month — it's not dormant, it's being used without being correctly billed.</p>",
+        trafVozTitle: "Voice Traffic", trafVozDesc: "30-day aggregation from <code>AGG_TRF_VOZ_MED_ABONADO</code>. Minutes of voice per subscriber, last traffic date. FULL JOIN with data traffic for unified view.",
+        trafDataTitle: "Data Traffic", trafDataDesc: "30-day MB from <code>AGG_TRF_DATOS_ABONADO</code> (KB_DOWN + KB_UP / 1024). Aggregated per subscriber, last active date.",
+        trafSmsTitle: "SMS Traffic", trafSmsDesc: "Delivered messages from SYMSOFT <code>BT_TRAFICO_SMSC_SYMSOFT</code>. State: 'Delivered' or 'Delivered direct'. Hit count + last delivery date.",
+        trafVasTitle: "VAS / Shortcode", trafVasDesc: "Value-added service charges from <code>BT_TRAFICO_SHRTC</code>. Net amount extracted via <code>SUBSTR + INSTR</code> position parsing on <code>ADDITIONAL_ORIGCHARGEINFO</code>.",
+        trafResultTitle: "Reconciliation view", trafResultDesc: "All four traffic sources joined to the park cross in SQL Server. Output: subscribers with platform status + usage evidence, sorted by gap priority.",
+        reportTitle: "Reporting", reportDesc: "Results sent by email to Backend (Héctor Leiva) and IT Monitoring (Theo Soto, César Barrios, Jorge Durán) for investigation and correction.",
+        label5: "05 · What I Owned",
+        title5: "The decisions I'd defend — and the constraints I worked around.",
+        decHead: "Decisions I owned",
+        d1t: "BAT as the orchestration layer.", d1d: "No modern orchestrator existed in the environment. A single <code>.bat</code> file sequencing WinSCP → 7-zip → gawk/sed → SQL*Plus → sqlcmd was the right tool: auditable, runnable by anyone, no dependencies to install.",
+        d2t: "FULL JOIN on voice + data traffic.", d2d: "An INNER JOIN would have silently dropped subscribers using only voice or only data. The FULL JOIN + CASE WHEN pattern ensures every active subscriber surfaces regardless of which traffic type they generate.",
+        d3t: "Pipe-delimited flat file as the integration format.", d3d: "BSCS Oracle couldn't write directly to SQL Server. SQL*Plus <code>SPOOL</code> to <code>|</code>-delimited text, then <code>BULK INSERT</code> in SQL Server, was the only format that crossed both runtimes reliably.",
+        d4t: "Stored procedures for the cross-platform join logic.", d4d: "Keeping the reconciliation logic inside SQL Server stored procedures meant the join rules were versioned in one place — not scattered across shell scripts or ad hoc queries.",
+        failHead: "Constraints + what I'd change",
+        f1t: "Resolution by email — not automated.", f1d: "Discrepancies were sent to Backend and IT Monitoring teams by email. The fix depended on human response time. A ticketing integration or automated correction workflow would have closed the loop faster.",
+        f2t: "Credentials embedded in the BAT file.", f2d: "FTP credentials and SQL connection strings lived inside the script. Acceptable for a local-desktop tool in 2018; the modern fix is a secrets manager or at minimum environment variables.",
+        f3t: "No historical trend — only weekly snapshots.", f3d: "The process produced a point-in-time view, not a time-series. Adding a weekly append-to table in SQL Server would have let you track whether gaps were growing, shrinking, or recurring seasonally.",
+        f4t: "Manual trigger — not scheduled.", f4d: "The BAT had to be run manually each week. A SQL Server Agent job or Task Scheduler entry would have made it truly automatic and removed the single point of human failure.",
+        closingQuote: '"A 30,000-record billing gap doesn\'t announce itself. Someone has to build the system that looks for it every week."',
+        closingAuthor: "— Working principle from this project",
+        contactText: "Revenue assurance pipelines for telecom, AI adoption analytics for aviation — different domains, same discipline: build the instrumentation before you need it.",
+        contactBtn: "Contact Javier", queryLabel: "Source"
+    },
+    es: {
+        navBack: "Volver al Portafolio",
+        badge: "Caso de Estudio · WOM Chile · 2018–2019",
+        title: "Conciliación<br><span class='text-accent'>de Plataformas</span>",
+        lead: "Seis plataformas de telecomunicaciones. 4,5 millones de abonados. Discrepancias de facturación detectadas semanalmente por un pipeline automatizado con BAT, FTP, Oracle SQL y SQL Server — antes de que se convirtieran en pérdidas silenciosas de revenue.",
+        kpi1: "Abonados válidos", kpi2: "Plataformas conciliadas", kpi3: "Brechas por ejecución", kpi4: "Planes tarifarios catalogados",
+        metaPeriod: "Semanal · 1h de ejecución", metaRole: "Analista de Datos → Analytics Engineer",
+        label1: "01 · Contexto",
+        title1: "Una telco no pierde revenue por caídas de red. Lo pierde por <b>inconsistencias que nadie está monitoreando.</b>",
+        text1: "<p>WOM Chile crecía rápido — nuevos abonados, nuevos planes, expansión de red constante en BSCS, HSS, ICC, SYMSOFT, DWH y PCRF. Cada plataforma mantenía sus propios registros de abonados. Ninguna se comunicaba automáticamente con las demás.</p><p>Un abonado <strong>activo en la red</strong> (HSS) pero <strong>sin facturación correcta</strong> (BSCS) es una fuga silenciosa de revenue. Sin una vista transversal, la única forma de encontrar esas inconsistencias era notarlas — generalmente demasiado tarde, generalmente por accidente.</p><p><em>El problema no eran los datos. Era la ausencia de un proceso que los cruzara semanalmente.</em></p>",
+        beforeTag: "Antes", afterTag: "Con el pipeline",
+        beforeText: "Discrepancias entre plataformas detectadas de forma ad hoc, semanas después. Sin vista sistemática de BSCS · HSS · ICC · SYMSOFT · PCRF. Escalación por correo cuando alguien notaba una anomalía.",
+        afterText: "Ejecución semanal automatizada. 1 hora de proceso: extracción FTP, parseo, carga SQL Server, stored procedures de cruce, vista de análisis. Discrepancias enviadas a los equipos de Backend y Monitoreo IT con contexto.",
+        label2: "02 · Arquitectura",
+        title2: "Un archivo BAT que orquestó <b>cuatro runtimes</b>, seis plataformas y dos servidores FTP.",
+        text2: "<p>El pipeline corría desde un solo archivo BAT de Windows (<code>SCRIPT_CONCILIACION_PARQUE.bat</code>), que actuaba como director. Manejaba FTP vía <strong>WinSCP</strong> para bajar dumps comprimidos de HSS y PCRF, los descomprimía con <strong>7-zip</strong>, los parseaba con <strong>gawk + sed</strong>, luego ejecutaba SQL*Plus contra Oracle BSCS y Netezza para el DWH. Todo aterrizaba en SQL Server, donde los stored procedures hacían el cruce.</p><p><em>Este no era un problema de base de datos — era un problema de integración de runtimes.</em> Ninguna base de datos podía hablar con las seis fuentes. La capa BAT era el ETL.</p>",
+        pipeLabel: "Secuencia de ejecución · ~1 hora total",
+        p1: "Trigger", p2: "FTP Pull", p3: "Parseo", p4: "Extracción", p5: "Carga + Cruce",
+        platLabel: "Seis plataformas · tres capas",
+        dwhDesc: "Fuente de verdad. 4,5M abonados válidos. 658 planes mapeados en <code>LK_PLN_PLAN</code>. Define lo que facturación debe ver.",
+        bscsDesc: "Sistema de facturación. 7,2M registros totales (facturables + no facturables). Extraído vía SQL*Plus <code>SPOOL</code>. Fuente de la mayoría de las discrepancias.",
+        bscsDif: "Δ 30.513 vs DWH",
+        iccDesc: "Inventario de SIM cards. Dump FTP descargado semanalmente. Cruzado con contratos activos de BSCS.",
+        hssDesc: "Autenticación de red. 11,1M registros. Parseado desde dump comprimido con gawk + sed. La red confirmaba que estas SIMs estaban activas.",
+        hssDif: "Δ 22 vs DWH ✓",
+        symsoftDesc: "Plataforma SMS. Tráfico extraído de <code>BT_TRAFICO_SMSC_SYMSOFT</code>. Validado contra el parque activo.",
+        pcrfDesc: "Control de política y datos. ~4,9M registros. Parseado desde dump comprimido. Cruzado para validar el aprovisionamiento de servicios de datos.",
+        label3: "03 · El Hallazgo",
+        title3: "HSS tenía 22 diferencias. BSCS tenía <b>30.513. La red estaba bien. La facturación, no.</b>",
+        text3: "<p>Cada semana la conciliación producía un número clave: el delta entre lo que cada plataforma creía que estaba activo. HSS — la capa de autenticación de red — mostraba solo <strong>22 registros</strong> distintos al DWH. El aprovisionamiento estaba casi limpio.</p><p>BSCS — el sistema de facturación — mostraba <strong>30.513 registros</strong> distintos. <em>Cada uno de esos registros era una línea que facturación no podía procesar correctamente.</em></p>",
+        ch1Title: "Discrepancia por plataforma vs DWH", ch1Sub: "snapshot semanal — registros divergentes de la fuente de verdad",
+        insight1: "<b>La red aprovisionó correctamente. Facturación no siguió.</b> Sin la vista transversal, estos 30.513 registros habrían sido invisibles — apareciendo como 'activos' en cada auditoría individual, mientras fallaban silenciosamente en generar facturación correcta.",
+        ch2Title: "Composición del parque · DWH baseline", ch2Sub: "4,5M válidos + 2,7M en revisión",
+        ch3Title: "Revenue en riesgo · estimación de referencia", ch3Sub: "30.513 inconsistencias · ~CLP 13.990/plan/mes",
+        mc1Label: "Registros en riesgo", mc1Sub: "Divergencias BSCS por ejecución semanal vs DWH",
+        mc2Label: "Exposición mensual", mc2Sub: "Referencia: ~CLP 13.990 plan / mes. Varía según mix de planes.",
+        mc3Label: "Proyección anual", mc3Sub: "A volumen constante. Identificar la brecha es la primera condición para recuperarla.",
+        insight2: "<b>Esta es una estimación conservadora de referencia, no revenue recuperado.</b> El impacto monetario real dependía del mix de planes, el timing del ciclo de facturación y si los registros se corregían dentro del mismo período. Lo que el pipeline garantizaba era que la discrepancia se encontraba semanalmente — no trimestralmente.",
+        label4: "04 · Enriquecimiento con Tráfico",
+        title4: "Saber que un abonado está mal codificado es el punto de partida. <b>Saber que está activo en la red es la prueba.</b>",
+        text4: "<p>Más allá de la conciliación estática del parque, el pipeline cruzaba <strong>30 días de tráfico de Voz, Datos, SMS y VAS</strong> con la base de abonados. Una discrepancia de facturación es mucho más accionable cuando también puedes decir: esta línea tuvo 340 minutos de voz y 2,8GB de datos este mes — no está dormida, se está usando sin que se facture correctamente.</p>",
+        trafVozTitle: "Tráfico Voz", trafVozDesc: "Agregación 30 días de <code>AGG_TRF_VOZ_MED_ABONADO</code>. Minutos de voz por abonado, fecha de último tráfico. FULL JOIN con datos para vista unificada.",
+        trafDataTitle: "Tráfico Datos", trafDataDesc: "MB de 30 días de <code>AGG_TRF_DATOS_ABONADO</code> (KB_DOWN + KB_UP / 1024). Agregado por abonado, fecha de último tráfico.",
+        trafSmsTitle: "Tráfico SMS", trafSmsDesc: "Mensajes entregados de SYMSOFT <code>BT_TRAFICO_SMSC_SYMSOFT</code>. Estado: 'Delivered' o 'Delivered direct'. Conteo + fecha de último envío.",
+        trafVasTitle: "VAS / Shortcode", trafVasDesc: "Cargos de servicios de valor agregado de <code>BT_TRAFICO_SHRTC</code>. Monto neto extraído vía parsing de posición <code>SUBSTR + INSTR</code> sobre <code>ADDITIONAL_ORIGCHARGEINFO</code>.",
+        trafResultTitle: "Vista de conciliación", trafResultDesc: "Las cuatro fuentes de tráfico cruzadas con el parque en SQL Server. Output: abonados con estado por plataforma + evidencia de uso, ordenados por prioridad de brecha.",
+        reportTitle: "Reporte", reportDesc: "Resultados enviados por correo a Backend (Héctor Leiva) y Monitoreo IT (Theo Soto, César Barrios, Jorge Durán) para investigación y corrección.",
+        label5: "05 · Lo que Tuve a Cargo",
+        title5: "Las decisiones que defendería — y las limitaciones que tuve que trabajar.",
+        decHead: "Decisiones que tomé",
+        d1t: "BAT como capa de orquestación.", d1d: "No existía un orquestador moderno en el entorno. Un solo <code>.bat</code> secuenciando WinSCP → 7-zip → gawk/sed → SQL*Plus → sqlcmd era la herramienta correcta: auditable, ejecutable por cualquiera, sin dependencias a instalar.",
+        d2t: "FULL JOIN en tráfico voz + datos.", d2d: "Un INNER JOIN habría descartado silenciosamente abonados con solo voz o solo datos. El patrón FULL JOIN + CASE WHEN asegura que todo abonado activo aparezca independiente del tipo de tráfico que genere.",
+        d3t: "Flat file pipe-delimited como formato de integración.", d3d: "BSCS Oracle no podía escribir directamente a SQL Server. SQL*Plus <code>SPOOL</code> a texto <code>|</code>-delimitado, luego <code>BULK INSERT</code> en SQL Server, fue el único formato que cruzó ambos runtimes de forma confiable.",
+        d4t: "Stored procedures para la lógica de cruce.", d4d: "Mantener la lógica de conciliación dentro de stored procedures en SQL Server significaba que las reglas de cruce estaban versionadas en un solo lugar — no dispersas en shell scripts o queries ad hoc.",
+        failHead: "Limitaciones + qué cambiaría",
+        f1t: "Resolución por correo — no automatizada.", f1d: "Las discrepancias se enviaban por correo a Backend y Monitoreo IT. El fix dependía del tiempo de respuesta humano. Una integración con ticketing o un flujo de corrección automatizado habría cerrado el loop más rápido.",
+        f2t: "Credenciales dentro del archivo BAT.", f2d: "Las credenciales FTP y los strings de conexión SQL vivían dentro del script. Aceptable para una herramienta de escritorio local en 2018; el fix moderno es un secrets manager o al menos variables de entorno.",
+        f3t: "Sin tendencia histórica — solo snapshots semanales.", f3d: "El proceso producía una vista puntual, no una serie de tiempo. Agregar un append semanal a una tabla en SQL Server habría permitido rastrear si las brechas crecían, decrecían o se repetían estacionalmente.",
+        f4t: "Trigger manual — no programado.", f4d: "El BAT tenía que ejecutarse manualmente cada semana. Un SQL Server Agent job o una entrada en Task Scheduler lo habría hecho verdaderamente automático y eliminado el único punto de falla humana.",
+        closingQuote: '"Una brecha de 30.000 registros de facturación no se anuncia sola. Alguien tiene que construir el sistema que la busca cada semana."',
+        closingAuthor: "— Principio de trabajo de este proyecto",
+        contactText: "Pipelines de revenue assurance para telecomunicaciones, analítica de adopción de IA para aviación — dominios distintos, misma disciplina: construir la instrumentación antes de necesitarla.",
+        contactBtn: "Contactar a Javier", queryLabel: "Consulta"
+    }
+};
+
+function changeLang(lang) {
+    document.querySelectorAll('.lang-opt').forEach(b => b.classList.remove('is-active'));
+    document.getElementById('btn-' + lang).classList.add('is-active');
+    const t = T[lang];
+    const setText = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const setHTML = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+
+    setText('nav-back', t.navBack);
+    setText('hero-badge', t.badge);
+    setHTML('hero-title', t.title);
+    setText('hero-lead', t.lead);
+    setText('kpi-1', t.kpi1); setText('kpi-2', t.kpi2); setText('kpi-3', t.kpi3); setText('kpi-4', t.kpi4);
+    setText('meta-period', t.metaPeriod); setText('meta-role', t.metaRole);
+    setText('label-1', t.label1); setHTML('title-1', t.title1); setHTML('text-1', t.text1);
+    setText('before-tag', t.beforeTag); setText('after-tag', t.afterTag);
+    setText('before-text', t.beforeText); setText('after-text', t.afterText);
+    setText('label-2', t.label2); setHTML('title-2', t.title2); setHTML('text-2', t.text2);
+    setText('pipe-label', t.pipeLabel);
+    setText('p1-label', t.p1); setText('p2-label', t.p2); setText('p3-label', t.p3);
+    setText('p4-label', t.p4); setText('p5-label', t.p5);
+    setText('plat-label', t.platLabel);
+    setHTML('dwh-desc', t.dwhDesc); setHTML('bscs-desc', t.bscsDesc); setText('bscs-dif', t.bscsDif);
+    setHTML('icc-desc', t.iccDesc); setHTML('hss-desc', t.hssDesc); setText('hss-dif', t.hssDif);
+    setHTML('symsoft-desc', t.symsoftDesc); setHTML('pcrf-desc', t.pcrfDesc);
+    setText('label-3', t.label3); setHTML('title-3', t.title3); setHTML('text-3', t.text3);
+    setText('chart-1-title', t.ch1Title); setText('chart-1-sub', t.ch1Sub);
+    setHTML('insight-1', t.insight1);
+    setText('chart-2-title', t.ch2Title); setText('chart-2-sub', t.ch2Sub);
+    setText('chart-3-title', t.ch3Title); setText('chart-3-sub', t.ch3Sub);
+    setText('mc-1-label', t.mc1Label); setText('mc-1-sub', t.mc1Sub);
+    setText('mc-2-label', t.mc2Label); setText('mc-2-sub', t.mc2Sub);
+    setText('mc-3-label', t.mc3Label); setText('mc-3-sub', t.mc3Sub);
+    setHTML('insight-2', t.insight2);
+    setText('label-4', t.label4); setHTML('title-4', t.title4); setHTML('text-4', t.text4);
+    setText('traf-voz-title', t.trafVozTitle); setHTML('traf-voz-desc', t.trafVozDesc);
+    setText('traf-data-title', t.trafDataTitle); setHTML('traf-data-desc', t.trafDataDesc);
+    setText('traf-sms-title', t.trafSmsTitle); setHTML('traf-sms-desc', t.trafSmsDesc);
+    setText('traf-vas-title', t.trafVasTitle); setHTML('traf-vas-desc', t.trafVasDesc);
+    setText('traf-result-title', t.trafResultTitle); setHTML('traf-result-desc', t.trafResultDesc);
+    setText('report-title', t.reportTitle); setHTML('report-desc', t.reportDesc);
+    setText('label-5', t.label5); setText('title-5', t.title5);
+    setText('dec-head', t.decHead);
+    setText('d1-t', t.d1t); setHTML('d1-d', t.d1d);
+    setText('d2-t', t.d2t); setHTML('d2-d', t.d2d);
+    setText('d3-t', t.d3t); setHTML('d3-d', t.d3d);
+    setText('d4-t', t.d4t); setHTML('d4-d', t.d4d);
+    setText('fail-head', t.failHead);
+    setText('f1-t', t.f1t); setHTML('f1-d', t.f1d);
+    setText('f2-t', t.f2t); setHTML('f2-d', t.f2d);
+    setText('f3-t', t.f3t); setHTML('f3-d', t.f3d);
+    setText('f4-t', t.f4t); setHTML('f4-d', t.f4d);
+    setText('closing-quote', t.closingQuote);
+    setText('closing-author', t.closingAuthor);
+    setText('contact-text', t.contactText);
+    setHTML('contact-btn', '<i class="fas fa-arrow-right"></i> ' + t.contactBtn);
+    document.querySelectorAll('.query-label').forEach(el => el.textContent = t.queryLabel);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const params = new URLSearchParams(window.location.search);
+    const lang = params.get('lang') || 'en';
+    changeLang(lang);
+    const backBtn = document.querySelector('.back-link');
+    if (backBtn) {
+        let url = "../index.html";
+        const ps = [];
+        if (params.get('v')) ps.push(`v=${params.get('v')}`);
+        if (lang) ps.push(`lang=${lang}`);
+        if (ps.length) url += "?" + ps.join("&");
+        url += "#projects";
+        backBtn.href = url;
+    }
+});
+</script>
+</body>
+</html>
