@@ -2205,13 +2205,13 @@ body::after {
           </div>
           <span class="cta-arrow">→</span>
         </a>
-        <a href="resume_javier_moraga.pdf" class="cta-row" target="_self">
+        <a href="Javier_Moraga_Resume_Global.pdf" id="cv-link" class="cta-row" target="_self">
           <div class="cta-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg>
           </div>
           <div>
-            <span class="cta-label">Résumé</span>
-            <span class="cta-value">Download PDF</span>
+            <span class="cta-label" data-i18n="cv-label">Résumé</span>
+            <span class="cta-value" data-i18n="cv-value">Download PDF</span>
           </div>
           <span class="cta-arrow">→</span>
         </a>
@@ -2365,6 +2365,8 @@ var translations = {
     'projkpil-17': 'Query speedup',
     'projkpil-18': 'Silos retired',
     'projkpil-19': 'Real-time analytics',
+    'cv-label': 'Résumé',
+    'cv-value': 'Download PDF',
 
     /* Clínica Alemana Medical Templates */
     'projtag-8':   'Healthcare · Metadata-Driven Platform',
@@ -2564,6 +2566,8 @@ var translations = {
     'projkpil-17': 'Aceleración queries',
     'projkpil-18': 'Silos retirados',
     'projkpil-19': 'Analytics tiempo real',
+    'cv-label': 'Currículum',
+    'cv-value': 'Descargar PDF',
 
     /* Clínica Alemana Plantillas Médicas */
     'projtag-8':   'Salud · Plataforma Metadata-Driven',
@@ -2670,6 +2674,14 @@ function changeLang(lang) {
   });
 
   // ── Persist preference ──
+  // ── Path CV: switch PDF href by language ──
+  var cvLink = document.getElementById('cv-link');
+  if (cvLink) {
+    cvLink.href = (lang === 'es')
+      ? 'Javier_Moraga_Resume_Global_Esp.pdf'
+      : 'Javier_Moraga_Resume_Global.pdf';
+  }
+
   try { localStorage.setItem('lang', lang); } catch (e) {}
 }
 
