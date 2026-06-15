@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Alemana · SAS → BigQuery Migration System — Javier Moraga</title>
+    <meta name="description" content="Case study: A deterministic migration engine for ~300 SAS Enterprise Guide processes to BigQuery. Topological execution-order resolution, risk detection, and a single master prompt that keeps 300 AI translations consistent.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
+<style>
+:root {
+    --bg:        #050505;
+    --bg2:       #08080c;
+    --surface:   rgba(12,12,16,0.6);
+    --surface-2: rgba(255,255,255,0.025);
+    --border:    rgba(255,255,255,0.05);
+    --border-hi: rgba(255,255,255,0.12);
+    --text:      rgba(255,255,255,0.92);
+    --muted:     #94a3b8;
+    --dim:       rgba(255,255,255,0.22);
+
+    --c-eng:     #00e5ff;
+    --c-viz:     #d500f9;
+    --c-biz:     #fbbf24;
+    --c-ok:      #4ade80;
+    --c-fail:    #f87171;
+    --border-glass: rgba(255,255,255,0.08);
+
+    --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+    --font-body: 'Inter', sans-serif;
+    --font-disp: 'Jost', sans-serif;
+    --font-mono: 'Fira Code', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; background: var(--bg); }
+body {
+    background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,229,255,0.05) 0%, transparent 60%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    padding-top: 64px;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+
+/* ── NAV ── */
+.nav-bar {
+    position: fixed; top:0; left:0; right:0; z-index:1000; height:64px;
+    padding: 0 48px; display:flex; justify-content:space-between; align-items:center;
+    background: rgba(5,5,5,0.85); backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border);
+}
+.back-link, .nav-name {
+    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+    border: 1px solid var(--border); padding: 7px 14px; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.back-link:hover { color: var(--text); border-color: var(--border-hi); }
+.back-link i { font-size: 0.7rem; opacity: 0.7; transition: transform 0.25s var(--ease); }
+.back-link:hover i { transform: translateX(-3px); color: var(--c-eng); opacity:1; }
+.nav-name b { color: var(--c-eng); margin-left: 10px; font-weight: 500; letter-spacing: 0.14em; }
+
+.lang-switch {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 6px; border: 1px solid var(--border); border-radius: 100px;
+    background: rgba(255,255,255,0.015);
+}
+.lang-opt {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim);
+    padding: 5px 10px; border-radius: 100px;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.lang-opt.is-active { color: var(--c-eng); background: rgba(0,229,255,0.08); }
+.lang-sep { font-family: var(--font-mono); color: var(--dim); user-select: none; }
+
+/* ── SCROLLBAR ── */
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.18); border-radius: 100px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,229,255,0.4); }
+
+/* ── HERO ── */
+header {
+    padding: 80px 48px 60px;
+    border-bottom: 1px solid var(--border);
+}
+.container { max-width: 1200px; margin: 0 auto; }
+
+.hero-badge {
+    display: inline-block; font-family: var(--font-mono);
+    font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-eng); padding: 5px 12px;
+    border: 1px solid rgba(0,229,255,0.3); border-radius: 100px;
+    background: rgba(0,229,255,0.04); margin-bottom: 28px;
+}
+
+h1 {
+    font-family: var(--font-disp); font-weight: 300;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    line-height: 1.08; letter-spacing: -0.025em; margin-bottom: 24px;
+}
+.text-gradient {
+    background: linear-gradient(120deg, var(--c-eng) 0%, var(--c-viz) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.lead {
+    color: var(--muted); font-size: 1.05rem; line-height: 1.7;
+    max-width: 760px; margin-bottom: 40px;
+}
+
+.hero-kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-bottom: 32px;
+}
+.hero-kpi {
+    padding: 18px 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.3s var(--ease);
+}
+.hero-kpi:hover { border-color: var(--border-hi); }
+.hero-kpi-value {
+    display: block; font-family: var(--font-disp);
+    font-size: 1.7rem; font-weight: 400; color: var(--text);
+    letter-spacing: -0.02em; margin-bottom: 4px;
+}
+.hero-kpi-value b { color: var(--c-eng); font-weight: 400; }
+.hero-kpi-label {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+}
+
+.hero-meta {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted); margin-bottom: 28px;
+}
+.hero-meta b { color: var(--c-eng); font-weight: 500; }
+
+.stack-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+.stack-pill {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 6px 12px; border: 1px solid var(--border);
+    border-radius: 100px; color: var(--muted);
+    background: var(--surface-2); transition: all 0.25s var(--ease);
+}
+.stack-pill:hover { border-color: var(--border-hi); color: var(--text); }
+.stack-pill.is-primary {
+    color: var(--c-eng); border-color: rgba(0,229,255,0.25);
+    background: rgba(0,229,255,0.05);
+}
+
+/* ── SECTIONS ── */
+main { padding: 60px 48px 80px; }
+section { margin-bottom: 48px; }
+
+.card {
+    max-width: 1200px; margin: 0 auto;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 44px 48px;
+    transition: border-color 0.4s var(--ease);
+}
+.card:hover { border-color: var(--border-hi); }
+
+.section-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 14px; display: block;
+}
+
+.narrative-title {
+    font-family: var(--font-disp); font-weight: 300;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.2; letter-spacing: -0.02em;
+    margin-bottom: 24px; color: var(--text);
+    max-width: 860px;
+}
+
+.narrative-text { color: var(--muted); margin-bottom: 36px; max-width: 880px; }
+.narrative-text p { margin-bottom: 16px; line-height: 1.75; }
+.narrative-text p:last-child { margin-bottom: 0; }
+.narrative-text strong { color: var(--text); font-weight: 500; }
+.narrative-text em { color: var(--c-eng); font-style: normal; }
+.narrative-text code {
+    font-family: var(--font-mono); font-size: 0.85em;
+    background: rgba(0,229,255,0.08); color: var(--c-eng);
+    padding: 1px 7px; border-radius: 4px;
+}
+
+.section-sub-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin: 32px 0 14px; display: block;
+}
+
+/* ── COMPARE BEFORE/AFTER ── */
+.compare-block {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 16px; align-items: stretch; margin-top: 32px;
+}
+.compare-side {
+    padding: 22px 24px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+}
+.compare-side.is-after { border-color: rgba(0,229,255,0.25); background: rgba(0,229,255,0.03); }
+.compare-tag {
+    display: inline-block; font-family: var(--font-mono);
+    font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 100px; margin-bottom: 12px;
+    color: var(--c-fail); background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.2);
+}
+.compare-side.is-after .compare-tag {
+    color: var(--c-eng); background: rgba(0,229,255,0.08);
+    border-color: rgba(0,229,255,0.2);
+}
+.compare-text { color: var(--muted); font-size: 0.92rem; line-height: 1.65; }
+.compare-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-eng); font-size: 1.3rem;
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow-block {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; margin-top: 16px;
+}
+.flow-step {
+    padding: 16px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+    text-align: center; position: relative;
+}
+.flow-step-day {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 8px; display: block;
+}
+.flow-step-title {
+    font-family: var(--font-disp); font-size: 0.95rem;
+    color: var(--text); margin-bottom: 6px;
+}
+.flow-step-meta {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    color: var(--muted); line-height: 1.5;
+}
+
+/* ── TWO COL ── */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+.twocol-block {
+    padding: 26px 28px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+}
+.twocol-block h4 {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: 1.1rem; color: var(--text); margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+}
+.twocol-block h4 i { color: var(--c-eng); font-size: 1rem; }
+.twocol-block.is-fail h4 i { color: var(--c-fail); }
+.twocol-list li {
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    color: var(--muted); font-size: 0.92rem; line-height: 1.65;
+}
+.twocol-list li:last-child { border-bottom: none; }
+.twocol-list b { color: var(--text); font-weight: 500; display: block; margin-bottom: 4px; }
+.twocol-list code {
+    font-family: var(--font-mono); font-size: 0.82em;
+    background: rgba(0,229,255,0.06); color: var(--c-eng);
+    padding: 1px 5px; border-radius: 3px;
+}
+
+/* ── METRIC CARDS ── */
+.metric-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-top: 28px;
+}
+.metric-card {
+    padding: 22px 24px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+}
+.metric-card-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px; display: block;
+}
+.metric-card-value {
+    font-family: var(--font-disp); font-weight: 400;
+    font-size: 1.8rem; color: var(--c-eng);
+    letter-spacing: -0.02em; line-height: 1; margin-bottom: 8px;
+}
+.metric-card-desc { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+
+/* ── SCHEMA / CODE ── */
+.schema-card {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 18px 22px; margin-top: 20px;
+    font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--muted); line-height: 1.7; overflow-x: auto;
+    white-space: pre;
+}
+.schema-card .kw { color: var(--c-viz); }
+.schema-card .col { color: var(--c-eng); }
+.schema-card .com { color: var(--dim); }
+
+/* ── CONTACT ── */
+.contact-section {
+    max-width: 1200px; margin: 60px auto 40px;
+    padding: 44px 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    text-align: center;
+}
+.contact-section h3 {
+    font-family: var(--font-disp); font-weight: 300;
+    font-size: 1.6rem; color: var(--text); margin-bottom: 12px;
+}
+.contact-section p { color: var(--muted); margin-bottom: 24px; }
+.contact-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.contact-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 10px 20px; border: 1px solid var(--border);
+    border-radius: 100px; color: var(--muted);
+    transition: all 0.25s var(--ease);
+}
+.contact-link:hover { color: var(--c-eng); border-color: var(--c-eng); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .nav-bar, header, main { padding-left: 20px; padding-right: 20px; }
+    .card { padding: 32px 24px; }
+    .hero-kpis { grid-template-columns: repeat(2, 1fr); }
+    .compare-block { grid-template-columns: 1fr; }
+    .compare-arrow { transform: rotate(90deg); }
+    .flow-block { grid-template-columns: 1fr 1fr; }
+    .twocol { grid-template-columns: 1fr; }
+    .metric-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ── EVIDENCE BLOCK · before/after data transformation ── */
+.evidence-grid {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 14px; margin-top: 28px; align-items: stretch;
+}
+.evidence-card {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    font-family: var(--font-mono); font-size: 0.72rem;
+    line-height: 1.6; overflow: hidden;
+}
+.evidence-card.is-output { border-color: rgba(0,229,255,0.2); background: rgba(0,229,255,0.02); }
+.evidence-label {
+    font-family: var(--font-mono); font-size: 0.6rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px; display: block;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.evidence-card.is-output .evidence-label { color: var(--c-eng); }
+.evidence-code { color: var(--muted); white-space: pre; overflow-x: auto; }
+.evidence-code .kw  { color: var(--c-viz); }
+.evidence-code .col { color: var(--c-eng); }
+.evidence-code .str { color: var(--c-biz); }
+.evidence-code .num { color: var(--c-ok); }
+.evidence-code .com { color: var(--dim); font-style: italic; }
+.evidence-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-eng); font-size: 1.4rem;
+}
+.evidence-arrow-label {
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); writing-mode: horizontal-tb;
+    text-align: center; margin-top: 6px;
+}
+
+/* ── TERMINAL · pseudo console output ── */
+.terminal-card {
+    background: #0a0a0d; border: 1px solid var(--border);
+    border-radius: 10px; padding: 0;
+    margin-top: 28px; overflow: hidden;
+}
+.terminal-bar {
+    background: rgba(255,255,255,0.03);
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+.terminal-dot.r { background: #ff5f57; }
+.terminal-dot.y { background: #febc2e; }
+.terminal-dot.g { background: #28c840; }
+.terminal-title {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    color: var(--muted); margin-left: 8px;
+}
+.terminal-body {
+    padding: 18px 22px;
+    font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--text); line-height: 1.7;
+    overflow-x: auto; white-space: pre;
+}
+.terminal-body .prompt  { color: var(--c-eng); }
+.terminal-body .input   { color: var(--c-biz); }
+.terminal-body .ok      { color: var(--c-ok); }
+.terminal-body .label   { color: var(--c-viz); font-weight: 500; }
+.terminal-body .muted   { color: var(--muted); }
+.terminal-body .header  { color: var(--text); font-weight: 500; }
+
+/* ── DELTA COMPOSITION ── */
+.delta-composition {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 28px; margin-top: 28px; align-items: center;
+}
+.delta-bars { display: flex; flex-direction: column; gap: 12px; }
+.delta-bar-row {
+    display: grid; grid-template-columns: 110px 1fr 60px;
+    gap: 12px; align-items: center;
+    font-family: var(--font-mono); font-size: 0.72rem;
+}
+.delta-bar-label { color: var(--muted); letter-spacing: 0.06em; }
+.delta-bar-track {
+    height: 12px; background: rgba(255,255,255,0.04);
+    border-radius: 100px; overflow: hidden; position: relative;
+}
+.delta-bar-fill {
+    height: 100%; border-radius: 100px;
+    transition: width 0.6s var(--ease);
+}
+.delta-bar-fill.is-new   { background: var(--c-eng); }
+.delta-bar-fill.is-upd   { background: var(--c-biz); }
+.delta-bar-fill.is-del   { background: var(--c-fail); }
+.delta-bar-value { color: var(--text); font-weight: 500; text-align: right; }
+.delta-summary {
+    padding: 22px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+    font-family: var(--font-mono); font-size: 0.78rem;
+    color: var(--muted); line-height: 1.8;
+}
+.delta-summary b { color: var(--c-eng); font-weight: 500; }
+
+/* ── EXCEL MOCK ── */
+.excel-mock {
+    margin-top: 28px;
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    font-family: var(--font-mono); font-size: 0.72rem;
+}
+.excel-tabs {
+    display: flex; background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    padding: 0 12px;
+}
+.excel-tab {
+    padding: 10px 16px; color: var(--muted);
+    border-right: 1px solid var(--border);
+    font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.excel-tab.is-active { color: var(--c-eng); background: var(--surface); }
+.excel-table { width: 100%; }
+.excel-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr 100px;
+    border-bottom: 1px solid var(--border);
+}
+.excel-row.is-header {
+    background: rgba(255,255,255,0.04); color: var(--text);
+    font-weight: 500; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+}
+.excel-row.is-new  { background: rgba(74,222,128,0.05); }
+.excel-row.is-upd  { background: rgba(251,191,36,0.04); }
+.excel-row.is-del  { background: rgba(248,113,113,0.05); }
+.excel-cell {
+    padding: 9px 14px;
+    border-right: 1px solid var(--border);
+    color: var(--muted); overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.excel-cell:last-child { border-right: none; }
+.excel-cell.is-new   { color: var(--c-ok); }
+.excel-cell.is-upd   { color: var(--c-biz); }
+.excel-cell.is-del   { color: var(--c-fail); }
+.excel-cell .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 100px;
+    font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.badge.is-new { background: rgba(74,222,128,0.1); color: var(--c-ok); }
+.badge.is-upd { background: rgba(251,191,36,0.1); color: var(--c-biz); }
+.badge.is-del { background: rgba(248,113,113,0.1); color: var(--c-fail); }
+
+/* ── RESPONSIVE additions ── */
+@media (max-width: 768px) {
+    .evidence-grid { grid-template-columns: 1fr; }
+    .evidence-arrow { transform: rotate(90deg); padding: 8px 0; }
+    .delta-composition { grid-template-columns: 1fr; }
+    .excel-row { grid-template-columns: 60px 1fr 90px; }
+    .excel-cell:nth-child(3) { display: none; }
+}
+
+
+
+/* ── JOURNEY FLOW · horizontal template-to-dashboard ── */
+.journey-flow {
+    display: flex; align-items: center; gap: 16px;
+    margin-top: 28px; overflow-x: auto; padding: 20px 0;
+}
+.journey-step {
+    min-width: 140px; text-align: center;
+    padding: 18px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--surface-2);
+    transition: border-color 0.3s var(--ease);
+}
+.journey-step:hover { border-color: var(--border-hi); }
+.journey-step.is-highlight {
+    border-color: rgba(0,229,255,0.3);
+    background: rgba(0,229,255,0.03);
+}
+.journey-icon {
+    font-size: 1.8rem; color: var(--c-eng);
+    margin-bottom: 10px; display: block;
+}
+.journey-label {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); line-height: 1.5;
+}
+.journey-arrow {
+    font-size: 1.2rem; color: var(--dim);
+    flex-shrink: 0;
+}
+
+/* ── TEMPLATE WIREFRAME · módulos del formulario ── */
+.template-wireframe {
+    margin-top: 28px; padding: 24px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface-2);
+}
+.wireframe-title {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--c-eng); margin-bottom: 18px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.wireframe-modules {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+.wireframe-module {
+    padding: 14px; border: 1px solid var(--border);
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+}
+.wireframe-module-name {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--text); font-weight: 500; margin-bottom: 8px;
+}
+.wireframe-field {
+    font-family: var(--font-mono); font-size: 0.62rem;
+    color: var(--muted); padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.wireframe-field:last-child { border-bottom: none; }
+
+/* ── FLATTEN · 3 estados del dato ── */
+.flatten-grid {
+    display: grid; grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 12px; align-items: center; margin-top: 28px;
+}
+.flatten-card {
+    padding: 18px 20px; border: 1px solid var(--border);
+    border-radius: 10px; background: rgba(0,0,0,0.3);
+    font-family: var(--font-mono); font-size: 0.72rem;
+}
+.flatten-card.is-final {
+    border-color: rgba(0,229,255,0.2);
+    background: rgba(0,229,255,0.02);
+}
+.flatten-label {
+    font-size: 0.6rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 12px; display: block;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.flatten-card.is-final .flatten-label { color: var(--c-eng); }
+.flatten-code {
+    color: var(--muted); white-space: pre-wrap;
+    line-height: 1.7; overflow-x: auto;
+}
+.flatten-code .key { color: var(--c-eng); }
+.flatten-code .val { color: var(--c-biz); }
+.flatten-code .type { color: var(--c-viz); }
+.flatten-arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-eng); font-size: 1.3rem;
+}
+.flatten-arrow-label {
+    font-family: var(--font-mono); font-size: 0.55rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); writing-mode: horizontal-tb;
+    text-align: center; margin-top: 6px;
+}
+
+/* ── EVOLUTION TIMELINE ── */
+.evolution-timeline {
+    margin-top: 28px; padding: 24px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface-2);
+}
+.timeline-row {
+    display: grid; grid-template-columns: 100px 1fr;
+    gap: 20px; padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+}
+.timeline-row:last-child { border-bottom: none; }
+.timeline-date {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.12em; color: var(--c-eng);
+    font-weight: 500;
+}
+.timeline-event {
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--muted); line-height: 1.7;
+}
+.timeline-event b { color: var(--text); font-weight: 500; }
+.timeline-event code {
+    background: rgba(0,229,255,0.06); color: var(--c-eng);
+    padding: 1px 6px; border-radius: 3px; font-size: 0.7rem;
+}
+.timeline-event .ok  { color: var(--c-ok); }
+.timeline-event .fail { color: var(--c-fail); }
+
+/* ── RESPONSIVE additions for new components ── */
+@media (max-width: 768px) {
+    .journey-flow { flex-direction: column; }
+    .journey-arrow { transform: rotate(90deg); }
+    .flatten-grid { grid-template-columns: 1fr; }
+    .flatten-arrow { transform: rotate(90deg); padding: 8px 0; }
+    .wireframe-modules { grid-template-columns: 1fr; }
+}
+
+
+
+/* ── FORM MOCK · realistic medical template ── */
+.form-mock {
+    margin-top: 28px; border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    background: rgba(255,255,255,0.01);
+}
+.form-header {
+    background: linear-gradient(135deg, rgba(0,229,255,0.08) 0%, rgba(213,0,249,0.06) 100%);
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px;
+}
+.form-logo {
+    width: 40px; height: 40px; border-radius: 6px;
+    background: var(--c-eng); display: flex;
+    align-items: center; justify-content: center;
+    font-family: var(--font-disp); font-weight: 500;
+    color: var(--bg); font-size: 1.1rem;
+}
+.form-title-block h4 {
+    font-family: var(--font-disp); font-size: 1.1rem;
+    color: var(--text); margin: 0 0 4px 0; font-weight: 400;
+}
+.form-title-block p {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    color: var(--muted); letter-spacing: 0.08em;
+    text-transform: uppercase; margin: 0;
+}
+.form-body { padding: 0; }
+.form-section {
+    border-bottom: 1px solid var(--border);
+}
+.form-section:last-child { border-bottom: none; }
+.form-section-header {
+    padding: 14px 24px; background: rgba(0,229,255,0.03);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--c-eng); font-weight: 500;
+    letter-spacing: 0.06em;
+    display: flex; align-items: center; gap: 10px;
+}
+.form-section-header i { font-size: 0.9rem; opacity: 0.8; }
+.form-section-body { padding: 20px 24px; }
+.form-field {
+    margin-bottom: 18px; display: grid;
+    grid-template-columns: 200px 1fr; gap: 16px;
+    align-items: start;
+}
+.form-field:last-child { margin-bottom: 0; }
+.form-label {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted); padding-top: 8px;
+}
+.form-label.is-required::after {
+    content: "*"; color: var(--c-fail);
+    margin-left: 3px;
+}
+.form-input {
+    height: 36px; border: 1px solid var(--border);
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+    padding: 0 12px; font-family: var(--font-mono);
+    font-size: 0.7rem; color: var(--dim);
+    display: flex; align-items: center;
+}
+.form-input.is-dropdown::after {
+    content: "▼"; margin-left: auto;
+    font-size: 0.6rem; opacity: 0.5;
+}
+.form-textarea {
+    min-height: 60px; border: 1px solid var(--border);
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+    padding: 10px 12px; font-family: var(--font-mono);
+    font-size: 0.7rem; color: var(--dim);
+}
+.form-checkbox-group {
+    display: flex; flex-wrap: wrap; gap: 14px;
+}
+.form-checkbox {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--muted);
+}
+.form-checkbox-box {
+    width: 16px; height: 16px; border: 1px solid var(--border);
+    border-radius: 3px; background: rgba(0,0,0,0.2);
+}
+.form-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+/* ── SAS→BQ case study · custom components ──────────────── */
+.flow-diagram {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: 8px;
+    margin: 18px 0 32px; justify-content: center;
+}
+.flow-node {
+    flex: 1 1 130px; min-width: 120px; max-width: 180px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 12px; text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    transition: all 0.25s var(--ease);
+}
+.flow-node:hover { border-color: var(--border-hi); transform: translateY(-2px); }
+.flow-node.is-core { border-color: rgba(0,229,255,0.45); background: rgba(0,229,255,0.05); }
+.flow-num {
+    width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+    font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500;
+    background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border);
+}
+.flow-node.is-core .flow-num { background: var(--c-eng); color: #04141a; border-color: var(--c-eng); }
+.flow-label { font-size: 0.78rem; color: var(--text); line-height: 1.35; }
+.flow-label i { color: var(--muted); font-style: normal; font-size: 0.66rem; font-family: var(--font-mono); }
+.flow-sep { align-self: center; color: var(--dim); font-size: 1.1rem; }
+
+.layer-stack { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 8px; }
+.layer-row {
+    display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: center;
+    padding: 14px 18px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+}
+.layer-row.is-mid { background: rgba(0,229,255,0.04); border-color: rgba(0,229,255,0.18); }
+.layer-row.is-final { background: rgba(74,222,128,0.05); border-color: rgba(74,222,128,0.22); }
+.layer-name { font-family: var(--font-mono); font-size: 0.82rem; color: var(--c-eng); letter-spacing: 0.02em; }
+.layer-row.is-final .layer-name { color: var(--c-ok); }
+.layer-desc { font-size: 0.85rem; color: var(--muted); }
+
+.resolver-head, .immut-head, .dec-head, .fail-head {
+    font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--muted); margin: 28px 0 14px;
+}
+.resolver-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;
+}
+.resolver-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; transition: all 0.25s var(--ease);
+}
+.resolver-card:hover { border-color: var(--border-hi); }
+.resolver-title { display: block; font-family: var(--font-disp); font-size: 1.05rem; color: var(--text); margin-bottom: 8px; }
+.resolver-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.55; }
+.resolver-desc code, .layer-desc code { font-family: var(--font-mono); font-size: 0.78em; color: var(--c-eng); background: rgba(0,229,255,0.07); padding: 1px 5px; border-radius: 4px; }
+
+.parser-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px;
+    margin-top: 14px;
+}
+.parser-item {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 12px 16px; background: rgba(255,255,255,0.015);
+    border: 1px solid var(--border); border-radius: 9px;
+}
+.parser-k { font-size: 0.85rem; color: var(--text); font-weight: 500; }
+.parser-v { font-size: 0.78rem; color: var(--muted); }
+.parser-k code, .parser-v code { font-family: var(--font-mono); font-size: 0.85em; color: var(--c-viz); }
+
+.risk-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 8px; }
+.risk-row {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 18px; background: rgba(251,191,36,0.03);
+    border: 1px solid rgba(251,191,36,0.14); border-radius: 10px;
+}
+.risk-row i { color: var(--c-biz); font-size: 0.9rem; margin-top: 3px; flex: none; }
+.risk-row b { display: block; font-size: 0.9rem; color: var(--text); margin-bottom: 3px; font-weight: 600; }
+.risk-row span { display: block; font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+.risk-row code { font-family: var(--font-mono); font-size: 0.82em; color: var(--c-biz); }
+
+.trace-note, .honest-note, .form-note {
+    margin-top: 20px; padding: 16px 20px; font-size: 0.88rem; color: var(--muted);
+    line-height: 1.6; background: rgba(0,229,255,0.035);
+    border: 1px solid rgba(0,229,255,0.14); border-radius: 10px;
+}
+.trace-note strong, .honest-note strong { color: var(--c-eng); }
+.trace-note code, .honest-note code { font-family: var(--font-mono); font-size: 0.85em; color: var(--text); }
+
+.split-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0 8px; }
+.split-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 22px;
+}
+.split-card.is-master { background: rgba(0,229,255,0.05); border-color: rgba(0,229,255,0.25); }
+.split-tag {
+    display: block; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+.split-card.is-master .split-tag { color: var(--c-eng); }
+.split-text { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+.split-text code { font-family: var(--font-mono); font-size: 0.85em; color: var(--c-eng); }
+
+.todo-strip { margin-top: 22px; }
+.todo-strip-label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
+.todo-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.todo-pill {
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.04em;
+    color: var(--c-viz); background: rgba(213,0,249,0.07);
+    border: 1px solid rgba(213,0,249,0.22); border-radius: 100px; padding: 5px 12px;
+}
+
+.metric-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin: 16px 0 8px; }
+.metric-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px 20px; text-align: left;
+}
+.metric-val { display: block; font-family: var(--font-disp); font-size: 2.1rem; color: var(--c-eng); line-height: 1; margin-bottom: 8px; }
+.metric-label { display: block; font-size: 0.92rem; color: var(--text); font-weight: 500; margin-bottom: 6px; }
+.metric-desc { display: block; font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+@media (max-width: 720px) {
+    .split-cards { grid-template-columns: 1fr; }
+    .layer-row { grid-template-columns: 1fr; gap: 4px; }
+    .flow-sep { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="nav-bar">
+    <a href="index.html#systems" class="back-link" id="nav-back">
+        <i class="fas fa-arrow-left"></i> Back to Portfolio
+    </a>
+    <div class="lang-switch">
+        <button class="lang-opt is-active" data-lang="en" onclick="changeLang('en')" id="btn-en">EN</button>
+        <span class="lang-sep">/</span>
+        <button class="lang-opt" data-lang="es" onclick="changeLang('es')" id="btn-es">ES</button>
+    </div>
+    <div class="nav-name">Javier Moraga <b>Clínica Alemana · SAS → BQ</b></div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header>
+    <div class="hero-inner">
+        <span class="hero-badge" id="hero-badge">Case Study · Clínica Alemana · 2025–2027</span>
+        <h1 id="main-title">
+            Migrating 300 SAS Processes to BigQuery —<br><span class="text-gradient">Without Migrating Blind.</span>
+        </h1>
+        <p class="lead" id="main-desc">
+            ~300 SAS Enterprise Guide processes, one deadline. The hard part was never writing SQL —
+            it was the order. The visual order of steps in SAS <em>is not</em> the execution order.
+            A deterministic engine resolves it, flags the risks, and lets AI translate against a single
+            standard — so 300 migrations come out consistent, not 300 different ways.
+        </p>
+
+        <div class="hero-kpis">
+            <div class="hero-kpi">
+                <span class="hero-kpi-value">~300</span>
+                <span class="hero-kpi-label" id="kpi-label-1">SAS processes in scope</span>
+            </div>
+            <div class="hero-kpi">
+                <span class="hero-kpi-value"><b>16 / 16</b></span>
+                <span class="hero-kpi-label" id="kpi-label-2">Validated · executable order</span>
+            </div>
+            <div class="hero-kpi">
+                <span class="hero-kpi-value">5 → 48</span>
+                <span class="hero-kpi-label" id="kpi-label-3">Steps per process (range)</span>
+            </div>
+            <div class="hero-kpi">
+                <span class="hero-kpi-value"><b>1</b></span>
+                <span class="hero-kpi-label" id="kpi-label-4">Master prompt for all 300</span>
+            </div>
+        </div>
+
+        <p class="hero-meta">
+            <span id="meta-1">2025 — 2027</span> · <b data-en="Migration engine + governance" data-es="Motor de migración + gobierno">Migration engine + governance</b> ·
+            <span id="meta-2">Role:</span> <span data-en="Data Engineer &amp; Migration Architect" data-es="Data Engineer &amp; Arquitecto de Migración">Data Engineer &amp; Migration Architect</span>
+        </p>
+
+        <div class="stack-strip">
+            <span class="stack-pill is-primary">BigQuery</span>
+            <span class="stack-pill is-primary">Python</span>
+            <span class="stack-pill is-primary">SAS EG</span>
+            <span class="stack-pill is-primary">Topological sort</span>
+            <span class="stack-pill">Standard SQL</span>
+            <span class="stack-pill">Dual-run</span>
+            <span class="stack-pill">Generative AI</span>
+            <span class="stack-pill">Excel governance</span>
+            <span class="stack-pill">Jira</span>
+            <span class="stack-pill">Oracle passthrough</span>
+            <span class="stack-pill">Kahn's algorithm</span>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<!-- ═══════════ 01 · CONTEXT ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-1">01 · Context</span>
+        <h3 class="narrative-title" id="title-1">
+            Migrating 300 processes by hand isn't slow because of volume. It's slow because of hidden order.
+        </h3>
+        <div class="narrative-text" id="text-1">
+            <p>
+                Clínica Alemana's clinical-studies reporting ran on <strong>~300 SAS Enterprise Guide
+                processes</strong> (<code>.egp</code> files). Each one produces the gestion tables that
+                feed clinical studies — and each one is a graph of dozens of interdependent steps, with a
+                hard deadline to reach BigQuery by <strong>31 May 2027</strong>.
+            </p>
+            <p>
+                The trap is subtle. When you open an <code>.egp</code>, the steps appear in a
+                <em>visual</em> order. But that order <strong>is not</strong> the execution order.
+                In one real process, <strong>24 of 32 nodes were out of sequence</strong> — a step
+                reading a <code>WORK</code> table that a later step hadn't created yet. Translate in
+                visual order and the SQL fails, or worse, runs and produces silently wrong data.
+            </p>
+            <p>
+                With a 2–3 person team, doing this by hand 300 times wasn't an option. The system had
+                to resolve the order, flag what needs human judgement, and keep every translation
+                consistent — so the migration could scale without losing control.
+            </p>
+        </div>
+
+        <div class="compare-block">
+            <div class="compare-side">
+                <span class="compare-tag" id="before-tag">Without the engine</span>
+                <p class="compare-text" id="before-text">
+                    A developer opens each <code>.egp</code>, reverse-engineers the dependency graph by
+                    hand, guesses the order, and translates. The most expensive error —
+                    <em>migrating wrong in silence</em> — only surfaces weeks later in a dual-run
+                    mismatch nobody can explain.
+                </p>
+            </div>
+            <div class="compare-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="compare-side is-after">
+                <span class="compare-tag" id="after-tag">With the engine</span>
+                <p class="compare-text" id="after-text">
+                    The engine resolves the true execution order deterministically, marks every risky
+                    pattern <em>before</em> translation, and hands the AI a process-specific prompt plus
+                    a shared master standard. The developer validates — they don't reverse-engineer.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 02 · ARCHITECTURE ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-2">02 · Architecture</span>
+        <h3 class="narrative-title" id="title-2">
+            A six-step pipeline. Each step consumes what the previous one produced.
+        </h3>
+        <div class="narrative-text" id="text-2">
+            <p>
+                The system is a Python pipeline of six ordered steps, plus two GUI apps. The order
+                matters: extraction feeds lineage, lineage feeds governance, and the final step — the
+                core — reorders each process and prepares the AI material. Nothing in the chain depends
+                on the AI for correctness; the AI only translates what the deterministic code has
+                already resolved.
+            </p>
+        </div>
+
+        <div class="section-sub-label" id="arch-flow-label">Pipeline · .egp → migration contract</div>
+        <div class="flow-diagram">
+            <div class="flow-node"><span class="flow-num">1</span><span class="flow-label" id="flow-1">Process EGPs<br><i>stable IDs · folders</i></span></div>
+            <span class="flow-sep">→</span>
+            <div class="flow-node"><span class="flow-num">2</span><span class="flow-label" id="flow-2">Global lineage<br><i>dependencies · waves</i></span></div>
+            <span class="flow-sep">→</span>
+            <div class="flow-node"><span class="flow-num">3</span><span class="flow-label" id="flow-3">Governance<br><i>Excel · dictionary</i></span></div>
+            <span class="flow-sep">→</span>
+            <div class="flow-node"><span class="flow-num">4</span><span class="flow-label" id="flow-4">Gantt<br><i>sprint plan</i></span></div>
+            <span class="flow-sep">→</span>
+            <div class="flow-node"><span class="flow-num">5</span><span class="flow-label" id="flow-5">Panel<br><i>HTML monitor</i></span></div>
+            <span class="flow-sep">→</span>
+            <div class="flow-node is-core"><span class="flow-num">6</span><span class="flow-label" id="flow-6">Contracts<br><i>reorder · risks · AI</i></span></div>
+        </div>
+
+        <div class="section-sub-label" id="layers-label">Data layers · raw mirror → cns final</div>
+        <div class="layer-stack">
+            <div class="layer-row"><span class="layer-name">SAS (source)</span><span class="layer-desc" id="layer-1">Legacy .egp tables, fragmented across departments</span></div>
+            <div class="layer-row is-mid"><span class="layer-name">raw_*</span><span class="layer-desc" id="layer-2">Mirror in BigQuery — validation checkpoint for dual-run</span></div>
+            <div class="layer-row is-final"><span class="layer-name">cns_gestudio · _bq</span><span class="layer-desc" id="layer-3">Final curated table — the migrated output</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 03 · THE CORE ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-3">03 · The Core</span>
+        <h3 class="narrative-title" id="title-3">
+            Reordering isn't a heuristic. It's a topological sort over the real data dependencies.
+        </h3>
+        <div class="narrative-text" id="text-3">
+            <p>
+                The heart of the system reads every step's SQL, extracts which tables it
+                <em>creates</em> and which it <em>reads</em>, and builds a dependency graph. Then it
+                resolves the execution order with <strong>Kahn's algorithm</strong> (topological sort) —
+                deterministic, reproducible, and verifiable. The same process always yields the same
+                order, and the engine self-validates: no step may read a <code>WORK</code> table that
+                an earlier step hasn't created.
+            </p>
+            <p>
+                This is the deliberate boundary: <strong>the deterministic code decides the order; the
+                AI never does.</strong> The AI receives a correct sequence and only translates SQL.
+            </p>
+        </div>
+
+        <div class="resolver-head" id="resolver-head">Why determinism matters here</div>
+        <div class="resolver-grid">
+            <div class="resolver-card">
+                <span class="resolver-title" id="lvl-1-title">Reproducible</span>
+                <p class="resolver-desc" id="lvl-1-desc">The same <code>.egp</code> always produces the same execution order. No prompt drift, no run-to-run variance.</p>
+            </div>
+            <div class="resolver-card">
+                <span class="resolver-title" id="lvl-2-title">Self-validated</span>
+                <p class="resolver-desc" id="lvl-2-desc">After ordering, the engine checks that every <code>WORK</code> read resolves to an earlier create. If not, it flags a cycle for manual review.</p>
+            </div>
+            <div class="resolver-card">
+                <span class="resolver-title" id="lvl-3-title">Proven at scale</span>
+                <p class="resolver-desc" id="lvl-3-desc">Validated on 16 real processes, 5 to 48 nodes. The 48-node case has one table feeding 11 parallel branches — it resolved cleanly.</p>
+            </div>
+        </div>
+
+        <div class="section-sub-label" id="parser-label">Parser coverage · 6 real-world SAS patterns absorbed</div>
+        <div class="parser-grid">
+            <div class="parser-item"><span class="parser-k" id="parser-1-k">Literal SAS names</span><span class="parser-v" id="parser-1-v"><code>WORK."PRESUP1"n</code> → normalized</span></div>
+            <div class="parser-item"><span class="parser-k" id="parser-2-k">Implicit joins</span><span class="parser-v" id="parser-2-v"><code>FROM a t1, b t2</code> with aliases</span></div>
+            <div class="parser-item"><span class="parser-k" id="parser-3-k">Oracle passthrough</span><span class="parser-v" id="parser-3-v">excluded — not a data table</span></div>
+            <div class="parser-item"><span class="parser-k" id="parser-4-k">Missing code</span><span class="parser-v" id="parser-4-v">flagged, not silently skipped</span></div>
+            <div class="parser-item"><span class="parser-k" id="parser-5-k"><code>CREATE VIEW</code></span><span class="parser-v" id="parser-5-v">PROC TRANSPOSE temp tables</span></div>
+            <div class="parser-item"><span class="parser-k" id="parser-6-k">Multi-table DATA step</span><span class="parser-v" id="parser-6-v">OUT=, INSERT, APPEND, MERGE</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 04 · RISK DETECTION ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-4">04 · Risk Detection</span>
+        <h3 class="narrative-title" id="title-4">
+            Before translating, the engine warns about what will break in dual-run.
+        </h3>
+        <div class="narrative-text" id="text-4">
+            <p>
+                Every migration has points only a human should decide. Instead of letting the AI guess,
+                the engine scans each process and surfaces the risky patterns <em>up front</em>, in the
+                prompt and in the governance Excel. One real scan found a hardcoded Oracle password in
+                plain text — <code>password=aqgestudio</code> — and flagged it as a security risk that
+                must never reach BigQuery.
+            </p>
+        </div>
+
+        <div class="risk-list">
+            <div class="risk-row"><i class="fas fa-triangle-exclamation"></i><div><b id="risk-1-t">Oracle passthrough</b><span id="risk-1-d">Not data: <code>connect to oracle</code> blocks are grants/DDL. Resolved as IAM/permissions, not SQL.</span></div></div>
+            <div class="risk-row"><i class="fas fa-triangle-exclamation"></i><div><b id="risk-2-t">Plain-text credentials</b><span id="risk-2-d">Passwords detected in source. Flagged: never port to BigQuery — use Secret Manager.</span></div></div>
+            <div class="risk-row"><i class="fas fa-triangle-exclamation"></i><div><b id="risk-3-t">SAS date functions</b><span id="risk-3-d"><code>MDY</code>, <code>DATEPART</code>, <code>INTNX</code> — the #1 source of dual-run differences.</span></div></div>
+            <div class="risk-row"><i class="fas fa-triangle-exclamation"></i><div><b id="risk-4-t">SAS macros</b><span id="risk-4-d"><code>%MACRO</code> / <code>&amp;var</code> require redesign — BigQuery has no macros.</span></div></div>
+            <div class="risk-row"><i class="fas fa-triangle-exclamation"></i><div><b id="risk-5-t">Sequential logic</b><span id="risk-5-d"><code>RETAIN</code>, <code>FIRST.</code>, <code>LAST.</code> rewritten as window functions.</span></div></div>
+            <div class="risk-row"><i class="fas fa-triangle-exclamation"></i><div><b id="risk-6-t">Code not extracted</b><span id="risk-6-d">Nodes with no code in the <code>.egp</code> cache. The contract is incomplete — review the original.</span></div></div>
+        </div>
+
+        <div class="trace-note" id="trace-note">
+            <strong>End-to-end traceability:</strong> the same alert surfaces in four places — the contract
+            markdown (<code>🚫 SIN CÓDIGO</code> per step), the AI prompt ("special attention"), the global
+            index, and the governance Excel (a red-highlighted row with a comment). The alert lives wherever
+            a person might make a wrong decision.
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 05 · THE AI BOUNDARY ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-5">05 · The AI Boundary</span>
+        <h3 class="narrative-title" id="title-5">
+            Rules written once, consistent across 300 processes. The master prompt closes the gap.
+        </h3>
+        <div class="narrative-text" id="text-5">
+            <p>
+                A subtle failure mode appeared early: the AI made inconsistent architecture decisions.
+                One process used CTEs and <code>CREATE OR REPLACE</code>; another used temp tables and
+                <code>DELETE + INSERT</code> for the same shape of problem. Both work — but 300 processes
+                in 300 different styles is unmaintainable technical debt.
+            </p>
+            <p>
+                The fix separates the <strong>WHAT</strong> from the <strong>HOW</strong>. The
+                process prompt carries the what (this process's ordered steps, tables, risks). The
+                <strong>master prompt</strong> carries the how (fixed architecture, a SAS→BigQuery date
+                recipe, output format, dual-run checklist) — written once, attached to all 300.
+            </p>
+        </div>
+
+        <div class="split-cards">
+            <div class="split-card">
+                <span class="split-tag" id="what-tag">The WHAT · per process</span>
+                <p class="split-text" id="what-text">Ordered steps, source and target tables, detected risks. Unique to each <code>.egp</code>. This is what changes 300 times.</p>
+            </div>
+            <div class="split-card is-master">
+                <span class="split-tag" id="how-tag">The HOW · master prompt</span>
+                <p class="split-text" id="how-text">CTEs by default, temp only on 3+ reuse. A date/type recipe. A target-decision tree. <code>TODO[CATEGORY]</code> tags for human review. Written once.</p>
+            </div>
+        </div>
+
+        <div class="todo-strip">
+            <span class="todo-strip-label" id="todo-label">AI marks every uncertain decision with a category — so the reviewer filters fast:</span>
+            <div class="todo-pills">
+                <span class="todo-pill">TODO[DATE]</span>
+                <span class="todo-pill">TODO[TYPE]</span>
+                <span class="todo-pill">TODO[ORACLE]</span>
+                <span class="todo-pill">TODO[MACRO]</span>
+                <span class="todo-pill">TODO[WINDOW]</span>
+                <span class="todo-pill">TODO[BUSINESS]</span>
+                <span class="todo-pill">TODO[SCHEMA]</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ 06 · VALIDATION ═══════════ -->
+<section>
+    <div class="card">
+        <span class="section-label" id="label-6">06 · Validation</span>
+        <h3 class="narrative-title" id="title-6">
+            Nothing is "migrated" until SAS and BigQuery agree. Dual-run is the close.
+        </h3>
+        <div class="narrative-text" id="text-6">
+            <p>
+                Every candidate query closes with a dual-run checklist — row counts, sums of key
+                numeric columns, and a date sample compared between SAS and BigQuery. The raw layer is
+                kept precisely as this validation checkpoint. The maturity curve tells the story: across
+                six batches of real cases, the engine absorbed five parser patterns, then one, then
+                zero, then zero. It reached stability.
+            </p>
+        </div>
+
+        <div class="metric-row">
+            <div class="metric-card">
+                <span class="metric-val">16 / 16</span>
+                <span class="metric-label" id="metric-1-l">Executable order</span>
+                <span class="metric-desc" id="metric-1-d">Every validated process produces a runnable sequence — verified, no premature reads.</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-val">48</span>
+                <span class="metric-label" id="metric-2-l">Max nodes resolved</span>
+                <span class="metric-desc" id="metric-2-d">One table feeding 11 parallel branches. The hardest real case passed cleanly.</span>
+            </div>
+            <div class="metric-card">
+                <span class="metric-val">5→1→0</span>
+                <span class="metric-label" id="metric-3-l">Findings per batch</span>
+                <span class="metric-desc" id="metric-3-d">The discovery curve flattened — the parser now covers the dominant SAS profile.</span>
+            </div>
+        </div>
+
+        <div class="honest-note" id="honest-note">
+            <strong>The honest limit:</strong> the engine accelerates, it doesn't replace judgement.
+            Business logic, dual-run validation, and Tier-3 processes with <code>%MACRO</code> still
+            need a person. Recognising that precisely is what makes the system trustworthy — it tells
+            you when something needs a human, instead of failing in silence.
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- ═══════════ CLOSING ═══════════ -->
+<blockquote class="closing-take">
+    <span id="closing-quote">"The most expensive error in a mass migration is migrating wrong in silence. The whole system exists so that can't happen."</span>
+    <span class="closing-take-author" id="closing-author">— Working principle from this project</span>
+</blockquote>
+
+<div class="contact-section">
+    <h3 id="contact-title">Systems that fail safe, not silent.</h3>
+    <p class="contact-text" id="contact-text">
+        This case shows how I turn an unbounded, error-prone migration into a deterministic, traceable,
+        semi-automated system — resolving execution order with graph algorithms, surfacing risk before it
+        bites, and using AI where it adds leverage without ceding correctness.
+    </p>
+    <a href="index.html#contact" class="contact-btn" id="contact-btn-text">
+        <i class="fas fa-arrow-right"></i> Contact Javier
+    </a>
+</div>
+
+<script>
+// ── EN snapshots (capture original innerHTML before translating) ──
+var _enSnapshots = {};
+var _currentLang = 'en';
+document.addEventListener('DOMContentLoaded', function() {
+    Object.keys(i18n.es).forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) _enSnapshots[id] = el.innerHTML;
+    });
+});
+
+// ── i18n object (ES translations only) ──
+var i18n = {
+    en: {},
+    es: {
+        'nav-back': 'Volver al Portfolio',
+        'hero-badge': 'Caso de estudio · Clínica Alemana · 2025–2027',
+        'main-title': 'Migrar 300 Procesos SAS a BigQuery —<br><span class="text-gradient">Sin Migrar a Ciegas.</span>',
+        'main-desc': '~300 procesos SAS Enterprise Guide, un deadline. La parte difícil nunca fue escribir SQL — era el orden. El orden visual de los pasos en SAS <em>no es</em> el orden de ejecución. Un motor determinístico lo resuelve, marca los riesgos y deja que la IA traduzca contra un estándar único — para que 300 migraciones salgan consistentes, no de 300 formas distintas.',
+        'kpi-label-1': 'Procesos SAS en alcance',
+        'kpi-label-2': 'Validados · orden ejecutable',
+        'kpi-label-3': 'Pasos por proceso (rango)',
+        'kpi-label-4': 'Prompt maestro para los 300',
+        'meta-1': '2025 — 2027',
+        'meta-2': 'Rol:',
+
+        'label-1': '01 · Contexto',
+        'title-1': 'Migrar 300 procesos a mano no es lento por el volumen. Es lento por el orden oculto.',
+        'text-1': '<p>El reporting de estudios clínicos de Clínica Alemana corría sobre <strong>~300 procesos SAS Enterprise Guide</strong> (archivos <code>.egp</code>). Cada uno produce las tablas de gestión que alimentan los estudios clínicos — y cada uno es un grafo de decenas de pasos interdependientes, con un deadline firme para llegar a BigQuery antes del <strong>31 de mayo de 2027</strong>.</p><p>La trampa es sutil. Cuando abres un <code>.egp</code>, los pasos aparecen en un orden <em>visual</em>. Pero ese orden <strong>no es</strong> el orden de ejecución. En un proceso real, <strong>24 de 32 nodos estaban fuera de secuencia</strong> — un paso leyendo una tabla <code>WORK</code> que un paso posterior aún no había creado. Traduce en orden visual y el SQL falla, o peor, corre y produce datos silenciosamente incorrectos.</p><p>Con un equipo de 2–3 personas, hacer esto a mano 300 veces no era opción. El sistema tenía que resolver el orden, marcar lo que requiere criterio humano y mantener cada traducción consistente — para que la migración escalara sin perder control.</p>',
+        'before-tag': 'Sin el motor',
+        'before-text': 'Un desarrollador abre cada <code>.egp</code>, reconstruye el grafo de dependencias a mano, adivina el orden y traduce. El error más caro — <em>migrar mal en silencio</em> — solo aparece semanas después en una diferencia de dual-run que nadie sabe explicar.',
+        'after-tag': 'Con el motor',
+        'after-text': 'El motor resuelve el orden de ejecución real de forma determinística, marca cada patrón riesgoso <em>antes</em> de traducir, y entrega a la IA un prompt por proceso más un estándar maestro común. El desarrollador valida — no reconstruye.',
+
+        'label-2': '02 · Arquitectura',
+        'title-2': 'Un pipeline de seis pasos. Cada paso consume lo que produjo el anterior.',
+        'text-2': '<p>El sistema es un pipeline Python de seis pasos ordenados, más dos apps GUI. El orden importa: la extracción alimenta el linaje, el linaje alimenta el gobierno, y el paso final — el núcleo — reordena cada proceso y prepara el material para la IA. Nada en la cadena depende de la IA para ser correcto; la IA solo traduce lo que el código determinístico ya resolvió.</p>',
+        'arch-flow-label': 'Pipeline · .egp → contrato de migración',
+        'flow-1': 'Procesar EGPs<br><i>IDs estables · carpetas</i>',
+        'flow-2': 'Linaje global<br><i>dependencias · waves</i>',
+        'flow-3': 'Gobierno<br><i>Excel · diccionario</i>',
+        'flow-4': 'Gantt<br><i>plan de sprints</i>',
+        'flow-5': 'Panel<br><i>monitor HTML</i>',
+        'flow-6': 'Contratos<br><i>reorden · riesgos · IA</i>',
+        'layers-label': 'Capas de datos · espejo raw → cns final',
+        'layer-1': 'Tablas legadas .egp, fragmentadas por departamento',
+        'layer-2': 'Espejo en BigQuery — punto de validación para el dual-run',
+        'layer-3': 'Tabla final curada — la salida migrada',
+
+        'label-3': '03 · El núcleo',
+        'title-3': 'El reordenamiento no es una heurística. Es un orden topológico sobre las dependencias reales de datos.',
+        'text-3': '<p>El corazón del sistema lee el SQL de cada paso, extrae qué tablas <em>crea</em> y cuáles <em>lee</em>, y construye un grafo de dependencias. Luego resuelve el orden de ejecución con el <strong>algoritmo de Kahn</strong> (orden topológico) — determinístico, reproducible y verificable. El mismo proceso siempre produce el mismo orden, y el motor se auto-valida: ningún paso puede leer una tabla <code>WORK</code> que un paso anterior no haya creado.</p><p>Esta es la frontera deliberada: <strong>el código determinístico decide el orden; la IA nunca lo hace.</strong> La IA recibe una secuencia correcta y solo traduce SQL.</p>',
+        'resolver-head': 'Por qué importa el determinismo aquí',
+        'lvl-1-title': 'Reproducible',
+        'lvl-1-desc': 'El mismo <code>.egp</code> siempre produce el mismo orden de ejecución. Sin deriva del prompt, sin varianza entre corridas.',
+        'lvl-2-title': 'Auto-validado',
+        'lvl-2-desc': 'Tras ordenar, el motor verifica que cada lectura <code>WORK</code> resuelva a un create anterior. Si no, marca un ciclo para revisión manual.',
+        'lvl-3-title': 'Probado a escala',
+        'lvl-3-desc': 'Validado en 16 procesos reales, de 5 a 48 nodos. El caso de 48 nodos tiene una tabla que alimenta 11 ramas paralelas — resolvió limpio.',
+        'parser-label': 'Cobertura del parser · 6 patrones SAS reales absorbidos',
+        'parser-1-k': 'Nombres literales SAS',
+        'parser-1-v': '<code>WORK."PRESUP1"n</code> → normalizado',
+        'parser-2-k': 'Joins implícitos',
+        'parser-2-v': '<code>FROM a t1, b t2</code> con aliases',
+        'parser-3-k': 'Oracle passthrough',
+        'parser-3-v': 'excluido — no es tabla de datos',
+        'parser-4-k': 'Código faltante',
+        'parser-4-v': 'marcado, no omitido en silencio',
+        'parser-5-k': '<code>CREATE VIEW</code>',
+        'parser-5-v': 'tablas temp de PROC TRANSPOSE',
+        'parser-6-k': 'DATA step multi-tabla',
+        'parser-6-v': 'OUT=, INSERT, APPEND, MERGE',
+
+        'label-4': '04 · Detección de riesgos',
+        'title-4': 'Antes de traducir, el motor avisa qué romperá en el dual-run.',
+        'text-4': '<p>Toda migración tiene puntos que solo un humano debería decidir. En vez de dejar que la IA adivine, el motor escanea cada proceso y expone los patrones riesgosos <em>por adelantado</em>, en el prompt y en el Excel de gobierno. Un escaneo real encontró una contraseña Oracle hardcodeada en texto plano — <code>password=aqgestudio</code> — y la marcó como riesgo de seguridad que nunca debe llegar a BigQuery.</p>',
+        'risk-1-t': 'Oracle passthrough',
+        'risk-1-d': 'No son datos: los bloques <code>connect to oracle</code> son grants/DDL. Se resuelven como IAM/permisos, no SQL.',
+        'risk-2-t': 'Credenciales en texto plano',
+        'risk-2-d': 'Contraseñas detectadas en el origen. Marcadas: nunca trasladar a BigQuery — usar Secret Manager.',
+        'risk-3-t': 'Funciones de fecha SAS',
+        'risk-3-d': '<code>MDY</code>, <code>DATEPART</code>, <code>INTNX</code> — la fuente #1 de diferencias en dual-run.',
+        'risk-4-t': 'Macros SAS',
+        'risk-4-d': '<code>%MACRO</code> / <code>&amp;var</code> requieren rediseño — BigQuery no tiene macros.',
+        'risk-5-t': 'Lógica secuencial',
+        'risk-5-d': '<code>RETAIN</code>, <code>FIRST.</code>, <code>LAST.</code> se reescriben como funciones de ventana.',
+        'risk-6-t': 'Código no extraído',
+        'risk-6-d': 'Nodos sin código en el caché del <code>.egp</code>. El contrato está incompleto — revisar el original.',
+        'trace-note': '<strong>Trazabilidad de punta a punta:</strong> la misma alerta aparece en cuatro lugares — el contrato markdown (<code>🚫 SIN CÓDIGO</code> por paso), el prompt de la IA ("atención especial"), el índice global, y el Excel de gobierno (fila resaltada en rojo con comentario). La alerta vive donde alguien podría tomar una decisión equivocada.',
+
+        'label-5': '05 · La frontera con la IA',
+        'title-5': 'Reglas escritas una vez, consistentes en los 300 procesos. El prompt maestro cierra la brecha.',
+        'text-5': '<p>Un modo de fallo sutil apareció temprano: la IA tomaba decisiones de arquitectura inconsistentes. Un proceso usaba CTEs y <code>CREATE OR REPLACE</code>; otro usaba tablas temp y <code>DELETE + INSERT</code> para el mismo tipo de problema. Ambos funcionan — pero 300 procesos en 300 estilos distintos son deuda técnica inmantenible.</p><p>La solución separa el <strong>QUÉ</strong> del <strong>CÓMO</strong>. El prompt del proceso trae el qué (los pasos ordenados, tablas, riesgos de ese proceso). El <strong>prompt maestro</strong> trae el cómo (arquitectura fija, un recetario de fechas SAS→BigQuery, formato de salida, checklist de dual-run) — escrito una vez, adjunto a los 300.</p>',
+        'what-tag': 'El QUÉ · por proceso',
+        'what-text': 'Pasos ordenados, tablas fuente y destino, riesgos detectados. Único de cada <code>.egp</code>. Esto es lo que cambia 300 veces.',
+        'how-tag': 'El CÓMO · prompt maestro',
+        'how-text': 'CTEs por defecto, temp solo si se reúsa 3+ veces. Un recetario de fechas/tipos. Un árbol de decisión de destino. Etiquetas <code>TODO[CATEGORÍA]</code> para revisión humana. Escrito una vez.',
+        'todo-label': 'La IA marca cada decisión incierta con una categoría — para que el revisor filtre rápido:',
+
+        'label-6': '06 · Validación',
+        'title-6': 'Nada está "migrado" hasta que SAS y BigQuery coinciden. El dual-run es el cierre.',
+        'text-6': '<p>Cada query candidata cierra con un checklist de dual-run — conteos de filas, sumas de columnas numéricas clave, y un muestreo de fechas comparado entre SAS y BigQuery. La capa raw se conserva precisamente como este punto de validación. La curva de madurez cuenta la historia: en seis lotes de casos reales, el motor absorbió cinco patrones del parser, luego uno, luego cero, luego cero. Alcanzó la estabilidad.</p>',
+        'metric-1-l': 'Orden ejecutable',
+        'metric-1-d': 'Cada proceso validado produce una secuencia corrible — verificada, sin lecturas prematuras.',
+        'metric-2-l': 'Máx. nodos resueltos',
+        'metric-2-d': 'Una tabla alimentando 11 ramas paralelas. El caso real más difícil pasó limpio.',
+        'metric-3-l': 'Hallazgos por lote',
+        'metric-3-d': 'La curva de descubrimiento se aplanó — el parser ya cubre el perfil SAS dominante.',
+        'honest-note': '<strong>El límite honesto:</strong> el motor acelera, no reemplaza el criterio. La lógica de negocio, la validación dual-run y los procesos Tier-3 con <code>%MACRO</code> aún necesitan a una persona. Reconocerlo con precisión es lo que hace confiable al sistema — te avisa cuando algo necesita un humano, en vez de fallar en silencio.',
+
+        'closing-quote': '"El error más caro en una migración masiva es migrar mal en silencio. Todo el sistema existe para que eso no pueda pasar."',
+        'closing-author': '— Principio de trabajo de este proyecto',
+        'contact-title': 'Sistemas que fallan seguro, no en silencio.',
+        'contact-text': 'Este caso muestra cómo convierto una migración sin límites y propensa a errores en un sistema determinístico, trazable y semiautomático — resolviendo el orden de ejecución con algoritmos de grafos, exponiendo el riesgo antes de que muerda, y usando IA donde aporta apalancamiento sin ceder la corrección.',
+        'contact-btn-text': '<i class="fas fa-arrow-right"></i> Contactar a Javier'
+    }
+};
+
+function changeLang(lang) {
+    if (lang === _currentLang) return;
+    _currentLang = lang;
+    document.querySelectorAll('.lang-opt').forEach(function(b) {
+        b.classList.toggle('is-active', b.dataset.lang === lang);
+    });
+    document.documentElement.lang = lang;
+    document.title = (lang === 'es')
+        ? 'Clínica Alemana · Sistema de Migración SAS → BigQuery — Javier Moraga'
+        : 'Clínica Alemana · SAS → BigQuery Migration System — Javier Moraga';
+
+    if (lang === 'en') {
+        Object.keys(_enSnapshots).forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.innerHTML = _enSnapshots[id];
+        });
+        document.querySelectorAll('[data-en]').forEach(function(el) {
+            el.innerHTML = el.dataset.en;
+        });
+    } else {
+        Object.entries(i18n.es).forEach(function(entry) {
+            var el = document.getElementById(entry[0]);
+            if (el) el.innerHTML = entry[1];
+        });
+        document.querySelectorAll('[data-es]').forEach(function(el) {
+            el.innerHTML = el.dataset.es;
+        });
+    }
+}
+</script>
+
+</body>
+</html>

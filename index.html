@@ -3,8 +3,14 @@
 <head>
 <!--
 ═══════════════════════════════════════════════════════════════════════
-  Javier Moraga · Senior Data Engineer · Portfolio v25
-  Last updated: 2026-05-05
+  Javier Moraga · Senior Data Engineer · Portfolio v26
+  Last updated: 2026-06-15
+  
+  v26 Changelog:
+  • Added case study: Clínica Alemana SAS → BigQuery Migration System
+    → new proj-card (is-featured, data-co="clinica") in project grid
+    → i18n keys projtag-9, projname-9, projctx-9, projkpil-24..27 (EN+ES)
+    → links to clinica-alemana-sas-bigquery-case-study.html
   
   v25 Changelog (CSS layout fixes for ES translation):
   • Fixed Remote Delivery section: stack-block was floating outside
@@ -80,7 +86,8 @@
   │  │   ├── WOM Heavy Users (featured, 2-col)          ~1359      │
   │  │   ├── Entel Notifications                        ~1392      │
   │  │   ├── Entel Collections                          ~1416      │
-  │  │   └── Clínica Alemana SAS→BQ                     ~1439      │
+  │  │   ├── Clínica Alemana Templates                  ~1439      │
+  │  │   └── Clínica Alemana SAS→BQ Migration           ~1465      │
   │  │       ↑ TO ADD A NEW PROJECT:                               │
   │  │         Copy any proj-card block, paste inside proj-grid,   │
   │  │         edit: data-co, proj-tag, proj-name, proj-context,   │
@@ -137,6 +144,8 @@
     wom-retention-case-study-v2.html
     entel-notifications-case-study.html
     entel-fibra-case-study.html
+    clinica-alemana-templates-case-study.html
+    clinica-alemana-sas-bigquery-case-study.html
 
 -->
 <meta charset="UTF-8">
@@ -1781,6 +1790,39 @@ body::after {
         </div>
       </a>
 
+      <!-- Clínica Alemana · SAS → BigQuery Migration System -->
+      <a href="clinica-alemana-sas-bigquery-case-study.html" class="proj-card is-featured reveal" data-co="clinica">
+        <div class="proj-header">
+          <div>
+            <span data-i18n="projtag-9" class="proj-tag">Healthcare · Migration Engine</span>
+            <h3 data-i18n="projname-9" class="proj-name">SAS → BigQuery Migration System — Clínica Alemana</h3>
+            <p data-i18n="projctx-9" class="proj-context">A deterministic engine for migrating ~300 SAS Enterprise Guide processes to BigQuery. Resolves true execution order via topological sort (the visual order isn't the run order), flags risky patterns before translation, and drives AI with one master prompt so 300 migrations stay consistent.</p>
+          </div>
+          <span class="proj-arrow">↗</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-stack">
+            <span class="proj-stack-tag core">BigQuery</span>
+            <span class="proj-stack-tag core">Topological sort</span>
+            <span class="proj-stack-tag">Python</span>
+            <span class="proj-stack-tag">Generative AI</span>
+            <span class="proj-stack-tag">Dual-run</span>
+          </div>
+          <div class="proj-flow">
+            .egp parser <span class="flow-arrow">→</span> Dependency graph
+            <span class="flow-arrow">→</span> Kahn topological sort <span style="color:var(--muted);font-size:0.6rem">(self-validated)</span>
+            <span class="flow-arrow">→</span> Risk detection + master prompt
+            <span class="flow-arrow">→</span> AI translation → dual-run
+          </div>
+        </div>
+        <div class="proj-kpis">
+          <div class="proj-kpi"><span class="proj-kpi-val">~300</span><span data-i18n="projkpil-24" class="proj-kpi-label">Processes in scope</span></div>
+          <div class="proj-kpi"><span class="proj-kpi-val">16/16</span><span data-i18n="projkpil-25" class="proj-kpi-label">Executable order</span></div>
+          <div class="proj-kpi"><span class="proj-kpi-val">48</span><span data-i18n="projkpil-26" class="proj-kpi-label">Max nodes resolved</span></div>
+          <div class="proj-kpi"><span class="proj-kpi-val">1</span><span data-i18n="projkpil-27" class="proj-kpi-label">Master prompt · 300 procs</span></div>
+        </div>
+      </a>
+
       <!-- WOM Reconciliation -->
       <a href="wom-reconciliation-case-study.html" class="proj-card reveal" data-co="wom">
         <div class="proj-header">
@@ -2392,6 +2434,13 @@ var translations = {
     'projkpil-21': 'Time per new template',
     'projkpil-22': 'Time-to-insight cut',
     'projkpil-23': 'Code deploys per change',
+    'projtag-9':   'Healthcare · Migration Engine',
+    'projname-9':  'SAS → BigQuery Migration System — Clínica Alemana',
+    'projctx-9':   'A deterministic engine for migrating ~300 SAS Enterprise Guide processes to BigQuery. Resolves true execution order via topological sort (the visual order isn\'t the run order), flags risky patterns before translation, and drives AI with one master prompt so 300 migrations stay consistent.',
+    'projkpil-24': 'Processes in scope',
+    'projkpil-25': 'Executable order',
+    'projkpil-26': 'Max nodes resolved',
+    'projkpil-27': 'Master prompt · 300 procs',
     'projkpil-2': 'Countries',
     'projkpil-3': 'Charts',
     'projkpil-4': 'NPS improvement',
@@ -2593,6 +2642,13 @@ var translations = {
     'projkpil-21': 'Tiempo por plantilla nueva',
     'projkpil-22': 'Reducción time-to-insight',
     'projkpil-23': 'Deploys de código por cambio',
+    'projtag-9':   'Salud · Motor de Migración',
+    'projname-9':  'Sistema de Migración SAS → BigQuery — Clínica Alemana',
+    'projctx-9':   'Motor determinístico para migrar ~300 procesos SAS Enterprise Guide a BigQuery. Resuelve el orden de ejecución real con orden topológico (el orden visual no es el de ejecución), marca patrones riesgosos antes de traducir, y guía a la IA con un prompt maestro para que las 300 migraciones salgan consistentes.',
+    'projkpil-24': 'Procesos en alcance',
+    'projkpil-25': 'Orden ejecutable',
+    'projkpil-26': 'Máx. nodos resueltos',
+    'projkpil-27': 'Prompt maestro · 300 procs',
     'projkpil-2': 'Países',
     'projkpil-3': 'Charts',
     'projkpil-4': 'Mejora NPS',
