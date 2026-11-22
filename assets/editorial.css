@@ -1,0 +1,11 @@
+.ed-tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:16px 0 4px}.ed-tags li{font:11px/1.7 var(--font-mono);color:#c4d4d1;border:1px solid #344541;border-radius:3px;padding:3px 8px}.ed-case{max-width:1124px}.ed-overview{max-width:850px;padding-bottom:32px;border-bottom:1px solid #34413f}.ed-overview h1{font:400 clamp(34px,4vw,58px)/1.12 var(--font-disp);color:#ededeb;margin:10px 0 22px}.ed-overview>p{font:14px/1.8 var(--font-mono);color:#c2c7cc;margin:14px 0}.ed-overview strong{color:#ededeb;font-weight:500}.ed-overview .ed-problem{color:#dce7e4}.ed-case li{font:14px/1.85 var(--font-mono);color:#c2c7cc;margin:10px 0}.ed-case ol{padding-left:24px}.ed-case .ed-tags li{margin:0;font-size:11px}.ed-table{overflow-x:auto;margin:24px 0;max-width:100%;border:1px solid #34413f}.ed-table table{width:100%;border-collapse:collapse;text-align:left;font:12px/1.7 var(--font-mono)}.ed-table th,.ed-table td{border-bottom:1px solid #34413f;padding:12px;vertical-align:top}.ed-table th{color:#dce7e4;font-weight:500}.ed-table td{color:#bfcac7}.ed-note{border-left:2px solid #00bfae;padding-left:16px;font-size:12px!important;color:#b7c8c4!important}.ed-tags[aria-label]{text-transform:none}.lang-opt[aria-current]{color:var(--accent)}
+.lang-switch{display:inline-flex;align-items:center;gap:0}.lang-switch>span{line-height:1}
+@media(max-width:760px){.ed-overview h1{font-size:34px;line-height:1.12;margin:6px 0 18px}.ed-overview>p{font-size:12px;line-height:1.75;margin:12px 0}.ed-overview .ed-tags li{font-size:10px}.ed-case .ed-overview{padding-bottom:22px}.ed-table table{min-width:370px}body[data-page="case"] .poc-return{padding-top:105px;padding-bottom:4px;gap:0 20px}body[data-page="case"] main+.poc-return{padding-top:20px}.ed-case section h2{font-size:27px!important}}
+
+/* 2026-11-22: language toggle restored to H2 look (active pill + glow, 44px targets, centred text) */
+.lang-switch{gap:4px;padding:3px 5px}
+.lang-opt{display:inline-flex;align-items:center;justify-content:center;line-height:1;min-width:44px;padding:10px 8px;font-size:.8rem;letter-spacing:.18em}
+@media (max-width:768px){.lang-switch{padding:2px 4px}.lang-opt{min-width:44px;padding:10px 8px}}
+
+/* Navigation anchored to the top edge */
+#nav{top:0}

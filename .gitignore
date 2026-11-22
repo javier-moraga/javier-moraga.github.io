@@ -1,0 +1,16 @@
+# Internal evidence/specifications remain local. Ignore does not erase tracked files/history.
+/career/
+/apoyo_cv/
+/CONTINUIDAD_PROYECTO.md
+/ROADMAP_UPDATE_REPORT.md
+/tarea_sitio.md
+
+# Local secrets, caches and editor state; no private data belongs in public assets.
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+Thumbs.db
